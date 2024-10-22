@@ -25,7 +25,7 @@ export default class CgxQuick20AdapterTest extends AbstractSpruceTest {
         assert.isEqual(FakeBleScanner.numCallsToConstructor, 1)
     }
 
-    private static CgxQuick20Adapter() {
-        return CgxQuick20Adapter.Create()
+    private static async CgxQuick20Adapter() {
+        return await CgxQuick20Adapter.Create()
     }
 }

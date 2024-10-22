@@ -5,7 +5,7 @@ export default class CgxQuick20Adapter implements BiosensorAdapter {
 
     protected constructor() {}
 
-    public static Create() {
+    public static async Create() {
         BleScannerImpl.Create()
         return new (this.Class ?? this)()
     }
