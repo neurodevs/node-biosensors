@@ -1,12 +1,14 @@
-import { BleScannerImpl } from '@neurodevs/node-ble-scanner'
+import { BleScannerImpl, SimplePeripheral } from '@neurodevs/node-ble-scanner'
 
 export default class CgxQuick20Adapter implements BiosensorAdapter {
     public static Class?: BiosensorAdapterConstructor
 
     protected constructor() {}
 
-    public static async Create() {
-        BleScannerImpl.Create()
+    public static async Create(peripheral?: SimplePeripheral) {
+        if (!peripheral) {
+            BleScannerImpl.Create()
+        }
         return new (this.Class ?? this)()
     }
 }
