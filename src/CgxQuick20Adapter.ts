@@ -1,20 +1,36 @@
-import { BleScannerImpl, SimplePeripheral } from '@neurodevs/node-ble-scanner'
-import { ChannelFormat, LslOutletImpl } from '@neurodevs/node-lsl'
+import { BleAdapter } from '@neurodevs/node-ble-adapter'
+import { BleScannerImpl } from '@neurodevs/node-ble-scanner'
+import { ChannelFormat, LslOutlet, LslOutletImpl } from '@neurodevs/node-lsl'
 
 export default class CgxQuick20Adapter implements BiosensorAdapter {
     public static Class?: BiosensorAdapterConstructor
 
-    protected constructor() {}
+    protected ble: BleAdapter
+    protected outlet: LslOutlet
 
-    public static async Create(peripheral?: SimplePeripheral) {
-        if (!peripheral) {
-            BleScannerImpl.Create()
-        }
-
-        await this.LslOutlet()
-
-        return new (this.Class ?? this)()
+    protected constructor(ble: BleAdapter, outlet: LslOutlet) {
+        this.ble = ble
+        this.outlet = outlet
     }
+
+    public static async CreateFromBle(ble: BleAdapter) {
+        const outlet = await this.LslOutlet()
+        return new (this.Class ?? this)(ble, outlet)
+    }
+
+    public static async CreateFromUuid(uuid: string) {
+        const scanner = this.BleScanner()
+        const ble = await scanner.scanForUuid(uuid)
+        return this.CreateFromBle(ble)
+    }
+
+    public static async Create() {
+        const scanner = this.BleScanner()
+        const peripheral = await scanner.scanForName(this.adapterName)
+        return this.CreateFromBle(peripheral)
+    }
+
+    private static readonly adapterName = 'CGX Quick-Series Headset'
 
     private static readonly channelNames: string[] = []
 
@@ -31,8 +47,12 @@ export default class CgxQuick20Adapter implements BiosensorAdapter {
         maxBuffered: 360,
     }
 
+    private static BleScanner() {
+        return BleScannerImpl.Create()
+    }
+
     private static async LslOutlet() {
-        await LslOutletImpl.Create(this.eegConstructorOptions)
+        return await LslOutletImpl.Create(this.eegConstructorOptions)
     }
 }
 

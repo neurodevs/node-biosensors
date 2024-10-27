@@ -1,4 +1,8 @@
-import AbstractSpruceTest, { test, assert } from '@sprucelabs/test-utils'
+import AbstractSpruceTest, {
+    test,
+    assert,
+    generateId,
+} from '@sprucelabs/test-utils'
 import {
     BleScannerImpl,
     FakeBleScanner,
@@ -19,7 +23,7 @@ export default class CgxQuick20AdapterTest extends AbstractSpruceTest {
         LslOutletImpl.Class = FakeLslOutlet
         FakeLslOutlet.resetTestDouble()
 
-        this.instance = this.CgxQuick20Adapter()
+        this.instance = this.CreateFromPeripheral()
     }
 
     @test()
@@ -28,14 +32,21 @@ export default class CgxQuick20AdapterTest extends AbstractSpruceTest {
     }
 
     @test()
-    protected static async createsBleScanner() {
+    protected static async createFromPeripheralDoesNotCreateBleScanner() {
+        assert.isEqual(FakeBleScanner.numCallsToConstructor, 0)
+    }
+
+    @test()
+    protected static async createFromUuidCreatesBleScanner() {
+        await this.CreateFromUuid(generateId())
+
         assert.isEqual(FakeBleScanner.numCallsToConstructor, 1)
     }
 
     @test()
     protected static async doesNotCreateBleScannerIfPeripheralPassed() {
         FakeBleScanner.resetTestDouble()
-        await this.CgxQuick20Adapter({} as SimplePeripheral)
+        await this.CreateFromPeripheral({} as SimplePeripheral)
 
         assert.isEqual(FakeBleScanner.numCallsToConstructor, 0)
     }
@@ -46,6 +57,19 @@ export default class CgxQuick20AdapterTest extends AbstractSpruceTest {
             FakeLslOutlet.constructorOptions,
             this.eegConstructorOptions
         )
+    }
+
+    @test()
+    protected static async createsCgxAdapterFromUuid() {
+        const uuid = generateId()
+        const instance = await this.CreateFromUuid(uuid)
+        assert.isTruthy(instance)
+    }
+
+    @test()
+    protected static async createCgxAdapterFromCreateWithNoArgs() {
+        const instance = await this.Create()
+        assert.isTruthy(instance)
     }
 
     private static readonly channelNames: string[] = []
@@ -63,7 +87,17 @@ export default class CgxQuick20AdapterTest extends AbstractSpruceTest {
         maxBuffered: 360,
     }
 
-    private static async CgxQuick20Adapter(peripheral?: SimplePeripheral) {
-        return await CgxQuick20Adapter.Create(peripheral)
+    private static async CreateFromPeripheral(peripheral?: SimplePeripheral) {
+        return await CgxQuick20Adapter.CreateFromBle(
+            peripheral ?? ({} as SimplePeripheral)
+        )
+    }
+
+    private static async CreateFromUuid(uuid: string) {
+        return await CgxQuick20Adapter.CreateFromUuid(uuid)
+    }
+
+    private static async Create() {
+        return await CgxQuick20Adapter.Create()
     }
 }

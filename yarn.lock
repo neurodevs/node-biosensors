@@ -660,12 +660,21 @@
     semver "^7.3.5"
     tar "^6.1.11"
 
-"@neurodevs/node-ble-scanner@^0.6.0":
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/@neurodevs/node-ble-scanner/-/node-ble-scanner-0.6.0.tgz#c524ccb8712187f6efee47c908f90e77d48335e2"
-  integrity sha512-jKKEb6/L8me5KjWVXJfJ0jvKC/qGVx7f4I9BvDubz6YwUMhY+k+UxrGRBOMUQh/KJLI7nSv2MVVu4EskuyKEnw==
+"@neurodevs/node-ble-adapter@^0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@neurodevs/node-ble-adapter/-/node-ble-adapter-0.2.1.tgz#c81d5c24add5b835d9a8e744172437224d92e351"
+  integrity sha512-r2pzywsDB8HkOEb5pvXLob2AtfzHjVtx1d/BMuXNo6Sq8eJQ6j0s3E1Bo4sespuwjGtXBVkE8imIzqQcWvyf3Q==
   dependencies:
     "@abandonware/noble" "^1.9.2-25"
+    "@sprucelabs/schema" "^30.0.483"
+
+"@neurodevs/node-ble-scanner@^0.7.1":
+  version "0.7.1"
+  resolved "https://registry.yarnpkg.com/@neurodevs/node-ble-scanner/-/node-ble-scanner-0.7.1.tgz#26d8fe591315f837555c04f4b53b799622ac1c7a"
+  integrity sha512-Qq7eloRg3/vab+ijRM6suZPos+6Auwvcb48q1drUCDHPjJOm2A6vw3QtFSbPu/Kc4e5yJLMqIjwlz9HcjDyeKg==
+  dependencies:
+    "@abandonware/noble" "^1.9.2-25"
+    "@neurodevs/node-ble-adapter" "^0.2.1"
     "@sprucelabs/error" "^6.0.483"
     "@sprucelabs/schema" "^30.0.491"
     "@sprucelabs/spruce-core-schemas" "^40.1.477"
@@ -785,7 +794,7 @@
     tsconfig-paths "^4.2.0"
     yargs "^17.7.2"
 
-"@sprucelabs/schema@^30.0.476", "@sprucelabs/schema@^30.0.491", "@sprucelabs/schema@^30.0.531":
+"@sprucelabs/schema@^30.0.476", "@sprucelabs/schema@^30.0.483", "@sprucelabs/schema@^30.0.491", "@sprucelabs/schema@^30.0.531":
   version "30.0.531"
   resolved "https://registry.yarnpkg.com/@sprucelabs/schema/-/schema-30.0.531.tgz#4c8e2ac308a51587bdefee0f3ccafb5101723bd3"
   integrity sha512-2G0L+wsDvdHrAC0dhK2t5j6u/fsjismGCadAel7OSJBo17G8l7Xga0aHVGx56j+9GhfRg+0wKGvstmdocab8oQ==
