@@ -1,5 +1,5 @@
 import { BleAdapter } from '@neurodevs/node-ble-adapter'
-import { BleScannerImpl } from '@neurodevs/node-ble-scanner'
+import { BleScanner, BleScannerImpl } from '@neurodevs/node-ble-scanner'
 import { ChannelFormat, LslOutlet, LslOutletImpl } from '@neurodevs/node-lsl'
 
 export default class CgxQuick20Adapter implements BiosensorAdapter {
@@ -48,7 +48,7 @@ export default class CgxQuick20Adapter implements BiosensorAdapter {
     }
 
     private static BleScanner() {
-        return BleScannerImpl.Create()
+        return BleScannerImpl.Create() as BleScanner
     }
 
     private static async LslOutlet() {
