@@ -32,7 +32,7 @@ export default class CgxQuick20Adapter implements BiosensorAdapter {
 
     private static readonly adapterName = 'CGX Quick-Series Headset'
 
-    private static readonly channelNames: string[] = []
+    private static readonly channelNames: string[] = ['tmp']
 
     private static readonly eegConstructorOptions = {
         name: 'CGX Quick20 EEG Stream',

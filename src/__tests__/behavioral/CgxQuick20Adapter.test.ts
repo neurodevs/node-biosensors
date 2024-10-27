@@ -72,7 +72,7 @@ export default class CgxQuick20AdapterTest extends AbstractSpruceTest {
         assert.isTruthy(instance)
     }
 
-    private static readonly channelNames: string[] = []
+    private static readonly channelNames: string[] = ['tmp']
 
     private static readonly eegConstructorOptions = {
         name: 'CGX Quick20 EEG Stream',
