@@ -26,8 +26,8 @@ export default class CgxQuick20Adapter implements BiosensorAdapter {
 
     public static async Create() {
         const scanner = this.BleScanner()
-        const peripheral = await scanner.scanForName(this.adapterName)
-        return this.CreateFromBle(peripheral)
+        const ble = await scanner.scanForName(this.adapterName)
+        return this.CreateFromBle(ble)
     }
 
     private static readonly adapterName = 'CGX Quick-Series Headset'
