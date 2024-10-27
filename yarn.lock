@@ -668,10 +668,10 @@
     "@abandonware/noble" "^1.9.2-25"
     "@sprucelabs/schema" "^30.0.483"
 
-"@neurodevs/node-ble-scanner@^0.7.3":
-  version "0.7.3"
-  resolved "https://registry.yarnpkg.com/@neurodevs/node-ble-scanner/-/node-ble-scanner-0.7.3.tgz#bb5908dd9bef6a9cca97e20ab47e35f7e3f4984c"
-  integrity sha512-chrSWixK9NtLQ6BNRAu2gxtlC7+Epn02/FMkrS6wi9jl1Tub9IKlEpcJ7BtO4ldQXPLE0cfLmKxAU/qy99KjYQ==
+"@neurodevs/node-ble-scanner@^0.7.4":
+  version "0.7.4"
+  resolved "https://registry.yarnpkg.com/@neurodevs/node-ble-scanner/-/node-ble-scanner-0.7.4.tgz#7dfd6328820d083719680baf19f81d0dbb3b3d7f"
+  integrity sha512-Baj4obhDTUXruav1W7AglS6mGDZUBEpjYowWe+HNt/afr0JDaXhntvi0t17dctGI0SqkhiZloxmOw9sPKgZKlQ==
   dependencies:
     "@abandonware/noble" "^1.9.2-25"
     "@neurodevs/node-ble-adapter" "^0.2.1"
