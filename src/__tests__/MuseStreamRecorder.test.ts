@@ -1,5 +1,5 @@
 import AbstractSpruceTest, { test, assert } from '@sprucelabs/test-utils'
-import MuseStreamRecorder from '../components/MuseStreamRecorder'
+import MuseStreamRecorder from '../components/Muse/MuseStreamRecorder'
 import { StreamRecorder } from '../types'
 
 export default class MuseStreamRecorderTest extends AbstractSpruceTest {

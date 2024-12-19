@@ -1,4 +1,4 @@
-import { StreamRecorder, StreamRecorderConstructor } from '../types'
+import { StreamRecorder, StreamRecorderConstructor } from '../../types'
 
 export default class MuseStreamRecorder implements StreamRecorder {
     public static Class?: StreamRecorderConstructor

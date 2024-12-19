@@ -1,4 +1,4 @@
-import { StreamGenerator, StreamGeneratorConstructor } from '../types'
+import { StreamGenerator, StreamGeneratorConstructor } from '../../types'
 
 export default class MuseStreamGenerator implements StreamGenerator {
     public static Class?: StreamGeneratorConstructor
