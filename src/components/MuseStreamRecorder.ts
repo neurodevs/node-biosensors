@@ -1,6 +1,6 @@
 import { StreamRecorder, StreamRecorderConstructor } from '../types'
 
-export default class MuseRecorder implements StreamRecorder {
+export default class MuseStreamRecorder implements StreamRecorder {
     public static Class?: StreamRecorderConstructor
 
     protected constructor() {}
