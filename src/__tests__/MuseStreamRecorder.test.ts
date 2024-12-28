@@ -65,7 +65,7 @@ export default class MuseStreamRecorderTest extends AbstractSpruceTest {
         this.stop()
 
         assert.isEqual(
-            FakeXdfRecorder.numCallsToStart,
+            FakeXdfRecorder.numCallsToStop,
             1,
             'Should call start on XdfStreamRecorder!'
         )
