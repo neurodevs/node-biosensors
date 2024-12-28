@@ -687,7 +687,7 @@
     "@sprucelabs/spruce-core-schemas" "^40.1.477"
     "@sprucelabs/spruce-skill-utils" "^31.0.550"
 
-"@neurodevs/node-lsl@^10.1.1":
+"@neurodevs/node-lsl@^10.1.1", "@neurodevs/node-lsl@^10.2.1":
   version "10.2.2"
   resolved "https://registry.yarnpkg.com/@neurodevs/node-lsl/-/node-lsl-10.2.2.tgz#ee04c174373235c9b65fb5569e88c548dba45d45"
   integrity sha512-+AO7qcL8gh4C4AI9Pcp0Xpna5ao+4/0g7I6B0VTOMHUdB0TbudSSOIro0ROVd3riNWEFDaNJg6n44fURWSU3UQ==
@@ -700,6 +700,29 @@
     node-gyp "^10.2.0"
     ref-array-napi "^1.2.2"
     ref-napi "^3.0.3"
+
+"@neurodevs/node-mangled-names@^0.0.8":
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/@neurodevs/node-mangled-names/-/node-mangled-names-0.0.8.tgz#9f207275ba7faf7a827e73eb6f6b449c7d6f3e60"
+  integrity sha512-jIfDwncHA1Q7QfjVzI77KjAbe+Zp5uPGHkAbjVrIo9PI2hid8R5vlrl4wAFhS/8CFKwCbZgKYXrYkBJ13fHtrw==
+  dependencies:
+    "@sprucelabs/error" "^6.0.541"
+    "@sprucelabs/schema" "^30.0.560"
+    "@sprucelabs/spruce-core-schemas" "^40.1.547"
+    "@sprucelabs/spruce-skill-utils" "^31.0.624"
+
+"@neurodevs/node-xdf@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@neurodevs/node-xdf/-/node-xdf-1.1.0.tgz#cc9b52e7791e039558353ae18bbe85eddbec7cd7"
+  integrity sha512-ZRPq190QA1yyPuVfOvu1tJfZIl6oM8byS3ZrLNgmb4AK+jzFGedTZMROgORlzjUlphgmT7pqUAVHhLkUD9UE/Q==
+  dependencies:
+    "@neurodevs/node-lsl" "^10.2.1"
+    "@neurodevs/node-mangled-names" "^0.0.8"
+    "@sprucelabs/error" "^6.0.541"
+    "@sprucelabs/schema" "^30.0.560"
+    "@sprucelabs/spruce-core-schemas" "^40.1.547"
+    "@sprucelabs/spruce-skill-utils" "^31.0.624"
+    ffi-rs "^1.0.98"
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
