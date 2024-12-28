@@ -1,6 +1,12 @@
-import AbstractSpruceTest, { test, assert } from '@sprucelabs/test-utils'
-import MuseStreamRecorder from '../components/Muse/MuseStreamRecorder'
-import { StreamRecorder } from '../types'
+import AbstractSpruceTest, {
+    test,
+    assert,
+    errorAssert,
+    generateId,
+} from '@sprucelabs/test-utils'
+import MuseStreamRecorder, {
+    StreamRecorder,
+} from '../components/Muse/MuseStreamRecorder'
 
 export default class MuseStreamRecorderTest extends AbstractSpruceTest {
     private static instance: StreamRecorder
@@ -15,7 +21,19 @@ export default class MuseStreamRecorderTest extends AbstractSpruceTest {
         assert.isTruthy(this.instance, 'Should create an instance!')
     }
 
+    @test()
+    protected static async throwsWithMissingRequiredOptions() {
+        // @ts-ignore
+        const err = assert.doesThrow(() => MuseStreamRecorder.Create())
+
+        errorAssert.assertError(err, 'MISSING_PARAMETERS', {
+            parameters: ['xdfSavePath'],
+        })
+    }
+
+    private static readonly xdfSavePath = generateId()
+
     private static MuseStreamRecorder() {
-        return MuseStreamRecorder.Create()
+        return MuseStreamRecorder.Create(this.xdfSavePath)
     }
 }

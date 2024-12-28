@@ -9,7 +9,9 @@ import {
     SimplePeripheral,
 } from '@neurodevs/node-ble-scanner'
 import { LslOutletImpl, FakeLslOutlet } from '@neurodevs/node-lsl'
-import CgxQuick20Adapter, { BiosensorAdapter } from '../components/Cgx/CgxQuick20Adapter'
+import CgxQuick20Adapter, {
+    BiosensorAdapter,
+} from '../components/Cgx/CgxQuick20Adapter'
 
 export default class CgxQuick20AdapterTest extends AbstractSpruceTest {
     private static instance: BiosensorAdapter
