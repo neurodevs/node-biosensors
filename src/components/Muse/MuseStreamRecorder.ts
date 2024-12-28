@@ -40,4 +40,6 @@ export interface StreamRecorder {
     stop(): void
 }
 
-export type StreamRecorderConstructor = new () => StreamRecorder
+export type StreamRecorderConstructor = new (
+    xdfRecorder: XdfRecorder
+) => StreamRecorder
