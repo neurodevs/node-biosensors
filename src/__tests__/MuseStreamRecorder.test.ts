@@ -48,6 +48,21 @@ export default class MuseStreamRecorderTest extends AbstractSpruceTest {
         )
     }
 
+    @test()
+    protected static async callingStartCallsStartOnXdfRecorder() {
+        this.start()
+
+        assert.isEqual(
+            FakeXdfRecorder.numCallsToStart,
+            1,
+            'Should call start on XdfStreamRecorder!'
+        )
+    }
+
+    private static start() {
+        this.instance.start()
+    }
+
     private static readonly xdfSavePath = generateId()
 
     private static readonly streamQueries = [
