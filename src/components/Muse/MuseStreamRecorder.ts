@@ -19,10 +19,7 @@ export default class MuseStreamRecorder implements StreamRecorder {
     ]
 
     private static XdfStreamRecorder(xdfSavePath: string) {
-        XdfStreamRecorder.Create(
-            xdfSavePath,
-            MuseStreamRecorder.museStreamQueries
-        )
+        XdfStreamRecorder.Create(xdfSavePath, this.museStreamQueries)
     }
 }
 
