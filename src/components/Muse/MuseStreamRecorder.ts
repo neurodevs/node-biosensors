@@ -17,11 +17,11 @@ export default class MuseStreamRecorder implements StreamRecorder {
     }
 
     public start() {
-        this.startXdfRecorder()
+        this.xdfRecorder.start()
     }
 
-    private startXdfRecorder() {
-        this.xdfRecorder.start()
+    public stop() {
+        this.xdfRecorder.stop()
     }
 
     private static readonly museStreamQueries = [
@@ -37,6 +37,7 @@ export default class MuseStreamRecorder implements StreamRecorder {
 
 export interface StreamRecorder {
     start(): void
+    stop(): void
 }
 
 export type StreamRecorderConstructor = new () => StreamRecorder
