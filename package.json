@@ -67,7 +67,7 @@
     "@neurodevs/node-ble-adapter": "^0.2.1",
     "@neurodevs/node-ble-scanner": "^0.7.4",
     "@neurodevs/node-lsl": "^10.1.1",
-    "@neurodevs/node-xdf": "^1.1.0",
+    "@neurodevs/node-xdf": "^1.1.1",
     "@sprucelabs/schema": "^31.0.3"
   }
 }

@@ -6,8 +6,8 @@ export default class MuseStreamRecorder implements StreamRecorder {
 
     private xdfRecorder: XdfRecorder
 
-    protected constructor(recorder: XdfRecorder) {
-        this.xdfRecorder = recorder
+    protected constructor(xdfRecorder: XdfRecorder) {
+        this.xdfRecorder = xdfRecorder
     }
 
     public static Create(xdfSavePath: string) {
