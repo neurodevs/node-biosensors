@@ -35,10 +35,8 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
 
     @test()
     protected static async callsScanForNameOnBleDeviceScanner() {
-        const a = FakeBleScanner.callsToScanForName
-        debugger
         assert.isEqualDeep(
-            a,
+            this.callsToScanForName,
             ['MuseS'],
             'Should call scanForName on BleDeviceScanner!\n'
         )
@@ -49,9 +47,17 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
         FakeBleScanner.resetTestDouble()
 
         FakeBleScanner.fakedPeripherals = [
-            new FakePeripheral({ localName: 'MuseS' }),
+            new FakePeripheral({
+                localName: this.museBleLocalName,
+            }),
         ]
     }
+
+    private static get callsToScanForName() {
+        return FakeBleScanner.callsToScanForName
+    }
+
+    private static readonly museBleLocalName = 'MuseS'
 
     private static async MuseStreamGenerator() {
         return await MuseStreamGenerator.Create()
