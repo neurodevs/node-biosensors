@@ -1,5 +1,3 @@
-import { StreamGenerator, StreamGeneratorConstructor } from '../../types'
-
 export default class MuseStreamGenerator implements StreamGenerator {
     public static Class?: StreamGeneratorConstructor
 
@@ -9,3 +7,7 @@ export default class MuseStreamGenerator implements StreamGenerator {
         return new (this.Class ?? this)()
     }
 }
+
+export interface StreamGenerator {}
+
+export type StreamGeneratorConstructor = new () => StreamGenerator
