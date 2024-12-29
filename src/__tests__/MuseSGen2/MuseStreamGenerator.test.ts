@@ -1,6 +1,6 @@
 import AbstractSpruceTest, { test, assert } from '@sprucelabs/test-utils'
-import MuseStreamGenerator from '../components/Muse/MuseStreamGenerator'
-import { StreamGenerator } from '../types'
+import MuseStreamGenerator from '../../components/MuseSGen2/MuseStreamGenerator'
+import { StreamGenerator } from '../../types'
 
 export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
     private static instance: StreamGenerator

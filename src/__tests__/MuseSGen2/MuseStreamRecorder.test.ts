@@ -7,7 +7,7 @@ import AbstractSpruceTest, {
 import { FakeXdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 import MuseStreamRecorder, {
     StreamRecorder,
-} from '../components/Muse/MuseStreamRecorder'
+} from '../../components/MuseSGen2/MuseStreamRecorder'
 
 export default class MuseStreamRecorderTest extends AbstractSpruceTest {
     private static instance: StreamRecorder

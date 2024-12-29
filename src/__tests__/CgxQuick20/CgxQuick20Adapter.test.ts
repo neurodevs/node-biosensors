@@ -11,7 +11,7 @@ import {
 import { LslOutletImpl, FakeLslOutlet } from '@neurodevs/node-lsl'
 import CgxQuick20Adapter, {
     BiosensorAdapter,
-} from '../components/Cgx/CgxQuick20Adapter'
+} from '../../components/CgxQuick20/CgxQuick20Adapter'
 
 export default class CgxQuick20AdapterTest extends AbstractSpruceTest {
     private static instance: BiosensorAdapter
