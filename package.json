@@ -64,6 +64,7 @@
     }
   },
   "dependencies": {
+    "@neurodevs/node-ble": "^0.1.0",
     "@neurodevs/node-ble-adapter": "^0.2.1",
     "@neurodevs/node-ble-scanner": "^0.7.4",
     "@neurodevs/node-lsl": "^10.1.1",
