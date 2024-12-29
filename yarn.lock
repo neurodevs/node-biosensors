@@ -687,10 +687,10 @@
     "@sprucelabs/spruce-core-schemas" "^40.1.477"
     "@sprucelabs/spruce-skill-utils" "^31.0.550"
 
-"@neurodevs/node-ble@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@neurodevs/node-ble/-/node-ble-0.1.0.tgz#aae63add5c3ae722e457b6a8221d12f14b25df75"
-  integrity sha512-xTs0uQXQoDj0t2b/+sTdzsIAvhAjvJaB3Il2mjSl4Mg412urZHe3MurpTVfBEatM2zT6X6K1jiD5anwjWVofyQ==
+"@neurodevs/node-ble@^0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@neurodevs/node-ble/-/node-ble-0.1.1.tgz#e5b16b0bc010e499556ab34e7e4cd985bc6c4a3e"
+  integrity sha512-wPAPk9RLdyImPs7Hahf0Esf8wzZASiLMRuWsd3JrE2Shs4BYUefDE52NTS1AM6m1ax+8076cfMibO9ol4aCleA==
   dependencies:
     "@abandonware/noble" "^1.9.2-25"
     "@sprucelabs/error" "^6.0.520"

@@ -1,5 +1,9 @@
 import AbstractSpruceTest, { test, assert } from '@sprucelabs/test-utils'
-import { BleDeviceScanner, FakeBleScanner } from '@neurodevs/node-ble'
+import {
+    BleDeviceScanner,
+    FakeBleScanner,
+    FakePeripheral,
+} from '@neurodevs/node-ble'
 import MuseStreamGenerator, {
     StreamGenerator,
 } from '../../components/MuseSGen2/MuseStreamGenerator'
@@ -12,7 +16,7 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
 
         this.setFakeBleScanner()
 
-        this.instance = this.MuseStreamGenerator()
+        this.instance = await this.MuseStreamGenerator()
     }
 
     @test()
@@ -29,12 +33,27 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
         )
     }
 
+    @test()
+    protected static async callsScanForNameOnBleDeviceScanner() {
+        const a = FakeBleScanner.callsToScanForName
+        debugger
+        assert.isEqualDeep(
+            a,
+            ['MuseS'],
+            'Should call scanForName on BleDeviceScanner!\n'
+        )
+    }
+
     private static setFakeBleScanner() {
         BleDeviceScanner.Class = FakeBleScanner
         FakeBleScanner.resetTestDouble()
+
+        FakeBleScanner.fakedPeripherals = [
+            new FakePeripheral({ localName: 'MuseS' }),
+        ]
     }
 
-    private static MuseStreamGenerator() {
-        return MuseStreamGenerator.Create()
+    private static async MuseStreamGenerator() {
+        return await MuseStreamGenerator.Create()
     }
 }

@@ -5,8 +5,10 @@ export default class MuseStreamGenerator implements StreamGenerator {
 
     protected constructor() {}
 
-    public static Create() {
-        this.BleDeviceScanner()
+    public static async Create() {
+        const bleScanner = this.BleDeviceScanner()
+        await bleScanner.scanForName('MuseS')
+
         return new (this.Class ?? this)()
     }
 
