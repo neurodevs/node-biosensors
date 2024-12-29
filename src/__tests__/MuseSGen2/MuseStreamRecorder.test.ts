@@ -79,6 +79,15 @@ export default class MuseStreamRecorderTest extends AbstractSpruceTest {
         this.instance.stop()
     }
 
+    private static setFakeXdfRecorder() {
+        XdfStreamRecorder.Class = FakeXdfRecorder
+        FakeXdfRecorder.resetTestDouble()
+    }
+
+    private static get xdfRecorderOptions() {
+        return FakeXdfRecorder.callsToConstructor[0]
+    }
+
     private static readonly xdfSavePath = generateId()
 
     private static readonly streamQueries = [
@@ -86,15 +95,6 @@ export default class MuseStreamRecorderTest extends AbstractSpruceTest {
         'type="PPG"',
         'type="Markers"',
     ]
-
-    private static get xdfRecorderOptions() {
-        return FakeXdfRecorder.callsToConstructor[0]
-    }
-
-    private static setFakeXdfRecorder() {
-        XdfStreamRecorder.Class = FakeXdfRecorder
-        FakeXdfRecorder.resetTestDouble()
-    }
 
     private static MuseStreamRecorder() {
         return MuseStreamRecorder.Create(this.xdfSavePath)
