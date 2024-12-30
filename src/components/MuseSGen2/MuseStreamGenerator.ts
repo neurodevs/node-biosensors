@@ -1,15 +1,32 @@
-import { BleDeviceScanner, SimpleCharacteristic } from '@neurodevs/node-ble'
+import {
+    BleDeviceScanner,
+    SimpleCharacteristic,
+    BleAdapter,
+} from '@neurodevs/node-ble'
 import { MUSE_CHARACTERISTIC_UUIDS } from './museCharacteristicUuids'
 
 export default class MuseStreamGenerator implements StreamGenerator {
     public static Class?: StreamGeneratorConstructor
 
-    protected constructor() {}
+    private adapter: BleAdapter
+
+    protected constructor(adapter: BleAdapter) {
+        this.adapter = adapter
+    }
 
     public static async Create() {
         const scanner = this.BleDeviceScanner()
-        await scanner.scanForName(this.museLocalName, this.scanOptions)
-        return new (this.Class ?? this)()
+
+        const adapter = await scanner.scanForName(
+            this.museLocalName,
+            this.scanOptions
+        )
+
+        return new (this.Class ?? this)(adapter)
+    }
+
+    public async start() {
+        this.adapter.getCharacteristic(MUSE_CHARACTERISTIC_UUIDS.CONTROL)
     }
 
     private static readonly museLocalName = 'MuseS'
@@ -82,6 +99,8 @@ export default class MuseStreamGenerator implements StreamGenerator {
     }
 }
 
-export interface StreamGenerator {}
+export interface StreamGenerator {
+    start(): Promise<void>
+}
 
 export type StreamGeneratorConstructor = new () => StreamGenerator

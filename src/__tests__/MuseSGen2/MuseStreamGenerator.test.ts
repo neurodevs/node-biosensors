@@ -1,6 +1,8 @@
 import AbstractSpruceTest, { test, assert } from '@sprucelabs/test-utils'
 import {
+    BleDeviceAdapter,
     BleDeviceScanner,
+    FakeBleAdapter,
     FakeBleScanner,
     FakePeripheral,
 } from '@neurodevs/node-ble'
@@ -15,6 +17,7 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
     protected static async beforeEach() {
         await super.beforeEach()
 
+        this.setFakeBleAdapter()
         this.setFakeBleScanner()
 
         this.instance = await this.MuseStreamGenerator()
@@ -53,6 +56,25 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
         )
     }
 
+    @test()
+    protected static async startCallsGetCharacteristicForControlUuid() {
+        await this.start()
+
+        assert.isEqual(
+            this.callsToGetCharacteristic[0],
+            MUSE_CHARACTERISTIC_UUIDS.CONTROL
+        )
+    }
+
+    private static async start() {
+        await this.instance.start()
+    }
+
+    private static setFakeBleAdapter() {
+        BleDeviceAdapter.Class = FakeBleAdapter
+        FakeBleAdapter.resetTestDouble()
+    }
+
     private static setFakeBleScanner() {
         BleDeviceScanner.Class = FakeBleScanner
         FakeBleScanner.resetTestDouble()
@@ -66,6 +88,10 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
 
     private static get callsToScanForName() {
         return FakeBleScanner.callsToScanForName
+    }
+
+    private static get callsToGetCharacteristic() {
+        return FakeBleAdapter.callsToGetCharacteristic
     }
 
     private static readonly museBleLocalName = 'MuseS'
