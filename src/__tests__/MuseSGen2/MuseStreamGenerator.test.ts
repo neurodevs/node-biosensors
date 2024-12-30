@@ -40,7 +40,7 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
             {
                 name: 'MuseS',
                 options: {
-                    characteristicCallbacks: {},
+                    characteristicCallbacks: this.museCharacteristicCallbacks,
                 },
             },
             'Should call scanForName on BleDeviceScanner!\n'
@@ -63,6 +63,8 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
     }
 
     private static readonly museBleLocalName = 'MuseS'
+
+    private static readonly museCharacteristicCallbacks = {}
 
     private static async MuseStreamGenerator() {
         return await MuseStreamGenerator.Create()
