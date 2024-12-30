@@ -13,7 +13,7 @@ export default class MuseStreamGenerator implements StreamGenerator {
 
     private static readonly museLocalName = 'MuseS'
 
-    private static readonly museCharacteristicNames = [
+    private static readonly eegCharacteristicNames = [
         'EEG_TP9',
         'EEG_AF7',
         'EEG_AF8',
@@ -28,7 +28,11 @@ export default class MuseStreamGenerator implements StreamGenerator {
     }
 
     private static generateCallbacks() {
-        return this.museCharacteristicNames.reduce(
+        return { ...this.generateEegCallbacks() }
+    }
+
+    private static generateEegCallbacks() {
+        return this.eegCharacteristicNames.reduce(
             (acc, name) => ({
                 ...acc,
                 [name]: this.handleEegChannelData.bind(this),
