@@ -4,6 +4,7 @@ import {
     BleDeviceScanner,
     FakeBleAdapter,
     FakeBleScanner,
+    FakeCharacteristic,
     FakePeripheral,
 } from '@neurodevs/node-ble'
 import { MUSE_CHARACTERISTIC_UUIDS } from '../../components/MuseSGen2/museCharacteristicUuids'
@@ -58,6 +59,8 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
 
     @test()
     protected static async startCallsGetCharacteristicForControlUuid() {
+        this.createFakeCharacteristic()
+
         await this.start()
 
         assert.isEqual(
@@ -66,8 +69,45 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
         )
     }
 
+    @test()
+    protected static async startWritesControlCommands() {
+        const fake = this.createFakeCharacteristic()
+
+        await this.start()
+
+        assert.isEqualDeep(
+            fake.callsToWriteAsync,
+            [
+                this.generateExpectedCall('h'),
+                this.generateExpectedCall('p50'),
+                this.generateExpectedCall('s'),
+                this.generateExpectedCall('d'),
+            ],
+            'Should write to the control characteristic!'
+        )
+    }
+
+    private static createFakeCharacteristic() {
+        const fake = new FakeCharacteristic({
+            uuid: this.controlUuid,
+        })
+
+        FakeBleAdapter.fakeCharacteristics = { [this.controlUuid]: fake as any }
+        return fake
+    }
+
+    private static generateExpectedCall(cmd: string) {
+        return { data: this.encodeCommand(cmd), withoutResponse: true }
+    }
+
     private static async start() {
         await this.instance.start()
+    }
+
+    private static encodeCommand(cmd: string) {
+        const encoded = new TextEncoder().encode(`X${cmd}\n`)
+        encoded[0] = encoded.length - 1
+        return Buffer.from(encoded)
     }
 
     private static setFakeBleAdapter() {
@@ -106,6 +146,8 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
         'PPG_INFRARED',
         'PPG_RED',
     ]
+
+    private static readonly controlUuid = MUSE_CHARACTERISTIC_UUIDS.CONTROL
 
     private static readonly museCharacteristicCallbacks =
         this.generateCallbacks()

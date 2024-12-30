@@ -26,7 +26,25 @@ export default class MuseStreamGenerator implements StreamGenerator {
     }
 
     public async start() {
-        this.adapter.getCharacteristic(MUSE_CHARACTERISTIC_UUIDS.CONTROL)
+        await this.writeControlCommands()
+    }
+
+    private async writeControlCommands() {
+        const characteristic = this.adapter.getCharacteristic(this.controlUuid)!
+
+        for (const cmd of ['h', 'p50', 's', 'd']) {
+            await characteristic.writeAsync(this.encodeCommand(cmd), true)
+        }
+    }
+
+    private get controlUuid() {
+        return MUSE_CHARACTERISTIC_UUIDS.CONTROL
+    }
+
+    private encodeCommand(cmd: string) {
+        const encoded = new TextEncoder().encode(`X${cmd}\n`)
+        encoded[0] = encoded.length - 1
+        return Buffer.from(encoded)
     }
 
     private static readonly museLocalName = 'MuseS'
