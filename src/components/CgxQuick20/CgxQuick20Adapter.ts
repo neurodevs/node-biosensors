@@ -1,6 +1,5 @@
-import { BleAdapter } from '@neurodevs/node-ble-adapter'
-import { BleScanner, BleScannerImpl } from '@neurodevs/node-ble-scanner'
-import { ChannelFormat, LslOutlet, LslOutletImpl } from '@neurodevs/node-lsl'
+import { BleAdapter, BleDeviceScanner, BleScanner } from '@neurodevs/node-ble'
+import { ChannelFormat, LslOutlet, LslStreamOutlet } from '@neurodevs/node-lsl'
 
 export default class CgxQuick20Adapter implements BiosensorAdapter {
     public static Class?: BiosensorAdapterConstructor
@@ -13,20 +12,20 @@ export default class CgxQuick20Adapter implements BiosensorAdapter {
         this.outlet = outlet
     }
 
+    public static async Create() {
+        const scanner = this.BleDeviceScanner()
+        const ble = await scanner.scanForName(this.adapterName)
+        return this.CreateFromBle(ble)
+    }
+
     public static async CreateFromBle(ble: BleAdapter) {
         const outlet = await this.LslOutlet()
         return new (this.Class ?? this)(ble, outlet)
     }
 
     public static async CreateFromUuid(uuid: string) {
-        const scanner = this.BleScanner()
+        const scanner = this.BleDeviceScanner()
         const ble = await scanner.scanForUuid(uuid)
-        return this.CreateFromBle(ble)
-    }
-
-    public static async Create() {
-        const scanner = this.BleScanner()
-        const ble = await scanner.scanForName(this.adapterName)
         return this.CreateFromBle(ble)
     }
 
@@ -47,12 +46,12 @@ export default class CgxQuick20Adapter implements BiosensorAdapter {
         maxBuffered: 360,
     }
 
-    private static BleScanner() {
-        return BleScannerImpl.Create() as BleScanner
+    private static BleDeviceScanner() {
+        return BleDeviceScanner.Create() as BleScanner
     }
 
     private static async LslOutlet() {
-        return await LslOutletImpl.Create(this.eegConstructorOptions)
+        return await LslStreamOutlet.Create(this.eegConstructorOptions)
     }
 }
 

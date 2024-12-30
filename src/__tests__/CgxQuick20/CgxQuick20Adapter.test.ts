@@ -4,12 +4,15 @@ import AbstractSpruceTest, {
     generateId,
 } from '@sprucelabs/test-utils'
 import {
-    BleScannerImpl,
+    BleAdapter,
+    BleDeviceAdapter,
+    BleDeviceScanner,
+    FakeBleAdapter,
     FakeBleScanner,
-    SimplePeripheral,
-} from '@neurodevs/node-ble-scanner'
+    FakePeripheral,
+} from '@neurodevs/node-ble'
 import {
-    LslOutletImpl,
+    LslStreamOutlet,
     FakeLslOutlet,
     LslStreamInfo,
     FakeStreamInfo,
@@ -24,15 +27,19 @@ export default class CgxQuick20AdapterTest extends AbstractSpruceTest {
     protected static async beforeEach() {
         await super.beforeEach()
 
-        BleScannerImpl.Class = FakeBleScanner
+        BleDeviceAdapter.Class = FakeBleAdapter
+        FakeBleAdapter.resetTestDouble()
+
+        BleDeviceScanner.Class = FakeBleScanner
         FakeBleScanner.resetTestDouble()
 
-        LslOutletImpl.Class = FakeLslOutlet
+        LslStreamOutlet.Class = FakeLslOutlet
         FakeLslOutlet.resetTestDouble()
 
         LslStreamInfo.Class = FakeStreamInfo
+        FakeStreamInfo.resetTestDouble()
 
-        this.instance = this.CreateFromPeripheral()
+        this.instance = this.CreateFromBle()
     }
 
     @test()
@@ -42,28 +49,28 @@ export default class CgxQuick20AdapterTest extends AbstractSpruceTest {
 
     @test()
     protected static async createFromPeripheralDoesNotCreateBleScanner() {
-        assert.isEqual(FakeBleScanner.numCallsToConstructor, 0)
+        assert.isEqual(FakeBleScanner.callsToConstructor.length, 0)
     }
 
     @test()
     protected static async createFromUuidCreatesBleScanner() {
         await this.CreateFromUuid(generateId())
 
-        assert.isEqual(FakeBleScanner.numCallsToConstructor, 1)
+        assert.isEqual(FakeBleScanner.callsToConstructor.length, 1)
     }
 
     @test()
     protected static async doesNotCreateBleScannerIfPeripheralPassed() {
         FakeBleScanner.resetTestDouble()
-        await this.CreateFromPeripheral({} as SimplePeripheral)
+        await this.CreateFromBle(this.FakeBleAdapter())
 
-        assert.isEqual(FakeBleScanner.numCallsToConstructor, 0)
+        assert.isEqual(FakeBleScanner.callsToConstructor.length, 0)
     }
 
     @test()
     protected static async createsLslOutletForEegStream() {
         assert.isEqualDeep(
-            FakeLslOutlet.constructorOptions,
+            FakeLslOutlet.callsToConstructor[0].options,
             this.eegConstructorOptions
         )
     }
@@ -77,7 +84,10 @@ export default class CgxQuick20AdapterTest extends AbstractSpruceTest {
 
     @test()
     protected static async createCgxAdapterFromCreateWithNoArgs() {
-        const instance = await this.Create()
+        FakeBleScanner.fakedPeripherals = [
+            new FakePeripheral({ localName: 'CGX Quick-Series Headset' }),
+        ]
+        const instance = await this.CgxQuick20Adapter()
         assert.isTruthy(instance)
     }
 
@@ -96,17 +106,22 @@ export default class CgxQuick20AdapterTest extends AbstractSpruceTest {
         maxBuffered: 360,
     }
 
-    private static async CreateFromPeripheral(peripheral?: SimplePeripheral) {
+    private static async CreateFromBle(adapter?: BleAdapter) {
         return await CgxQuick20Adapter.CreateFromBle(
-            peripheral ?? ({} as SimplePeripheral)
+            adapter ?? this.FakeBleAdapter()
         )
     }
 
     private static async CreateFromUuid(uuid: string) {
+        FakeBleScanner.setFakedPeripherals([uuid])
         return await CgxQuick20Adapter.CreateFromUuid(uuid)
     }
 
-    private static async Create() {
+    private static FakeBleAdapter() {
+        return new FakeBleAdapter()
+    }
+
+    private static async CgxQuick20Adapter() {
         return await CgxQuick20Adapter.Create()
     }
 }
