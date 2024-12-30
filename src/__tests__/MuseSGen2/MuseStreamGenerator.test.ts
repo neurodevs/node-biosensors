@@ -35,15 +35,20 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
 
     @test()
     protected static async callsScanForNameOnBleDeviceScanner() {
+        const { name, options } = this.callsToScanForName[0]
+
+        assert.isEqual(
+            name,
+            'MuseS',
+            'Should call scanForName on BleDeviceScanner!'
+        )
+
+        const { characteristicCallbacks } = options ?? {}
+
         assert.isEqualDeep(
-            this.callsToScanForName[0],
-            {
-                name: 'MuseS',
-                options: {
-                    characteristicCallbacks: this.museCharacteristicCallbacks,
-                },
-            },
-            'Should call scanForName on BleDeviceScanner!\n'
+            Object.keys(characteristicCallbacks ?? {}),
+            Object.keys(this.museCharacteristicCallbacks),
+            'Should call scanForName with the correct options!'
         )
     }
 
@@ -64,7 +69,13 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
 
     private static readonly museBleLocalName = 'MuseS'
 
-    private static readonly museCharacteristicCallbacks = {}
+    private static readonly museCharacteristicCallbacks = {
+        EEG_TP9: () => {},
+        EEG_AF7: () => {},
+        EEG_AF8: () => {},
+        EEG_TP10: () => {},
+        EEG_AUX: () => {},
+    }
 
     private static async MuseStreamGenerator() {
         return await MuseStreamGenerator.Create()

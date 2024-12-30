@@ -12,3 +12,5 @@ export const MUSE_CHARACTERISTIC_UUIDS = {
     EEG_TP10: '273e00064c4d454d96bef03bac821358',
     EEG_AUX: '273e00074c4d454d96bef03bac821358',
 }
+
+export type CharacteristicNames = keyof typeof MUSE_CHARACTERISTIC_UUIDS
