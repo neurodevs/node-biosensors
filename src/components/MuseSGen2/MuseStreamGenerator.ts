@@ -23,6 +23,10 @@ export default class MuseStreamGenerator implements StreamGenerator {
 
     private static readonly museCallbacks = this.generateCallbacks()
 
+    private static readonly scanOptions = {
+        characteristicCallbacks: this.museCallbacks,
+    }
+
     private static generateCallbacks() {
         return this.museCharacteristicNames.reduce(
             (acc, name) => ({
@@ -34,10 +38,6 @@ export default class MuseStreamGenerator implements StreamGenerator {
     }
 
     private static handleEegChannelData() {}
-
-    private static readonly scanOptions = {
-        characteristicCallbacks: this.museCallbacks,
-    }
 
     private static BleDeviceScanner() {
         return BleDeviceScanner.Create()
