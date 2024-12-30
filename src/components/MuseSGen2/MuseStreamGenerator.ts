@@ -1,4 +1,4 @@
-import { BleDeviceScanner } from '@neurodevs/node-ble'
+import { BleDeviceScanner, SimpleCharacteristic } from '@neurodevs/node-ble'
 
 export default class MuseStreamGenerator implements StreamGenerator {
     public static Class?: StreamGeneratorConstructor
@@ -50,7 +50,12 @@ export default class MuseStreamGenerator implements StreamGenerator {
         )
     }
 
-    private static handleEegChannelData() {}
+    private static handleEegChannelData(
+        data: Buffer,
+        characteristic: SimpleCharacteristic
+    ) {
+        console.log(data, characteristic)
+    }
 
     private static generatePpgCallbacks() {
         return this.ppgCharacteristicNames.reduce(
@@ -62,7 +67,12 @@ export default class MuseStreamGenerator implements StreamGenerator {
         )
     }
 
-    private static handlePpgChannelData() {}
+    private static handlePpgChannelData(
+        data: Buffer,
+        characteristic: SimpleCharacteristic
+    ) {
+        console.log(data, characteristic)
+    }
 
     private static BleDeviceScanner() {
         return BleDeviceScanner.Create()
