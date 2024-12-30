@@ -30,11 +30,13 @@ export default class MuseStreamGenerator implements StreamGenerator {
     }
 
     private async writeControlCommands() {
-        const characteristic = this.adapter.getCharacteristic(this.controlUuid)!
-
         for (const cmd of ['h', 'p50', 's', 'd']) {
-            await characteristic.writeAsync(this.encodeCommand(cmd), true)
+            await this.control.writeAsync(this.encodeCommand(cmd), true)
         }
+    }
+
+    private get control() {
+        return this.adapter.getCharacteristic(this.controlUuid)!
     }
 
     private get controlUuid() {
@@ -80,8 +82,7 @@ export default class MuseStreamGenerator implements StreamGenerator {
         return this.eegCharacteristicNames.reduce(
             (acc, name) => ({
                 ...acc,
-                [MUSE_CHARACTERISTIC_UUIDS[name]]:
-                    this.handleEegChannelData.bind(this),
+                [MUSE_CHARACTERISTIC_UUIDS[name]]: this.handleEegChannelData,
             }),
             {}
         )
@@ -98,8 +99,7 @@ export default class MuseStreamGenerator implements StreamGenerator {
         return this.ppgCharacteristicNames.reduce(
             (acc, name) => ({
                 ...acc,
-                [MUSE_CHARACTERISTIC_UUIDS[name]]:
-                    this.handlePpgChannelData.bind(this),
+                [MUSE_CHARACTERISTIC_UUIDS[name]]: this.handlePpgChannelData,
             }),
             {}
         )
