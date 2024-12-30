@@ -75,6 +75,9 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
         EEG_AF8: () => {},
         EEG_TP10: () => {},
         EEG_AUX: () => {},
+        PPG_AMBIENT: () => {},
+        PPG_INFRARED: () => {},
+        PPG_RED: () => {},
     }
 
     private static async MuseStreamGenerator() {

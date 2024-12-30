@@ -21,6 +21,12 @@ export default class MuseStreamGenerator implements StreamGenerator {
         'EEG_AUX',
     ]
 
+    private static readonly ppgCharacteristicNames = [
+        'PPG_AMBIENT',
+        'PPG_INFRARED',
+        'PPG_RED',
+    ]
+
     private static readonly museCallbacks = this.generateCallbacks()
 
     private static readonly scanOptions = {
@@ -28,7 +34,10 @@ export default class MuseStreamGenerator implements StreamGenerator {
     }
 
     private static generateCallbacks() {
-        return { ...this.generateEegCallbacks() }
+        return {
+            ...this.generateEegCallbacks(),
+            ...this.generatePpgCallbacks(),
+        }
     }
 
     private static generateEegCallbacks() {
@@ -42,6 +51,18 @@ export default class MuseStreamGenerator implements StreamGenerator {
     }
 
     private static handleEegChannelData() {}
+
+    private static generatePpgCallbacks() {
+        return this.ppgCharacteristicNames.reduce(
+            (acc, name) => ({
+                ...acc,
+                [name]: this.handlePpgChannelData.bind(this),
+            }),
+            {}
+        )
+    }
+
+    private static handlePpgChannelData() {}
 
     private static BleDeviceScanner() {
         return BleDeviceScanner.Create()
