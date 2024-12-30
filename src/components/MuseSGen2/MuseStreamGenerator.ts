@@ -1,4 +1,5 @@
 import { BleDeviceScanner, SimpleCharacteristic } from '@neurodevs/node-ble'
+import { MUSE_CHARACTERISTIC_UUIDS } from './museCharacteristicUuids'
 
 export default class MuseStreamGenerator implements StreamGenerator {
     public static Class?: StreamGeneratorConstructor
@@ -8,6 +9,7 @@ export default class MuseStreamGenerator implements StreamGenerator {
     public static async Create() {
         const scanner = this.BleDeviceScanner()
         await scanner.scanForName(this.museLocalName, this.scanOptions)
+        console.log('Callbacks', this.museCallbacks)
         return new (this.Class ?? this)()
     }
 
@@ -37,6 +39,7 @@ export default class MuseStreamGenerator implements StreamGenerator {
         return {
             ...this.generateEegCallbacks(),
             ...this.generatePpgCallbacks(),
+            ...this.generateControlCallback(),
         }
     }
 
@@ -44,7 +47,8 @@ export default class MuseStreamGenerator implements StreamGenerator {
         return this.eegCharacteristicNames.reduce(
             (acc, name) => ({
                 ...acc,
-                [name]: this.handleEegChannelData.bind(this),
+                [MUSE_CHARACTERISTIC_UUIDS[name]]:
+                    this.handleEegChannelData.bind(this),
             }),
             {}
         )
@@ -61,7 +65,8 @@ export default class MuseStreamGenerator implements StreamGenerator {
         return this.ppgCharacteristicNames.reduce(
             (acc, name) => ({
                 ...acc,
-                [name]: this.handlePpgChannelData.bind(this),
+                [MUSE_CHARACTERISTIC_UUIDS[name]]:
+                    this.handlePpgChannelData.bind(this),
             }),
             {}
         )
@@ -72,6 +77,17 @@ export default class MuseStreamGenerator implements StreamGenerator {
         characteristic: SimpleCharacteristic
     ) {
         console.log(data, characteristic)
+    }
+
+    private static generateControlCallback() {
+        return {
+            [MUSE_CHARACTERISTIC_UUIDS.CONTROL]:
+                this.handleControlCommands.bind(this),
+        }
+    }
+
+    private static handleControlCommands() {
+        console.log('Control command received!')
     }
 
     private static BleDeviceScanner() {

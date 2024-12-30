@@ -4,6 +4,7 @@ import {
     FakeBleScanner,
     FakePeripheral,
 } from '@neurodevs/node-ble'
+import { MUSE_CHARACTERISTIC_UUIDS } from '../../components/MuseSGen2/museCharacteristicUuids'
 import MuseStreamGenerator, {
     StreamGenerator,
 } from '../../components/MuseSGen2/MuseStreamGenerator'
@@ -69,15 +70,29 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
 
     private static readonly museBleLocalName = 'MuseS'
 
-    private static readonly museCharacteristicCallbacks = {
-        EEG_TP9: () => {},
-        EEG_AF7: () => {},
-        EEG_AF8: () => {},
-        EEG_TP10: () => {},
-        EEG_AUX: () => {},
-        PPG_AMBIENT: () => {},
-        PPG_INFRARED: () => {},
-        PPG_RED: () => {},
+    private static readonly museCharacteristicNames = [
+        'EEG_TP9',
+        'EEG_AF7',
+        'EEG_AF8',
+        'EEG_TP10',
+        'EEG_AUX',
+        'PPG_AMBIENT',
+        'PPG_INFRARED',
+        'PPG_RED',
+        'CONTROL',
+    ]
+
+    private static readonly museCharacteristicCallbacks =
+        this.generateCallbacks()
+
+    private static generateCallbacks() {
+        return this.museCharacteristicNames.reduce(
+            (acc, name) => ({
+                ...acc,
+                [MUSE_CHARACTERISTIC_UUIDS[name]]: () => {},
+            }),
+            {}
+        )
     }
 
     private static async MuseStreamGenerator() {
