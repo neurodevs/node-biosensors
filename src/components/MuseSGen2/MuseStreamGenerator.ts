@@ -9,7 +9,6 @@ export default class MuseStreamGenerator implements StreamGenerator {
     public static async Create() {
         const scanner = this.BleDeviceScanner()
         await scanner.scanForName(this.museLocalName, this.scanOptions)
-        console.log('Callbacks', this.museCallbacks)
         return new (this.Class ?? this)()
     }
 
@@ -39,7 +38,6 @@ export default class MuseStreamGenerator implements StreamGenerator {
         return {
             ...this.generateEegCallbacks(),
             ...this.generatePpgCallbacks(),
-            ...this.generateControlCallback(),
         }
     }
 
@@ -77,17 +75,6 @@ export default class MuseStreamGenerator implements StreamGenerator {
         characteristic: SimpleCharacteristic
     ) {
         console.log(data, characteristic)
-    }
-
-    private static generateControlCallback() {
-        return {
-            [MUSE_CHARACTERISTIC_UUIDS.CONTROL]:
-                this.handleControlCommands.bind(this),
-        }
-    }
-
-    private static handleControlCommands() {
-        console.log('Control command received!')
     }
 
     private static BleDeviceScanner() {

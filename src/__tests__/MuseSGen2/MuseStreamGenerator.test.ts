@@ -79,7 +79,6 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
         'PPG_AMBIENT',
         'PPG_INFRARED',
         'PPG_RED',
-        'CONTROL',
     ]
 
     private static readonly museCharacteristicCallbacks =
