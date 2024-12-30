@@ -8,7 +8,12 @@ import {
     FakeBleScanner,
     SimplePeripheral,
 } from '@neurodevs/node-ble-scanner'
-import { LslOutletImpl, FakeLslOutlet } from '@neurodevs/node-lsl'
+import {
+    LslOutletImpl,
+    FakeLslOutlet,
+    LslStreamInfo,
+    FakeStreamInfo,
+} from '@neurodevs/node-lsl'
 import CgxQuick20Adapter, {
     BiosensorAdapter,
 } from '../../components/CgxQuick20/CgxQuick20Adapter'
@@ -24,6 +29,8 @@ export default class CgxQuick20AdapterTest extends AbstractSpruceTest {
 
         LslOutletImpl.Class = FakeLslOutlet
         FakeLslOutlet.resetTestDouble()
+
+        LslStreamInfo.Class = FakeStreamInfo
 
         this.instance = this.CreateFromPeripheral()
     }
