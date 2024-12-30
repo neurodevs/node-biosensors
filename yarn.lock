@@ -14,7 +14,7 @@
   optionalDependencies:
     usb "^2.11.0"
 
-"@abandonware/noble@^1.9.2-25":
+"@abandonware/noble@^1.9.2-22", "@abandonware/noble@^1.9.2-25":
   version "1.9.2-25"
   resolved "https://registry.yarnpkg.com/@abandonware/noble/-/noble-1.9.2-25.tgz#0efdd421f7f92ca578873bbd8fc72142f0a402a6"
   integrity sha512-FBgwjWkXF3VLb0V0hdOeeVhuupdfuagkBz9E0Xjfmr8MYuR5JjnXHty0/6Q38d4v//EhX7oZaZXBiZWrhWKKbg==
@@ -687,12 +687,12 @@
     "@sprucelabs/spruce-core-schemas" "^40.1.477"
     "@sprucelabs/spruce-skill-utils" "^31.0.550"
 
-"@neurodevs/node-ble@^0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@neurodevs/node-ble/-/node-ble-0.5.0.tgz#97691e1af2290ee2db9b2af8087c738c64dc452b"
-  integrity sha512-avUjAZfLAFvZVOKa9UpsvAmsSbwtZoopuPOStPy9ULv4Z+gPEnjZfjdG2hcy6Z2M7/3rQ/ad/6DTZ9SG3bDKVA==
+"@neurodevs/node-ble@^0.5.3":
+  version "0.5.3"
+  resolved "https://registry.yarnpkg.com/@neurodevs/node-ble/-/node-ble-0.5.3.tgz#00ee6aee15603036988c458c1bf52fa50c9c9a86"
+  integrity sha512-wMp+8lruuJWIB3Lb+ltfkJpmE67ZQOv0NvmwnFARnET84KBHgpqQ6Emmkn228c5UFu8ynnSVZqpQp24O7czarw==
   dependencies:
-    "@abandonware/noble" "^1.9.2-25"
+    "@abandonware/noble" "^1.9.2-22"
     "@sprucelabs/error" "^6.0.520"
     "@sprucelabs/schema" "^30.0.531"
     "@sprucelabs/spruce-core-schemas" "^40.1.516"

@@ -2,27 +2,34 @@ import {
     BleDeviceScanner,
     SimpleCharacteristic,
     BleAdapter,
+    BleScanner,
 } from '@neurodevs/node-ble'
 import { MUSE_CHARACTERISTIC_UUIDS } from './museCharacteristicUuids'
 
 export default class MuseStreamGenerator implements StreamGenerator {
     public static Class?: StreamGeneratorConstructor
 
-    private adapter: BleAdapter
+    private scanner: BleScanner
+    private adapter!: BleAdapter
 
-    protected constructor(adapter: BleAdapter) {
-        this.adapter = adapter
+    protected constructor(scanner: BleScanner) {
+        this.scanner = scanner
     }
 
     public static async Create() {
         const scanner = this.BleDeviceScanner()
 
-        const adapter = await scanner.scanForName(
+        const instance = new (this.Class ?? this)(scanner)
+        await instance.connect()
+
+        return instance
+    }
+
+    public async connect() {
+        this.adapter = await this.scanner.scanForName(
             this.museLocalName,
             this.scanOptions
         )
-
-        return new (this.Class ?? this)(adapter)
     }
 
     public async start() {
@@ -49,9 +56,9 @@ export default class MuseStreamGenerator implements StreamGenerator {
         return Buffer.from(encoded)
     }
 
-    private static readonly museLocalName = 'MuseS'
+    private readonly museLocalName = 'MuseS'
 
-    private static readonly eegCharacteristicNames = [
+    private readonly eegCharacteristicNames = [
         'EEG_TP9',
         'EEG_AF7',
         'EEG_AF8',
@@ -59,26 +66,26 @@ export default class MuseStreamGenerator implements StreamGenerator {
         'EEG_AUX',
     ]
 
-    private static readonly ppgCharacteristicNames = [
+    private readonly ppgCharacteristicNames = [
         'PPG_AMBIENT',
         'PPG_INFRARED',
         'PPG_RED',
     ]
 
-    private static readonly museCallbacks = this.generateCallbacks()
+    private readonly museCallbacks = this.generateCallbacks()
 
-    private static readonly scanOptions = {
+    private readonly scanOptions = {
         characteristicCallbacks: this.museCallbacks,
     }
 
-    private static generateCallbacks() {
+    private generateCallbacks() {
         return {
             ...this.generateEegCallbacks(),
             ...this.generatePpgCallbacks(),
         }
     }
 
-    private static generateEegCallbacks() {
+    private generateEegCallbacks() {
         return this.eegCharacteristicNames.reduce(
             (acc, name) => ({
                 ...acc,
@@ -88,14 +95,14 @@ export default class MuseStreamGenerator implements StreamGenerator {
         )
     }
 
-    private static handleEegChannelData(
+    private handleEegChannelData(
         data: Buffer,
         characteristic: SimpleCharacteristic
     ) {
-        console.log(data, characteristic)
+        console.log(data, characteristic.uuid)
     }
 
-    private static generatePpgCallbacks() {
+    private generatePpgCallbacks() {
         return this.ppgCharacteristicNames.reduce(
             (acc, name) => ({
                 ...acc,
@@ -105,11 +112,11 @@ export default class MuseStreamGenerator implements StreamGenerator {
         )
     }
 
-    private static handlePpgChannelData(
+    private handlePpgChannelData(
         data: Buffer,
         characteristic: SimpleCharacteristic
     ) {
-        console.log(data, characteristic)
+        console.log(data, characteristic.uuid)
     }
 
     private static BleDeviceScanner() {
@@ -118,6 +125,7 @@ export default class MuseStreamGenerator implements StreamGenerator {
 }
 
 export interface StreamGenerator {
+    connect(): Promise<void>
     start(): Promise<void>
 }
 
