@@ -37,7 +37,12 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
     protected static async callsScanForNameOnBleDeviceScanner() {
         assert.isEqualDeep(
             this.callsToScanForName[0],
-            { name: 'MuseS', options: undefined },
+            {
+                name: 'MuseS',
+                options: {
+                    characteristicCallbacks: {},
+                },
+            },
             'Should call scanForName on BleDeviceScanner!\n'
         )
     }
