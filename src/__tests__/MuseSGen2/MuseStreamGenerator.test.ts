@@ -133,12 +133,9 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
 
     @test()
     protected static async outletPushesEegSampleForEachChunk() {
-        const fakeChars = await this.createFakeEegChars()
-        this.peripheral.setFakeCharacteristics(fakeChars)
+        const fakeChars = await this.fakeCharsAndSetPeripheral()
 
-        FakeBleScanner.fakedPeripherals = [this.peripheral]
-
-        void this.instance.start()
+        void this.start()
         await this.wait(10)
 
         fakeChars.forEach((char) => {
@@ -150,9 +147,41 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
         await this.wait(10)
 
         assert.isEqualDeep(
-            FakeLslOutlet.callsToPushSample.length,
+            MuseStreamGeneratorTest.callsToPushSample.length,
             this.eegChunkSize
         )
+    }
+
+    @test()
+    protected static async ignoresFirstTwoEegSamplesThatAreTimestamps() {
+        const fakeChars = await this.fakeCharsAndSetPeripheral()
+
+        void this.start()
+        await this.wait(10)
+
+        fakeChars.forEach((char) => {
+            const increasingData = Array(this.eegChunkSize)
+                .fill(0)
+                .map((_, i) => i)
+            char.simulateDataReceived(Buffer.from(increasingData))
+        })
+
+        await this.wait(10)
+
+        assert.isEqualDeep(
+            FakeLslOutlet.callsToPushSample[0],
+            [2, 2, 2, 2, 2],
+            'Should ignore the first two EEG samples that are timestamps!'
+        )
+    }
+
+    private static async fakeCharsAndSetPeripheral() {
+        const fakeChars = await this.createFakeEegChars()
+        this.peripheral.setFakeCharacteristics(fakeChars)
+
+        FakeBleScanner.fakedPeripherals = [this.peripheral]
+
+        return fakeChars
     }
 
     private static async createFakeEegChars() {
@@ -244,6 +273,10 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
 
     private static get callsToGetCharacteristic() {
         return FakeBleAdapter.callsToGetCharacteristic
+    }
+
+    private static get callsToPushSample() {
+        return FakeLslOutlet.callsToPushSample
     }
 
     private static readonly bleLocalName = 'MuseS'

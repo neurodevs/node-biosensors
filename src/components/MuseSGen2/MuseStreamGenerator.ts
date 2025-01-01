@@ -71,7 +71,7 @@ export default class MuseStreamGenerator implements StreamGenerator {
     }
 
     protected handleEegChannelForChunk(data: Buffer, char: Characteristic) {
-        const channelValuesForChunk = Array.from(data) as number[]
+        const channelValuesForChunk = Array.from(data).slice(2) as number[]
         const channelCharIdx = this.getEegCharIdx(char.uuid)
 
         this.eegChannelChunks[channelCharIdx] = channelValuesForChunk
