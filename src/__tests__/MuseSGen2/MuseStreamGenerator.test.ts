@@ -223,7 +223,7 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
     }
 
     private static get handleEegChannelData() {
-        return this.instance.getHandleEegChannelData()
+        return this.instance.getHandleEegChannelForChunk()
     }
 
     private static generateExpectedCall(cmd: string) {
