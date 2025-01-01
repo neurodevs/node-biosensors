@@ -22,12 +22,14 @@ export default class MuseStreamGenerator implements StreamGenerator {
     private adapter!: BleAdapter
     private eegOutlet: LslOutlet
     private eegChannelChunks = this.generateEmptyEegMatrix()
+    private encoder: TextEncoder
 
     protected constructor(options: StreamGeneratorConstructorOptions) {
         const { scanner, eegOutlet } = options
 
         this.scanner = scanner
         this.eegOutlet = eegOutlet
+        this.encoder = this.TextEncoder()
 
         this.generateScanOptions()
     }
@@ -124,17 +126,15 @@ export default class MuseStreamGenerator implements StreamGenerator {
         return this.ppgCharacteristicNames.reduce(
             (acc, name) => ({
                 ...acc,
-                [MUSE_CHARACTERISTIC_UUIDS[name]]: this.handlePpgChannelData,
+                [MUSE_CHARACTERISTIC_UUIDS[name]]:
+                    this.handlePpgChannelForChunk.bind(this),
             }),
             {}
         )
     }
 
-    private handlePpgChannelData(
-        data: Buffer,
-        characteristic: SimpleCharacteristic
-    ) {
-        console.log(data, characteristic.uuid)
+    private handlePpgChannelForChunk(data: Buffer, char: SimpleCharacteristic) {
+        console.log(data, char.uuid)
     }
 
     public async connect() {
@@ -150,7 +150,8 @@ export default class MuseStreamGenerator implements StreamGenerator {
 
     private async writeControlCommands() {
         for (const cmd of ['h', 'p50', 's', 'd']) {
-            await this.control.writeAsync(this.encodeCommand(cmd), true)
+            const buffer = this.createBufferFrom(cmd)
+            await this.control.writeAsync(buffer, true)
         }
     }
 
@@ -162,8 +163,8 @@ export default class MuseStreamGenerator implements StreamGenerator {
         return MUSE_CHARACTERISTIC_UUIDS.CONTROL
     }
 
-    private encodeCommand(cmd: string) {
-        const encoded = new TextEncoder().encode(`X${cmd}\n`)
+    private createBufferFrom(cmd: string) {
+        const encoded = this.encoder.encode(`X${cmd}\n`)
         encoded[0] = encoded.length - 1
         return Buffer.from(encoded)
     }
@@ -229,6 +230,10 @@ export default class MuseStreamGenerator implements StreamGenerator {
         unit: 'N/A',
         chunkSize: 6,
         maxBuffered: 360,
+    }
+
+    private TextEncoder() {
+        return new TextEncoder()
     }
 
     private static async LslStreamOutlet(options: LslOutletOptions) {
