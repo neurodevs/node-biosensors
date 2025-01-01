@@ -173,15 +173,15 @@ export default class MuseStreamGenerator implements StreamGenerator {
         return MuseStreamGenerator.eegChunkSize
     }
 
-    private readonly museLocalName = 'MuseS'
+    private get eegCharacteristicNames() {
+        return MuseStreamGenerator.eegCharacteristicNames
+    }
 
-    private readonly eegCharacteristicNames = [
-        'EEG_TP9',
-        'EEG_AF7',
-        'EEG_AF8',
-        'EEG_TP10',
-        'EEG_AUX',
-    ]
+    private get ppgCharacteristicNames() {
+        return MuseStreamGenerator.ppgCharacteristicNames
+    }
+
+    private readonly museLocalName = 'MuseS'
 
     private readonly eegNumChannels = this.eegCharacteristicNames.length
 
@@ -189,27 +189,27 @@ export default class MuseStreamGenerator implements StreamGenerator {
         (name) => MUSE_CHARACTERISTIC_UUIDS[name]
     )
 
-    private readonly ppgCharacteristicNames = [
+    private static readonly eegSampleRate = 256
+    private static readonly eegChunkSize = 12
+
+    private static readonly eegCharacteristicNames = [
+        'EEG_TP9',
+        'EEG_AF7',
+        'EEG_AF8',
+        'EEG_TP10',
+        'EEG_AUX',
+    ]
+
+    private static readonly ppgCharacteristicNames = [
         'PPG_AMBIENT',
         'PPG_INFRARED',
         'PPG_RED',
     ]
 
-    private static readonly eegSampleRate = 256
-    private static readonly eegChunkSize = 12
-
-    private static readonly eegChannelNames = [
-        'TP9',
-        'AF7',
-        'AF8',
-        'TP10',
-        'AUX',
-    ]
-
     private static readonly eegOutletOptions = {
         name: 'Muse S Gen 2 EEG',
         type: 'EEG',
-        channelNames: this.eegChannelNames,
+        channelNames: this.eegCharacteristicNames,
         sampleRate: this.eegSampleRate,
         channelFormat: 'float32' as ChannelFormat,
         sourceId: 'muse-eeg',
@@ -222,7 +222,7 @@ export default class MuseStreamGenerator implements StreamGenerator {
     private static readonly ppgOutletOptions = {
         name: 'Muse S Gen 2 PPG',
         type: 'PPG',
-        channelNames: ['Ambient', 'Infrared', 'Red'],
+        channelNames: this.ppgCharacteristicNames,
         sampleRate: 64,
         channelFormat: 'float32' as ChannelFormat,
         sourceId: 'muse-s-ppg',

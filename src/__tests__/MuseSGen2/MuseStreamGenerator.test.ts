@@ -104,7 +104,7 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
         assert.isEqualDeep(FakeLslOutlet.callsToConstructor[0].options, {
             name: 'Muse S Gen 2 EEG',
             type: 'EEG',
-            channelNames: this.eegChannelNames,
+            channelNames: this.eegCharNames,
             sampleRate: this.eegSampleRate,
             channelFormat: 'float32',
             sourceId: 'muse-eeg',
@@ -120,7 +120,7 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
         assert.isEqualDeep(FakeLslOutlet.callsToConstructor[1].options, {
             name: 'Muse S Gen 2 PPG',
             type: 'PPG',
-            channelNames: MuseStreamGeneratorTest.ppgChannelNames,
+            channelNames: this.ppgCharNames,
             sampleRate: this.ppgSampleRate,
             channelFormat: 'float32',
             sourceId: 'muse-s-ppg',
@@ -280,17 +280,7 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
         (name) => MUSE_CHARACTERISTIC_UUIDS[name]
     )
 
-    private static readonly eegChannelNames = [
-        'TP9',
-        'AF7',
-        'AF8',
-        'TP10',
-        'AUX',
-    ]
-
-    private static readonly eegNumChannels = this.eegChannelNames.length
-
-    private static readonly ppgChannelNames = ['Ambient', 'Infrared', 'Red']
+    private static readonly eegNumChannels = this.eegCharNames.length
 
     private static async MuseStreamGenerator() {
         return (await MuseStreamGenerator.Create()) as SpyMuseStreamGenerator
