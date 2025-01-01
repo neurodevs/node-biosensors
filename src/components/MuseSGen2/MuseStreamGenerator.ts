@@ -19,7 +19,7 @@ export default class MuseStreamGenerator implements StreamGenerator {
 
     private scanner: BleScanner
     private scanOptions!: ScanOptions
-    private adapter!: BleAdapter
+    private ble!: BleAdapter
     private eegOutlet: LslOutlet
     private eegChannelChunks = this.generateEmptyEegMatrix()
     private encoder: TextEncoder
@@ -138,7 +138,7 @@ export default class MuseStreamGenerator implements StreamGenerator {
     }
 
     public async connect() {
-        this.adapter = await this.scanner.scanForName(
+        this.ble = await this.scanner.scanForName(
             this.museLocalName,
             this.scanOptions
         )
@@ -156,7 +156,7 @@ export default class MuseStreamGenerator implements StreamGenerator {
     }
 
     private get control() {
-        return this.adapter.getCharacteristic(this.controlUuid)!
+        return this.ble.getCharacteristic(this.controlUuid)!
     }
 
     private get controlUuid() {
