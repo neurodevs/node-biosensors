@@ -1,4 +1,8 @@
-import AbstractSpruceTest, { test, assert } from '@sprucelabs/test-utils'
+import AbstractSpruceTest, {
+    test,
+    assert,
+    generateId,
+} from '@sprucelabs/test-utils'
 import {
     BleDeviceAdapter,
     BleDeviceScanner,
@@ -13,13 +17,15 @@ import {
     LslStreamInfo,
     LslStreamOutlet,
 } from '@neurodevs/node-lsl'
-import { MUSE_CHARACTERISTIC_UUIDS } from '../../components/MuseSGen2/museCharacteristicUuids'
+import { MUSE_CHARACTERISTIC_UUIDS as CHAR_UUIDS } from '../../components/MuseSGen2/museCharacteristicUuids'
 import MuseStreamGenerator from '../../components/MuseSGen2/MuseStreamGenerator'
 import SpyMuseStreamGenerator from '../../testDoubles/SpyMuseStreamGenerator'
 
 export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
     private static instance: SpyMuseStreamGenerator
     private static museCharCallbacks: Record<string, (data: Buffer) => void>
+    private static eegChars: FakeCharacteristic[]
+    private static controlChar: FakeCharacteristic
 
     protected static async beforeEach() {
         await super.beforeEach()
@@ -33,6 +39,8 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
         this.instance = await this.MuseStreamGenerator()
 
         this.museCharCallbacks = this.generateCallbacks()
+        this.eegChars = await this.setFakeCharsOnPeripheral()
+        this.controlChar = this.fakeControlChar()
     }
 
     @test()
@@ -70,24 +78,17 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
 
     @test()
     protected static async startCallsGetCharacteristicForControlUuid() {
-        this.fakeControlChar()
-
         await this.start()
 
-        assert.isEqual(
-            this.callsToGetCharacteristic[0],
-            MUSE_CHARACTERISTIC_UUIDS.CONTROL
-        )
+        assert.isEqual(this.callsToGetCharacteristic[0], CHAR_UUIDS.CONTROL)
     }
 
     @test()
     protected static async startWritesControlCommands() {
-        const control = this.fakeControlChar()
-
         await this.start()
 
         assert.isEqualDeep(
-            control.callsToWriteAsync,
+            this.controlChar.callsToWriteAsync,
             [
                 this.generateExpectedCall('h'),
                 this.generateExpectedCall('p50'),
@@ -100,7 +101,9 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
 
     @test()
     protected static async createsLslOutletForEegChannels() {
-        assert.isEqualDeep(FakeLslOutlet.callsToConstructor[0].options, {
+        const firstCall = FakeLslOutlet.callsToConstructor[0]
+
+        assert.isEqualDeep(firstCall.options, {
             name: 'Muse S Gen 2 EEG',
             type: 'EEG',
             channelNames: this.eegCharNames,
@@ -116,7 +119,9 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
 
     @test()
     protected static async createsLslOutletForPpgChannels() {
-        assert.isEqualDeep(FakeLslOutlet.callsToConstructor[1].options, {
+        const secondCall = FakeLslOutlet.callsToConstructor[1]
+
+        assert.isEqualDeep(secondCall.options, {
             name: 'Muse S Gen 2 PPG',
             type: 'PPG',
             channelNames: this.ppgCharNames,
@@ -132,49 +137,51 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
 
     @test()
     protected static async outletPushesEegSampleForEachChunk() {
-        const fakeChars = await this.fakeCharsAndSetPeripheral()
+        this.simulateDataForChars(this.emptyEegBufferForChannel)
 
-        void this.start()
-        await this.wait(10)
-
-        fakeChars.forEach((char) => {
-            char.simulateDataReceived(
-                Buffer.from(Array(this.eegChunkSize).fill(0))
-            )
-        })
-
-        await this.wait(10)
+        const emptySample = [0, 0, 0, 0, 0]
+        const expected = Array(this.eegChunkSize).fill(emptySample)
 
         assert.isEqualDeep(
-            MuseStreamGeneratorTest.callsToPushSample.length,
-            this.eegChunkSize
+            this.callsToPushSample,
+            expected,
+            'Should push an EEG sample for each chunk!'
         )
     }
 
     @test()
     protected static async ignoresFirstTwoEegSamplesThatAreTimestamps() {
-        const fakeChars = await this.fakeCharsAndSetPeripheral()
+        const increasingData = Array(this.eegChunkSize)
+            .fill(0)
+            .map((_, i) => i)
 
-        void this.start()
-        await this.wait(10)
-
-        fakeChars.forEach((char) => {
-            const increasingData = Array(this.eegChunkSize)
-                .fill(0)
-                .map((_, i) => i)
-            char.simulateDataReceived(Buffer.from(increasingData))
-        })
-
-        await this.wait(10)
+        const increasingBuffer = Buffer.from(increasingData)
+        this.simulateDataForChars(increasingBuffer)
 
         assert.isEqualDeep(
-            FakeLslOutlet.callsToPushSample[0],
+            this.firstCallToPushSample,
             [2, 2, 2, 2, 2],
             'Should ignore the first two EEG samples that are timestamps!'
         )
     }
 
-    private static async fakeCharsAndSetPeripheral() {
+    private static generateCallbacks() {
+        return this.museCharNames.reduce(
+            (acc, name) => ({
+                ...acc,
+                [CHAR_UUIDS[name]]: this.handleEegChannelData.bind(
+                    this.instance
+                ),
+            }),
+            {}
+        )
+    }
+
+    private static get handleEegChannelData() {
+        return this.instance.getHandleEegChannelForChunk()
+    }
+
+    private static async setFakeCharsOnPeripheral() {
         const fakeChars = await this.createFakeEegChars()
         this.peripheral.setFakeCharacteristics(fakeChars)
 
@@ -200,9 +207,7 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
     }
 
     private static fakeControlChar() {
-        const control = new FakeCharacteristic({
-            uuid: this.controlUuid,
-        })
+        const control = this.FakeCharacteristic(this.controlUuid)
 
         FakeBleAdapter.fakeCharacteristics = {
             [this.controlUuid]: control as any,
@@ -211,33 +216,24 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
         return control
     }
 
-    private static generateCallbacks() {
-        return this.museCharNames.reduce(
-            (acc, name) => ({
-                ...acc,
-                [MUSE_CHARACTERISTIC_UUIDS[name]]:
-                    this.handleEegChannelData.bind(this.instance),
-            }),
-            {}
-        )
-    }
-
-    private static get handleEegChannelData() {
-        return this.instance.getHandleEegChannelForChunk()
-    }
-
     private static generateExpectedCall(cmd: string) {
         return { data: this.encodeCommand(cmd), withoutResponse: true }
-    }
-
-    private static async start() {
-        await this.instance.start()
     }
 
     private static encodeCommand(cmd: string) {
         const encoded = new TextEncoder().encode(`X${cmd}\n`)
         encoded[0] = encoded.length - 1
         return Buffer.from(encoded)
+    }
+
+    private static async start() {
+        await this.instance.start()
+    }
+
+    private static simulateDataForChars(buffer: Buffer<ArrayBuffer>) {
+        this.eegChars.forEach((char) => {
+            char.simulateDataReceived(buffer)
+        })
     }
 
     private static setFakeBleAdapter() {
@@ -278,8 +274,12 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
         return FakeLslOutlet.callsToPushSample
     }
 
+    private static get firstCallToPushSample() {
+        return FakeLslOutlet.callsToPushSample[0]
+    }
+
     private static readonly bleLocalName = 'MuseS'
-    private static readonly controlUuid = MUSE_CHARACTERISTIC_UUIDS.CONTROL
+    private static readonly controlUuid: string = CHAR_UUIDS.CONTROL
     private static readonly eegSampleRate = 256
     private static readonly eegChunkSize = 12
     private static readonly ppgSampleRate = 64
@@ -309,10 +309,24 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
     ]
 
     private static readonly eegCharUuids = this.eegCharNames.map(
-        (name) => MUSE_CHARACTERISTIC_UUIDS[name]
+        (name) => CHAR_UUIDS[name]
+    )
+
+    private static readonly numTimestamps = 2
+
+    private static readonly emptyEegChunkForChannel = Array(
+        this.eegChunkSize + this.numTimestamps
+    ).fill(0)
+
+    private static readonly emptyEegBufferForChannel = Buffer.from(
+        this.emptyEegChunkForChannel
     )
 
     private static readonly eegNumChannels = this.eegCharNames.length
+
+    private static FakeCharacteristic(uuid = generateId()) {
+        return new FakeCharacteristic({ uuid })
+    }
 
     private static async MuseStreamGenerator() {
         return (await MuseStreamGenerator.Create()) as SpyMuseStreamGenerator
