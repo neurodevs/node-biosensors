@@ -14,9 +14,8 @@ import {
     LslStreamOutlet,
 } from '@neurodevs/node-lsl'
 import { MUSE_CHARACTERISTIC_UUIDS } from '../../components/MuseSGen2/museCharacteristicUuids'
-import MuseStreamGenerator, {
-    StreamGeneratorConstructorOptions,
-} from '../../components/MuseSGen2/MuseStreamGenerator'
+import MuseStreamGenerator from '../../components/MuseSGen2/MuseStreamGenerator'
+import SpyMuseStreamGenerator from '../../testDoubles/SpyMuseStreamGenerator'
 
 export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
     private static instance: SpyMuseStreamGenerator
@@ -317,15 +316,5 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
 
     private static async MuseStreamGenerator() {
         return (await MuseStreamGenerator.Create()) as SpyMuseStreamGenerator
-    }
-}
-
-class SpyMuseStreamGenerator extends MuseStreamGenerator {
-    public constructor(options: StreamGeneratorConstructorOptions) {
-        super(options)
-    }
-
-    public getHandleEegChannelData() {
-        return this.handleEegChannelForChunk
     }
 }

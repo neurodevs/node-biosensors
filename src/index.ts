@@ -6,3 +6,6 @@ export * from './components/MuseSGen2/MuseStreamGenerator'
 
 export { default as MuseStreamRecorder } from './components/MuseSGen2/MuseStreamRecorder'
 export * from './components/MuseSGen2/MuseStreamRecorder'
+
+export { default as SpyMuseStreamGenerator } from './testDoubles/SpyMuseStreamGenerator'
+export * from './testDoubles/SpyMuseStreamGenerator'
