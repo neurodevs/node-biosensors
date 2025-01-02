@@ -27,7 +27,7 @@ export default class MuseDeviceAdapterTest extends AbstractBiosensorsTest {
     @test()
     protected static async constructsMuseStreamProducer() {
         assert.isEqual(
-            FakeMuseProducer.numCallsToConstructor,
+            FakeMuseProducer.callsToConstructor.length,
             1,
             'Should construct MuseStreamProducer!'
         )
@@ -76,12 +76,24 @@ export default class MuseDeviceAdapterTest extends AbstractBiosensorsTest {
         )
     }
 
+    @test()
+    protected static async passesOptionalBleUuidToProducerForSpeedOptimization() {
+        assert.isEqual(
+            FakeMuseProducer.callsToConstructor[0]?.bleUuid,
+            this.bleUuid,
+            'Should pass bleUuid to MuseStreamProducer!'
+        )
+    }
+
     private static startStreaming() {
         this.instance.startStreaming()
     }
 
+    private static readonly bleUuid = generateId()
+
     private static async MuseDeviceAdapter(options?: MuseAdapterOptions) {
         return MuseDeviceAdapter.Create({
+            bleUuid: this.bleUuid,
             xdfRecordPath: generateId(),
             ...options,
         })

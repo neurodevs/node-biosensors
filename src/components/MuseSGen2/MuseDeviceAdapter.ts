@@ -16,9 +16,9 @@ export default class MuseDeviceAdapter implements MuseAdapter {
     }
 
     public static async Create(options?: MuseAdapterOptions) {
-        const { xdfRecordPath } = options ?? {}
+        const { bleUuid, xdfRecordPath } = options ?? {}
 
-        const producer = await this.MuseStreamProducer()
+        const producer = await this.MuseStreamProducer({ bleUuid })
 
         let recorder: MuseXdfRecorder | undefined
 
@@ -42,8 +42,8 @@ export default class MuseDeviceAdapter implements MuseAdapter {
         await this.lslProducer.startLslStreams()
     }
 
-    private static MuseStreamProducer() {
-        return MuseStreamProducer.Create()
+    private static MuseStreamProducer(options?: MuseAdapterOptions) {
+        return MuseStreamProducer.Create(options)
     }
 
     private static MuseStreamRecorder(xdfRecordPath: string) {
@@ -56,6 +56,7 @@ export interface MuseAdapter {
 }
 
 export interface MuseAdapterOptions {
+    bleUuid?: string
     xdfRecordPath?: string
 }
 

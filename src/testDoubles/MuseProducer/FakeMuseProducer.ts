@@ -1,12 +1,15 @@
-import { MuseLslProducer } from '../../components/MuseSGen2/MuseStreamProducer'
+import {
+    MuseLslProducer,
+    MuseLslProducerConstructorOptions,
+} from '../../components/MuseSGen2/MuseStreamProducer'
 
 export default class FakeMuseProducer implements MuseLslProducer {
-    public static numCallsToConstructor = 0
+    public static callsToConstructor: CallToConstructor[] = []
     public static numCallsToConnectBle = 0
     public static numCallsToStartLslStreams = 0
 
-    public constructor() {
-        FakeMuseProducer.numCallsToConstructor++
+    public constructor(options?: MuseLslProducerConstructorOptions) {
+        FakeMuseProducer.callsToConstructor.push(options)
     }
     public async connectBle() {
         FakeMuseProducer.numCallsToConnectBle++
@@ -16,8 +19,10 @@ export default class FakeMuseProducer implements MuseLslProducer {
     }
 
     public static resetTestDouble() {
-        this.numCallsToConstructor = 0
+        this.callsToConstructor = []
         this.numCallsToConnectBle = 0
         this.numCallsToStartLslStreams = 0
     }
 }
+
+export type CallToConstructor = MuseLslProducerConstructorOptions | undefined
