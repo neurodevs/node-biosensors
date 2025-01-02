@@ -206,6 +206,10 @@ export default class MuseStreamProducer implements MuseLslProducer {
         }
     }
 
+    private get hasUuidForSpeedOptimization() {
+        return this.bleUuid
+    }
+
     private async fastScanForUuid() {
         this.ble = await this.scanner.scanForUuid(
             this.bleUuid!,
@@ -220,15 +224,11 @@ export default class MuseStreamProducer implements MuseLslProducer {
         )
     }
 
-    private get hasUuidForSpeedOptimization() {
-        return this.bleUuid
-    }
-
     public async startLslStreams() {
-        await this.writeControlCommands()
+        await this.writeStartCmdsToControl()
     }
 
-    private async writeControlCommands() {
+    private async writeStartCmdsToControl() {
         for (const cmd of ['h', 'p50', 's', 'd']) {
             const buffer = this.createBufferFrom(cmd)
             await this.control.writeAsync(buffer, true)
