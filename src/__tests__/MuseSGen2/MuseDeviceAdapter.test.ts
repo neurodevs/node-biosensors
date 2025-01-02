@@ -14,7 +14,7 @@ export default class MuseDeviceAdapterTest extends AbstractBiosensorsTest {
 
         this.setFakeMuseRecorder()
 
-        this.instance = this.MuseDeviceAdapter()
+        this.instance = await this.MuseDeviceAdapter()
     }
 
     @test()
@@ -34,7 +34,7 @@ export default class MuseDeviceAdapterTest extends AbstractBiosensorsTest {
     @test()
     protected static async doesNotConstructRecorderIfNoXdfRecordPath() {
         FakeMuseRecorder.resetTestDouble()
-        this.MuseDeviceAdapter({ xdfRecordPath: undefined })
+        await this.MuseDeviceAdapter({ xdfRecordPath: undefined })
 
         assert.isEqual(
             FakeMuseRecorder.numCallsToConstructor,
@@ -58,7 +58,7 @@ export default class MuseDeviceAdapterTest extends AbstractBiosensorsTest {
         this.instance.startStreaming()
     }
 
-    private static MuseDeviceAdapter(options?: MuseAdapterOptions) {
+    private static async MuseDeviceAdapter(options?: MuseAdapterOptions) {
         return MuseDeviceAdapter.Create({
             xdfRecordPath: generateId(),
             ...options,

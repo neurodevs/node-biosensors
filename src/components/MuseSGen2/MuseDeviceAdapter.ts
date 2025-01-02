@@ -9,7 +9,7 @@ export default class MuseDeviceAdapter implements MuseAdapter {
         this.xdfRecorder = recorder
     }
 
-    public static Create(options?: MuseAdapterOptions) {
+    public static async Create(options?: MuseAdapterOptions) {
         const { xdfRecordPath } = options ?? {}
 
         let recorder: MuseRecorder | undefined
