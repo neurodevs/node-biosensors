@@ -186,6 +186,21 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
         )
     }
 
+    @test()
+    protected static async passesOptionalBleUuidToScanner() {
+        FakeBleScanner.resetTestDouble()
+
+        await this.MuseStreamProducer({
+            bleUuid: this.peripheral.uuid,
+        })
+
+        assert.isEqual(
+            FakeBleScanner.callsToScanForUuid[0]?.uuid,
+            this.peripheral.uuid,
+            'Should pass uuid to BleDeviceScanner!'
+        )
+    }
+
     private static generateCallbacks() {
         return {
             ...this.generateEegCallbacks(),

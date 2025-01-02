@@ -19,6 +19,7 @@ export default class MuseStreamProducer implements MuseLslProducer {
     private scanner: BleScanner
     private scanOptions!: ScanOptions
     private ble!: BleAdapter
+    private bleUuid?: string
     private eegOutlet: LslOutlet
     private ppgOutlet: LslOutlet
     private eegChannelChunks = this.generateEmptyEegMatrix()
@@ -26,9 +27,10 @@ export default class MuseStreamProducer implements MuseLslProducer {
     private encoder: TextEncoder
 
     protected constructor(options: MuseLslProducerConstructorOptions) {
-        const { scanner, eegOutlet, ppgOutlet } = options
+        const { scanner, bleUuid, eegOutlet, ppgOutlet } = options
 
         this.scanner = scanner
+        this.bleUuid = bleUuid
         this.eegOutlet = eegOutlet
         this.ppgOutlet = ppgOutlet
         this.encoder = this.TextEncoder()
@@ -37,7 +39,7 @@ export default class MuseStreamProducer implements MuseLslProducer {
     }
 
     public static async Create(options?: MuseLslProducerOptions) {
-        const { connectBleOnCreate = true } = options ?? {}
+        const { bleUuid, connectBleOnCreate = true } = options ?? {}
         const scanner = this.BleDeviceScanner()
 
         const eegOutlet = await this.LslStreamOutlet(this.eegOutletOptions)
@@ -45,6 +47,7 @@ export default class MuseStreamProducer implements MuseLslProducer {
 
         const instance = new (this.Class ?? this)({
             scanner,
+            bleUuid,
             eegOutlet,
             ppgOutlet,
         })
@@ -178,10 +181,17 @@ export default class MuseStreamProducer implements MuseLslProducer {
     }
 
     public async connectBle() {
-        this.ble = await this.scanner.scanForName(
-            this.bleLocalName,
-            this.scanOptions
-        )
+        if (this.bleUuid) {
+            this.ble = await this.scanner.scanForUuid(
+                this.bleUuid,
+                this.scanOptions
+            )
+        } else {
+            this.ble = await this.scanner.scanForName(
+                this.bleLocalName,
+                this.scanOptions
+            )
+        }
     }
 
     public async startLslStreams() {
@@ -303,7 +313,8 @@ export interface MuseLslProducer {
 }
 
 export interface MuseLslProducerOptions {
-    connectBleOnCreate: boolean
+    bleUuid?: string
+    connectBleOnCreate?: boolean
 }
 
 export type MuseLslProducerConstructor = new (
@@ -312,6 +323,7 @@ export type MuseLslProducerConstructor = new (
 
 export interface MuseLslProducerConstructorOptions {
     scanner: BleScanner
+    bleUuid?: string
     eegOutlet: LslOutlet
     ppgOutlet: LslOutlet
 }
