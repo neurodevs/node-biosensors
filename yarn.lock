@@ -667,10 +667,10 @@
     semver "^7.3.5"
     tar "^6.1.11"
 
-"@neurodevs/node-ble@^0.5.7":
-  version "0.5.7"
-  resolved "https://registry.yarnpkg.com/@neurodevs/node-ble/-/node-ble-0.5.7.tgz#34ab07d4b6940adf5ac7f837186100fd07336b02"
-  integrity sha512-UoUtBN6qDairIs/iy++uqN/Gih2qMmAxd4oUrqOQWX9rEHOJx+SN9LcYvGPHFU2CGZWXuZ82xxCh4HrnvxvmPQ==
+"@neurodevs/node-ble@^0.6.3":
+  version "0.6.3"
+  resolved "https://registry.yarnpkg.com/@neurodevs/node-ble/-/node-ble-0.6.3.tgz#a9af7ee705cb37652ca01e569a5c7b3a1d93c135"
+  integrity sha512-MMZMgYpV3xkTCJ6mTuT7LzUUmhnuv/5D6zTqDWz1uNAVMaXaAqINcwjorCBtXEp7JclDdDhnIVo6Bz18FIdQUg==
   dependencies:
     "@abandonware/noble" "^1.9.2-22"
     "@sprucelabs/error" "^6.0.520"
@@ -1963,7 +1963,7 @@ error-ex@^1.3.1:
   dependencies:
     is-arrayish "^0.2.1"
 
-es-abstract@^1.23.2, es-abstract@^1.23.5, es-abstract@^1.23.6:
+es-abstract@^1.23.2, es-abstract@^1.23.5, es-abstract@^1.23.9:
   version "1.23.9"
   resolved "https://registry.yarnpkg.com/es-abstract/-/es-abstract-1.23.9.tgz#5b45994b7de78dada5c1bebf1379646b32b9d606"
   integrity sha512-py07lI0wjxAC/DcfK1S6G7iANonniZwTISvdPzk9hzeH0IZIshbuuFxLIU96OyF89Yb9hiqWn8M/bY83KY5vzA==
@@ -2595,10 +2595,10 @@ get-package-type@^0.1.0:
   resolved "https://registry.yarnpkg.com/get-package-type/-/get-package-type-0.1.0.tgz#8de2d803cff44df3bc6c456e6668b36c3926e11a"
   integrity sha512-pjzuKtY64GYfWizNAJ0fr9VqttZkNiK2iS430LtIHzjBEr6bX8Am2zm4sW4Ro5wjWW5cAlRL1qAMTcXbjNAO2Q==
 
-get-proto@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/get-proto/-/get-proto-1.0.0.tgz#2f14be4ab6a5ba2ca65b49defb544280730d9c5c"
-  integrity sha512-TtLgOcKaF1nMP2ijJnITkE4nRhbpshHhmzKiuhmSniiwWzovoqwqQ8rNuhf0mXJOqIY5iU+QkUe0CkJYrLsG9w==
+get-proto@^1.0.0, get-proto@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/get-proto/-/get-proto-1.0.1.tgz#150b3f2743869ef3e851ec0c49d15b1d14d00ee1"
+  integrity sha512-sTSfBjoXBp89JvIKIefqw7U2CCebsc74kiY6awiGogKtoSGbgjYE/G/+l9sF3MWFPNc9IcoOC4ODfKHfxFmp0g==
   dependencies:
     dunder-proto "^1.0.1"
     es-object-atoms "^1.0.0"
@@ -4337,17 +4337,17 @@ ref-napi@^3.0.1, ref-napi@^3.0.3:
     node-gyp-build "^4.2.1"
 
 reflect.getprototypeof@^1.0.6, reflect.getprototypeof@^1.0.9:
-  version "1.0.9"
-  resolved "https://registry.yarnpkg.com/reflect.getprototypeof/-/reflect.getprototypeof-1.0.9.tgz#c905f3386008de95a62315f3ea8630404be19e2f"
-  integrity sha512-r0Ay04Snci87djAsI4U+WNRcSw5S4pOH7qFjd/veA5gC7TbqESR3tcj28ia95L/fYUDw11JKP7uqUKUAfVvV5Q==
+  version "1.0.10"
+  resolved "https://registry.yarnpkg.com/reflect.getprototypeof/-/reflect.getprototypeof-1.0.10.tgz#c629219e78a3316d8b604c765ef68996964e7bf9"
+  integrity sha512-00o4I+DVrefhv+nX0ulyi3biSHCPDe+yLv5o/p6d/UVlirijB8E16FtfwSAi4g3tcqrQ4lRAqQSoFEZJehYEcw==
   dependencies:
     call-bind "^1.0.8"
     define-properties "^1.2.1"
-    dunder-proto "^1.0.1"
-    es-abstract "^1.23.6"
+    es-abstract "^1.23.9"
     es-errors "^1.3.0"
-    get-intrinsic "^1.2.6"
-    gopd "^1.2.0"
+    es-object-atoms "^1.0.0"
+    get-intrinsic "^1.2.7"
+    get-proto "^1.0.1"
     which-builtin-type "^1.2.1"
 
 regexp.prototype.flags@^1.5.1, regexp.prototype.flags@^1.5.3:

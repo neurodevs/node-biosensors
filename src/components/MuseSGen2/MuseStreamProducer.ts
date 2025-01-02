@@ -18,8 +18,9 @@ export default class MuseStreamProducer implements MuseLslProducer {
 
     private scanner: BleScanner
     private scanOptions!: ScanOptions
-    private ble!: BleAdapter
+    protected ble!: BleAdapter
     private bleUuid?: string
+    private rssiIntervalMs?: number
     private eegOutlet: LslOutlet
     private ppgOutlet: LslOutlet
     private eegChannelChunks = this.generateEmptyEegMatrix()
@@ -27,10 +28,12 @@ export default class MuseStreamProducer implements MuseLslProducer {
     private encoder: TextEncoder
 
     protected constructor(options: MuseLslProducerConstructorOptions) {
-        const { scanner, bleUuid, eegOutlet, ppgOutlet } = options
+        const { scanner, bleUuid, rssiIntervalMs, eegOutlet, ppgOutlet } =
+            options
 
         this.scanner = scanner
         this.bleUuid = bleUuid
+        this.rssiIntervalMs = rssiIntervalMs
         this.eegOutlet = eegOutlet
         this.ppgOutlet = ppgOutlet
         this.encoder = this.TextEncoder()
@@ -39,7 +42,12 @@ export default class MuseStreamProducer implements MuseLslProducer {
     }
 
     public static async Create(options?: MuseLslProducerOptions) {
-        const { bleUuid, connectBleOnCreate = true } = options ?? {}
+        const {
+            bleUuid,
+            connectBleOnCreate = true,
+            rssiIntervalMs,
+        } = options ?? {}
+
         const scanner = this.BleDeviceScanner()
 
         const eegOutlet = await this.LslStreamOutlet(this.eegOutletOptions)
@@ -48,6 +56,7 @@ export default class MuseStreamProducer implements MuseLslProducer {
         const instance = new (this.Class ?? this)({
             scanner,
             bleUuid,
+            rssiIntervalMs,
             eegOutlet,
             ppgOutlet,
         })
@@ -62,6 +71,7 @@ export default class MuseStreamProducer implements MuseLslProducer {
     private generateScanOptions() {
         this.scanOptions = {
             characteristicCallbacks: this.generateCharCallbacks(),
+            rssiIntervalMs: this.rssiIntervalMs,
         }
     }
 
@@ -361,6 +371,7 @@ export interface MuseLslProducer {
 export interface MuseLslProducerOptions {
     bleUuid?: string
     connectBleOnCreate?: boolean
+    rssiIntervalMs?: number
 }
 
 export type MuseLslProducerConstructor = new (
@@ -370,6 +381,7 @@ export type MuseLslProducerConstructor = new (
 export interface MuseLslProducerConstructorOptions {
     scanner: BleScanner
     bleUuid?: string
+    rssiIntervalMs?: number
     eegOutlet: LslOutlet
     ppgOutlet: LslOutlet
 }

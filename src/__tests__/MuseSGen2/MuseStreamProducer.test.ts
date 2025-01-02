@@ -1,9 +1,11 @@
 import { test, assert } from '@sprucelabs/test-utils'
 import {
+    BleDeviceAdapter,
     FakeBleAdapter,
     FakeBleScanner,
     FakeCharacteristic,
     FakePeripheral,
+    SpyBleAdapter,
 } from '@neurodevs/node-ble'
 import { FakeLslOutlet } from '@neurodevs/node-lsl'
 import MuseStreamProducer, {
@@ -219,6 +221,25 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
             FakeBleScanner.callsToScanForUuid[0]?.uuid,
             this.peripheral.uuid,
             'Should pass uuid to BleDeviceScanner!'
+        )
+    }
+
+    @test()
+    protected static async passesOptionalRssiIntervalMsToBle() {
+        BleDeviceAdapter.Class = SpyBleAdapter
+        const rssiIntervalMs = 10
+
+        const instance = await this.MuseStreamProducer({
+            rssiIntervalMs,
+        })
+
+        const ble = instance.bleAdapter as SpyBleAdapter
+        const actualRssi = ble.getRssiIntervalMs()
+
+        assert.isEqual(
+            actualRssi,
+            rssiIntervalMs,
+            'Should pass rssiIntervalMs to BleDeviceScanner!'
         )
     }
 
