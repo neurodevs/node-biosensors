@@ -1,21 +1,15 @@
-import AbstractSpruceTest, {
-    test,
-    assert,
-    errorAssert,
-    generateId,
-} from '@sprucelabs/test-utils'
-import { FakeXdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
+import { test, assert, errorAssert, generateId } from '@sprucelabs/test-utils'
+import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 import MuseStreamRecorder, {
-    StreamRecorder,
+    MuseRecorder,
 } from '../../components/MuseSGen2/MuseStreamRecorder'
+import AbstractBiosensorsTest from '../AbstractBiosensorsTest'
 
-export default class MuseStreamRecorderTest extends AbstractSpruceTest {
-    private static instance: StreamRecorder
+export default class MuseStreamRecorderTest extends AbstractBiosensorsTest {
+    private static instance: MuseRecorder
 
     protected static async beforeEach() {
         await super.beforeEach()
-
-        this.setFakeXdfRecorder()
 
         this.instance = this.MuseStreamRecorder()
     }
@@ -31,7 +25,7 @@ export default class MuseStreamRecorderTest extends AbstractSpruceTest {
         const err = assert.doesThrow(() => MuseStreamRecorder.Create())
 
         errorAssert.assertError(err, 'MISSING_PARAMETERS', {
-            parameters: ['xdfSavePath'],
+            parameters: ['xdfRecordPath'],
         })
     }
 
@@ -39,7 +33,7 @@ export default class MuseStreamRecorderTest extends AbstractSpruceTest {
     protected static async createsXdfStreamRecorderWithCorrectOptions() {
         const { savePath, streamQueries } = this.xdfRecorderOptions
 
-        assert.isEqual(savePath, this.xdfSavePath, 'Invalid save path!')
+        assert.isEqual(savePath, this.xdfRecordPath, 'Invalid xdfRecordPath!')
 
         assert.isEqualDeep(
             streamQueries,
@@ -79,16 +73,11 @@ export default class MuseStreamRecorderTest extends AbstractSpruceTest {
         this.instance.stop()
     }
 
-    private static setFakeXdfRecorder() {
-        XdfStreamRecorder.Class = FakeXdfRecorder
-        FakeXdfRecorder.resetTestDouble()
-    }
-
     private static get xdfRecorderOptions() {
         return FakeXdfRecorder.callsToConstructor[0]
     }
 
-    private static readonly xdfSavePath = generateId()
+    private static readonly xdfRecordPath = generateId()
 
     private static readonly streamQueries = [
         'type="EEG"',
@@ -97,6 +86,6 @@ export default class MuseStreamRecorderTest extends AbstractSpruceTest {
     ]
 
     private static MuseStreamRecorder() {
-        return MuseStreamRecorder.Create(this.xdfSavePath)
+        return MuseStreamRecorder.Create(this.xdfRecordPath)
     }
 }

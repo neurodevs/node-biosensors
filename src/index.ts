@@ -17,5 +17,5 @@ export * from './components/MuseSGen2/MuseStreamProducer'
 export { default as MuseStreamRecorder } from './components/MuseSGen2/MuseStreamRecorder'
 export * from './components/MuseSGen2/MuseStreamRecorder'
 
-export { default as SpyMuseStreamProducer } from './testDoubles/SpyMuseStreamProducer'
-export * from './testDoubles/SpyMuseStreamProducer'
+export { default as SpyMuseStreamProducer } from './testDoubles/MuseProducer/SpyMuseStreamProducer'
+export * from './testDoubles/MuseProducer/SpyMuseStreamProducer'

@@ -1,8 +1,4 @@
-import AbstractSpruceTest, {
-    test,
-    assert,
-    generateId,
-} from '@sprucelabs/test-utils'
+import { test, assert, generateId } from '@sprucelabs/test-utils'
 import {
     BleAdapter,
     BleDeviceAdapter,
@@ -20,8 +16,9 @@ import {
 import CgxQuick20Adapter, {
     BiosensorAdapter,
 } from '../../components/CgxQuick20/CgxQuick20Adapter'
+import AbstractBiosensorsTest from '../AbstractBiosensorsTest'
 
-export default class CgxQuick20AdapterTest extends AbstractSpruceTest {
+export default class CgxQuick20AdapterTest extends AbstractBiosensorsTest {
     private static instance: BiosensorAdapter
 
     protected static async beforeEach() {

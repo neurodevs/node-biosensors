@@ -1,4 +1,4 @@
-import AbstractSpruceTest, { test, assert } from '@sprucelabs/test-utils'
+import { test, assert } from '@sprucelabs/test-utils'
 import {
     BleDeviceAdapter,
     BleDeviceScanner,
@@ -17,9 +17,10 @@ import MuseStreamProducer, {
     MuseProducerOptions,
 } from '../../components/MuseSGen2/MuseStreamProducer'
 import { MUSE_CHARACTERISTIC_UUIDS as CHAR_UUIDS } from '../../components/MuseSGen2/MuseStreamProducer'
-import SpyMuseStreamProducer from '../../testDoubles/SpyMuseStreamProducer'
+import SpyMuseStreamProducer from '../../testDoubles/MuseProducer/SpyMuseStreamProducer'
+import AbstractBiosensorsTest from '../AbstractBiosensorsTest'
 
-export default class MuseStreamProducerTest extends AbstractSpruceTest {
+export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
     private static instance: SpyMuseStreamProducer
     private static museCharCallbacks: Record<string, (data: Buffer) => void>
     private static eegChars: FakeCharacteristic[]

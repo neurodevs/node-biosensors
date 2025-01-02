@@ -1,8 +1,8 @@
 import { assertOptions } from '@sprucelabs/schema'
 import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 
-export default class MuseStreamRecorder implements StreamRecorder {
-    public static Class?: StreamRecorderConstructor
+export default class MuseStreamRecorder implements MuseRecorder {
+    public static Class?: MuseRecorderConstructor
 
     private xdfRecorder: XdfRecorder
 
@@ -10,9 +10,9 @@ export default class MuseStreamRecorder implements StreamRecorder {
         this.xdfRecorder = xdfRecorder
     }
 
-    public static Create(xdfSavePath: string) {
-        assertOptions({ xdfSavePath }, ['xdfSavePath'])
-        const recorder = this.XdfStreamRecorder(xdfSavePath)
+    public static Create(xdfRecordPath: string) {
+        assertOptions({ xdfRecordPath }, ['xdfRecordPath'])
+        const recorder = this.XdfStreamRecorder(xdfRecordPath)
         return new (this.Class ?? this)(recorder)
     }
 
@@ -30,16 +30,16 @@ export default class MuseStreamRecorder implements StreamRecorder {
         'type="Markers"',
     ]
 
-    private static XdfStreamRecorder(xdfSavePath: string) {
-        return XdfStreamRecorder.Create(xdfSavePath, this.museStreamQueries)
+    private static XdfStreamRecorder(xdfRecordPath: string) {
+        return XdfStreamRecorder.Create(xdfRecordPath, this.museStreamQueries)
     }
 }
 
-export interface StreamRecorder {
+export interface MuseRecorder {
     start(): void
     stop(): void
 }
 
-export type StreamRecorderConstructor = new (
+export type MuseRecorderConstructor = new (
     xdfRecorder: XdfRecorder
-) => StreamRecorder
+) => MuseRecorder
