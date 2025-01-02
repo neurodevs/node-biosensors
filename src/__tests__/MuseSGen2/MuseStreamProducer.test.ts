@@ -13,12 +13,12 @@ import {
     LslStreamInfo,
     LslStreamOutlet,
 } from '@neurodevs/node-lsl'
-import MuseStreamGenerator from '../../components/MuseSGen2/MuseStreamGenerator'
-import { MUSE_CHARACTERISTIC_UUIDS as CHAR_UUIDS } from '../../components/MuseSGen2/MuseStreamGenerator'
-import SpyMuseStreamGenerator from '../../testDoubles/SpyMuseStreamGenerator'
+import MuseStreamProducer from '../../components/MuseSGen2/MuseStreamProducer'
+import { MUSE_CHARACTERISTIC_UUIDS as CHAR_UUIDS } from '../../components/MuseSGen2/MuseStreamProducer'
+import SpyMuseStreamProducer from '../../testDoubles/SpyMuseStreamProducer'
 
-export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
-    private static instance: SpyMuseStreamGenerator
+export default class MuseStreamProducerTest extends AbstractSpruceTest {
+    private static instance: SpyMuseStreamProducer
     private static museCharCallbacks: Record<string, (data: Buffer) => void>
     private static eegChars: FakeCharacteristic[]
     private static ppgChars: FakeCharacteristic[]
@@ -31,9 +31,9 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
         this.setFakeBleScanner()
         this.setFakeLslOutlet()
         this.setFakeStreamInfo()
-        this.setSpyMuseStreamGenerator()
+        this.setSpyMuseStreamProducer()
 
-        this.instance = await this.MuseStreamGenerator()
+        this.instance = await this.MuseStreamProducer()
 
         this.museCharCallbacks = this.generateCallbacks()
         await this.setFakeCharsOnPeripheral()
@@ -41,7 +41,7 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
     }
 
     @test()
-    protected static async canCreateMuseStreamGenerator() {
+    protected static async canCreateMuseStreamProducer() {
         assert.isTruthy(this.instance, 'Should create an instance!')
     }
 
@@ -314,8 +314,8 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
         FakeStreamInfo.resetTestDouble()
     }
 
-    private static setSpyMuseStreamGenerator() {
-        MuseStreamGenerator.Class = SpyMuseStreamGenerator
+    private static setSpyMuseStreamProducer() {
+        MuseStreamProducer.Class = SpyMuseStreamProducer
     }
 
     private static get callsToScanForName() {
@@ -382,7 +382,7 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
         return new FakeCharacteristic({ uuid })
     }
 
-    private static async MuseStreamGenerator() {
-        return (await MuseStreamGenerator.Create()) as SpyMuseStreamGenerator
+    private static async MuseStreamProducer() {
+        return (await MuseStreamProducer.Create()) as SpyMuseStreamProducer
     }
 }

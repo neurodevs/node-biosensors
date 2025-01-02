@@ -5,14 +5,17 @@ export * from './components/CgxQuick20/CgxQuick20Adapter'
 
 // Muse S Gen 2
 
+// BLE -> LSL + XDF
 export { default as MuseDeviceAdapter } from './components/MuseSGen2/MuseDeviceAdapter'
 export * from './components/MuseSGen2/MuseDeviceAdapter'
 
-export { default as MuseStreamGenerator } from './components/MuseSGen2/MuseStreamGenerator'
-export * from './components/MuseSGen2/MuseStreamGenerator'
+// BLE -> LSL
+export { default as MuseStreamProducer } from './components/MuseSGen2/MuseStreamProducer'
+export * from './components/MuseSGen2/MuseStreamProducer'
 
+// LSL -> XDF
 export { default as MuseStreamRecorder } from './components/MuseSGen2/MuseStreamRecorder'
 export * from './components/MuseSGen2/MuseStreamRecorder'
 
-export { default as SpyMuseStreamGenerator } from './testDoubles/SpyMuseStreamGenerator'
-export * from './testDoubles/SpyMuseStreamGenerator'
+export { default as SpyMuseStreamProducer } from './testDoubles/SpyMuseStreamProducer'
+export * from './testDoubles/SpyMuseStreamProducer'

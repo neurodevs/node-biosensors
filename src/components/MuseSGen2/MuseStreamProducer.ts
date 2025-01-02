@@ -13,8 +13,8 @@ import {
     LslStreamOutlet,
 } from '@neurodevs/node-lsl'
 
-export default class MuseStreamGenerator implements StreamGenerator {
-    public static Class?: StreamGeneratorConstructor
+export default class MuseStreamProducer implements MuseProducer {
+    public static Class?: MuseProducerConstructor
 
     private scanner: BleScanner
     private scanOptions!: ScanOptions
@@ -25,7 +25,7 @@ export default class MuseStreamGenerator implements StreamGenerator {
     private ppgChannelChunks = this.generateEmptyPpgMatrix()
     private encoder: TextEncoder
 
-    protected constructor(options: StreamGeneratorConstructorOptions) {
+    protected constructor(options: MuseProducerConstructorOptions) {
         const { scanner, eegOutlet, ppgOutlet } = options
 
         this.scanner = scanner
@@ -219,12 +219,12 @@ export default class MuseStreamGenerator implements StreamGenerator {
 
     private readonly bleLocalName = 'MuseS'
 
-    private readonly eegCharNames = MuseStreamGenerator.eegCharacteristicNames
-    private readonly eegChunkSize = MuseStreamGenerator.eegChunkSize
+    private readonly eegCharNames = MuseStreamProducer.eegCharacteristicNames
+    private readonly eegChunkSize = MuseStreamProducer.eegChunkSize
     private readonly eegNumChannels = this.eegCharNames.length
 
-    private readonly ppgCharNames = MuseStreamGenerator.ppgCharacteristicNames
-    private readonly ppgChunkSize = MuseStreamGenerator.ppgChunkSize
+    private readonly ppgCharNames = MuseStreamProducer.ppgCharacteristicNames
+    private readonly ppgChunkSize = MuseStreamProducer.ppgChunkSize
     private readonly ppgNumChannels = this.ppgCharNames.length
 
     private readonly eegCharUuids = this.eegCharNames.map(
@@ -293,16 +293,16 @@ export default class MuseStreamGenerator implements StreamGenerator {
     }
 }
 
-export interface StreamGenerator {
+export interface MuseProducer {
     connect(): Promise<void>
     start(): Promise<void>
 }
 
-export type StreamGeneratorConstructor = new (
-    options: StreamGeneratorConstructorOptions
-) => StreamGenerator
+export type MuseProducerConstructor = new (
+    options: MuseProducerConstructorOptions
+) => MuseProducer
 
-export interface StreamGeneratorConstructorOptions {
+export interface MuseProducerConstructorOptions {
     scanner: BleScanner
     eegOutlet: LslOutlet
     ppgOutlet: LslOutlet
@@ -324,5 +324,3 @@ export const MUSE_CHARACTERISTIC_UUIDS: Record<string, string> = {
 }
 
 const CHAR_UUIDS = MUSE_CHARACTERISTIC_UUIDS
-
-export type CharacteristicNames = keyof typeof MUSE_CHARACTERISTIC_UUIDS
