@@ -3,7 +3,6 @@ import MuseDeviceAdapter, {
     MuseAdapter,
     MuseAdapterOptions,
 } from '../../components/MuseSGen2/MuseDeviceAdapter'
-import MuseStreamRecorder from '../../components/MuseSGen2/MuseStreamRecorder'
 import FakeMuseRecorder from '../../testDoubles/MuseRecorder/FakeMuseRecorder'
 import AbstractBiosensorsTest from '../AbstractBiosensorsTest'
 
@@ -42,11 +41,6 @@ export default class MuseDeviceAdapterTest extends AbstractBiosensorsTest {
             0,
             'Should not construct MuseStreamRecorder!'
         )
-    }
-
-    private static setFakeMuseRecorder() {
-        MuseStreamRecorder.Class = FakeMuseRecorder
-        FakeMuseRecorder.resetTestDouble()
     }
 
     private static MuseDeviceAdapter(options?: MuseAdapterOptions) {

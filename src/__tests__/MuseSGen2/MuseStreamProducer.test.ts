@@ -1,18 +1,11 @@
 import { test, assert } from '@sprucelabs/test-utils'
 import {
-    BleDeviceAdapter,
-    BleDeviceScanner,
     FakeBleAdapter,
     FakeBleScanner,
     FakeCharacteristic,
     FakePeripheral,
 } from '@neurodevs/node-ble'
-import {
-    FakeLslOutlet,
-    FakeStreamInfo,
-    LslStreamInfo,
-    LslStreamOutlet,
-} from '@neurodevs/node-lsl'
+import { FakeLslOutlet } from '@neurodevs/node-lsl'
 import MuseStreamProducer, {
     MuseProducerOptions,
 } from '../../components/MuseSGen2/MuseStreamProducer'
@@ -30,11 +23,9 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
     protected static async beforeEach() {
         await super.beforeEach()
 
-        this.setFakeBleAdapter()
-        this.setFakeBleScanner()
-        this.setFakeLslOutlet()
-        this.setFakeStreamInfo()
         this.setSpyMuseStreamProducer()
+
+        FakeBleScanner.fakedPeripherals = [this.peripheral]
 
         this.instance = await this.MuseStreamProducer()
 
@@ -309,32 +300,6 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
         this.ppgChars.forEach((char) => {
             char.simulateDataReceived(buffer)
         })
-    }
-
-    private static setFakeBleAdapter() {
-        BleDeviceAdapter.Class = FakeBleAdapter
-        FakeBleAdapter.resetTestDouble()
-    }
-
-    private static setFakeBleScanner() {
-        BleDeviceScanner.Class = FakeBleScanner
-        FakeBleScanner.resetTestDouble()
-
-        FakeBleScanner.fakedPeripherals = [this.peripheral]
-    }
-
-    private static setFakeLslOutlet() {
-        LslStreamOutlet.Class = FakeLslOutlet
-        FakeLslOutlet.resetTestDouble()
-    }
-
-    private static setFakeStreamInfo() {
-        LslStreamInfo.Class = FakeStreamInfo
-        FakeStreamInfo.resetTestDouble()
-    }
-
-    private static setSpyMuseStreamProducer() {
-        MuseStreamProducer.Class = SpyMuseStreamProducer
     }
 
     private static get callsToScanForName() {
