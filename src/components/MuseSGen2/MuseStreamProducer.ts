@@ -50,7 +50,7 @@ export default class MuseStreamProducer implements MuseProducer {
         })
 
         if (connectBleOnCreate) {
-            await instance.connect()
+            await instance.connectBle()
         }
 
         return instance
@@ -177,14 +177,14 @@ export default class MuseStreamProducer implements MuseProducer {
         this.ppgChannelChunks = this.generateEmptyPpgMatrix()
     }
 
-    public async connect() {
+    public async connectBle() {
         this.ble = await this.scanner.scanForName(
             this.bleLocalName,
             this.scanOptions
         )
     }
 
-    public async start() {
+    public async startLslStreams() {
         await this.writeControlCommands()
     }
 
@@ -298,8 +298,8 @@ export default class MuseStreamProducer implements MuseProducer {
 }
 
 export interface MuseProducer {
-    connect(): Promise<void>
-    start(): Promise<void>
+    connectBle(): Promise<void>
+    startLslStreams(): Promise<void>
 }
 
 export interface MuseProducerOptions {

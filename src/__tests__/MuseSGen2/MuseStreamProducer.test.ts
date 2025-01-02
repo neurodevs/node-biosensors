@@ -39,8 +39,9 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
         this.instance = await this.MuseStreamProducer()
 
         this.museCharCallbacks = this.generateCallbacks()
-        await this.setFakeCharsOnPeripheral()
         this.controlChar = this.fakeControlChar()
+
+        await this.setFakeCharsOnPeripheral()
     }
 
     @test()
@@ -180,7 +181,7 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
     }
 
     @test()
-    protected static async canDisableConnectOnCreate() {
+    protected static async canDisableConnectBleOnCreate() {
         FakeBleAdapter.resetTestDouble()
 
         await this.MuseStreamProducer({
@@ -295,7 +296,7 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
     }
 
     private static async start() {
-        await this.instance.start()
+        await this.instance.startLslStreams()
     }
 
     private static simulateEegForChars(buffer: Buffer) {
