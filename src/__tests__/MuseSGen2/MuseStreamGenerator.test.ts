@@ -13,8 +13,8 @@ import {
     LslStreamInfo,
     LslStreamOutlet,
 } from '@neurodevs/node-lsl'
-import { MUSE_CHARACTERISTIC_UUIDS as CHAR_UUIDS } from '../../components/MuseSGen2/museCharacteristicUuids'
 import MuseStreamGenerator from '../../components/MuseSGen2/MuseStreamGenerator'
+import { MUSE_CHARACTERISTIC_UUIDS as CHAR_UUIDS } from '../../components/MuseSGen2/MuseStreamGenerator'
 import SpyMuseStreamGenerator from '../../testDoubles/SpyMuseStreamGenerator'
 
 export default class MuseStreamGeneratorTest extends AbstractSpruceTest {

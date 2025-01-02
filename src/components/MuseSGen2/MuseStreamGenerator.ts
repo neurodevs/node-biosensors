@@ -12,7 +12,6 @@ import {
     LslOutletOptions,
     LslStreamOutlet,
 } from '@neurodevs/node-lsl'
-import { MUSE_CHARACTERISTIC_UUIDS as CHAR_UUIDS } from './museCharacteristicUuids'
 
 export default class MuseStreamGenerator implements StreamGenerator {
     public static Class?: StreamGeneratorConstructor
@@ -308,3 +307,22 @@ export interface StreamGeneratorConstructorOptions {
     eegOutlet: LslOutlet
     ppgOutlet: LslOutlet
 }
+
+export const MUSE_CHARACTERISTIC_UUIDS: Record<string, string> = {
+    CONTROL: '273e00014c4d454d96bef03bac821358',
+    TELEMETRY: '273e000b4c4d454d96bef03bac821358',
+    GYROSCOPE: '273e00094c4d454d96bef03bac821358',
+    ACCELEROMETER: '273e000a4c4d454d96bef03bac821358',
+    PPG_AMBIENT: '273e000f4c4d454d96bef03bac821358',
+    PPG_INFRARED: '273e00104c4d454d96bef03bac821358',
+    PPG_RED: '273e00114c4d454d96bef03bac821358',
+    EEG_TP9: '273e00034c4d454d96bef03bac821358',
+    EEG_AF7: '273e00044c4d454d96bef03bac821358',
+    EEG_AF8: '273e00054c4d454d96bef03bac821358',
+    EEG_TP10: '273e00064c4d454d96bef03bac821358',
+    EEG_AUX: '273e00074c4d454d96bef03bac821358',
+}
+
+const CHAR_UUIDS = MUSE_CHARACTERISTIC_UUIDS
+
+export type CharacteristicNames = keyof typeof MUSE_CHARACTERISTIC_UUIDS
