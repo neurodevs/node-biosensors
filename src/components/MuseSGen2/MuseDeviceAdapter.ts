@@ -39,10 +39,15 @@ export default class MuseDeviceAdapter implements MuseAdapter {
 
     public async stopStreaming() {
         this.stopXdfRecorderIfEnabled()
+        await this.stopLslStreams()
     }
 
     private stopXdfRecorderIfEnabled() {
         this.xdfRecorder?.stop()
+    }
+
+    private async stopLslStreams() {
+        await this.lslProducer.stopLslStreams()
     }
 
     private static MuseStreamProducer(options?: MuseAdapterOptions) {
