@@ -60,14 +60,18 @@ export default class MuseDeviceAdapter implements MuseAdapter {
         await this.lslProducer.disconnectBle()
     }
 
+    private static createXdfRecorderIfGivenPath(xdfRecordPath?: string) {
+        return xdfRecordPath
+            ? this.MuseStreamRecorder(xdfRecordPath)
+            : undefined
+    }
+
     private static MuseStreamProducer(options?: MuseAdapterOptions) {
         return MuseStreamProducer.Create(options)
     }
 
-    private static createXdfRecorderIfGivenPath(xdfRecordPath?: string) {
-        return xdfRecordPath
-            ? MuseStreamRecorder.Create(xdfRecordPath)
-            : undefined
+    private static MuseStreamRecorder(xdfRecorderPath: string) {
+        return MuseStreamRecorder.Create(xdfRecorderPath)
     }
 }
 
