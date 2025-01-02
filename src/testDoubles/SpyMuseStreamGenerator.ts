@@ -8,6 +8,10 @@ export default class SpyMuseStreamGenerator extends MuseStreamGenerator {
     }
 
     public getHandleEegChannelForChunk() {
-        return this.handleEegChannelForChunk
+        return this.handleEegChannelChunk
+    }
+
+    public getHandlePpgChannelForChunk() {
+        return this.handlePpgChannelChunk
     }
 }

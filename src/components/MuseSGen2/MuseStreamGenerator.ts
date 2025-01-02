@@ -12,7 +12,7 @@ import {
     LslOutletOptions,
     LslStreamOutlet,
 } from '@neurodevs/node-lsl'
-import { MUSE_CHARACTERISTIC_UUIDS } from './museCharacteristicUuids'
+import { MUSE_CHARACTERISTIC_UUIDS as CHAR_UUIDS } from './museCharacteristicUuids'
 
 export default class MuseStreamGenerator implements StreamGenerator {
     public static Class?: StreamGeneratorConstructor
@@ -21,14 +21,17 @@ export default class MuseStreamGenerator implements StreamGenerator {
     private scanOptions!: ScanOptions
     private ble!: BleAdapter
     private eegOutlet: LslOutlet
+    private ppgOutlet: LslOutlet
     private eegChannelChunks = this.generateEmptyEegMatrix()
+    private ppgChannelChunks = this.generateEmptyPpgMatrix()
     private encoder: TextEncoder
 
     protected constructor(options: StreamGeneratorConstructorOptions) {
-        const { scanner, eegOutlet } = options
+        const { scanner, eegOutlet, ppgOutlet } = options
 
         this.scanner = scanner
         this.eegOutlet = eegOutlet
+        this.ppgOutlet = ppgOutlet
         this.encoder = this.TextEncoder()
 
         this.generateScanOptions()
@@ -38,9 +41,13 @@ export default class MuseStreamGenerator implements StreamGenerator {
         const scanner = this.BleDeviceScanner()
 
         const eegOutlet = await this.LslStreamOutlet(this.eegOutletOptions)
-        await this.LslStreamOutlet(this.ppgOutletOptions)
+        const ppgOutlet = await this.LslStreamOutlet(this.ppgOutletOptions)
 
-        const instance = new (this.Class ?? this)({ scanner, eegOutlet })
+        const instance = new (this.Class ?? this)({
+            scanner,
+            eegOutlet,
+            ppgOutlet,
+        })
         await instance.connect()
 
         return instance
@@ -60,44 +67,43 @@ export default class MuseStreamGenerator implements StreamGenerator {
     }
 
     private generateEegCallbacks() {
-        return this.eegCharacteristicNames.reduce(
+        return this.eegCharNames.reduce(
             (acc, name) => ({
                 ...acc,
-                [MUSE_CHARACTERISTIC_UUIDS[name]]:
-                    this.handleEegChannelForChunk.bind(this),
+                [CHAR_UUIDS[name]]: this.handleEegChannelChunk.bind(this),
             }),
             {}
         )
     }
 
-    protected handleEegChannelForChunk(data: Buffer, char: Characteristic) {
+    protected handleEegChannelChunk(data: Buffer, char: Characteristic) {
         const channelValuesForChunk = Array.from(data).slice(2) as number[]
-        const channelCharIdx = this.getEegCharIdx(char.uuid)
+        const channelIdx = this.getEegChannelIdx(char.uuid)
 
-        this.eegChannelChunks[channelCharIdx] = channelValuesForChunk
+        this.eegChannelChunks[channelIdx] = channelValuesForChunk
 
-        if (this.isLastChannel(channelCharIdx)) {
+        if (this.isLastEegChannel(channelIdx)) {
             this.pushEegSamples()
         }
     }
 
-    private getEegCharIdx(charUuid: string) {
-        return this.eegCharacteristicUuids.indexOf(charUuid)
+    private getEegChannelIdx(charUuid: string) {
+        return this.eegCharUuids.indexOf(charUuid)
     }
 
-    private isLastChannel(charIdx: number) {
+    private isLastEegChannel(charIdx: number) {
         return charIdx === 4
     }
 
     private pushEegSamples() {
         for (let j = 0; j < this.eegChunkSize; j++) {
             const chunkIdx = j
-            this.createAndPushSample(chunkIdx)
+            this.createAndPushEegSample(chunkIdx)
         }
         this.resetEegChannelChunks()
     }
 
-    private createAndPushSample(chunkIdx: number) {
+    private createAndPushEegSample(chunkIdx: number) {
         let sample: number[] = []
 
         for (let i = 0; i < this.eegNumChannels; i++) {
@@ -114,32 +120,63 @@ export default class MuseStreamGenerator implements StreamGenerator {
         this.eegChannelChunks = this.generateEmptyEegMatrix()
     }
 
-    private generateEmptyEegMatrix() {
-        return this.generateEmptyMatrix(this.eegNumChannels, this.eegChunkSize)
-    }
-
-    private generateEmptyMatrix(rows: number, columns: number) {
-        return Array.from({ length: rows }, () => new Array(columns).fill(0))
-    }
-
     private generatePpgCallbacks() {
-        return this.ppgCharacteristicNames.reduce(
+        return this.ppgCharNames.reduce(
             (acc, name) => ({
                 ...acc,
-                [MUSE_CHARACTERISTIC_UUIDS[name]]:
-                    this.handlePpgChannelForChunk.bind(this),
+                [CHAR_UUIDS[name]]: this.handlePpgChannelChunk.bind(this),
             }),
             {}
         )
     }
 
-    private handlePpgChannelForChunk(data: Buffer, char: SimpleCharacteristic) {
-        console.log(data, char.uuid)
+    protected handlePpgChannelChunk(data: Buffer, char: SimpleCharacteristic) {
+        const channelValuesForChunk = Array.from(data)
+        const channelIdx = this.getPpgChannelIdx(char.uuid)
+
+        this.ppgChannelChunks[channelIdx] = channelValuesForChunk
+
+        if (this.isLastPpgChannel(channelIdx)) {
+            this.pushPpgSamples()
+        }
+    }
+
+    private getPpgChannelIdx(charUuid: string) {
+        return this.ppgCharUuids.indexOf(charUuid)
+    }
+
+    private isLastPpgChannel(idx: number) {
+        return idx === 2
+    }
+
+    private pushPpgSamples() {
+        for (let j = 0; j < this.ppgChunkSize; j++) {
+            const chunkIdx = j
+            this.createAndPushPpgSample(chunkIdx)
+        }
+        this.resetPpgChannelChunks()
+    }
+
+    private createAndPushPpgSample(chunkIdx: number) {
+        let sample: number[] = []
+
+        for (let i = 0; i < this.ppgNumChannels; i++) {
+            const channelIdx = i
+            const channelValue = this.ppgChannelChunks[channelIdx][chunkIdx]
+
+            sample.push(channelValue)
+        }
+
+        this.ppgOutlet.pushSample(sample)
+    }
+
+    protected resetPpgChannelChunks() {
+        this.ppgChannelChunks = this.generateEmptyPpgMatrix()
     }
 
     public async connect() {
         this.ble = await this.scanner.scanForName(
-            this.museLocalName,
+            this.bleLocalName,
             this.scanOptions
         )
     }
@@ -160,7 +197,7 @@ export default class MuseStreamGenerator implements StreamGenerator {
     }
 
     private get controlUuid() {
-        return MUSE_CHARACTERISTIC_UUIDS.CONTROL
+        return CHAR_UUIDS.CONTROL
     }
 
     private createBufferFrom(cmd: string) {
@@ -169,28 +206,40 @@ export default class MuseStreamGenerator implements StreamGenerator {
         return Buffer.from(encoded)
     }
 
-    private get eegChunkSize() {
-        return MuseStreamGenerator.eegChunkSize
+    private generateEmptyEegMatrix() {
+        return this.generateEmptyMatrix(this.eegNumChannels, this.eegChunkSize)
     }
 
-    private get eegCharacteristicNames() {
-        return MuseStreamGenerator.eegCharacteristicNames
+    private generateEmptyPpgMatrix() {
+        return this.generateEmptyMatrix(this.ppgNumChannels, this.ppgChunkSize)
     }
 
-    private get ppgCharacteristicNames() {
-        return MuseStreamGenerator.ppgCharacteristicNames
+    private generateEmptyMatrix(rows: number, columns: number) {
+        return Array.from({ length: rows }, () => new Array(columns).fill(0))
     }
 
-    private readonly museLocalName = 'MuseS'
+    private readonly bleLocalName = 'MuseS'
 
-    private readonly eegNumChannels = this.eegCharacteristicNames.length
+    private readonly eegCharNames = MuseStreamGenerator.eegCharacteristicNames
+    private readonly eegChunkSize = MuseStreamGenerator.eegChunkSize
+    private readonly eegNumChannels = this.eegCharNames.length
 
-    private readonly eegCharacteristicUuids = this.eegCharacteristicNames.map(
-        (name) => MUSE_CHARACTERISTIC_UUIDS[name]
+    private readonly ppgCharNames = MuseStreamGenerator.ppgCharacteristicNames
+    private readonly ppgChunkSize = MuseStreamGenerator.ppgChunkSize
+    private readonly ppgNumChannels = this.ppgCharNames.length
+
+    private readonly eegCharUuids = this.eegCharNames.map(
+        (name) => CHAR_UUIDS[name]
     )
 
-    private static readonly eegSampleRate = 256
+    private readonly ppgCharUuids = this.ppgCharNames.map(
+        (name) => CHAR_UUIDS[name]
+    )
+
     private static readonly eegChunkSize = 12
+    private static readonly eegSampleRate = 256
+    private static readonly ppgChunkSize = 6
+    private static readonly ppgSampleRate = 64
 
     private static readonly eegCharacteristicNames = [
         'EEG_TP9',
@@ -223,12 +272,12 @@ export default class MuseStreamGenerator implements StreamGenerator {
         name: 'Muse S Gen 2 PPG',
         type: 'PPG',
         channelNames: this.ppgCharacteristicNames,
-        sampleRate: 64,
+        sampleRate: this.ppgSampleRate,
         channelFormat: 'float32' as ChannelFormat,
         sourceId: 'muse-s-ppg',
         manufacturer: 'Interaxon Inc.',
         unit: 'N/A',
-        chunkSize: 6,
+        chunkSize: this.ppgChunkSize,
         maxBuffered: 360,
     }
 
@@ -257,4 +306,5 @@ export type StreamGeneratorConstructor = new (
 export interface StreamGeneratorConstructorOptions {
     scanner: BleScanner
     eegOutlet: LslOutlet
+    ppgOutlet: LslOutlet
 }

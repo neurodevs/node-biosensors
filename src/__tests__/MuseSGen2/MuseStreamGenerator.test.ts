@@ -1,8 +1,4 @@
-import AbstractSpruceTest, {
-    test,
-    assert,
-    generateId,
-} from '@sprucelabs/test-utils'
+import AbstractSpruceTest, { test, assert } from '@sprucelabs/test-utils'
 import {
     BleDeviceAdapter,
     BleDeviceScanner,
@@ -25,6 +21,7 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
     private static instance: SpyMuseStreamGenerator
     private static museCharCallbacks: Record<string, (data: Buffer) => void>
     private static eegChars: FakeCharacteristic[]
+    private static ppgChars: FakeCharacteristic[]
     private static controlChar: FakeCharacteristic
 
     protected static async beforeEach() {
@@ -39,7 +36,7 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
         this.instance = await this.MuseStreamGenerator()
 
         this.museCharCallbacks = this.generateCallbacks()
-        this.eegChars = await this.setFakeCharsOnPeripheral()
+        await this.setFakeCharsOnPeripheral()
         this.controlChar = this.fakeControlChar()
     }
 
@@ -118,26 +115,8 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
     }
 
     @test()
-    protected static async createsLslOutletForPpgChannels() {
-        const secondCall = FakeLslOutlet.callsToConstructor[1]
-
-        assert.isEqualDeep(secondCall.options, {
-            name: 'Muse S Gen 2 PPG',
-            type: 'PPG',
-            channelNames: this.ppgCharNames,
-            sampleRate: this.ppgSampleRate,
-            channelFormat: 'float32',
-            sourceId: 'muse-s-ppg',
-            manufacturer: 'Interaxon Inc.',
-            unit: 'N/A',
-            chunkSize: this.ppgChunkSize,
-            maxBuffered: 360,
-        })
-    }
-
-    @test()
     protected static async outletPushesEegSampleForEachChunk() {
-        this.simulateDataForChars(this.emptyEegBufferForChannel)
+        this.simulateEegForChars(this.emptyEegBuffer)
 
         const emptySample = [0, 0, 0, 0, 0]
         const expected = Array(this.eegChunkSize).fill(emptySample)
@@ -156,7 +135,7 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
             .map((_, i) => i)
 
         const increasingBuffer = Buffer.from(increasingData)
-        this.simulateDataForChars(increasingBuffer)
+        this.simulateEegForChars(increasingBuffer)
 
         assert.isEqualDeep(
             this.firstCallToPushSample,
@@ -165,11 +144,62 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
         )
     }
 
+    @test()
+    protected static async createsLslOutletForPpgChannels() {
+        const secondCall = FakeLslOutlet.callsToConstructor[1]
+
+        assert.isEqualDeep(secondCall.options, {
+            name: 'Muse S Gen 2 PPG',
+            type: 'PPG',
+            channelNames: this.ppgCharNames,
+            sampleRate: this.ppgSampleRate,
+            channelFormat: 'float32',
+            sourceId: 'muse-s-ppg',
+            manufacturer: 'Interaxon Inc.',
+            unit: 'N/A',
+            chunkSize: this.ppgChunkSize,
+            maxBuffered: 360,
+        })
+    }
+
+    @test()
+    protected static async outletPushesPpgSampleForEachChunk() {
+        this.simulatePpgForChars(this.emptyPpgBuffer)
+
+        const emptySample = [0, 0, 0]
+        const expected = Array(this.ppgChunkSize).fill(emptySample)
+
+        assert.isEqualDeep(
+            this.callsToPushSample,
+            expected,
+            'Should push a PPG sample for each chunk!'
+        )
+    }
+
     private static generateCallbacks() {
-        return this.museCharNames.reduce(
+        return {
+            ...this.generateEegCallbacks(),
+            ...this.generatePpgCallbacks(),
+        }
+    }
+
+    private static generateEegCallbacks() {
+        return this.eegCharNames.reduce(
             (acc, name) => ({
                 ...acc,
                 [CHAR_UUIDS[name]]: this.handleEegChannelData.bind(
+                    this.instance
+                ),
+            }),
+            {}
+        )
+    }
+
+    private static generatePpgCallbacks() {
+        return this.ppgCharNames.reduce(
+            (acc, name) => ({
+                ...acc,
+                [CHAR_UUIDS[name]]: this.handlePpgChannelData.bind(
                     this.instance
                 ),
             }),
@@ -181,13 +211,17 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
         return this.instance.getHandleEegChannelForChunk()
     }
 
+    private static get handlePpgChannelData() {
+        return this.instance.getHandlePpgChannelForChunk()
+    }
+
     private static async setFakeCharsOnPeripheral() {
-        const fakeChars = await this.createFakeEegChars()
-        this.peripheral.setFakeCharacteristics(fakeChars)
+        this.eegChars = await this.createFakeEegChars()
+        this.ppgChars = await this.createFakePpgChars()
+
+        this.peripheral.setFakeCharacteristics(this.eegChars)
 
         FakeBleScanner.fakedPeripherals = [this.peripheral]
-
-        return fakeChars
     }
 
     private static async createFakeEegChars() {
@@ -195,10 +229,26 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
 
         for (let i = 0; i < this.eegNumChannels; i++) {
             const charUuid = this.eegCharUuids[i]
-            const char = new FakeCharacteristic({ uuid: charUuid })
+            const char = this.FakeCharacteristic(charUuid)
             await char.subscribeAsync()
 
-            const callback = this.museCharCallbacks[this.eegCharUuids[i]]
+            const callback = this.museCharCallbacks[charUuid]
+            char.on('data', callback)
+
+            fakeChars.push(char)
+        }
+        return fakeChars
+    }
+
+    private static async createFakePpgChars() {
+        const fakeChars: FakeCharacteristic[] = []
+
+        for (let i = 0; i < this.ppgNumChannels; i++) {
+            const charUuid = this.ppgCharUuids[i]
+            const char = this.FakeCharacteristic(charUuid)
+            await char.subscribeAsync()
+
+            const callback = this.museCharCallbacks[charUuid]
             char.on('data', callback)
 
             fakeChars.push(char)
@@ -230,8 +280,14 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
         await this.instance.start()
     }
 
-    private static simulateDataForChars(buffer: Buffer<ArrayBuffer>) {
+    private static simulateEegForChars(buffer: Buffer) {
         this.eegChars.forEach((char) => {
+            char.simulateDataReceived(buffer)
+        })
+    }
+
+    private static simulatePpgForChars(buffer: Buffer) {
+        this.ppgChars.forEach((char) => {
             char.simulateDataReceived(buffer)
         })
     }
@@ -278,17 +334,6 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
         return FakeLslOutlet.callsToPushSample[0]
     }
 
-    private static readonly bleLocalName = 'MuseS'
-    private static readonly controlUuid: string = CHAR_UUIDS.CONTROL
-    private static readonly eegSampleRate = 256
-    private static readonly eegChunkSize = 12
-    private static readonly ppgSampleRate = 64
-    private static readonly ppgChunkSize = 6
-
-    private static readonly peripheral = new FakePeripheral({
-        localName: this.bleLocalName,
-    })
-
     private static readonly eegCharNames = [
         'EEG_TP9',
         'EEG_AF7',
@@ -303,28 +348,37 @@ export default class MuseStreamGeneratorTest extends AbstractSpruceTest {
         'PPG_RED',
     ]
 
-    private static readonly museCharNames = [
-        ...this.eegCharNames,
-        ...this.ppgCharNames,
-    ]
-
     private static readonly eegCharUuids = this.eegCharNames.map(
         (name) => CHAR_UUIDS[name]
     )
 
-    private static readonly numTimestamps = 2
-
-    private static readonly emptyEegChunkForChannel = Array(
-        this.eegChunkSize + this.numTimestamps
-    ).fill(0)
-
-    private static readonly emptyEegBufferForChannel = Buffer.from(
-        this.emptyEegChunkForChannel
+    private static readonly ppgCharUuids = this.ppgCharNames.map(
+        (name) => CHAR_UUIDS[name]
     )
 
+    private static readonly bleLocalName = 'MuseS'
+    private static readonly controlUuid: string = CHAR_UUIDS.CONTROL
+    private static readonly numTimestamps = 2
+
+    private static readonly eegSampleRate = 256
+    private static readonly eegChunkSize = 12
+    private static readonly eegSize = this.eegChunkSize + this.numTimestamps
+    private static readonly emptyEegChunk = Array(this.eegSize).fill(0)
+    private static readonly emptyEegBuffer = Buffer.from(this.emptyEegChunk)
     private static readonly eegNumChannels = this.eegCharNames.length
 
-    private static FakeCharacteristic(uuid = generateId()) {
+    private static readonly ppgSampleRate = 64
+    private static readonly ppgChunkSize = 6
+    private static readonly ppgSize = this.ppgChunkSize + this.numTimestamps
+    private static readonly emptyPpgChunk = Array(this.ppgSize).fill(0)
+    private static readonly emptyPpgBuffer = Buffer.from(this.emptyPpgChunk)
+    private static readonly ppgNumChannels = this.ppgCharNames.length
+
+    private static readonly peripheral = new FakePeripheral({
+        localName: this.bleLocalName,
+    })
+
+    private static FakeCharacteristic(uuid: string) {
         return new FakeCharacteristic({ uuid })
     }
 
