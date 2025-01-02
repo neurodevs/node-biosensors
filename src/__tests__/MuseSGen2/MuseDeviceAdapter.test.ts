@@ -56,7 +56,7 @@ export default class MuseDeviceAdapterTest extends AbstractBiosensorsTest {
 
     @test()
     protected static async startStreamingCallsStartOnRecorderIfEnabled() {
-        this.startStreaming()
+        await this.startStreaming()
 
         assert.isEqual(
             FakeMuseRecorder.numCallsToStart,
@@ -67,7 +67,7 @@ export default class MuseDeviceAdapterTest extends AbstractBiosensorsTest {
 
     @test()
     protected static async startStreamingCallsStartLslStreamsOnProducer() {
-        this.startStreaming()
+        await this.startStreaming()
 
         assert.isEqual(
             FakeMuseProducer.numCallsToStartLslStreams,
@@ -87,7 +87,7 @@ export default class MuseDeviceAdapterTest extends AbstractBiosensorsTest {
 
     @test()
     protected static async stopStreamingCallsStopOnRecorderIfEnabled() {
-        this.stopStreaming()
+        await this.stopStreaming()
 
         assert.isEqual(
             FakeMuseRecorder.numCallsToStop,
@@ -98,7 +98,7 @@ export default class MuseDeviceAdapterTest extends AbstractBiosensorsTest {
 
     @test()
     protected static async stopStreamingCallsStopLslStreamsOnProducer() {
-        this.stopStreaming()
+        await this.stopStreaming()
 
         assert.isEqual(
             FakeMuseProducer.numCallsToStopLslStreams,
@@ -107,12 +107,12 @@ export default class MuseDeviceAdapterTest extends AbstractBiosensorsTest {
         )
     }
 
-    private static startStreaming() {
-        this.instance.startStreaming()
+    private static async startStreaming() {
+        await this.instance.startStreaming()
     }
 
-    private static stopStreaming() {
-        this.instance.stopStreaming()
+    private static async stopStreaming() {
+        await this.instance.stopStreaming()
     }
 
     private static readonly bleUuid = generateId()

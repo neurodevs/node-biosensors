@@ -31,9 +31,13 @@ export default class MuseStreamRecorderTest extends AbstractBiosensorsTest {
 
     @test()
     protected static async createsXdfStreamRecorderWithCorrectOptions() {
-        const { savePath, streamQueries } = this.xdfRecorderOptions
+        const { xdfRecordPath, streamQueries } = this.xdfRecorderOptions
 
-        assert.isEqual(savePath, this.xdfRecordPath, 'Invalid xdfRecordPath!')
+        assert.isEqual(
+            xdfRecordPath,
+            this.xdfRecordPath,
+            'Invalid xdfRecordPath!'
+        )
 
         assert.isEqualDeep(
             streamQueries,
