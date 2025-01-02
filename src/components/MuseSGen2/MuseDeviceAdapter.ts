@@ -1,18 +1,32 @@
-import MuseStreamRecorder from './MuseStreamRecorder'
+import MuseStreamRecorder, { MuseRecorder } from './MuseStreamRecorder'
 
 export default class MuseDeviceAdapter implements MuseAdapter {
     public static Class?: MuseAdapterConstructor
 
-    protected constructor() {}
+    private xdfRecorder?: MuseRecorder
+
+    protected constructor(recorder?: MuseRecorder) {
+        this.xdfRecorder = recorder
+    }
 
     public static Create(options?: MuseAdapterOptions) {
         const { xdfRecordPath } = options ?? {}
 
+        let recorder: MuseRecorder | undefined
+
         if (xdfRecordPath) {
-            this.MuseStreamRecorder(xdfRecordPath)
+            recorder = this.MuseStreamRecorder(xdfRecordPath)
         }
 
-        return new (this.Class ?? this)()
+        return new (this.Class ?? this)(recorder)
+    }
+
+    public startStreaming() {
+        this.startXdfRecorderIfEnabled()
+    }
+
+    private startXdfRecorderIfEnabled() {
+        this.xdfRecorder?.start()
     }
 
     private static MuseStreamRecorder(xdfRecordPath: string) {
@@ -20,7 +34,9 @@ export default class MuseDeviceAdapter implements MuseAdapter {
     }
 }
 
-export interface MuseAdapter {}
+export interface MuseAdapter {
+    startStreaming(): void
+}
 
 export interface MuseAdapterOptions {
     xdfRecordPath?: string

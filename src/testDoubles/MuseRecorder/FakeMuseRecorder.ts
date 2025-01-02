@@ -1,25 +1,25 @@
 import { MuseRecorder } from '../../components/MuseSGen2/MuseStreamRecorder'
 
 export default class FakeMuseRecorder implements MuseRecorder {
-    public static callsToConstructor = 0
-    public static callsToStart = 0
-    public static callsToStop = 0
+    public static numCallsToConstructor = 0
+    public static numCallsToStart = 0
+    public static numCallsToStop = 0
 
     public constructor() {
-        FakeMuseRecorder.callsToConstructor++
+        FakeMuseRecorder.numCallsToConstructor++
     }
 
     public start() {
-        FakeMuseRecorder.callsToStart++
+        FakeMuseRecorder.numCallsToStart++
     }
 
     public stop() {
-        FakeMuseRecorder.callsToStop++
+        FakeMuseRecorder.numCallsToStop++
     }
 
     public static resetTestDouble() {
-        this.callsToConstructor = 0
-        this.callsToStart = 0
-        this.callsToStop = 0
+        this.numCallsToConstructor = 0
+        this.numCallsToStart = 0
+        this.numCallsToStop = 0
     }
 }

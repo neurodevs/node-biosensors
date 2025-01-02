@@ -25,22 +25,37 @@ export default class MuseDeviceAdapterTest extends AbstractBiosensorsTest {
     @test()
     protected static async constructsMuseStreamRecorderIfPassedXdfRecordPath() {
         assert.isEqual(
-            FakeMuseRecorder.callsToConstructor,
+            FakeMuseRecorder.numCallsToConstructor,
             1,
             'Should construct MuseStreamRecorder!'
         )
     }
 
     @test()
-    protected static async doesNotConstructMuseStreamRecorderIfNoXdfRecordPath() {
+    protected static async doesNotConstructRecorderIfNoXdfRecordPath() {
         FakeMuseRecorder.resetTestDouble()
         this.MuseDeviceAdapter({ xdfRecordPath: undefined })
 
         assert.isEqual(
-            FakeMuseRecorder.callsToConstructor,
+            FakeMuseRecorder.numCallsToConstructor,
             0,
             'Should not construct MuseStreamRecorder!'
         )
+    }
+
+    @test()
+    protected static async startStreamingCallsStartOnRecorderIfEnabled() {
+        this.startStreaming()
+
+        assert.isEqual(
+            FakeMuseRecorder.numCallsToStart,
+            1,
+            'Should call start on MuseStreamRecorder!'
+        )
+    }
+
+    private static startStreaming() {
+        this.instance.startStreaming()
     }
 
     private static MuseDeviceAdapter(options?: MuseAdapterOptions) {
