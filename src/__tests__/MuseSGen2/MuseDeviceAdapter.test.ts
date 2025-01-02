@@ -85,8 +85,24 @@ export default class MuseDeviceAdapterTest extends AbstractBiosensorsTest {
         )
     }
 
+    @test()
+    protected static async stopStreamingCallsStopOnRecorderIfEnabled() {
+        this.startStreaming()
+        this.stopStreaming()
+
+        assert.isEqual(
+            FakeMuseRecorder.numCallsToStop,
+            1,
+            'Should call stop on MuseStreamRecorder!'
+        )
+    }
+
     private static startStreaming() {
         this.instance.startStreaming()
+    }
+
+    private static stopStreaming() {
+        this.instance.stopStreaming()
     }
 
     private static readonly bleUuid = generateId()

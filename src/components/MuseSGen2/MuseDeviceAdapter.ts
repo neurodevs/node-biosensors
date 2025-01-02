@@ -37,6 +37,14 @@ export default class MuseDeviceAdapter implements MuseAdapter {
         await this.lslProducer.startLslStreams()
     }
 
+    public async stopStreaming() {
+        this.stopXdfRecorderIfEnabled()
+    }
+
+    private stopXdfRecorderIfEnabled() {
+        this.xdfRecorder?.stop()
+    }
+
     private static MuseStreamProducer(options?: MuseAdapterOptions) {
         return MuseStreamProducer.Create(options)
     }
@@ -50,6 +58,7 @@ export default class MuseDeviceAdapter implements MuseAdapter {
 
 export interface MuseAdapter {
     startStreaming(): void
+    stopStreaming(): void
 }
 
 export interface MuseAdapterOptions {
