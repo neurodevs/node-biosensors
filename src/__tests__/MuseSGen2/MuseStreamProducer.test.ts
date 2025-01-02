@@ -13,7 +13,9 @@ import {
     LslStreamInfo,
     LslStreamOutlet,
 } from '@neurodevs/node-lsl'
-import MuseStreamProducer from '../../components/MuseSGen2/MuseStreamProducer'
+import MuseStreamProducer, {
+    MuseProducerOptions,
+} from '../../components/MuseSGen2/MuseStreamProducer'
 import { MUSE_CHARACTERISTIC_UUIDS as CHAR_UUIDS } from '../../components/MuseSGen2/MuseStreamProducer'
 import SpyMuseStreamProducer from '../../testDoubles/SpyMuseStreamProducer'
 
@@ -173,6 +175,21 @@ export default class MuseStreamProducerTest extends AbstractSpruceTest {
             this.callsToPushSample,
             expected,
             'Should push a PPG sample for each chunk!'
+        )
+    }
+
+    @test()
+    protected static async canDisableConnectOnCreate() {
+        FakeBleAdapter.resetTestDouble()
+
+        await this.MuseStreamProducer({
+            connectBleOnCreate: false,
+        })
+
+        assert.isEqual(
+            FakeBleAdapter.numCallsToConnect,
+            0,
+            'Should not connect to BleAdapter!'
         )
     }
 
@@ -382,7 +399,9 @@ export default class MuseStreamProducerTest extends AbstractSpruceTest {
         return new FakeCharacteristic({ uuid })
     }
 
-    private static async MuseStreamProducer() {
-        return (await MuseStreamProducer.Create()) as SpyMuseStreamProducer
+    private static async MuseStreamProducer(options?: MuseProducerOptions) {
+        return (await MuseStreamProducer.Create(
+            options
+        )) as SpyMuseStreamProducer
     }
 }

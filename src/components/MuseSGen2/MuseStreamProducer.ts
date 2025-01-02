@@ -36,7 +36,8 @@ export default class MuseStreamProducer implements MuseProducer {
         this.generateScanOptions()
     }
 
-    public static async Create() {
+    public static async Create(options?: MuseProducerOptions) {
+        const { connectBleOnCreate = true } = options ?? {}
         const scanner = this.BleDeviceScanner()
 
         const eegOutlet = await this.LslStreamOutlet(this.eegOutletOptions)
@@ -47,7 +48,10 @@ export default class MuseStreamProducer implements MuseProducer {
             eegOutlet,
             ppgOutlet,
         })
-        await instance.connect()
+
+        if (connectBleOnCreate) {
+            await instance.connect()
+        }
 
         return instance
     }
@@ -296,6 +300,10 @@ export default class MuseStreamProducer implements MuseProducer {
 export interface MuseProducer {
     connect(): Promise<void>
     start(): Promise<void>
+}
+
+export interface MuseProducerOptions {
+    connectBleOnCreate: boolean
 }
 
 export type MuseProducerConstructor = new (
