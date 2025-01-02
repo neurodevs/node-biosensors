@@ -140,7 +140,9 @@ export default class MuseStreamProducer implements MuseLslProducer {
         const channelValuesForChunk = Array.from(data).slice(2)
         const channelIdx = this.getPpgChannelIdx(char.uuid)
 
-        this.ppgChannelChunks[channelIdx] = channelValuesForChunk
+        const decoded = this.decodeUnsigned24BitData(channelValuesForChunk)
+
+        this.ppgChannelChunks[channelIdx] = decoded
 
         if (this.isLastPpgChannel(channelIdx)) {
             this.pushPpgSamples()
@@ -149,6 +151,22 @@ export default class MuseStreamProducer implements MuseLslProducer {
 
     private getPpgChannelIdx(charUuid: string) {
         return this.ppgCharUuids.indexOf(charUuid)
+    }
+
+    private decodeUnsigned24BitData(samples: number[]) {
+        const decodedSamples = []
+        const numBytesPerSample = 3
+
+        for (let i = 0; i < samples.length; i += numBytesPerSample) {
+            const mostSignificantByte = samples[i] << 16
+            const middleByte = samples[i + 1] << 8
+            const leastSignificantByte = samples[i + 2]
+
+            const val = mostSignificantByte | middleByte | leastSignificantByte
+            decodedSamples.push(val)
+        }
+
+        return decodedSamples
     }
 
     private isLastPpgChannel(idx: number) {
@@ -248,7 +266,9 @@ export default class MuseStreamProducer implements MuseLslProducer {
     }
 
     private generateEmptyMatrix(rows: number, columns: number) {
-        return Array.from({ length: rows }, () => new Array(columns).fill(0))
+        return Array.from({ length: rows }, () =>
+            new Array(columns).fill(0)
+        ) as number[][]
     }
 
     private readonly bleLocalName = 'MuseS'

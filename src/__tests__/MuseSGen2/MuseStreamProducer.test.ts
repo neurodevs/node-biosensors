@@ -125,9 +125,7 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
 
     @test()
     protected static async ignoresFirstTwoEegSamplesThatAreTimestamps() {
-        const increasingData = Array(this.eegChunkSize)
-            .fill(0)
-            .map((_, i) => i)
+        const increasingData = this.createIncreasingData(this.eegChunkSize)
 
         const increasingBuffer = Buffer.from(increasingData)
         this.simulateEegForChars(increasingBuffer)
@@ -137,6 +135,12 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
             [2, 2, 2, 2, 2],
             'Should ignore the first two EEG samples that are timestamps!'
         )
+    }
+
+    private static createIncreasingData(size = 0) {
+        return Array(size)
+            .fill(0)
+            .map((_, i) => i)
     }
 
     @test()
@@ -159,14 +163,15 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
 
     @test()
     protected static async outletPushesPpgSampleForEachChunk() {
-        this.simulatePpgForChars(this.emptyPpgBuffer)
+        const sample = Array(this.ppgSize).fill(0) as number[]
+        this.simulatePpgForChars(Buffer.from(sample))
 
-        const emptySample = [0, 0, 0]
-        const expected = Array(this.ppgChunkSize).fill(emptySample)
+        const decoded = this.decodeUnsigned24BitData(sample.slice(2))
+        const ppgSamples = this.generatePpgSamples(decoded)
 
         assert.isEqualDeep(
             this.callsToPushSample,
-            expected,
+            ppgSamples,
             'Should push a PPG sample for each chunk!'
         )
     }
@@ -182,7 +187,7 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
 
         assert.isEqualDeep(
             this.firstCallToPushSample,
-            [2, 2, 2],
+            [131844, 131844, 131844],
             'Should ignore the first two EEG samples that are timestamps!'
         )
     }
@@ -230,6 +235,38 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
         )
     }
 
+    @test()
+    protected static async decodesUnsigned24BitPpgData() {
+        const numBytesPerSample = 3
+
+        const len = this.numTimestamps + numBytesPerSample * this.ppgChunkSize
+        const samples = Array.from({ length: len }, (_, i) => i)
+
+        const decoded = this.decodeUnsigned24BitData(
+            samples.slice(2)
+        ) as number[]
+
+        this.simulatePpgForChars(Buffer.from(samples))
+
+        const ppgSamples = this.generatePpgSamples(decoded)
+
+        assert.isEqualDeep(
+            this.callsToPushSample,
+            ppgSamples,
+            'Should push a PPG sample for each chunk!'
+        )
+    }
+
+    private static generatePpgSamples(decoded: number[]) {
+        let expected: number[][] = []
+
+        for (let i = 0; i < this.ppgChunkSize; i++) {
+            const val = decoded[i]
+            expected.push([val, val, val])
+        }
+        return expected
+    }
+
     private static generateCallbacks() {
         return {
             ...this.generateEegCallbacks(),
@@ -267,6 +304,22 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
 
     private static get handlePpgChannelData() {
         return this.instance.getHandlePpgChannelForChunk()
+    }
+
+    private static decodeUnsigned24BitData(samples: number[]) {
+        const decodedSamples = []
+        const numBytesPerSample = 3
+
+        for (let i = 0; i < samples.length; i += numBytesPerSample) {
+            const mostSignificantByte = samples[i] << 16
+            const middleByte = samples[i + 1] << 8
+            const leastSignificantByte = samples[i + 2]
+
+            const val = mostSignificantByte | middleByte | leastSignificantByte
+            decodedSamples.push(val)
+        }
+
+        return decodedSamples
     }
 
     private static async setFakeCharsOnPeripheral() {
@@ -390,16 +443,16 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
 
     private static readonly eegSampleRate = 256
     private static readonly eegChunkSize = 12
-    private static readonly eegSize = this.eegChunkSize + this.numTimestamps
+    private static readonly eegSize = this.numTimestamps + this.eegChunkSize
     private static readonly emptyEegChunk = Array(this.eegSize).fill(0)
     private static readonly emptyEegBuffer = Buffer.from(this.emptyEegChunk)
     private static readonly eegNumChannels = this.eegCharNames.length
 
     private static readonly ppgSampleRate = 64
     private static readonly ppgChunkSize = 6
-    private static readonly ppgSize = this.ppgChunkSize + this.numTimestamps
-    private static readonly emptyPpgChunk = Array(this.ppgSize).fill(0)
-    private static readonly emptyPpgBuffer = Buffer.from(this.emptyPpgChunk)
+    private static readonly bytesPerSample = 3
+    private static readonly ppgBytes = this.bytesPerSample * this.ppgChunkSize
+    private static readonly ppgSize = this.numTimestamps + this.ppgBytes
     private static readonly ppgNumChannels = this.ppgCharNames.length
 
     private static readonly peripheral = new FakePeripheral({
