@@ -54,6 +54,15 @@ export default class MuseDeviceAdapter implements MuseAdapter {
         await this.lslProducer.stopLslStreams()
     }
 
+    public async disconnect() {
+        await this.stopStreaming()
+        await this.disconnectBle()
+    }
+
+    private async disconnectBle() {
+        await this.lslProducer.disconnectBle()
+    }
+
     private static MuseStreamProducer(options?: MuseAdapterOptions) {
         return MuseStreamProducer.Create(options)
     }
@@ -68,6 +77,7 @@ export default class MuseDeviceAdapter implements MuseAdapter {
 export interface MuseAdapter {
     startStreaming(): Promise<void>
     stopStreaming(): Promise<void>
+    disconnect(): Promise<void>
 }
 
 export interface MuseAdapterOptions {

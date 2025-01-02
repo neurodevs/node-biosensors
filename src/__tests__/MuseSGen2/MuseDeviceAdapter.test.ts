@@ -121,12 +121,49 @@ export default class MuseDeviceAdapterTest extends AbstractBiosensorsTest {
         )
     }
 
+    @test()
+    protected static async disconnectCallsStopOnXdfRecorder() {
+        await this.disconnect()
+
+        assert.isEqual(
+            FakeMuseRecorder.numCallsToStop,
+            1,
+            'Should call recorder.stop() on disconnect!'
+        )
+    }
+
+    @test()
+    protected static async disconnectCallsStopLslStreamsOnProducer() {
+        await this.disconnect()
+
+        assert.isEqual(
+            FakeMuseProducer.numCallsToStopLslStreams,
+            1,
+            'Should call producer.stopLslStreams() on disconnect!'
+        )
+    }
+
+    @test()
+    protected static async disconnectCallsDisconnectBleOnProducer() {
+        await this.disconnect()
+
+        assert.isEqual(
+            FakeMuseProducer.numCallsToDisconnectBle,
+            1,
+            'Should call producer.disconnect() on disconnect!'
+        )
+    }
+
     private static async startStreaming() {
         await this.instance.startStreaming()
     }
 
     private static async stopStreaming() {
         await this.instance.stopStreaming()
+    }
+
+    private static async disconnect() {
+        await this.instance.disconnect()
     }
 
     private static readonly bleUuid = generateId()
