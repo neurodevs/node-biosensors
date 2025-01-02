@@ -172,6 +172,22 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
     }
 
     @test()
+    protected static async ignoresFirstTwoPpgSamplesThatAreTimestamps() {
+        const increasingData = Array(this.ppgChunkSize)
+            .fill(0)
+            .map((_, i) => i)
+
+        const increasingBuffer = Buffer.from(increasingData)
+        this.simulatePpgForChars(increasingBuffer)
+
+        assert.isEqualDeep(
+            this.firstCallToPushSample,
+            [2, 2, 2],
+            'Should ignore the first two EEG samples that are timestamps!'
+        )
+    }
+
+    @test()
     protected static async canDisableConnectBleOnCreate() {
         FakeBleAdapter.resetTestDouble()
 

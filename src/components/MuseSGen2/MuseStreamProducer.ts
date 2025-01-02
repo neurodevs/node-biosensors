@@ -83,7 +83,7 @@ export default class MuseStreamProducer implements MuseLslProducer {
     }
 
     protected handleEegChannelChunk(data: Buffer, char: Characteristic) {
-        const channelValuesForChunk = Array.from(data).slice(2) as number[]
+        const channelValuesForChunk = Array.from(data).slice(2)
         const channelIdx = this.getEegChannelIdx(char.uuid)
 
         this.eegChannelChunks[channelIdx] = channelValuesForChunk
@@ -137,7 +137,7 @@ export default class MuseStreamProducer implements MuseLslProducer {
     }
 
     protected handlePpgChannelChunk(data: Buffer, char: SimpleCharacteristic) {
-        const channelValuesForChunk = Array.from(data)
+        const channelValuesForChunk = Array.from(data).slice(2)
         const channelIdx = this.getPpgChannelIdx(char.uuid)
 
         this.ppgChannelChunks[channelIdx] = channelValuesForChunk
