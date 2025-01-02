@@ -181,9 +181,9 @@ export default class MuseStreamProducer implements MuseLslProducer {
     }
 
     public async connectBle() {
-        if (this.bleUuid) {
+        if (this.hasUuidForSpeedOptimization) {
             this.ble = await this.scanner.scanForUuid(
-                this.bleUuid,
+                this.bleUuid!,
                 this.scanOptions
             )
         } else {
@@ -192,6 +192,10 @@ export default class MuseStreamProducer implements MuseLslProducer {
                 this.scanOptions
             )
         }
+    }
+
+    private get hasUuidForSpeedOptimization() {
+        return this.bleUuid
     }
 
     public async startLslStreams() {
