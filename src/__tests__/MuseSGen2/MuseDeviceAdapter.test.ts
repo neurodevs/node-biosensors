@@ -86,17 +86,6 @@ export default class MuseDeviceAdapterTest extends AbstractBiosensorsTest {
     }
 
     @test()
-    protected static async stopStreamingCallsStopOnRecorderIfEnabled() {
-        await this.stopStreaming()
-
-        assert.isEqual(
-            FakeMuseRecorder.numCallsToStop,
-            1,
-            'Should call stop on MuseStreamRecorder!'
-        )
-    }
-
-    @test()
     protected static async stopStreamingCallsStopLslStreamsOnProducer() {
         await this.stopStreaming()
 
@@ -122,17 +111,6 @@ export default class MuseDeviceAdapterTest extends AbstractBiosensorsTest {
     }
 
     @test()
-    protected static async disconnectCallsStopOnXdfRecorder() {
-        await this.disconnect()
-
-        assert.isEqual(
-            FakeMuseRecorder.numCallsToStop,
-            1,
-            'Should call recorder.stop() on disconnect!'
-        )
-    }
-
-    @test()
     protected static async disconnectCallsStopLslStreamsOnProducer() {
         await this.disconnect()
 
@@ -151,6 +129,17 @@ export default class MuseDeviceAdapterTest extends AbstractBiosensorsTest {
             FakeMuseProducer.numCallsToDisconnectBle,
             1,
             'Should call producer.disconnect() on disconnect!'
+        )
+    }
+
+    @test()
+    protected static async disconnectCallsStopOnXdfRecorder() {
+        await this.disconnect()
+
+        assert.isEqual(
+            FakeMuseRecorder.numCallsToStop,
+            1,
+            'Should call recorder.stop() on disconnect!'
         )
     }
 

@@ -38,7 +38,6 @@ export default class MuseDeviceAdapter implements MuseAdapter {
     }
 
     public async stopStreaming() {
-        this.stopXdfRecorderIfEnabled()
         await this.stopLslStreams()
     }
 
@@ -53,6 +52,8 @@ export default class MuseDeviceAdapter implements MuseAdapter {
     public async disconnect() {
         await this.stopStreaming()
         await this.disconnectBle()
+
+        this.stopXdfRecorderIfEnabled()
     }
 
     private async disconnectBle() {
