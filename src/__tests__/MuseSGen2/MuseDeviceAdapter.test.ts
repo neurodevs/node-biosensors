@@ -107,6 +107,20 @@ export default class MuseDeviceAdapterTest extends AbstractBiosensorsTest {
         )
     }
 
+    @test()
+    protected static async passesOptionalRssiIntervalMsToProducer() {
+        FakeMuseProducer.resetTestDouble()
+
+        const rssiIntervalMs = 10
+        await this.MuseDeviceAdapter({ rssiIntervalMs })
+
+        assert.isEqual(
+            FakeMuseProducer.callsToConstructor[0]?.rssiIntervalMs,
+            rssiIntervalMs,
+            'Should pass rssiIntervalMs to MuseStreamProducer!'
+        )
+    }
+
     private static async startStreaming() {
         await this.instance.startStreaming()
     }
