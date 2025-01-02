@@ -16,13 +16,9 @@ export default class MuseDeviceAdapter implements MuseAdapter {
     }
 
     public static async Create(options?: MuseAdapterOptions) {
-        const { bleUuid, rssiIntervalMs, xdfRecordPath } = options ?? {}
+        const { xdfRecordPath, ...producerOptions } = options ?? {}
 
-        const producer = await this.MuseStreamProducer({
-            bleUuid,
-            rssiIntervalMs,
-        })
-
+        const producer = await this.MuseStreamProducer(producerOptions)
         const recorder = this.createXdfRecorderIfGivenPath(xdfRecordPath)
 
         return new (this.Class ?? this)(producer, recorder)
