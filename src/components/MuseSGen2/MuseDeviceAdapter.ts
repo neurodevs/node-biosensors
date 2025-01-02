@@ -19,12 +19,7 @@ export default class MuseDeviceAdapter implements MuseAdapter {
         const { bleUuid, xdfRecordPath } = options ?? {}
 
         const producer = await this.MuseStreamProducer({ bleUuid })
-
-        let recorder: MuseXdfRecorder | undefined
-
-        if (xdfRecordPath) {
-            recorder = this.MuseStreamRecorder(xdfRecordPath)
-        }
+        const recorder = this.createXdfRecorderIfGivenPath(xdfRecordPath)
 
         return new (this.Class ?? this)(producer, recorder)
     }
@@ -46,8 +41,10 @@ export default class MuseDeviceAdapter implements MuseAdapter {
         return MuseStreamProducer.Create(options)
     }
 
-    private static MuseStreamRecorder(xdfRecordPath: string) {
-        return MuseStreamRecorder.Create(xdfRecordPath)
+    private static createXdfRecorderIfGivenPath(xdfRecordPath?: string) {
+        return xdfRecordPath
+            ? MuseStreamRecorder.Create(xdfRecordPath)
+            : undefined
     }
 }
 
