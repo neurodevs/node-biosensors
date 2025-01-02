@@ -62,8 +62,8 @@ export default class MuseDeviceAdapter implements MuseAdapter {
 }
 
 export interface MuseAdapter {
-    startStreaming(): void
-    stopStreaming(): void
+    startStreaming(): Promise<void>
+    stopStreaming(): Promise<void>
 }
 
 export interface MuseAdapterOptions {
