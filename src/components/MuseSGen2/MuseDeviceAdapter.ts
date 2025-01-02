@@ -8,7 +8,9 @@ export default class MuseDeviceAdapter implements MuseAdapter {
     public static Create(options?: MuseAdapterOptions) {
         const { xdfRecordPath } = options ?? {}
 
-        MuseStreamRecorder.Create(xdfRecordPath ?? '')
+        if (xdfRecordPath) {
+            MuseStreamRecorder.Create(xdfRecordPath ?? '')
+        }
 
         return new (this.Class ?? this)()
     }
