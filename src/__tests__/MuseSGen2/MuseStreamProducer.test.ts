@@ -201,6 +201,19 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
         )
     }
 
+    @test()
+    protected static async stopLslStreamsSendsHaltCmdToMuse() {
+        this.controlChar.resetTestDouble()
+
+        await this.instance.stopLslStreams()
+
+        assert.isEqualDeep(
+            this.controlChar.callsToWriteAsync,
+            [this.generateExpectedCall('h')],
+            'Should send stop command to Muse!'
+        )
+    }
+
     private static generateCallbacks() {
         return {
             ...this.generateEegCallbacks(),
