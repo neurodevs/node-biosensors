@@ -12,11 +12,11 @@ import MuseStreamProducer, {
     MuseLslProducerOptions,
 } from '../../components/MuseSGen2/MuseStreamProducer'
 import { MUSE_CHARACTERISTIC_UUIDS as CHAR_UUIDS } from '../../components/MuseSGen2/MuseStreamProducer'
-import SpyMuseStreamProducer from '../../testDoubles/MuseProducer/SpyMuseStreamProducer'
+import SpyMuseProducer from '../../testDoubles/MuseProducer/SpyMuseProducer'
 import AbstractBiosensorsTest from '../AbstractBiosensorsTest'
 
 export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
-    private static instance: SpyMuseStreamProducer
+    private static instance: SpyMuseProducer
     private static museCharCallbacks: Record<string, (data: Buffer) => void>
     private static eegChars: FakeCharacteristic[]
     private static ppgChars: FakeCharacteristic[]
@@ -25,7 +25,7 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
     protected static async beforeEach() {
         await super.beforeEach()
 
-        this.setSpyMuseStreamProducer()
+        this.setSpyMuseProducer()
 
         FakeBleScanner.fakedPeripherals = [this.peripheral]
 
@@ -500,8 +500,6 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
     }
 
     private static async MuseStreamProducer(options?: MuseLslProducerOptions) {
-        return (await MuseStreamProducer.Create(
-            options
-        )) as SpyMuseStreamProducer
+        return (await MuseStreamProducer.Create(options)) as SpyMuseProducer
     }
 }

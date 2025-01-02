@@ -25,5 +25,5 @@ export * from './testDoubles/MuseProducer/FakeMuseProducer'
 export { default as FakeMuseRecorder } from './testDoubles/MuseRecorder/FakeMuseRecorder'
 export * from './testDoubles/MuseRecorder/FakeMuseRecorder'
 
-export { default as SpyMuseStreamProducer } from './testDoubles/MuseProducer/SpyMuseStreamProducer'
-export * from './testDoubles/MuseProducer/SpyMuseStreamProducer'
+export { default as SpyMuseProducer } from './testDoubles/MuseProducer/SpyMuseProducer'
+export * from './testDoubles/MuseProducer/SpyMuseProducer'

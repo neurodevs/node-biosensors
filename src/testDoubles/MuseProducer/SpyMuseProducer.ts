@@ -2,7 +2,7 @@ import MuseStreamProducer, {
     MuseLslProducerConstructorOptions,
 } from '../../components/MuseSGen2/MuseStreamProducer'
 
-export default class SpyMuseStreamProducer extends MuseStreamProducer {
+export default class SpyMuseProducer extends MuseStreamProducer {
     public constructor(options: MuseLslProducerConstructorOptions) {
         super(options)
     }
