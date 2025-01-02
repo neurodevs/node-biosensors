@@ -1,35 +1,45 @@
-import MuseStreamProducer from './MuseStreamProducer'
-import MuseStreamRecorder, { MuseRecorder } from './MuseStreamRecorder'
+import MuseStreamProducer, { MuseLslProducer } from './MuseStreamProducer'
+import MuseStreamRecorder, { MuseXdfRecorder } from './MuseStreamRecorder'
 
 export default class MuseDeviceAdapter implements MuseAdapter {
     public static Class?: MuseAdapterConstructor
 
-    private xdfRecorder?: MuseRecorder
+    private lslProducer: MuseLslProducer
+    private xdfRecorder?: MuseXdfRecorder
 
-    protected constructor(recorder?: MuseRecorder) {
+    protected constructor(
+        producer: MuseLslProducer,
+        recorder?: MuseXdfRecorder
+    ) {
+        this.lslProducer = producer
         this.xdfRecorder = recorder
     }
 
     public static async Create(options?: MuseAdapterOptions) {
         const { xdfRecordPath } = options ?? {}
 
-        await this.MuseStreamProducer()
+        const producer = await this.MuseStreamProducer()
 
-        let recorder: MuseRecorder | undefined
+        let recorder: MuseXdfRecorder | undefined
 
         if (xdfRecordPath) {
             recorder = this.MuseStreamRecorder(xdfRecordPath)
         }
 
-        return new (this.Class ?? this)(recorder)
+        return new (this.Class ?? this)(producer, recorder)
     }
 
-    public startStreaming() {
+    public async startStreaming() {
         this.startXdfRecorderIfEnabled()
+        await this.startLslStreams()
     }
 
     private startXdfRecorderIfEnabled() {
         this.xdfRecorder?.start()
+    }
+
+    private async startLslStreams() {
+        await this.lslProducer.startLslStreams()
     }
 
     private static MuseStreamProducer() {

@@ -13,8 +13,8 @@ import {
     LslStreamOutlet,
 } from '@neurodevs/node-lsl'
 
-export default class MuseStreamProducer implements MuseProducer {
-    public static Class?: MuseProducerConstructor
+export default class MuseStreamProducer implements MuseLslProducer {
+    public static Class?: MuseLslProducerConstructor
 
     private scanner: BleScanner
     private scanOptions!: ScanOptions
@@ -25,7 +25,7 @@ export default class MuseStreamProducer implements MuseProducer {
     private ppgChannelChunks = this.generateEmptyPpgMatrix()
     private encoder: TextEncoder
 
-    protected constructor(options: MuseProducerConstructorOptions) {
+    protected constructor(options: MuseLslProducerConstructorOptions) {
         const { scanner, eegOutlet, ppgOutlet } = options
 
         this.scanner = scanner
@@ -36,7 +36,7 @@ export default class MuseStreamProducer implements MuseProducer {
         this.generateScanOptions()
     }
 
-    public static async Create(options?: MuseProducerOptions) {
+    public static async Create(options?: MuseLslProducerOptions) {
         const { connectBleOnCreate = true } = options ?? {}
         const scanner = this.BleDeviceScanner()
 
@@ -297,20 +297,20 @@ export default class MuseStreamProducer implements MuseProducer {
     }
 }
 
-export interface MuseProducer {
+export interface MuseLslProducer {
     connectBle(): Promise<void>
     startLslStreams(): Promise<void>
 }
 
-export interface MuseProducerOptions {
+export interface MuseLslProducerOptions {
     connectBleOnCreate: boolean
 }
 
-export type MuseProducerConstructor = new (
-    options: MuseProducerConstructorOptions
-) => MuseProducer
+export type MuseLslProducerConstructor = new (
+    options: MuseLslProducerConstructorOptions
+) => MuseLslProducer
 
-export interface MuseProducerConstructorOptions {
+export interface MuseLslProducerConstructorOptions {
     scanner: BleScanner
     eegOutlet: LslOutlet
     ppgOutlet: LslOutlet

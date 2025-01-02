@@ -1,8 +1,8 @@
 import { assertOptions } from '@sprucelabs/schema'
 import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 
-export default class MuseStreamRecorder implements MuseRecorder {
-    public static Class?: MuseRecorderConstructor
+export default class MuseStreamRecorder implements MuseXdfRecorder {
+    public static Class?: MuseXdfRecorderConstructor
 
     private xdfRecorder: XdfRecorder
 
@@ -35,11 +35,11 @@ export default class MuseStreamRecorder implements MuseRecorder {
     }
 }
 
-export interface MuseRecorder {
+export interface MuseXdfRecorder {
     start(): void
     stop(): void
 }
 
-export type MuseRecorderConstructor = new (
+export type MuseXdfRecorderConstructor = new (
     xdfRecorder: XdfRecorder
-) => MuseRecorder
+) => MuseXdfRecorder

@@ -65,6 +65,17 @@ export default class MuseDeviceAdapterTest extends AbstractBiosensorsTest {
         )
     }
 
+    @test()
+    protected static async startStreamingCallsStartLslStreamsOnProducer() {
+        this.startStreaming()
+
+        assert.isEqual(
+            FakeMuseProducer.numCallsToStartLslStreams,
+            1,
+            'Should call startLslStreams on MuseStreamProducer!'
+        )
+    }
+
     private static startStreaming() {
         this.instance.startStreaming()
     }

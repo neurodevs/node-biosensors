@@ -1,6 +1,6 @@
-import { MuseRecorder } from '../../components/MuseSGen2/MuseStreamRecorder'
+import { MuseXdfRecorder } from '../../components/MuseSGen2/MuseStreamRecorder'
 
-export default class FakeMuseRecorder implements MuseRecorder {
+export default class FakeMuseRecorder implements MuseXdfRecorder {
     public static numCallsToConstructor = 0
     public static numCallsToStart = 0
     public static numCallsToStop = 0
