@@ -257,6 +257,17 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
         )
     }
 
+    @test()
+    protected static async disconnectBleCallsDisconnectOnPeripheral() {
+        await this.disconnectBle()
+
+        assert.isEqual(
+            FakeBleAdapter.numCallsToDisconnect,
+            1,
+            'Should call disconnect on BleAdapter!'
+        )
+    }
+
     private static generatePpgSamples(decoded: number[]) {
         let expected: number[][] = []
 
@@ -385,6 +396,10 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
 
     private static async start() {
         await this.instance.startLslStreams()
+    }
+
+    private static async disconnectBle() {
+        await this.instance.disconnectBle()
     }
 
     private static simulateEegForChars(buffer: Buffer) {

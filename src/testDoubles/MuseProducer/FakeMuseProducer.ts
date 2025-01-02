@@ -8,6 +8,7 @@ export default class FakeMuseProducer implements MuseLslProducer {
     public static numCallsToConnectBle = 0
     public static numCallsToStartLslStreams = 0
     public static numCallsToStopLslStreams = 0
+    public static numCallsToDisconnectBle = 0
 
     public constructor(options?: MuseLslProducerConstructorOptions) {
         FakeMuseProducer.callsToConstructor.push(options)
@@ -25,11 +26,16 @@ export default class FakeMuseProducer implements MuseLslProducer {
         FakeMuseProducer.numCallsToStopLslStreams++
     }
 
+    public async disconnectBle() {
+        FakeMuseProducer.numCallsToDisconnectBle++
+    }
+
     public static resetTestDouble() {
         this.callsToConstructor = []
         this.numCallsToConnectBle = 0
         this.numCallsToStartLslStreams = 0
         this.numCallsToStopLslStreams = 0
+        this.numCallsToDisconnectBle = 0
     }
 }
 

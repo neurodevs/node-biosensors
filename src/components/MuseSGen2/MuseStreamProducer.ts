@@ -257,6 +257,10 @@ export default class MuseStreamProducer implements MuseLslProducer {
         return this.createBufferFrom('h')
     }
 
+    public async disconnectBle() {
+        await this.ble.disconnect()
+    }
+
     private generateEmptyEegMatrix() {
         return this.generateEmptyMatrix(this.eegNumChannels, this.eegChunkSize)
     }
@@ -351,6 +355,7 @@ export interface MuseLslProducer {
     connectBle(): Promise<void>
     startLslStreams(): Promise<void>
     stopLslStreams(): Promise<void>
+    disconnectBle(): Promise<void>
 }
 
 export interface MuseLslProducerOptions {
