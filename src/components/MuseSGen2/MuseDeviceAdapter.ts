@@ -1,3 +1,4 @@
+import MuseStreamProducer from './MuseStreamProducer'
 import MuseStreamRecorder, { MuseRecorder } from './MuseStreamRecorder'
 
 export default class MuseDeviceAdapter implements MuseAdapter {
@@ -11,6 +12,8 @@ export default class MuseDeviceAdapter implements MuseAdapter {
 
     public static async Create(options?: MuseAdapterOptions) {
         const { xdfRecordPath } = options ?? {}
+
+        await this.MuseStreamProducer()
 
         let recorder: MuseRecorder | undefined
 
@@ -27,6 +30,10 @@ export default class MuseDeviceAdapter implements MuseAdapter {
 
     private startXdfRecorderIfEnabled() {
         this.xdfRecorder?.start()
+    }
+
+    private static MuseStreamProducer() {
+        return MuseStreamProducer.Create()
     }
 
     private static MuseStreamRecorder(xdfRecordPath: string) {

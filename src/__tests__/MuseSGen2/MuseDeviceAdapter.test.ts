@@ -3,6 +3,7 @@ import MuseDeviceAdapter, {
     MuseAdapter,
     MuseAdapterOptions,
 } from '../../components/MuseSGen2/MuseDeviceAdapter'
+import FakeMuseProducer from '../../testDoubles/MuseProducer/FakeMuseProducer'
 import FakeMuseRecorder from '../../testDoubles/MuseRecorder/FakeMuseRecorder'
 import AbstractBiosensorsTest from '../AbstractBiosensorsTest'
 
@@ -12,6 +13,7 @@ export default class MuseDeviceAdapterTest extends AbstractBiosensorsTest {
     protected static async beforeEach() {
         await super.beforeEach()
 
+        this.setFakeMuseProducer()
         this.setFakeMuseRecorder()
 
         this.instance = await this.MuseDeviceAdapter()
@@ -20,6 +22,15 @@ export default class MuseDeviceAdapterTest extends AbstractBiosensorsTest {
     @test()
     protected static async canCreateMuseDeviceAdapter() {
         assert.isTruthy(this.instance, 'Should create an instance!')
+    }
+
+    @test()
+    protected static async constructsMuseStreamProducer() {
+        assert.isEqual(
+            FakeMuseProducer.numCallsToConstructor,
+            1,
+            'Should construct MuseStreamProducer!'
+        )
     }
 
     @test()

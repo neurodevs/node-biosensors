@@ -17,5 +17,13 @@ export * from './components/MuseSGen2/MuseStreamProducer'
 export { default as MuseStreamRecorder } from './components/MuseSGen2/MuseStreamRecorder'
 export * from './components/MuseSGen2/MuseStreamRecorder'
 
+// Test doubles
+
+export { default as FakeMuseProducer } from './testDoubles/MuseProducer/FakeMuseProducer'
+export * from './testDoubles/MuseProducer/FakeMuseProducer'
+
+export { default as FakeMuseRecorder } from './testDoubles/MuseRecorder/FakeMuseRecorder'
+export * from './testDoubles/MuseRecorder/FakeMuseRecorder'
+
 export { default as SpyMuseStreamProducer } from './testDoubles/MuseProducer/SpyMuseStreamProducer'
 export * from './testDoubles/MuseProducer/SpyMuseStreamProducer'
