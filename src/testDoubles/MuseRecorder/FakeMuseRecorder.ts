@@ -11,11 +11,15 @@ export default class FakeMuseRecorder implements MuseXdfRecorder {
 
     public start() {
         FakeMuseRecorder.numCallsToStart++
+        this.isRunning = true
     }
 
     public stop() {
         FakeMuseRecorder.numCallsToStop++
+        this.isRunning = false
     }
+
+    public isRunning = false
 
     public static resetTestDouble() {
         this.numCallsToConstructor = 0

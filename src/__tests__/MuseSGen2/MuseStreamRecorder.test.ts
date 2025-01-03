@@ -69,6 +69,21 @@ export default class MuseStreamRecorderTest extends AbstractBiosensorsTest {
         )
     }
 
+    @test()
+    protected static async passesIsRunningThroughFromXdfRecorder() {
+        assert.isFalse(
+            this.instance.isRunning,
+            'isRunning should be false by default!'
+        )
+    }
+
+    @test()
+    protected static async callingStartSetsIsRunningToTrue() {
+        this.start()
+
+        assert.isTrue(this.instance.isRunning, 'isRunning should be true!')
+    }
+
     private static start() {
         this.instance.start()
     }

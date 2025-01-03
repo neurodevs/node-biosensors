@@ -716,10 +716,10 @@
     "@sprucelabs/spruce-core-schemas" "^40.1.547"
     "@sprucelabs/spruce-skill-utils" "^31.0.624"
 
-"@neurodevs/node-xdf@^1.2.1":
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/@neurodevs/node-xdf/-/node-xdf-1.2.1.tgz#6025f6395b6c2bd459b4163c2bfc15e1e596a188"
-  integrity sha512-D/EQ8hmZFuBp1JPQTJAUUhJLyM3ZyEaQ+i1gTbDuabDEZMpXHzKEuQiGOCf0TOkKS/YOFamIsRDJwu7WRcbnlQ==
+"@neurodevs/node-xdf@^1.3.0":
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/@neurodevs/node-xdf/-/node-xdf-1.3.0.tgz#c8fa53cd07918abe32815e0c10689993c94dd15a"
+  integrity sha512-xBDzKS0kt8bYpQVmcIv5EWJyauAkwVtVqAgaavsaHhBE6jMraGH1m8Tbz1hfdqlzd7pWYSxv5xFjLswsoTUA1g==
   dependencies:
     "@neurodevs/node-lsl" "^10.2.1"
     "@neurodevs/node-mangled-names" "^0.0.8"
@@ -2734,7 +2734,7 @@ has-symbols@^1.0.3, has-symbols@^1.1.0:
   resolved "https://registry.yarnpkg.com/has-symbols/-/has-symbols-1.1.0.tgz#fc9c6a783a084951d0b971fe1018de813707a338"
   integrity sha512-1cDNdwJ2Jaohmb3sg4OmKaMBwuC48sYni5HUw2DvsC8LjGTLK9h+eb1X6RyuOHe4hT0ULCW68iomhjUoKUqlPQ==
 
-has-tostringtag@^1.0.0, has-tostringtag@^1.0.2:
+has-tostringtag@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/has-tostringtag/-/has-tostringtag-1.0.2.tgz#2cdc42d40bef2e5b4eeab7c01a73c54ce7ab5abc"
   integrity sha512-NqADB8VjPFLM2V0VvHUewwwsw0ZWBaIdgo+ieHtK3hasLz4qeCRjYcqfB6AQrBggRKppKF8L52/VqdVsO47Dlw==
@@ -2888,11 +2888,14 @@ is-arrayish@^0.2.1:
   integrity sha512-zz06S8t0ozoDXMG+ube26zeCTNXcKIPJZJi8hBrF4idCLms4CG9QtK7qBl1boi5ODzFpjswb5JPmHCbMpjaYzg==
 
 is-async-function@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/is-async-function/-/is-async-function-2.0.0.tgz#8e4418efd3e5d3a6ebb0164c05ef5afb69aa9646"
-  integrity sha512-Y1JXKrfykRJGdlDwdKlLpLyMIiWqWvuSd17TvZk68PLAOGOoF4Xyav1z0Xhoi+gCYjZVeC5SI+hYFOfvXmGRCA==
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/is-async-function/-/is-async-function-2.1.0.tgz#1d1080612c493608e93168fc4458c245074c06a6"
+  integrity sha512-GExz9MtyhlZyXYLxzlJRj5WUCE661zhDa1Yna52CN57AJsymh+DvXXjyveSioqSRdxvUrdKdvqB1b5cVKsNpWQ==
   dependencies:
-    has-tostringtag "^1.0.0"
+    call-bound "^1.0.3"
+    get-proto "^1.0.1"
+    has-tostringtag "^1.0.2"
+    safe-regex-test "^1.1.0"
 
 is-bigint@^1.1.0:
   version "1.1.0"
@@ -4351,13 +4354,15 @@ reflect.getprototypeof@^1.0.6, reflect.getprototypeof@^1.0.9:
     which-builtin-type "^1.2.1"
 
 regexp.prototype.flags@^1.5.1, regexp.prototype.flags@^1.5.3:
-  version "1.5.3"
-  resolved "https://registry.yarnpkg.com/regexp.prototype.flags/-/regexp.prototype.flags-1.5.3.tgz#b3ae40b1d2499b8350ab2c3fe6ef3845d3a96f42"
-  integrity sha512-vqlC04+RQoFalODCbCumG2xIOvapzVMHwsyIGM/SIE8fRhFFsXeH8/QQ+s0T0kDAhKc4k30s73/0ydkHQz6HlQ==
+  version "1.5.4"
+  resolved "https://registry.yarnpkg.com/regexp.prototype.flags/-/regexp.prototype.flags-1.5.4.tgz#1ad6c62d44a259007e55b3970e00f746efbcaa19"
+  integrity sha512-dYqgNSZbDwkaJ2ceRd9ojCGjBq+mOm9LmtXnAnEGyHhN/5R7iDW2TRw3h+o/jCFxus3P2LfWIIiwowAjANm7IA==
   dependencies:
-    call-bind "^1.0.7"
+    call-bind "^1.0.8"
     define-properties "^1.2.1"
     es-errors "^1.3.0"
+    get-proto "^1.0.1"
+    gopd "^1.2.0"
     set-function-name "^2.0.2"
 
 require-directory@^2.1.1:

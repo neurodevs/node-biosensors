@@ -24,6 +24,10 @@ export default class MuseStreamRecorder implements MuseXdfRecorder {
         this.xdfRecorder.stop()
     }
 
+    public get isRunning() {
+        return this.xdfRecorder.isRunning
+    }
+
     private static readonly museStreamQueries = [
         'type="EEG"',
         'type="PPG"',
@@ -38,6 +42,7 @@ export default class MuseStreamRecorder implements MuseXdfRecorder {
 export interface MuseXdfRecorder {
     start(): void
     stop(): void
+    isRunning: boolean
 }
 
 export type MuseXdfRecorderConstructor = new (
