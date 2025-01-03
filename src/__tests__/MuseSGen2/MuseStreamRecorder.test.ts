@@ -80,7 +80,6 @@ export default class MuseStreamRecorderTest extends AbstractBiosensorsTest {
     @test()
     protected static async callingStartSetsIsRunningToTrue() {
         this.start()
-
         assert.isTrue(this.instance.isRunning, 'isRunning should be true!')
     }
 

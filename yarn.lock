@@ -716,10 +716,10 @@
     "@sprucelabs/spruce-core-schemas" "^40.1.547"
     "@sprucelabs/spruce-skill-utils" "^31.0.624"
 
-"@neurodevs/node-xdf@^1.3.0":
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/@neurodevs/node-xdf/-/node-xdf-1.3.0.tgz#c8fa53cd07918abe32815e0c10689993c94dd15a"
-  integrity sha512-xBDzKS0kt8bYpQVmcIv5EWJyauAkwVtVqAgaavsaHhBE6jMraGH1m8Tbz1hfdqlzd7pWYSxv5xFjLswsoTUA1g==
+"@neurodevs/node-xdf@^1.3.1":
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/@neurodevs/node-xdf/-/node-xdf-1.3.1.tgz#4ceca939fa0a83318a65077649a60faea2a2f15a"
+  integrity sha512-OSwtFjmMskYs62APCtf8eSYsJ5JKt1tCFhrG2xUPMh5UHE8fHv8YTLpEhlym55k2s7Rz2Jv0g4TMzFYbfY8mFQ==
   dependencies:
     "@neurodevs/node-lsl" "^10.2.1"
     "@neurodevs/node-mangled-names" "^0.0.8"
