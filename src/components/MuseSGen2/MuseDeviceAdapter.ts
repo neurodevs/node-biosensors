@@ -47,10 +47,6 @@ export default class MuseDeviceAdapter implements MuseAdapter {
         await this.stopLslStreams()
     }
 
-    private stopXdfRecorderIfEnabled() {
-        this.xdfRecorder?.stop()
-    }
-
     private async stopLslStreams() {
         await this.lslProducer.stopLslStreams()
     }
@@ -64,6 +60,10 @@ export default class MuseDeviceAdapter implements MuseAdapter {
 
     private async disconnectBle() {
         await this.lslProducer.disconnectBle()
+    }
+
+    private stopXdfRecorderIfEnabled() {
+        this.xdfRecorder?.stop()
     }
 
     private static createXdfRecorderIfGivenPath(xdfRecordPath?: string) {
