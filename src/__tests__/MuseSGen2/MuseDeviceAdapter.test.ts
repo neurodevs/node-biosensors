@@ -143,6 +143,18 @@ export default class MuseDeviceAdapterTest extends AbstractBiosensorsTest {
         )
     }
 
+    @test()
+    protected static async doesNotStartRecorderIfAlreadyStarted() {
+        await this.startStreaming()
+        await this.startStreaming()
+
+        assert.isEqual(
+            FakeMuseRecorder.numCallsToStart,
+            1,
+            'Should only call start on MuseStreamRecorder once!'
+        )
+    }
+
     private static async startStreaming() {
         await this.instance.startStreaming()
     }

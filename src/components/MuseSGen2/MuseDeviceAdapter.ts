@@ -30,7 +30,13 @@ export default class MuseDeviceAdapter implements MuseAdapter {
     }
 
     private startXdfRecorderIfEnabled() {
-        this.xdfRecorder?.start()
+        if (!this.recorderIsRunning) {
+            this.xdfRecorder?.start()
+        }
+    }
+
+    private get recorderIsRunning() {
+        return this.xdfRecorder?.isRunning
     }
 
     private async startLslStreams() {
