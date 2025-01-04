@@ -8,9 +8,8 @@ import {
     SpyBleAdapter,
 } from '@neurodevs/node-ble'
 import { FakeLslOutlet } from '@neurodevs/node-lsl'
-import MuseStreamProducer, {
-    MuseLslProducerOptions,
-} from '../../components/MuseSGen2/MuseStreamProducer'
+import MuseStreamProducer from '../../components/MuseSGen2/MuseStreamProducer'
+import { LslProducerOptions } from 'types'
 import { MUSE_CHARACTERISTIC_UUIDS as CHAR_UUIDS } from '../../components/MuseSGen2/MuseStreamProducer'
 import SpyMuseProducer from '../../testDoubles/MuseProducer/SpyMuseProducer'
 import AbstractBiosensorsTest from '../AbstractBiosensorsTest'
@@ -499,7 +498,7 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
         return new FakeCharacteristic({ uuid })
     }
 
-    private static async MuseStreamProducer(options?: MuseLslProducerOptions) {
+    private static async MuseStreamProducer(options?: LslProducerOptions) {
         return (await MuseStreamProducer.Create(options)) as SpyMuseProducer
     }
 }

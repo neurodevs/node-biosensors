@@ -12,8 +12,9 @@ import {
     LslOutletOptions,
     LslStreamOutlet,
 } from '@neurodevs/node-lsl'
+import { LslProducer, LslProducerOptions } from '../../types'
 
-export default class MuseStreamProducer implements MuseLslProducer {
+export default class MuseStreamProducer implements LslProducer {
     public static Class?: MuseLslProducerConstructor
 
     private scanner: BleScanner
@@ -41,7 +42,7 @@ export default class MuseStreamProducer implements MuseLslProducer {
         this.generateScanOptions()
     }
 
-    public static async Create(options?: MuseLslProducerOptions) {
+    public static async Create(options?: LslProducerOptions) {
         const {
             bleUuid,
             connectBleOnCreate = true,
@@ -361,22 +362,9 @@ export default class MuseStreamProducer implements MuseLslProducer {
     }
 }
 
-export interface MuseLslProducer {
-    connectBle(): Promise<void>
-    startLslStreams(): Promise<void>
-    stopLslStreams(): Promise<void>
-    disconnectBle(): Promise<void>
-}
-
-export interface MuseLslProducerOptions {
-    bleUuid?: string
-    connectBleOnCreate?: boolean
-    rssiIntervalMs?: number
-}
-
 export type MuseLslProducerConstructor = new (
     options: MuseLslProducerConstructorOptions
-) => MuseLslProducer
+) => LslProducer
 
 export interface MuseLslProducerConstructorOptions {
     scanner: BleScanner

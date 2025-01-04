@@ -1,9 +1,9 @@
 import {
-    MuseLslProducer,
     MuseLslProducerConstructorOptions,
 } from '../../components/MuseSGen2/MuseStreamProducer'
+import { LslProducer } from 'types'
 
-export default class FakeMuseProducer implements MuseLslProducer {
+export default class FakeMuseProducer implements LslProducer {
     public static callsToConstructor: CallToConstructor[] = []
     public static numCallsToConnectBle = 0
     public static numCallsToStartLslStreams = 0
