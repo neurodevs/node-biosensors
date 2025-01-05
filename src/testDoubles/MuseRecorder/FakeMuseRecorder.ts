@@ -1,4 +1,4 @@
-import { MuseXdfRecorder } from '../../components/Muse/MuseStreamRecorder'
+import { MuseXdfRecorder } from '../../components/MuseStreamRecorder'
 
 export default class FakeMuseRecorder implements MuseXdfRecorder {
     public static numCallsToConstructor = 0

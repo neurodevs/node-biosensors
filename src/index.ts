@@ -1,26 +1,26 @@
 // CGX Cognionics Quick-20r
 
-export { default as CgxQuick20Adapter } from './components/Cognionics/CgxQuick20Adapter'
-export * from './components/Cognionics/CgxQuick20Adapter'
+export { default as CgxQuick20Adapter } from './components/CgxQuick20Adapter'
+export * from './components/CgxQuick20Adapter'
 
 // Empatica E4
 
-export { default as EmpaticaE4Adapter } from './components/Empatica/EmpaticaE4Adapter'
-export * from './components/Empatica/EmpaticaE4Adapter'
+export { default as EmpaticaE4Adapter } from './components/EmpaticaE4Adapter'
+export * from './components/EmpaticaE4Adapter'
 
 // Muse S Gen 2
 
 // BLE -> LSL + XDF
-export { default as MuseDeviceAdapter } from './components/Muse/MuseDeviceAdapter'
-export * from './components/Muse/MuseDeviceAdapter'
+export { default as MuseDeviceAdapter } from './components/MuseDeviceAdapter'
+export * from './components/MuseDeviceAdapter'
 
 // BLE -> LSL
-export { default as MuseStreamProducer } from './components/Muse/MuseStreamProducer'
-export * from './components/Muse/MuseStreamProducer'
+export { default as MuseStreamProducer } from './components/MuseStreamProducer'
+export * from './components/MuseStreamProducer'
 
 // LSL -> XDF
-export { default as MuseStreamRecorder } from './components/Muse/MuseStreamRecorder'
-export * from './components/Muse/MuseStreamRecorder'
+export { default as MuseStreamRecorder } from './components/MuseStreamRecorder'
+export * from './components/MuseStreamRecorder'
 
 // Test doubles
 

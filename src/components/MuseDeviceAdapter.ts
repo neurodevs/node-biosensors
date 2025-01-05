@@ -1,4 +1,4 @@
-import { LslProducer } from '../../types'
+import { LslProducer } from '../types'
 import MuseStreamProducer from './MuseStreamProducer'
 import MuseStreamRecorder, { MuseXdfRecorder } from './MuseStreamRecorder'
 

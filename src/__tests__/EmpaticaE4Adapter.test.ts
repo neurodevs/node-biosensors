@@ -1,8 +1,8 @@
 import { test, assert } from '@sprucelabs/test-utils'
 import EmpaticaE4Adapter, {
     E4Adapter,
-} from '../../components/Empatica/EmpaticaE4Adapter'
-import AbstractBiosensorsTest from '../AbstractBiosensorsTest'
+} from '../components/EmpaticaE4Adapter'
+import AbstractBiosensorsTest from './AbstractBiosensorsTest'
 
 export default class EmpaticaE4AdapterTest extends AbstractBiosensorsTest {
     private static instance: E4Adapter
