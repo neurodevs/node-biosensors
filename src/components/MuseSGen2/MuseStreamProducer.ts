@@ -1,10 +1,9 @@
 import {
-    BleDeviceScanner,
     SimpleCharacteristic,
-    BleAdapter,
-    BleScanner,
-    ScanOptions,
     Characteristic,
+    ScanOptions,
+    BleConnector,
+    BleDeviceConnector,
 } from '@neurodevs/node-ble'
 import {
     ChannelFormat,
@@ -17,60 +16,38 @@ import { LslProducer, LslProducerOptions } from '../../types'
 export default class MuseStreamProducer implements LslProducer {
     public static Class?: MuseLslProducerConstructor
 
-    protected ble!: BleAdapter
-    private scanner: BleScanner
-    private scanOptions!: ScanOptions
-    private bleUuid?: string
-    private rssiIntervalMs?: number
+    protected connector!: BleConnector
+    private scanOptions: ScanOptions
     private eegOutlet: LslOutlet
     private ppgOutlet: LslOutlet
+    private bleUuid?: string
+    private rssiIntervalMs?: number
     private eegChannelChunks = this.generateEmptyEegMatrix()
     private ppgChannelChunks = this.generateEmptyPpgMatrix()
     private encoder: TextEncoder
 
     protected constructor(options: MuseLslProducerConstructorOptions) {
-        const { scanner, bleUuid, rssiIntervalMs, eegOutlet, ppgOutlet } =
-            options
+        const { eegOutlet, ppgOutlet, bleUuid, rssiIntervalMs } = options
 
-        this.scanner = scanner
-        this.bleUuid = bleUuid
-        this.rssiIntervalMs = rssiIntervalMs
         this.eegOutlet = eegOutlet
         this.ppgOutlet = ppgOutlet
-        this.encoder = this.TextEncoder()
+        this.bleUuid = bleUuid
+        this.rssiIntervalMs = rssiIntervalMs
 
-        this.generateScanOptions()
+        this.encoder = this.TextEncoder()
+        this.scanOptions = this.generateScanOptions()
     }
 
     public static async Create(options?: LslProducerOptions) {
-        const {
-            bleUuid,
-            connectBleOnCreate = true,
-            rssiIntervalMs,
-        } = options ?? {}
-
-        const scanner = this.BleDeviceScanner()
-
-        const eegOutlet = await this.LslStreamOutlet(this.eegOutletOptions)
-        const ppgOutlet = await this.LslStreamOutlet(this.ppgOutletOptions)
-
-        const instance = new (this.Class ?? this)({
-            scanner,
-            bleUuid,
-            rssiIntervalMs,
-            eegOutlet,
-            ppgOutlet,
+        return new (this.Class ?? this)({
+            ...options,
+            eegOutlet: await this.LslStreamOutlet(this.eegOutletOptions),
+            ppgOutlet: await this.LslStreamOutlet(this.ppgOutletOptions),
         })
-
-        if (connectBleOnCreate) {
-            await instance.connectBle()
-        }
-
-        return instance
     }
 
     private generateScanOptions() {
-        this.scanOptions = {
+        return {
             characteristicCallbacks: this.generateCharCallbacks(),
             rssiIntervalMs: this.rssiIntervalMs,
         }
@@ -209,33 +186,8 @@ export default class MuseStreamProducer implements LslProducer {
         this.ppgChannelChunks = this.generateEmptyPpgMatrix()
     }
 
-    public async connectBle() {
-        if (this.hasUuidForSpeedOptimization) {
-            await this.fastScanForUuid()
-        } else {
-            await this.slowScanForName()
-        }
-    }
-
-    private get hasUuidForSpeedOptimization() {
-        return this.bleUuid
-    }
-
-    private async fastScanForUuid() {
-        this.ble = await this.scanner.scanForUuid(
-            this.bleUuid!,
-            this.scanOptions
-        )
-    }
-
-    private async slowScanForName() {
-        this.ble = await this.scanner.scanForName(
-            this.bleLocalName,
-            this.scanOptions
-        )
-    }
-
     public async startLslStreams() {
+        this.connector = await this.BleDeviceConnector()
         await this.writeStartCmdsToControl()
     }
 
@@ -248,6 +200,10 @@ export default class MuseStreamProducer implements LslProducer {
 
     private get control() {
         return this.ble.getCharacteristic(this.controlUuid)!
+    }
+
+    private get ble() {
+        return this.connector.getBleAdapter()
     }
 
     private get controlUuid() {
@@ -266,10 +222,6 @@ export default class MuseStreamProducer implements LslProducer {
 
     private get haltCmdBuffer() {
         return this.createBufferFrom('h')
-    }
-
-    public async disconnectBle() {
-        await this.ble.disconnect()
     }
 
     private generateEmptyEegMatrix() {
@@ -353,12 +305,17 @@ export default class MuseStreamProducer implements LslProducer {
         return new TextEncoder()
     }
 
-    private static async LslStreamOutlet(options: LslOutletOptions) {
-        return await LslStreamOutlet.Create(options)
+    private async BleDeviceConnector() {
+        return await BleDeviceConnector.Create({
+            scanOptions: this.scanOptions,
+            deviceLocalName: this.bleLocalName,
+            deviceUuid: this.bleUuid,
+            connectBleOnCreate: true,
+        })
     }
 
-    private static BleDeviceScanner() {
-        return BleDeviceScanner.Create()
+    private static async LslStreamOutlet(options: LslOutletOptions) {
+        return await LslStreamOutlet.Create(options)
     }
 }
 
@@ -367,11 +324,10 @@ export type MuseLslProducerConstructor = new (
 ) => LslProducer
 
 export interface MuseLslProducerConstructorOptions {
-    scanner: BleScanner
-    bleUuid?: string
-    rssiIntervalMs?: number
     eegOutlet: LslOutlet
     ppgOutlet: LslOutlet
+    bleUuid?: string
+    rssiIntervalMs?: number
 }
 
 export const MUSE_CHARACTERISTIC_UUIDS: Record<string, string> = {

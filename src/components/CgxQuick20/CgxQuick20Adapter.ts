@@ -14,7 +14,10 @@ export default class CgxQuick20Adapter implements BiosensorAdapter {
 
     public static async Create() {
         const scanner = this.BleDeviceScanner()
-        const ble = await scanner.scanForName(this.adapterName)
+        const ble = await scanner.scanForName(
+            this.adapterName,
+            this.defaultScanOptions
+        )
         return this.CreateFromBle(ble)
     }
 
@@ -25,8 +28,12 @@ export default class CgxQuick20Adapter implements BiosensorAdapter {
 
     public static async CreateFromUuid(uuid: string) {
         const scanner = this.BleDeviceScanner()
-        const ble = await scanner.scanForUuid(uuid)
+        const ble = await scanner.scanForUuid(uuid, this.defaultScanOptions)
         return this.CreateFromBle(ble)
+    }
+
+    private static defaultScanOptions = {
+        characteristicCallbacks: {},
     }
 
     private static readonly adapterName = 'CGX Quick-Series Headset'

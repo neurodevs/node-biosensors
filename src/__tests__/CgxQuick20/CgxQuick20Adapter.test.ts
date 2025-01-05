@@ -115,7 +115,10 @@ export default class CgxQuick20AdapterTest extends AbstractBiosensorsTest {
     }
 
     private static FakeBleAdapter() {
-        return new FakeBleAdapter()
+        return new FakeBleAdapter({
+            peripheral: {} as any,
+            characteristicCallbacks: {},
+        })
     }
 
     private static async CgxQuick20Adapter() {

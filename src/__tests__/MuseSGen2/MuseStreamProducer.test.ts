@@ -1,15 +1,13 @@
 import { test, assert } from '@sprucelabs/test-utils'
 import {
-    BleDeviceAdapter,
     FakeBleAdapter,
     FakeBleScanner,
     FakeCharacteristic,
     FakePeripheral,
-    SpyBleAdapter,
 } from '@neurodevs/node-ble'
 import { FakeLslOutlet } from '@neurodevs/node-lsl'
-import MuseStreamProducer from '../../components/MuseSGen2/MuseStreamProducer'
 import { LslProducerOptions } from 'types'
+import MuseStreamProducer from '../../components/MuseSGen2/MuseStreamProducer'
 import { MUSE_CHARACTERISTIC_UUIDS as CHAR_UUIDS } from '../../components/MuseSGen2/MuseStreamProducer'
 import SpyMuseProducer from '../../testDoubles/MuseProducer/SpyMuseProducer'
 import AbstractBiosensorsTest from '../AbstractBiosensorsTest'
@@ -39,34 +37,6 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
     @test()
     protected static async canCreateMuseStreamProducer() {
         assert.isTruthy(this.instance, 'Should create an instance!')
-    }
-
-    @test()
-    protected static async createsBleDeviceScanner() {
-        assert.isEqual(
-            FakeBleScanner.callsToConstructor.length,
-            1,
-            'Should create an instance of BleDeviceScanner!'
-        )
-    }
-
-    @test()
-    protected static async callsScanForNameOnBleDeviceScanner() {
-        const { name, options } = this.callsToScanForName[0]
-
-        assert.isEqual(
-            name,
-            'MuseS',
-            'Should call scanForName on BleDeviceScanner!'
-        )
-
-        const { characteristicCallbacks } = options ?? {}
-
-        assert.isEqualDeep(
-            Object.keys(characteristicCallbacks ?? {}),
-            Object.keys(this.museCharCallbacks),
-            'Should call scanForName with the correct options!'
-        )
     }
 
     @test()
@@ -194,58 +164,9 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
     }
 
     @test()
-    protected static async canDisableConnectBleOnCreate() {
-        FakeBleAdapter.resetTestDouble()
-
-        await this.MuseStreamProducer({
-            connectBleOnCreate: false,
-        })
-
-        assert.isEqual(
-            FakeBleAdapter.numCallsToConnect,
-            0,
-            'Should not connect to BleAdapter!'
-        )
-    }
-
-    @test()
-    protected static async passesOptionalBleUuidToScanner() {
-        FakeBleScanner.resetTestDouble()
-
-        await this.MuseStreamProducer({
-            bleUuid: this.peripheral.uuid,
-        })
-
-        assert.isEqual(
-            FakeBleScanner.callsToScanForUuid[0]?.uuid,
-            this.peripheral.uuid,
-            'Should pass uuid to BleDeviceScanner!'
-        )
-    }
-
-    @test()
-    protected static async passesOptionalRssiIntervalMsToBle() {
-        BleDeviceAdapter.Class = SpyBleAdapter
-        const rssiIntervalMs = 10
-
-        const instance = await this.MuseStreamProducer({
-            rssiIntervalMs,
-        })
-
-        const ble = instance.bleAdapter as SpyBleAdapter
-        const actualRssi = ble.getRssiIntervalMs()
-
-        assert.isEqual(
-            actualRssi,
-            rssiIntervalMs,
-            'Should pass rssiIntervalMs to BleDeviceScanner!'
-        )
-    }
-
-    @test()
     protected static async stopLslStreamsSendsHaltCmdToMuse() {
+        await this.start()
         this.controlChar.resetTestDouble()
-
         await this.instance.stopLslStreams()
 
         assert.isEqualDeep(
@@ -274,17 +195,6 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
             this.callsToPushSample,
             ppgSamples,
             'Should push a PPG sample for each chunk!'
-        )
-    }
-
-    @test()
-    protected static async disconnectBleCallsDisconnectOnPeripheral() {
-        await this.disconnectBle()
-
-        assert.isEqual(
-            FakeBleAdapter.numCallsToDisconnect,
-            1,
-            'Should call disconnect on BleAdapter!'
         )
     }
 
@@ -418,10 +328,6 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
         await this.instance.startLslStreams()
     }
 
-    private static async disconnectBle() {
-        await this.instance.disconnectBle()
-    }
-
     private static simulateEegForChars(buffer: Buffer) {
         this.eegChars.forEach((char) => {
             char.simulateDataReceived(buffer)
@@ -432,10 +338,6 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
         this.ppgChars.forEach((char) => {
             char.simulateDataReceived(buffer)
         })
-    }
-
-    private static get callsToScanForName() {
-        return FakeBleScanner.callsToScanForName
     }
 
     private static get callsToGetCharacteristic() {

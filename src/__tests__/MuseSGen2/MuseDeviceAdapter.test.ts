@@ -122,17 +122,6 @@ export default class MuseDeviceAdapterTest extends AbstractBiosensorsTest {
     }
 
     @test()
-    protected static async disconnectCallsDisconnectBleOnProducer() {
-        await this.disconnect()
-
-        assert.isEqual(
-            FakeMuseProducer.numCallsToDisconnectBle,
-            1,
-            'Should call producer.disconnect() on disconnect!'
-        )
-    }
-
-    @test()
     protected static async disconnectCallsStopOnXdfRecorder() {
         await this.disconnect()
 
