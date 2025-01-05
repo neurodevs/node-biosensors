@@ -3,6 +3,11 @@
 export { default as CgxQuick20Adapter } from './components/Cognionics/CgxQuick20Adapter'
 export * from './components/Cognionics/CgxQuick20Adapter'
 
+// Empatica E4
+
+export { default as EmpaticaE4Adapter } from './components/Empatica/EmpaticaE4Adapter'
+export * from './components/Empatica/EmpaticaE4Adapter'
+
 // Muse S Gen 2
 
 // BLE -> LSL + XDF
