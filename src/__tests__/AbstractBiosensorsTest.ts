@@ -14,8 +14,8 @@ import {
     FakeStreamInfo,
 } from '@neurodevs/node-lsl'
 import { XdfStreamRecorder, FakeXdfRecorder } from '@neurodevs/node-xdf'
-import MuseStreamProducer from '../components/MuseSGen2/MuseStreamProducer'
-import MuseStreamRecorder from '../components/MuseSGen2/MuseStreamRecorder'
+import MuseStreamProducer from '../components/Muse/MuseStreamProducer'
+import MuseStreamRecorder from '../components/Muse/MuseStreamRecorder'
 import FakeMuseProducer from '../testDoubles/MuseProducer/FakeMuseProducer'
 import SpyMuseProducer from '../testDoubles/MuseProducer/SpyMuseProducer'
 import FakeMuseRecorder from '../testDoubles/MuseRecorder/FakeMuseRecorder'

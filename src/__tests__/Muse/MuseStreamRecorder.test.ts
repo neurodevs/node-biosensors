@@ -2,7 +2,7 @@ import { test, assert, errorAssert, generateId } from '@sprucelabs/test-utils'
 import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 import MuseStreamRecorder, {
     MuseXdfRecorder,
-} from '../../components/MuseSGen2/MuseStreamRecorder'
+} from '../../components/Muse/MuseStreamRecorder'
 import AbstractBiosensorsTest from '../AbstractBiosensorsTest'
 
 export default class MuseStreamRecorderTest extends AbstractBiosensorsTest {

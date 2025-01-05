@@ -7,8 +7,8 @@ import {
 } from '@neurodevs/node-ble'
 import { FakeLslOutlet } from '@neurodevs/node-lsl'
 import { LslProducerOptions } from 'types'
-import MuseStreamProducer from '../../components/MuseSGen2/MuseStreamProducer'
-import { MUSE_CHARACTERISTIC_UUIDS as CHAR_UUIDS } from '../../components/MuseSGen2/MuseStreamProducer'
+import MuseStreamProducer from '../../components/Muse/MuseStreamProducer'
+import { MUSE_CHARACTERISTIC_UUIDS as CHAR_UUIDS } from '../../components/Muse/MuseStreamProducer'
 import SpyMuseProducer from '../../testDoubles/MuseProducer/SpyMuseProducer'
 import AbstractBiosensorsTest from '../AbstractBiosensorsTest'
 

@@ -1,5 +1,5 @@
 import { LslProducer } from 'types'
-import { MuseLslProducerConstructorOptions } from '../../components/MuseSGen2/MuseStreamProducer'
+import { MuseLslProducerConstructorOptions } from '../../components/Muse/MuseStreamProducer'
 
 export default class FakeMuseProducer implements LslProducer {
     public static callsToConstructor: CallToConstructor[] = []

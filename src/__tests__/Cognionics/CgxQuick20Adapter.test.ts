@@ -15,7 +15,7 @@ import {
 } from '@neurodevs/node-lsl'
 import CgxQuick20Adapter, {
     BiosensorAdapter,
-} from '../../components/CgxQuick20/CgxQuick20Adapter'
+} from '../../components/Cognionics/CgxQuick20Adapter'
 import AbstractBiosensorsTest from '../AbstractBiosensorsTest'
 
 export default class CgxQuick20AdapterTest extends AbstractBiosensorsTest {

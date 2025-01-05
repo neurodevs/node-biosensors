@@ -1,21 +1,21 @@
 // CGX Cognionics Quick-20r
 
-export { default as CgxQuick20Adapter } from './components/CgxQuick20/CgxQuick20Adapter'
-export * from './components/CgxQuick20/CgxQuick20Adapter'
+export { default as CgxQuick20Adapter } from './components/Cognionics/CgxQuick20Adapter'
+export * from './components/Cognionics/CgxQuick20Adapter'
 
 // Muse S Gen 2
 
 // BLE -> LSL + XDF
-export { default as MuseDeviceAdapter } from './components/MuseSGen2/MuseDeviceAdapter'
-export * from './components/MuseSGen2/MuseDeviceAdapter'
+export { default as MuseDeviceAdapter } from './components/Muse/MuseDeviceAdapter'
+export * from './components/Muse/MuseDeviceAdapter'
 
 // BLE -> LSL
-export { default as MuseStreamProducer } from './components/MuseSGen2/MuseStreamProducer'
-export * from './components/MuseSGen2/MuseStreamProducer'
+export { default as MuseStreamProducer } from './components/Muse/MuseStreamProducer'
+export * from './components/Muse/MuseStreamProducer'
 
 // LSL -> XDF
-export { default as MuseStreamRecorder } from './components/MuseSGen2/MuseStreamRecorder'
-export * from './components/MuseSGen2/MuseStreamRecorder'
+export { default as MuseStreamRecorder } from './components/Muse/MuseStreamRecorder'
+export * from './components/Muse/MuseStreamRecorder'
 
 // Test doubles
 
