@@ -24,6 +24,9 @@ export * from './components/MuseStreamRecorder'
 
 // Test doubles
 
+export { default as FakeMuseAdapter } from './testDoubles/MuseAdapter/FakeMuseAdapter'
+export * from './testDoubles/MuseAdapter/FakeMuseAdapter'
+
 export { default as FakeMuseProducer } from './testDoubles/MuseProducer/FakeMuseProducer'
 export * from './testDoubles/MuseProducer/FakeMuseProducer'
 
