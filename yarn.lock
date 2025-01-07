@@ -2527,6 +2527,11 @@ fsevents@^2.3.2, fsevents@~2.3.2:
   resolved "https://registry.yarnpkg.com/fsevents/-/fsevents-2.3.3.tgz#cac6407785d03675a2a5e1a5305c697b347d90d6"
   integrity sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==
 
+ftdi-d2xx@^1.3.1:
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/ftdi-d2xx/-/ftdi-d2xx-1.3.1.tgz#1fa6188466cd12b7d756a4f263367715733b4faf"
+  integrity sha512-Z5ylmoLym2VIpXt8P9A2qHg+asmUFPkv/fE67T1DGgN+59lzRPJk9+ZmuISU/voEbqYy6LnKMiYqxYDBTTzU4g==
+
 function-bind@^1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/function-bind/-/function-bind-1.1.2.tgz#2c02d864d97f3ea6c8830c464cbd11ab6eab7a1c"

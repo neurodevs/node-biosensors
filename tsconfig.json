@@ -31,7 +31,7 @@
 		"./src/*.ts",
 		"./src/**/*.ts",
 		"./src/.spruce/**/*"
-	],
+, "src/scripts/runCgx.ts"	],
 	"exclude": [
 		"build",
 		"esm"
