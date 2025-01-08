@@ -7,6 +7,7 @@ export default class MuseDeviceAdapter implements MuseAdapter {
 
     private lslProducer: LslProducer
     private xdfRecorder?: MuseXdfRecorder
+    private _isRunning = false
 
     protected constructor(producer: LslProducer, recorder?: MuseXdfRecorder) {
         this.lslProducer = producer
@@ -25,6 +26,7 @@ export default class MuseDeviceAdapter implements MuseAdapter {
     public async startStreaming() {
         this.startXdfRecorderIfEnabled()
         await this.startLslStreams()
+        this._isRunning = true
     }
 
     private startXdfRecorderIfEnabled() {
@@ -43,6 +45,7 @@ export default class MuseDeviceAdapter implements MuseAdapter {
 
     public async stopStreaming() {
         await this.stopLslStreams()
+        this._isRunning = false
     }
 
     private async stopLslStreams() {
@@ -56,6 +59,10 @@ export default class MuseDeviceAdapter implements MuseAdapter {
 
     private stopXdfRecorderIfEnabled() {
         this.xdfRecorder?.stop()
+    }
+
+    public get isRunning() {
+        return this._isRunning
     }
 
     public get bleUuid() {
@@ -85,6 +92,7 @@ export interface MuseAdapter {
     startStreaming(): Promise<void>
     stopStreaming(): Promise<void>
     disconnect(): Promise<void>
+    readonly isRunning: boolean
     readonly bleUuid: string
     readonly bleName: string
 }

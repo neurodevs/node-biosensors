@@ -6,16 +6,21 @@ export default class FakeMuseAdapter implements MuseAdapter {
     public static numCallsToStopStreaming = 0
     public static numCallsToDisconnect = 0
 
+    public isRunning = false
+
     public async startStreaming() {
         FakeMuseAdapter.numCallsToStartStreaming++
+        this.isRunning = true
     }
 
     public async stopStreaming() {
         FakeMuseAdapter.numCallsToStopStreaming++
+        this.isRunning = false
     }
 
     public async disconnect() {
         FakeMuseAdapter.numCallsToDisconnect++
+        this.isRunning = false
     }
 
     public bleUuid = `fake-${generateId()}`

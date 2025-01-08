@@ -158,6 +158,20 @@ export default class MuseDeviceAdapterTest extends AbstractBiosensorsTest {
         assert.isTruthy(this.instance.bleName, 'Should expose bleName!')
     }
 
+    @test()
+    protected static async startStreamingSetsIsRunningTrue() {
+        await this.startStreaming()
+        assert.isTrue(this.instance.isRunning, 'Should be running!')
+    }
+
+    @test()
+    protected static async stopStreamingSetsIsRunningFalse() {
+        await this.startStreaming()
+        await this.stopStreaming()
+
+        assert.isFalse(this.instance.isRunning, 'Should not be running!')
+    }
+
     private static async startStreaming() {
         await this.instance.startStreaming()
     }
