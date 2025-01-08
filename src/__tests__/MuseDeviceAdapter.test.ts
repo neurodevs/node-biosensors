@@ -144,6 +144,15 @@ export default class MuseDeviceAdapterTest extends AbstractBiosensorsTest {
         )
     }
 
+    @test()
+    protected static async exposesBleUuidField() {
+        assert.isEqual(
+            this.instance.bleUuid,
+            this.bleUuid,
+            'Should expose bleUuid!'
+        )
+    }
+
     private static async startStreaming() {
         await this.instance.startStreaming()
     }

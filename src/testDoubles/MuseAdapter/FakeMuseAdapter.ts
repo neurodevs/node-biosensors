@@ -1,3 +1,4 @@
+import { generateId } from '@sprucelabs/test-utils'
 import { MuseAdapter } from '../../components/MuseDeviceAdapter'
 
 export default class FakeMuseAdapter implements MuseAdapter {
@@ -16,6 +17,8 @@ export default class FakeMuseAdapter implements MuseAdapter {
     public async disconnect() {
         FakeMuseAdapter.numCallsToDisconnect++
     }
+
+    public bleUuid = `fake-${generateId()}`
 
     public static resetTestDouble() {
         this.numCallsToStartStreaming = 0

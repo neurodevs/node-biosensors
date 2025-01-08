@@ -20,7 +20,7 @@ export default class MuseStreamProducer implements LslProducer {
     private scanOptions: ScanOptions
     private eegOutlet: LslOutlet
     private ppgOutlet: LslOutlet
-    private bleUuid?: string
+    private _bleUuid?: string
     private rssiIntervalMs?: number
     private eegChannelChunks = this.generateEmptyEegMatrix()
     private ppgChannelChunks = this.generateEmptyPpgMatrix()
@@ -31,7 +31,7 @@ export default class MuseStreamProducer implements LslProducer {
 
         this.eegOutlet = eegOutlet
         this.ppgOutlet = ppgOutlet
-        this.bleUuid = bleUuid
+        this._bleUuid = bleUuid
         this.rssiIntervalMs = rssiIntervalMs
 
         this.encoder = this.TextEncoder()
@@ -224,6 +224,14 @@ export default class MuseStreamProducer implements LslProducer {
         return this.createBufferFrom('h')
     }
 
+    public get bleUuid() {
+        return this.bleAdapter.uuid
+    }
+
+    private get bleAdapter() {
+        return this.connector.getBleAdapter()
+    }
+
     private generateEmptyEegMatrix() {
         return this.generateEmptyMatrix(this.eegNumChannels, this.eegChunkSize)
     }
@@ -309,7 +317,7 @@ export default class MuseStreamProducer implements LslProducer {
         return await BleDeviceConnector.Create({
             scanOptions: this.scanOptions,
             deviceLocalName: this.bleLocalName,
-            deviceUuid: this.bleUuid,
+            deviceUuid: this._bleUuid,
             connectBleOnCreate: true,
         })
     }

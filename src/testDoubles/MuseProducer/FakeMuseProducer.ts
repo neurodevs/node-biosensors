@@ -1,3 +1,4 @@
+import { generateId } from '@sprucelabs/test-utils'
 import { LslProducer } from 'types'
 import { MuseLslProducerConstructorOptions } from '../../components/MuseStreamProducer'
 
@@ -8,7 +9,12 @@ export default class FakeMuseProducer implements LslProducer {
     public static numCallsToStopLslStreams = 0
     public static numCallsToDisconnect = 0
 
+    public readonly bleUuid: string
+
     public constructor(options?: MuseLslProducerConstructorOptions) {
+        const { bleUuid } = options ?? {}
+        this.bleUuid = bleUuid ?? generateId()
+
         FakeMuseProducer.callsToConstructor.push(options)
     }
 
