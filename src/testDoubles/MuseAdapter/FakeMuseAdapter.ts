@@ -19,6 +19,7 @@ export default class FakeMuseAdapter implements MuseAdapter {
     }
 
     public bleUuid = `fake-${generateId()}`
+    public bleName = 'fake-MuseS'
 
     public static resetTestDouble() {
         this.numCallsToStartStreaming = 0

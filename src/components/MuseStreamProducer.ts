@@ -228,6 +228,10 @@ export default class MuseStreamProducer implements LslProducer {
         return this.bleAdapter.uuid
     }
 
+    public get bleName() {
+        return this.bleAdapter.name
+    }
+
     private get bleAdapter() {
         return this.connector.getBleAdapter()
     }

@@ -62,6 +62,10 @@ export default class MuseDeviceAdapter implements MuseAdapter {
         return this.lslProducer.bleUuid
     }
 
+    public get bleName() {
+        return this.lslProducer.bleName
+    }
+
     private static createXdfRecorderIfGivenPath(xdfRecordPath?: string) {
         return xdfRecordPath
             ? this.MuseStreamRecorder(xdfRecordPath)
@@ -82,6 +86,7 @@ export interface MuseAdapter {
     stopStreaming(): Promise<void>
     disconnect(): Promise<void>
     readonly bleUuid: string
+    readonly bleName: string
 }
 
 export interface MuseAdapterOptions {

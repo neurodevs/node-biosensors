@@ -10,10 +10,11 @@ export default class FakeMuseProducer implements LslProducer {
     public static numCallsToDisconnect = 0
 
     public readonly bleUuid: string
+    public readonly bleName = 'fake-MuseS'
 
     public constructor(options?: MuseLslProducerConstructorOptions) {
         const { bleUuid } = options ?? {}
-        this.bleUuid = bleUuid ?? generateId()
+        this.bleUuid = bleUuid ?? `fake-${generateId()}`
 
         FakeMuseProducer.callsToConstructor.push(options)
     }

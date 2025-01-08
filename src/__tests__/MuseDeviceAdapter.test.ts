@@ -153,6 +153,11 @@ export default class MuseDeviceAdapterTest extends AbstractBiosensorsTest {
         )
     }
 
+    @test()
+    protected static async exposesBleNameField() {
+        assert.isTruthy(this.instance.bleName, 'Should expose bleName!')
+    }
+
     private static async startStreaming() {
         await this.instance.startStreaming()
     }
