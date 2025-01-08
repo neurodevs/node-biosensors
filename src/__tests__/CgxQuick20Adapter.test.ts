@@ -1,18 +1,11 @@
 import { test, assert, generateId } from '@sprucelabs/test-utils'
 import {
     BleAdapter,
-    BleDeviceAdapter,
-    BleDeviceScanner,
     FakeBleAdapter,
     FakeBleScanner,
     FakePeripheral,
 } from '@neurodevs/node-ble'
-import {
-    LslStreamOutlet,
-    FakeLslOutlet,
-    LslStreamInfo,
-    FakeStreamInfo,
-} from '@neurodevs/node-lsl'
+import { FakeLslOutlet } from '@neurodevs/node-lsl'
 import CgxQuick20Adapter, {
     BiosensorAdapter,
 } from '../components/CgxQuick20Adapter'
@@ -23,18 +16,6 @@ export default class CgxQuick20AdapterTest extends AbstractBiosensorsTest {
 
     protected static async beforeEach() {
         await super.beforeEach()
-
-        BleDeviceAdapter.Class = FakeBleAdapter
-        FakeBleAdapter.resetTestDouble()
-
-        BleDeviceScanner.Class = FakeBleScanner
-        FakeBleScanner.resetTestDouble()
-
-        LslStreamOutlet.Class = FakeLslOutlet
-        FakeLslOutlet.resetTestDouble()
-
-        LslStreamInfo.Class = FakeStreamInfo
-        FakeStreamInfo.resetTestDouble()
 
         this.instance = this.CreateFromBle()
     }
