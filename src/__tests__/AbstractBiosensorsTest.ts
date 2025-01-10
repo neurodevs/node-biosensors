@@ -6,6 +6,7 @@ import {
     FakeBleScanner,
     FakePeripheral,
     PeripheralOptions,
+    FakeCharacteristic,
 } from '@neurodevs/node-ble'
 import {
     LslStreamOutlet,
@@ -70,7 +71,11 @@ export default class AbstractBiosensorsTest extends AbstractSpruceTest {
         MuseStreamProducer.Class = SpyMuseProducer
     }
 
-    protected static async FakePeripheral(options?: PeripheralOptions) {
+    protected static FakeCharacteristic(uuid: string) {
+        return new FakeCharacteristic({ uuid })
+    }
+
+    protected static FakePeripheral(options?: PeripheralOptions) {
         return new FakePeripheral(options)
     }
 }

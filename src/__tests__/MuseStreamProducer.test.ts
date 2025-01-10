@@ -3,7 +3,6 @@ import {
     FakeBleAdapter,
     FakeBleScanner,
     FakeCharacteristic,
-    FakePeripheral,
 } from '@neurodevs/node-ble'
 import { FakeLslOutlet } from '@neurodevs/node-lsl'
 import { LslProducerOptions } from 'types'
@@ -392,13 +391,9 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
     private static readonly ppgSize = this.numTimestamps + this.ppgBytes
     private static readonly ppgNumChannels = this.ppgCharNames.length
 
-    private static readonly peripheral = new FakePeripheral({
+    private static readonly peripheral = this.FakePeripheral({
         localName: this.bleLocalName,
     })
-
-    private static FakeCharacteristic(uuid: string) {
-        return new FakeCharacteristic({ uuid })
-    }
 
     private static async MuseStreamProducer(options?: LslProducerOptions) {
         return (await MuseStreamProducer.Create(options)) as SpyMuseProducer
