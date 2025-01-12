@@ -34,6 +34,7 @@ export default class FakeMuseAdapter implements MuseAdapter {
     public bleName = 'fake-MuseS'
 
     public static resetTestDouble() {
+        this.callsToConstructor = []
         this.numCallsToStartStreaming = 0
         this.numCallsToStopStreaming = 0
         this.numCallsToDisconnect = 0
