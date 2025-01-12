@@ -1,12 +1,19 @@
 import { generateId } from '@sprucelabs/test-utils'
+import { XdfRecorder } from '@neurodevs/node-xdf'
 import { MuseAdapter } from '../../components/MuseDeviceAdapter'
+import { LslProducer } from '../../types'
 
 export default class FakeMuseAdapter implements MuseAdapter {
+    public static callsToConstructor: FakeMuseAdapterCallToConstructor[] = []
     public static numCallsToStartStreaming = 0
     public static numCallsToStopStreaming = 0
     public static numCallsToDisconnect = 0
 
     public isRunning = false
+
+    public constructor(producer?: LslProducer, recorder?: XdfRecorder) {
+        FakeMuseAdapter.callsToConstructor.push({ producer, recorder })
+    }
 
     public async startStreaming() {
         FakeMuseAdapter.numCallsToStartStreaming++
@@ -31,4 +38,9 @@ export default class FakeMuseAdapter implements MuseAdapter {
         this.numCallsToStopStreaming = 0
         this.numCallsToDisconnect = 0
     }
+}
+
+export interface FakeMuseAdapterCallToConstructor {
+    producer?: LslProducer
+    recorder?: XdfRecorder
 }
