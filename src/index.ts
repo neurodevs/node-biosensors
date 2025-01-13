@@ -1,7 +1,7 @@
 // CGX Cognionics Quick-20r
 
-export { default as CgxQuick20Adapter } from './components/CgxQuick20Adapter'
-export * from './components/CgxQuick20Adapter'
+export { default as CgxDeviceAdapter } from './components/CgxDeviceAdapter'
+export * from './components/CgxDeviceAdapter'
 
 // Empatica E4
 
