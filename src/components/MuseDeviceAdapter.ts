@@ -1,9 +1,14 @@
-import { LslProducer } from '../types'
+import {
+    DeviceAdapter,
+    DeviceAdapterConstructor,
+    DeviceAdapterOptions,
+    LslProducer,
+} from '../types'
 import MuseStreamProducer from './MuseStreamProducer'
 import MuseStreamRecorder, { MuseXdfRecorder } from './MuseStreamRecorder'
 
-export default class MuseDeviceAdapter implements MuseAdapter {
-    public static Class?: MuseAdapterConstructor
+export default class MuseDeviceAdapter implements DeviceAdapter {
+    public static Class?: DeviceAdapterConstructor
 
     private lslProducer: LslProducer
     private xdfRecorder?: MuseXdfRecorder
@@ -14,7 +19,7 @@ export default class MuseDeviceAdapter implements MuseAdapter {
         this.xdfRecorder = recorder
     }
 
-    public static async Create(options?: MuseAdapterOptions) {
+    public static async Create(options?: DeviceAdapterOptions) {
         const { xdfRecordPath, ...producerOptions } = options ?? {}
 
         const producer = await this.MuseStreamProducer(producerOptions)
@@ -79,7 +84,7 @@ export default class MuseDeviceAdapter implements MuseAdapter {
             : undefined
     }
 
-    private static MuseStreamProducer(options?: MuseAdapterOptions) {
+    private static MuseStreamProducer(options?: DeviceAdapterOptions) {
         return MuseStreamProducer.Create(options)
     }
 
@@ -87,20 +92,3 @@ export default class MuseDeviceAdapter implements MuseAdapter {
         return MuseStreamRecorder.Create(xdfRecorderPath)
     }
 }
-
-export interface MuseAdapter {
-    startStreaming(): Promise<void>
-    stopStreaming(): Promise<void>
-    disconnect(): Promise<void>
-    readonly isRunning: boolean
-    readonly bleUuid: string
-    readonly bleName: string
-}
-
-export interface MuseAdapterOptions {
-    bleUuid?: string
-    rssiIntervalMs?: number
-    xdfRecordPath?: string
-}
-
-export type MuseAdapterConstructor = new () => MuseAdapter

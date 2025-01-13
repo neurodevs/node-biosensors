@@ -1,9 +1,9 @@
 import { generateId } from '@sprucelabs/test-utils'
 import { XdfRecorder } from '@neurodevs/node-xdf'
-import { MuseAdapter } from '../../components/MuseDeviceAdapter'
-import { LslProducer } from '../../types'
 
-export default class FakeMuseAdapter implements MuseAdapter {
+import { DeviceAdapter, LslProducer } from '../../types'
+
+export default class FakeMuseAdapter implements DeviceAdapter {
     public static callsToConstructor: FakeMuseAdapterCallToConstructor[] = []
     public static numCallsToStartStreaming = 0
     public static numCallsToStopStreaming = 0

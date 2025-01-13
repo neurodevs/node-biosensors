@@ -1,14 +1,12 @@
-import { test, assert, generateId } from '@sprucelabs/test-utils'
-import MuseDeviceAdapter, {
-    MuseAdapter,
-    MuseAdapterOptions,
-} from '../components/MuseDeviceAdapter'
+import { assert, test, generateId } from '@sprucelabs/test-utils'
+import MuseDeviceAdapter from '../components/MuseDeviceAdapter'
 import FakeMuseProducer from '../testDoubles/MuseProducer/FakeMuseProducer'
 import FakeMuseRecorder from '../testDoubles/MuseRecorder/FakeMuseRecorder'
+import { DeviceAdapter, DeviceAdapterOptions } from '../types'
 import AbstractBiosensorsTest from './AbstractBiosensorsTest'
 
 export default class MuseDeviceAdapterTest extends AbstractBiosensorsTest {
-    private static instance: MuseAdapter
+    private static instance: DeviceAdapter
 
     protected static async beforeEach() {
         await super.beforeEach()
@@ -186,7 +184,7 @@ export default class MuseDeviceAdapterTest extends AbstractBiosensorsTest {
 
     private static readonly bleUuid = generateId()
 
-    private static async MuseDeviceAdapter(options?: MuseAdapterOptions) {
+    private static async MuseDeviceAdapter(options?: DeviceAdapterOptions) {
         return MuseDeviceAdapter.Create({
             bleUuid: this.bleUuid,
             xdfRecordPath: generateId(),

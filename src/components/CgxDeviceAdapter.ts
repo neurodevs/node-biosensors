@@ -1,13 +1,19 @@
-export default class CgxDeviceAdapterImpl implements CgxAdapter {
-    public static Class?: CgxAdapterConstructor
+import { DeviceAdapter, DeviceAdapterConstructor } from '../types'
+
+export default class CgxDeviceAdapter implements DeviceAdapter {
+    public static Class?: DeviceAdapterConstructor
+
+    public isRunning = false
+    public bleUuid = ''
+    public bleName = ''
 
     protected constructor() {}
 
-    public static Create() {
+    public static async Create() {
         return new (this.Class ?? this)()
     }
+
+    public async startStreaming() {}
+    public async stopStreaming() {}
+    public async disconnect() {}
 }
-
-export interface CgxAdapter {}
-
-export type CgxAdapterConstructor = new () => CgxAdapter
