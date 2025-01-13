@@ -3,11 +3,6 @@
 export { default as CgxDeviceAdapter } from './components/CgxDeviceAdapter'
 export * from './components/CgxDeviceAdapter'
 
-// Empatica E4
-
-export { default as EmpaticaE4Adapter } from './components/EmpaticaE4Adapter'
-export * from './components/EmpaticaE4Adapter'
-
 // Muse S Gen 2
 
 // BLE -> LSL + XDF
