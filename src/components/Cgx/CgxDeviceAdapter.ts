@@ -1,4 +1,4 @@
-import { DeviceAdapter, DeviceAdapterConstructor } from '../types'
+import { DeviceAdapter, DeviceAdapterConstructor } from '../../types'
 
 export default class CgxDeviceAdapter implements DeviceAdapter {
     public static Class?: DeviceAdapterConstructor

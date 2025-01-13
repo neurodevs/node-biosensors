@@ -1,6 +1,6 @@
 import AbstractSpruceTest, { test, assert } from '@sprucelabs/test-utils'
-import CgxDeviceAdapter from '../components/CgxDeviceAdapter'
-import { DeviceAdapter } from '../types'
+import CgxDeviceAdapter from '../../components/Cgx/CgxDeviceAdapter'
+import { DeviceAdapter } from '../../types'
 
 export default class CgxDeviceAdapterTest extends AbstractSpruceTest {
     private static instance: DeviceAdapter

@@ -3,7 +3,7 @@ import {
     DeviceAdapterConstructor,
     DeviceAdapterOptions,
     LslProducer,
-} from '../types'
+} from '../../types'
 import MuseStreamProducer from './MuseStreamProducer'
 import MuseStreamRecorder, { MuseXdfRecorder } from './MuseStreamRecorder'
 

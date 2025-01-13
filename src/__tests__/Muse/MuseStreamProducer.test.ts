@@ -6,10 +6,10 @@ import {
 } from '@neurodevs/node-ble'
 import { FakeLslOutlet } from '@neurodevs/node-lsl'
 import { LslProducerOptions } from 'types'
-import MuseStreamProducer from '../components/MuseStreamProducer'
-import { MUSE_CHARACTERISTIC_UUIDS as CHAR_UUIDS } from '../components/MuseStreamProducer'
-import SpyMuseProducer from '../testDoubles/MuseProducer/SpyMuseProducer'
-import AbstractBiosensorsTest from './AbstractBiosensorsTest'
+import MuseStreamProducer from '../../components/Muse/MuseStreamProducer'
+import { MUSE_CHARACTERISTIC_UUIDS as CHAR_UUIDS } from '../../components/Muse/MuseStreamProducer'
+import SpyMuseProducer from '../../testDoubles/MuseProducer/SpyMuseProducer'
+import AbstractBiosensorsTest from '../AbstractBiosensorsTest'
 
 export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
     private static instance: SpyMuseProducer

@@ -1,9 +1,9 @@
 import { assert, test, generateId } from '@sprucelabs/test-utils'
-import MuseDeviceAdapter from '../components/MuseDeviceAdapter'
-import FakeMuseProducer from '../testDoubles/MuseProducer/FakeMuseProducer'
-import FakeMuseRecorder from '../testDoubles/MuseRecorder/FakeMuseRecorder'
-import { DeviceAdapter, DeviceAdapterOptions } from '../types'
-import AbstractBiosensorsTest from './AbstractBiosensorsTest'
+import MuseDeviceAdapter from '../../components/Muse/MuseDeviceAdapter'
+import FakeMuseProducer from '../../testDoubles/MuseProducer/FakeMuseProducer'
+import FakeMuseRecorder from '../../testDoubles/MuseRecorder/FakeMuseRecorder'
+import { DeviceAdapter, DeviceAdapterOptions } from '../../types'
+import AbstractBiosensorsTest from '../AbstractBiosensorsTest'
 
 export default class MuseDeviceAdapterTest extends AbstractBiosensorsTest {
     private static instance: DeviceAdapter

@@ -1,6 +1,6 @@
 import { generateId } from '@sprucelabs/test-utils'
 import { LslProducer } from 'types'
-import { MuseLslProducerConstructorOptions } from '../../components/MuseStreamProducer'
+import { MuseLslProducerConstructorOptions } from '../../components/Muse/MuseStreamProducer'
 
 export default class FakeMuseProducer implements LslProducer {
     public static callsToConstructor: CallToConstructor[] = []
