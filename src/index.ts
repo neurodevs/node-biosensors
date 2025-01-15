@@ -1,7 +1,7 @@
 // CGX Cognionics Quick-20r
 
-export { default as CgxDeviceAdapter } from './components/Cgx/CgxDeviceAdapter'
-export * from './components/Cgx/CgxDeviceAdapter'
+export { default as CgxStreamProducer } from './components/Cgx/CgxStreamProducer'
+export * from './components/Cgx/CgxStreamProducer'
 
 // Muse S Gen 2
 
