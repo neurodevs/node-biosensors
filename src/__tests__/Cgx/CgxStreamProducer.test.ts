@@ -34,7 +34,7 @@ export default class CgxStreamProducerTest extends AbstractSpruceTest {
         FakeFTDI.fakeDevices = []
 
         const err = await assert.doesThrowAsync(() => this.CgxStreamProducer())
-        errorAssert.assertError(err, 'DEVICE_NOT_FOUND')
+        errorAssert.assertError(err, 'CGX_FTDI_DEVICE_NOT_FOUND')
     }
 
     private static setFakeFTDI() {

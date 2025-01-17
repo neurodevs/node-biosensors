@@ -8,8 +8,12 @@ export default class SpruceError extends BaseSpruceError<ErrorOptions> {
         let message
         switch (options?.code) {
             case 'CGX_FTDI_DEVICE_NOT_FOUND':
-                message =
-                    'FTDI device not found for the CGX headset! Please make sure the Bluetooth dongle is connected and FTDI D2XX drivers are installed.'
+                message = `
+                    \n FTDI device not found for the CGX headset!
+                    \n Please make sure the Bluetooth dongle is connected and FTDI D2XX drivers are installed: 
+                    \n - https://ftdichip.com/drivers/d2xx-drivers/
+                    \n
+                `
                 break
             default:
                 message = super.friendlyMessage()
