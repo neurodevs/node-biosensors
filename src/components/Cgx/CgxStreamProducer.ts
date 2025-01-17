@@ -24,6 +24,7 @@ export default class CgxStreamProducer implements LslProducer {
 
         device.setTimeouts(1000, 1000)
         device.purge(FTDI.FT_PURGE_RX)
+        device.setFlowControl(FTDI.FT_FLOW_RTS_CTS, 0x11, 0x13)
 
         return new (this.Class ?? this)()
     }

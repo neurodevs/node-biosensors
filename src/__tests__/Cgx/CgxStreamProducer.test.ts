@@ -59,6 +59,15 @@ export default class CgxStreamProducerTest extends AbstractSpruceTest {
         assert.isEqualDeep(FakeDeviceFTDI.callsToPurge[0], FTDI.FT_PURGE_RX)
     }
 
+    @test()
+    protected static async setsFlowControlOnDevice() {
+        assert.isEqualDeep(FakeDeviceFTDI.callsToSetFlowControl[0], {
+            flowControl: FTDI.FT_FLOW_RTS_CTS,
+            xOn: 0x11,
+            xOff: 0x13,
+        })
+    }
+
     private static setFakeFTDI() {
         CgxStreamProducer.FTDI = FakeFTDI as any
         FakeFTDI.resetTestDouble()

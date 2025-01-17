@@ -1,6 +1,7 @@
 export default class FakeDeviceFTDI {
     public static callsToSetTimeouts: CallToSetTimeouts[] = []
     public static callsToPurge: number[] = []
+    public static callsToSetFlowControl: CallToSetFlowControl[] = []
 
     public setTimeouts(txTimeoutMs: number, rxTimeoutMs: number) {
         FakeDeviceFTDI.callsToSetTimeouts.push({ txTimeoutMs, rxTimeoutMs })
@@ -10,13 +11,24 @@ export default class FakeDeviceFTDI {
         FakeDeviceFTDI.callsToPurge.push(mask)
     }
 
+    public setFlowControl(flowControl: number, xOn: number, xOff: number) {
+        FakeDeviceFTDI.callsToSetFlowControl.push({ flowControl, xOn, xOff })
+    }
+
     public static resetTestDouble() {
         FakeDeviceFTDI.callsToSetTimeouts = []
         FakeDeviceFTDI.callsToPurge = []
+        FakeDeviceFTDI.callsToSetFlowControl = []
     }
 }
 
 export interface CallToSetTimeouts {
     txTimeoutMs: number
     rxTimeoutMs: number
+}
+
+export interface CallToSetFlowControl {
+    flowControl: number
+    xOn: number
+    xOff: number
 }
