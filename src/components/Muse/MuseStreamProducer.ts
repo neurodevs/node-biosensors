@@ -16,7 +16,7 @@ import { LslProducer, LslProducerOptions } from '../../types'
 export default class MuseStreamProducer implements LslProducer {
     public static Class?: MuseLslProducerConstructor
 
-    protected connector!: BleConnector
+    protected bleConnector!: BleConnector
     private scanOptions: ScanOptions
     private eegOutlet: LslOutlet
     private ppgOutlet: LslOutlet
@@ -187,8 +187,14 @@ export default class MuseStreamProducer implements LslProducer {
     }
 
     public async startLslStreams() {
-        this.connector = await this.BleDeviceConnector()
+        await this.createBleConnectorIfNotExists()
         await this.writeStartCmdsToControl()
+    }
+
+    private async createBleConnectorIfNotExists() {
+        if (!this.bleConnector) {
+            this.bleConnector = await this.BleDeviceConnector()
+        }
     }
 
     private async writeStartCmdsToControl() {
@@ -203,7 +209,7 @@ export default class MuseStreamProducer implements LslProducer {
     }
 
     private get ble() {
-        return this.connector.getBleAdapter()
+        return this.bleConnector.getBleAdapter()
     }
 
     private get controlUuid() {
@@ -233,7 +239,7 @@ export default class MuseStreamProducer implements LslProducer {
     }
 
     private get bleAdapter() {
-        return this.connector.getBleAdapter()
+        return this.bleConnector.getBleAdapter()
     }
 
     private generateEmptyEegMatrix() {

@@ -7,6 +7,8 @@ import {
     FakePeripheral,
     PeripheralOptions,
     FakeCharacteristic,
+    BleDeviceConnector,
+    FakeBleConnector,
 } from '@neurodevs/node-ble'
 import {
     LslStreamOutlet,
@@ -26,6 +28,7 @@ export default class AbstractBiosensorsTest extends AbstractSpruceTest {
         await super.beforeEach()
 
         this.setFakeBleAdapter()
+        this.setFakeBleConnector()
         this.setFakeBleScanner()
         this.setFakeLslOutlet()
         this.setFakeStreamInfo()
@@ -35,6 +38,11 @@ export default class AbstractBiosensorsTest extends AbstractSpruceTest {
     protected static setFakeBleAdapter() {
         BleDeviceAdapter.Class = FakeBleAdapter
         FakeBleAdapter.resetTestDouble()
+    }
+
+    protected static setFakeBleConnector() {
+        BleDeviceConnector.Class = FakeBleConnector
+        FakeBleConnector.resetTestDouble()
     }
 
     protected static setFakeBleScanner() {

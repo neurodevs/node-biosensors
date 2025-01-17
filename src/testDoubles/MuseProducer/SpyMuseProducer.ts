@@ -7,10 +7,6 @@ export default class SpyMuseProducer extends MuseStreamProducer {
         super(options)
     }
 
-    public get bleConnector() {
-        return this.connector
-    }
-
     public getHandleEegChannelForChunk() {
         return this.handleEegChannelChunk
     }

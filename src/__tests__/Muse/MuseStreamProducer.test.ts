@@ -1,6 +1,7 @@
 import { test, assert } from '@sprucelabs/test-utils'
 import {
     FakeBleAdapter,
+    FakeBleConnector,
     FakeBleScanner,
     FakeCharacteristic,
 } from '@neurodevs/node-ble'
@@ -40,14 +41,14 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
 
     @test()
     protected static async startCallsGetCharacteristicForControlUuid() {
-        await this.start()
+        await this.startLslStreams()
 
         assert.isEqual(this.callsToGetCharacteristic[0], CHAR_UUIDS.CONTROL)
     }
 
     @test()
     protected static async startWritesControlCommands() {
-        await this.start()
+        await this.startLslStreams()
 
         assert.isEqualDeep(
             this.controlChar.callsToWriteAsync,
@@ -164,9 +165,9 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
 
     @test()
     protected static async stopLslStreamsSendsHaltCmdToMuse() {
-        await this.start()
+        await this.startLslStreams()
         this.controlChar.resetTestDouble()
-        await this.instance.stopLslStreams()
+        await this.stopLslStreams()
 
         assert.isEqualDeep(
             this.controlChar.callsToWriteAsync,
@@ -194,6 +195,18 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
             this.callsToPushSample,
             ppgSamples,
             'Should push a PPG sample for each chunk!'
+        )
+    }
+
+    @test()
+    protected static async doesNotCreateSecondBleDeviceConnector() {
+        await this.startLslStreams()
+        await this.startLslStreams()
+
+        assert.isEqual(
+            FakeBleConnector.numCallsToConnect,
+            1,
+            'Should not recreate the BLE device connector!'
         )
     }
 
@@ -323,8 +336,12 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
         return Buffer.from(encoded)
     }
 
-    private static async start() {
+    private static async startLslStreams() {
         await this.instance.startLslStreams()
+    }
+
+    private static async stopLslStreams() {
+        await this.instance.stopLslStreams()
     }
 
     private static simulateEegForChars(buffer: Buffer) {
