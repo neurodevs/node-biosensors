@@ -204,7 +204,7 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
         await this.startLslStreams()
 
         assert.isEqual(
-            FakeBleConnector.numCallsToConnect,
+            FakeBleConnector.numCallsToConnectBle,
             1,
             'Should not recreate the BLE device connector!'
         )
@@ -218,9 +218,38 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
             wasHit = true
         }
 
-        await this.instance.disconnect()
+        await this.startLslStreamsThenDisconnect()
 
         assert.isTrue(wasHit, 'Should call stopLslStreams on disconnect!')
+    }
+
+    @test()
+    protected static async disconnectCallsDisconnectBleOnConnector() {
+        await this.startLslStreams()
+        await this.instance.disconnect()
+
+        assert.isEqual(
+            FakeBleConnector.numCallsToDisconnectBle,
+            1,
+            'Should close the BLE connector on disconnect!'
+        )
+    }
+
+    private static async startLslStreams() {
+        await this.instance.startLslStreams()
+    }
+
+    private static async stopLslStreams() {
+        await this.instance.stopLslStreams()
+    }
+
+    private static async startLslStreamsThenDisconnect() {
+        await this.startLslStreams()
+        await this.disconnect()
+    }
+
+    private static async disconnect() {
+        await this.instance.disconnect()
     }
 
     private static generatePpgSamples(decoded: number[]) {
@@ -347,14 +376,6 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
         const encoded = new TextEncoder().encode(`X${cmd}\n`)
         encoded[0] = encoded.length - 1
         return Buffer.from(encoded)
-    }
-
-    private static async startLslStreams() {
-        await this.instance.startLslStreams()
-    }
-
-    private static async stopLslStreams() {
-        await this.instance.stopLslStreams()
     }
 
     private static simulateEegForChars(buffer: Buffer) {

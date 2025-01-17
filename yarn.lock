@@ -668,10 +668,10 @@
     semver "^7.3.5"
     tar "^6.1.11"
 
-"@neurodevs/node-ble@^0.10.0":
-  version "0.10.0"
-  resolved "https://registry.yarnpkg.com/@neurodevs/node-ble/-/node-ble-0.10.0.tgz#f7be42c02f7e70cc299ae11e6c5e20171735f812"
-  integrity sha512-TXKqV4PC4DbMKFQRvkMpW7Z3HZWH2fHnpXXkY17z5Hni000DJKK86xBkoB4cS+tmi/7xfsB7rmUlTJU+STGu0g==
+"@neurodevs/node-ble@^0.10.1":
+  version "0.10.1"
+  resolved "https://registry.yarnpkg.com/@neurodevs/node-ble/-/node-ble-0.10.1.tgz#a0b3f2b9cbe51ddbed34baa51fd14286924bb74e"
+  integrity sha512-8s2VLJ575tJi2datr09KOnaK4l1go/lzVKPxtQlOurqDUdqz9uuy9oju+5n40ry6VWGzUpgVyOdQrr2Wl6lz3w==
   dependencies:
     "@abandonware/noble" "^1.9.2-22"
     "@sprucelabs/error" "^6.0.520"
