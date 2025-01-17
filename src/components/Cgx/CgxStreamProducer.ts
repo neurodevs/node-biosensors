@@ -27,6 +27,12 @@ export default class CgxStreamProducer implements LslProducer {
         device.setFlowControl(FTDI.FT_FLOW_RTS_CTS, 0x11, 0x13)
         device.setBaudRate(1000000)
 
+        device.setDataCharacteristics(
+            FTDI.FT_BITS_8,
+            FTDI.FT_STOP_BITS_1,
+            FTDI.FT_PARITY_NONE
+        )
+
         return new (this.Class ?? this)()
     }
 

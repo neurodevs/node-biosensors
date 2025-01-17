@@ -73,6 +73,15 @@ export default class CgxStreamProducerTest extends AbstractSpruceTest {
         assert.isEqualDeep(FakeDeviceFTDI.callsToSetBaudRate[0], 1000000)
     }
 
+    @test()
+    protected static async setsDataCharacteristicsOnDevice() {
+        assert.isEqualDeep(FakeDeviceFTDI.callsToSetDataCharacteristics[0], {
+            dataBits: FTDI.FT_BITS_8,
+            stopBits: FTDI.FT_STOP_BITS_1,
+            parity: FTDI.FT_PARITY_NONE,
+        })
+    }
+
     private static setFakeFTDI() {
         CgxStreamProducer.FTDI = FakeFTDI as any
         FakeFTDI.resetTestDouble()
