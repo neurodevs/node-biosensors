@@ -82,6 +82,11 @@ export default class CgxStreamProducerTest extends AbstractSpruceTest {
         })
     }
 
+    @test()
+    protected static async setsLatencyTimerOnDevice() {
+        assert.isEqualDeep(FakeDeviceFTDI.callsToSetLatencyTimer[0], 4)
+    }
+
     private static setFakeFTDI() {
         CgxStreamProducer.FTDI = FakeFTDI as any
         FakeFTDI.resetTestDouble()

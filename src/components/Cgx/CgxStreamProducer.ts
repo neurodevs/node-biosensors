@@ -33,6 +33,8 @@ export default class CgxStreamProducer implements LslProducer {
             FTDI.FT_PARITY_NONE
         )
 
+        device.setLatencyTimer(4)
+
         return new (this.Class ?? this)()
     }
 

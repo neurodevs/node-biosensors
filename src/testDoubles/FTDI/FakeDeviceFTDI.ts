@@ -5,6 +5,7 @@ export default class FakeDeviceFTDI {
     public static callsToSetBaudRate: number[] = []
     public static callsToSetDataCharacteristics: CallToSetDataCharacteristics[] =
         []
+    public static callsToSetLatencyTimer: number[] = []
 
     public setTimeouts(txTimeoutMs: number, rxTimeoutMs: number) {
         FakeDeviceFTDI.callsToSetTimeouts.push({ txTimeoutMs, rxTimeoutMs })
@@ -34,11 +35,17 @@ export default class FakeDeviceFTDI {
         })
     }
 
+    public setLatencyTimer(latencyTimerMs: number) {
+        FakeDeviceFTDI.callsToSetLatencyTimer.push(latencyTimerMs)
+    }
+
     public static resetTestDouble() {
         FakeDeviceFTDI.callsToSetTimeouts = []
         FakeDeviceFTDI.callsToPurge = []
         FakeDeviceFTDI.callsToSetFlowControl = []
         FakeDeviceFTDI.callsToSetBaudRate = []
+        FakeDeviceFTDI.callsToSetDataCharacteristics = []
+        FakeDeviceFTDI.callsToSetLatencyTimer = []
     }
 }
 
