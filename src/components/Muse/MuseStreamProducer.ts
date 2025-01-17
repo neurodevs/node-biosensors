@@ -236,6 +236,10 @@ export default class MuseStreamProducer implements LslProducer {
 
     public async disconnect() {
         await this.stopLslStreams()
+        await this.disconnectBle()
+    }
+
+    private async disconnectBle() {
         await this.bleConnector.disconnectBle()
     }
 
