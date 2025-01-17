@@ -3,7 +3,6 @@ import AbstractSpruceTest, {
     assert,
     errorAssert,
 } from '@sprucelabs/test-utils'
-import { FTDI_Device } from 'ftdi-d2xx'
 import CgxStreamProducer from '../../components/Cgx/CgxStreamProducer'
 import FakeFTDI from '../../testDoubles/FTDI/FakeFTDI'
 import { LslProducer } from '../../types'
@@ -31,17 +30,25 @@ export default class CgxStreamProducerTest extends AbstractSpruceTest {
 
     @test()
     protected static async throwsIfFtdiDeviceNotFound() {
-        FakeFTDI.fakeDevices = []
+        FakeFTDI.fakeDeviceInfos = []
 
         const err = await assert.doesThrowAsync(() => this.CgxStreamProducer())
         errorAssert.assertError(err, 'CGX_FTDI_DEVICE_NOT_FOUND')
+    }
+
+    @test()
+    protected static async callsOpenDeviceOnSerialNumber() {
+        assert.isEqualDeep(
+            FakeFTDI.callsToOpenDevice[0],
+            FakeFTDI.fakeDeviceInfos[0].serial_number
+        )
     }
 
     private static setFakeFTDI() {
         CgxStreamProducer.FTDI = FakeFTDI as any
         FakeFTDI.resetTestDouble()
 
-        FakeFTDI.fakeDevices = [{} as FTDI_Device]
+        FakeFTDI.setFakeDeviceInfos()
     }
 
     private static async CgxStreamProducer() {

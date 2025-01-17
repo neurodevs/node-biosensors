@@ -13,11 +13,14 @@ export default class CgxStreamProducer implements LslProducer {
     protected constructor() {}
 
     public static async Create() {
-        const devices = await this.FTDI.getDeviceInfoList()
+        const infos = await this.FTDI.getDeviceInfoList()
 
-        if (devices.length === 0) {
+        if (infos.length === 0) {
             throw new SpruceError({ code: 'CGX_FTDI_DEVICE_NOT_FOUND' })
         }
+
+        const serialNumber = infos[0].serial_number
+        await this.FTDI.openDevice(serialNumber)
 
         return new (this.Class ?? this)()
     }
