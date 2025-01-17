@@ -41,6 +41,8 @@ export default class CgxStreamProducer implements LslProducer {
     public async startLslStreams() {}
 
     public async stopLslStreams() {}
+
+    public async disconnect() {}
 }
 
 export type CgxStreamProducerConstructor = new () => LslProducer

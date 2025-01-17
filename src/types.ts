@@ -22,6 +22,7 @@ export type DeviceAdapterConstructor = new () => DeviceAdapter
 export interface LslProducer {
     startLslStreams(): Promise<void>
     stopLslStreams(): Promise<void>
+    disconnect(): Promise<void>
     readonly bleUuid: string
     readonly bleName: string
 }

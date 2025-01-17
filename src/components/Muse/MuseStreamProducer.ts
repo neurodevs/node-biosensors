@@ -188,7 +188,7 @@ export default class MuseStreamProducer implements LslProducer {
 
     public async startLslStreams() {
         await this.createBleConnectorIfNotExists()
-        await this.writeStartCmdsToControl()
+        await this.writeStartCommandsToControl()
     }
 
     private async createBleConnectorIfNotExists() {
@@ -197,9 +197,9 @@ export default class MuseStreamProducer implements LslProducer {
         }
     }
 
-    private async writeStartCmdsToControl() {
-        for (const cmd of ['h', 'p50', 's', 'd']) {
-            const buffer = this.createBufferFrom(cmd)
+    private async writeStartCommandsToControl() {
+        for (const command of ['h', 'p50', 's', 'd']) {
+            const buffer = this.createBufferFrom(command)
             await this.control.writeAsync(buffer, true)
         }
     }
@@ -223,11 +223,19 @@ export default class MuseStreamProducer implements LslProducer {
     }
 
     public async stopLslStreams() {
+        await this.writeHaltCommandToControl()
+    }
+
+    private async writeHaltCommandToControl() {
         await this.control.writeAsync(this.haltCmdBuffer, true)
     }
 
     private get haltCmdBuffer() {
         return this.createBufferFrom('h')
+    }
+
+    public async disconnect() {
+        await this.stopLslStreams()
     }
 
     public get bleUuid() {

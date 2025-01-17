@@ -210,6 +210,19 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
         )
     }
 
+    @test()
+    protected static async disconnectCallsStopLslStreams() {
+        let wasHit = false
+
+        this.instance.stopLslStreams = async () => {
+            wasHit = true
+        }
+
+        await this.instance.disconnect()
+
+        assert.isTrue(wasHit, 'Should call stopLslStreams on disconnect!')
+    }
+
     private static generatePpgSamples(decoded: number[]) {
         let expected: number[][] = []
 
