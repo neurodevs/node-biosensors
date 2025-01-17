@@ -1,4 +1,5 @@
 import FTDI from 'ftdi-d2xx'
+import SpruceError from '../../errors/SpruceError'
 import { LslProducer } from '../../types'
 
 export default class CgxStreamProducer implements LslProducer {
@@ -12,7 +13,12 @@ export default class CgxStreamProducer implements LslProducer {
     protected constructor() {}
 
     public static async Create() {
-        await this.FTDI.getDeviceInfoList()
+        const devices = await this.FTDI.getDeviceInfoList()
+
+        if (devices.length === 0) {
+            throw new SpruceError({ code: 'CGX_FTDI_DEVICE_NOT_FOUND' })
+        }
+
         return new (this.Class ?? this)()
     }
 

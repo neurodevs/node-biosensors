@@ -1,4 +1,9 @@
-import AbstractSpruceTest, { test, assert } from '@sprucelabs/test-utils'
+import AbstractSpruceTest, {
+    test,
+    assert,
+    errorAssert,
+} from '@sprucelabs/test-utils'
+import { FTDI_Device } from 'ftdi-d2xx'
 import CgxStreamProducer from '../../components/Cgx/CgxStreamProducer'
 import FakeFTDI from '../../testDoubles/FTDI/FakeFTDI'
 import { LslProducer } from '../../types'
@@ -24,9 +29,19 @@ export default class CgxStreamProducerTest extends AbstractSpruceTest {
         assert.isEqual(FakeFTDI.numCallsToGetDeviceInfoList, 1)
     }
 
+    @test()
+    protected static async throwsIfFtdiDeviceNotFound() {
+        FakeFTDI.fakeDevices = []
+
+        const err = await assert.doesThrowAsync(() => this.CgxStreamProducer())
+        errorAssert.assertError(err, 'DEVICE_NOT_FOUND')
+    }
+
     private static setFakeFTDI() {
         CgxStreamProducer.FTDI = FakeFTDI as any
         FakeFTDI.resetTestDouble()
+
+        FakeFTDI.fakeDevices = [{} as FTDI_Device]
     }
 
     private static async CgxStreamProducer() {
