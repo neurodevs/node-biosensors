@@ -3,6 +3,7 @@ import AbstractSpruceTest, {
     assert,
     errorAssert,
 } from '@sprucelabs/test-utils'
+import FTDI from 'ftdi-d2xx'
 import CgxStreamProducer from '../../components/Cgx/CgxStreamProducer'
 import FakeDeviceFTDI from '../../testDoubles/FTDI/FakeDeviceFTDI'
 import FakeFTDI from '../../testDoubles/FTDI/FakeFTDI'
@@ -51,6 +52,11 @@ export default class CgxStreamProducerTest extends AbstractSpruceTest {
             txTimeoutMs: 1000,
             rxTimeoutMs: 1000,
         })
+    }
+
+    @test()
+    protected static async callsPurgeOnDeviceToClearPreviousData() {
+        assert.isEqualDeep(FakeDeviceFTDI.callsToPurge[0], FTDI.FT_PURGE_RX)
     }
 
     private static setFakeFTDI() {
