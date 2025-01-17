@@ -1,5 +1,6 @@
 import { generateId } from '@sprucelabs/test-utils'
 import { FTDI_Device, FTDI_DeviceInfo } from 'ftdi-d2xx'
+import FakeDeviceFTDI from './FakeDeviceFTDI'
 
 export default class FakeFTDI {
     public static numCallsToGetDeviceInfoList = 0
@@ -26,7 +27,11 @@ export default class FakeFTDI {
 
     public static async openDevice(serialNumber: string) {
         FakeFTDI.callsToOpenDevice.push(serialNumber)
-        return {} as FTDI_Device
+        return this.FakeDeviceFTDI() as FTDI_Device
+    }
+
+    private static FakeDeviceFTDI() {
+        return new FakeDeviceFTDI()
     }
 
     public static resetTestDouble() {

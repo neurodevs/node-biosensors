@@ -20,7 +20,9 @@ export default class CgxStreamProducer implements LslProducer {
         }
 
         const serialNumber = infos[0].serial_number
-        await this.FTDI.openDevice(serialNumber)
+        const device = await this.FTDI.openDevice(serialNumber)
+
+        device.setTimeouts(1000, 1000)
 
         return new (this.Class ?? this)()
     }
