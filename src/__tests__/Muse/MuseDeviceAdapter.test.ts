@@ -1,7 +1,7 @@
 import { assert, test, generateId } from '@sprucelabs/test-utils'
+import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 import MuseDeviceAdapter from '../../components/Muse/MuseDeviceAdapter'
 import FakeMuseProducer from '../../testDoubles/MuseProducer/FakeMuseProducer'
-import FakeMuseRecorder from '../../testDoubles/MuseRecorder/FakeMuseRecorder'
 import { DeviceAdapter, DeviceAdapterOptions } from '../../types'
 import AbstractBiosensorsTest from '../AbstractBiosensorsTest'
 
@@ -12,7 +12,6 @@ export default class MuseDeviceAdapterTest extends AbstractBiosensorsTest {
         await super.beforeEach()
 
         this.setFakeMuseProducer()
-        this.setFakeMuseRecorder()
 
         this.instance = await this.MuseDeviceAdapter()
     }
@@ -32,23 +31,23 @@ export default class MuseDeviceAdapterTest extends AbstractBiosensorsTest {
     }
 
     @test()
-    protected static async constructsMuseStreamRecorderIfPassedXdfRecordPath() {
+    protected static async constructsXdfStreamRecorderIfPassedXdfRecordPath() {
         assert.isEqual(
-            FakeMuseRecorder.numCallsToConstructor,
+            FakeXdfRecorder.callsToConstructor.length,
             1,
-            'Should construct MuseStreamRecorder!'
+            'Should construct XdfStreamRecorder!'
         )
     }
 
     @test()
     protected static async doesNotConstructRecorderIfNoXdfRecordPath() {
-        FakeMuseRecorder.resetTestDouble()
+        FakeXdfRecorder.resetTestDouble()
         await this.MuseDeviceAdapter({ xdfRecordPath: undefined })
 
         assert.isEqual(
-            FakeMuseRecorder.numCallsToConstructor,
+            FakeXdfRecorder.callsToConstructor.length,
             0,
-            'Should not construct MuseStreamRecorder!'
+            'Should not construct XdfStreamRecorder!'
         )
     }
 
@@ -57,9 +56,9 @@ export default class MuseDeviceAdapterTest extends AbstractBiosensorsTest {
         await this.startStreaming()
 
         assert.isEqual(
-            FakeMuseRecorder.numCallsToStart,
+            FakeXdfRecorder.numCallsToStart,
             1,
-            'Should call start on MuseStreamRecorder!'
+            'Should call start on XdfStreamRecorder!'
         )
     }
 
@@ -124,7 +123,7 @@ export default class MuseDeviceAdapterTest extends AbstractBiosensorsTest {
         await this.disconnect()
 
         assert.isEqual(
-            FakeMuseRecorder.numCallsToStop,
+            FakeXdfRecorder.numCallsToStop,
             1,
             'Should call recorder.stop() on disconnect!'
         )
@@ -136,9 +135,9 @@ export default class MuseDeviceAdapterTest extends AbstractBiosensorsTest {
         await this.startStreaming()
 
         assert.isEqual(
-            FakeMuseRecorder.numCallsToStart,
+            FakeXdfRecorder.numCallsToStart,
             1,
-            'Should only call start on MuseStreamRecorder once!'
+            'Should only call start on XdfStreamRecorder once!'
         )
     }
 

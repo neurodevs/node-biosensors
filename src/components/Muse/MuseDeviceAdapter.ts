@@ -1,3 +1,4 @@
+import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 import {
     DeviceAdapter,
     DeviceAdapterConstructor,
@@ -5,16 +6,15 @@ import {
     LslProducer,
 } from '../../types'
 import MuseStreamProducer from './MuseStreamProducer'
-import MuseStreamRecorder, { MuseXdfRecorder } from './MuseStreamRecorder'
 
 export default class MuseDeviceAdapter implements DeviceAdapter {
     public static Class?: DeviceAdapterConstructor
 
     private lslProducer: LslProducer
-    private xdfRecorder?: MuseXdfRecorder
+    private xdfRecorder?: XdfRecorder
     private _isRunning = false
 
-    protected constructor(producer: LslProducer, recorder?: MuseXdfRecorder) {
+    protected constructor(producer: LslProducer, recorder?: XdfRecorder) {
         this.lslProducer = producer
         this.xdfRecorder = recorder
     }
@@ -79,16 +79,20 @@ export default class MuseDeviceAdapter implements DeviceAdapter {
     }
 
     private static createXdfRecorderIfGivenPath(xdfRecordPath?: string) {
-        return xdfRecordPath
-            ? this.MuseStreamRecorder(xdfRecordPath)
-            : undefined
+        return xdfRecordPath ? this.XdfStreamRecorder(xdfRecordPath) : undefined
     }
+
+    private static readonly museStreamQueries = [
+        'type="EEG"',
+        'type="PPG"',
+        'type="Markers"',
+    ]
 
     private static MuseStreamProducer(options?: DeviceAdapterOptions) {
         return MuseStreamProducer.Create(options)
     }
 
-    private static MuseStreamRecorder(xdfRecorderPath: string) {
-        return MuseStreamRecorder.Create(xdfRecorderPath)
+    private static XdfStreamRecorder(xdfRecordPath: string) {
+        return XdfStreamRecorder.Create(xdfRecordPath, this.museStreamQueries)
     }
 }
