@@ -46,6 +46,63 @@ export default class MuseStreamProducer implements LslProducer {
         })
     }
 
+    public async startLslStreams() {
+        await this.createBleConnectorIfNotExists()
+        await this.writeStartCommandsToControl()
+    }
+
+    private async createBleConnectorIfNotExists() {
+        if (!this.bleConnector) {
+            this.bleConnector = await this.BleDeviceConnector()
+        }
+    }
+
+    private async writeStartCommandsToControl() {
+        for (const command of ['h', 'p50', 's', 'd']) {
+            const buffer = this.createBufferFrom(command)
+            await this.control.writeAsync(buffer, true)
+        }
+    }
+
+    private get control() {
+        return this.ble.getCharacteristic(this.controlUuid)!
+    }
+
+    private get ble() {
+        return this.bleConnector.getBleController()
+    }
+
+    private get controlUuid() {
+        return CHAR_UUIDS.CONTROL
+    }
+
+    private createBufferFrom(cmd: string) {
+        const encoded = this.encoder.encode(`X${cmd}\n`)
+        encoded[0] = encoded.length - 1
+        return Buffer.from(encoded)
+    }
+
+    public async stopLslStreams() {
+        await this.writeHaltCommandToControl()
+    }
+
+    private async writeHaltCommandToControl() {
+        await this.control.writeAsync(this.haltCmdBuffer, true)
+    }
+
+    private get haltCmdBuffer() {
+        return this.createBufferFrom('h')
+    }
+
+    public async disconnect() {
+        await this.stopLslStreams()
+        await this.disconnectBle()
+    }
+
+    private async disconnectBle() {
+        await this.bleConnector.disconnectBle()
+    }
+
     private generateScanOptions() {
         return {
             characteristicCallbacks: this.generateCharCallbacks(),
@@ -184,63 +241,6 @@ export default class MuseStreamProducer implements LslProducer {
 
     protected resetPpgChannelChunks() {
         this.ppgChannelChunks = this.generateEmptyPpgMatrix()
-    }
-
-    public async startLslStreams() {
-        await this.createBleConnectorIfNotExists()
-        await this.writeStartCommandsToControl()
-    }
-
-    private async createBleConnectorIfNotExists() {
-        if (!this.bleConnector) {
-            this.bleConnector = await this.BleDeviceConnector()
-        }
-    }
-
-    private async writeStartCommandsToControl() {
-        for (const command of ['h', 'p50', 's', 'd']) {
-            const buffer = this.createBufferFrom(command)
-            await this.control.writeAsync(buffer, true)
-        }
-    }
-
-    private get control() {
-        return this.ble.getCharacteristic(this.controlUuid)!
-    }
-
-    private get ble() {
-        return this.bleConnector.getBleController()
-    }
-
-    private get controlUuid() {
-        return CHAR_UUIDS.CONTROL
-    }
-
-    private createBufferFrom(cmd: string) {
-        const encoded = this.encoder.encode(`X${cmd}\n`)
-        encoded[0] = encoded.length - 1
-        return Buffer.from(encoded)
-    }
-
-    public async stopLslStreams() {
-        await this.writeHaltCommandToControl()
-    }
-
-    private async writeHaltCommandToControl() {
-        await this.control.writeAsync(this.haltCmdBuffer, true)
-    }
-
-    private get haltCmdBuffer() {
-        return this.createBufferFrom('h')
-    }
-
-    public async disconnect() {
-        await this.stopLslStreams()
-        await this.disconnectBle()
-    }
-
-    private async disconnectBle() {
-        await this.bleConnector.disconnectBle()
     }
 
     public get bleUuid() {
