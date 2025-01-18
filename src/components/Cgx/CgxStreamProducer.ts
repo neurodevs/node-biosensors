@@ -13,6 +13,14 @@ export default class CgxStreamProducer implements LslProducer {
     protected constructor() {}
 
     public static async Create() {
+        return new (this.Class ?? this)()
+    }
+
+    public async startLslStreams() {
+        await this.connectFtdi()
+    }
+
+    private async connectFtdi() {
         const infos = await this.FTDI.getDeviceInfoList()
 
         if (infos.length === 0) {
@@ -34,15 +42,15 @@ export default class CgxStreamProducer implements LslProducer {
         )
 
         device.setLatencyTimer(4)
-
-        return new (this.Class ?? this)()
     }
-
-    public async startLslStreams() {}
 
     public async stopLslStreams() {}
 
     public async disconnect() {}
+
+    private get FTDI() {
+        return CgxStreamProducer.FTDI
+    }
 }
 
 export type CgxStreamProducerConstructor = new () => LslProducer
