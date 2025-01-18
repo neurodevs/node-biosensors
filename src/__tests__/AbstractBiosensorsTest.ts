@@ -1,7 +1,7 @@
 import AbstractSpruceTest from '@sprucelabs/test-utils'
 import {
-    BleDeviceAdapter,
-    FakeBleAdapter,
+    BleDeviceController,
+    FakeBleController,
     BleDeviceScanner,
     FakeBleScanner,
     FakePeripheral,
@@ -27,7 +27,7 @@ export default class AbstractBiosensorsTest extends AbstractSpruceTest {
     protected static async beforeEach() {
         await super.beforeEach()
 
-        this.setFakeBleAdapter()
+        this.setFakeBleController()
         this.setFakeBleConnector()
         this.setFakeBleScanner()
         this.setFakeLslOutlet()
@@ -35,9 +35,9 @@ export default class AbstractBiosensorsTest extends AbstractSpruceTest {
         this.setFakeXdfRecorder()
     }
 
-    protected static setFakeBleAdapter() {
-        BleDeviceAdapter.Class = FakeBleAdapter
-        FakeBleAdapter.resetTestDouble()
+    protected static setFakeBleController() {
+        BleDeviceController.Class = FakeBleController
+        FakeBleController.resetTestDouble()
     }
 
     protected static setFakeBleConnector() {

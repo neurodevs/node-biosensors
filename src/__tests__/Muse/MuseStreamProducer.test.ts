@@ -1,6 +1,6 @@
 import { test, assert } from '@sprucelabs/test-utils'
 import {
-    FakeBleAdapter,
+    FakeBleController,
     FakeBleConnector,
     FakeBleScanner,
     FakeCharacteristic,
@@ -361,7 +361,7 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
     private static fakeControlChar() {
         const control = this.FakeCharacteristic(this.controlUuid)
 
-        FakeBleAdapter.fakeCharacteristics = {
+        FakeBleController.fakeCharacteristics = {
             [this.controlUuid]: control as any,
         }
 
@@ -391,7 +391,7 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
     }
 
     private static get callsToGetCharacteristic() {
-        return FakeBleAdapter.callsToGetCharacteristic
+        return FakeBleController.callsToGetCharacteristic
     }
 
     private static get callsToPushSample() {

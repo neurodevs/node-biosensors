@@ -209,7 +209,7 @@ export default class MuseStreamProducer implements LslProducer {
     }
 
     private get ble() {
-        return this.bleConnector.getBleAdapter()
+        return this.bleConnector.getBleController()
     }
 
     private get controlUuid() {
@@ -244,15 +244,15 @@ export default class MuseStreamProducer implements LslProducer {
     }
 
     public get bleUuid() {
-        return this.bleAdapter.uuid
+        return this.bleController.uuid
     }
 
     public get bleName() {
-        return this.bleAdapter.name
+        return this.bleController.name
     }
 
-    private get bleAdapter() {
-        return this.bleConnector.getBleAdapter()
+    private get bleController() {
+        return this.bleConnector.getBleController()
     }
 
     private generateEmptyEegMatrix() {
