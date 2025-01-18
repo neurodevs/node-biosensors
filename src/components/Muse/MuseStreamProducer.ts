@@ -65,11 +65,7 @@ export default class MuseStreamProducer implements LslProducer {
     }
 
     private get control() {
-        return this.ble.getCharacteristic(this.controlUuid)!
-    }
-
-    private get ble() {
-        return this.bleConnector.getBleController()
+        return this.bleController.getCharacteristic(this.controlUuid)!
     }
 
     private get controlUuid() {
