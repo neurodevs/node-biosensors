@@ -6,8 +6,9 @@ import {
     FakeCharacteristic,
 } from '@neurodevs/node-ble'
 import { FakeLslOutlet } from '@neurodevs/node-lsl'
-import { LslProducerOptions } from 'types'
-import MuseStreamProducer from '../../components/Muse/MuseStreamProducer'
+import MuseStreamProducer, {
+    MuseLslProducerOptions,
+} from '../../components/Muse/MuseStreamProducer'
 import { MUSE_CHARACTERISTIC_UUIDS as CHAR_UUIDS } from '../../components/Muse/MuseStreamProducer'
 import SpyMuseProducer from '../../testDoubles/MuseProducer/SpyMuseProducer'
 import AbstractBiosensorsTest from '../AbstractBiosensorsTest'
@@ -446,7 +447,7 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
         localName: this.bleLocalName,
     })
 
-    private static async MuseStreamProducer(options?: LslProducerOptions) {
+    private static async MuseStreamProducer(options?: MuseLslProducerOptions) {
         return (await MuseStreamProducer.Create(options)) as SpyMuseProducer
     }
 }

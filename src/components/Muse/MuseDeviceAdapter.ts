@@ -3,18 +3,17 @@ import {
     DeviceAdapter,
     DeviceAdapterConstructor,
     DeviceAdapterOptions,
-    LslProducer,
 } from '../../types'
-import MuseStreamProducer from './MuseStreamProducer'
+import MuseStreamProducer, { MuseLslProducer } from './MuseStreamProducer'
 
 export default class MuseDeviceAdapter implements DeviceAdapter {
     public static Class?: DeviceAdapterConstructor
 
-    private lslProducer: LslProducer
+    private lslProducer: MuseLslProducer
     private xdfRecorder?: XdfRecorder
     private _isRunning = false
 
-    protected constructor(producer: LslProducer, recorder?: XdfRecorder) {
+    protected constructor(producer: MuseLslProducer, recorder?: XdfRecorder) {
         this.lslProducer = producer
         this.xdfRecorder = recorder
     }

@@ -7,8 +7,7 @@ export default class CgxStreamProducer implements LslProducer {
     public static FTDI = FTDI
 
     public isRunning = false
-    public bleUuid = ''
-    public bleName = ''
+    private device!: FTDI.FTDI_Device
 
     protected constructor() {}
 
@@ -28,20 +27,20 @@ export default class CgxStreamProducer implements LslProducer {
         }
 
         const serialNumber = infos[0].serial_number
-        const device = await this.FTDI.openDevice(serialNumber)
+        this.device = await this.FTDI.openDevice(serialNumber)
 
-        device.setTimeouts(1000, 1000)
-        device.purge(FTDI.FT_PURGE_RX)
-        device.setFlowControl(FTDI.FT_FLOW_RTS_CTS, 0x11, 0x13)
-        device.setBaudRate(1000000)
+        this.device.setTimeouts(1000, 1000)
+        this.device.purge(FTDI.FT_PURGE_RX)
+        this.device.setFlowControl(FTDI.FT_FLOW_RTS_CTS, 0x11, 0x13)
+        this.device.setBaudRate(1000000)
 
-        device.setDataCharacteristics(
+        this.device.setDataCharacteristics(
             FTDI.FT_BITS_8,
             FTDI.FT_STOP_BITS_1,
             FTDI.FT_PARITY_NONE
         )
 
-        device.setLatencyTimer(4)
+        this.device.setLatencyTimer(4)
     }
 
     public async stopLslStreams() {}

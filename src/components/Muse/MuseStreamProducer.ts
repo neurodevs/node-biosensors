@@ -11,9 +11,9 @@ import {
     LslOutletOptions,
     LslStreamOutlet,
 } from '@neurodevs/node-lsl'
-import { LslProducer, LslProducerOptions } from '../../types'
+import { LslProducer } from '../../types'
 
-export default class MuseStreamProducer implements LslProducer {
+export default class MuseStreamProducer implements MuseLslProducer {
     public static Class?: MuseLslProducerConstructor
 
     protected bleConnector!: BleConnector
@@ -38,7 +38,7 @@ export default class MuseStreamProducer implements LslProducer {
         this.scanOptions = this.generateScanOptions()
     }
 
-    public static async Create(options?: LslProducerOptions) {
+    public static async Create(options?: MuseLslProducerOptions) {
         return new (this.Class ?? this)({
             ...options,
             eegOutlet: await this.LslStreamOutlet(this.eegOutletOptions),
@@ -346,9 +346,19 @@ export default class MuseStreamProducer implements LslProducer {
     }
 }
 
+export interface MuseLslProducer extends LslProducer {
+    readonly bleUuid: string
+    readonly bleName: string
+}
+
+export interface MuseLslProducerOptions {
+    bleUuid?: string
+    rssiIntervalMs?: number
+}
+
 export type MuseLslProducerConstructor = new (
     options: MuseLslProducerConstructorOptions
-) => LslProducer
+) => MuseLslProducer
 
 export interface MuseLslProducerConstructorOptions {
     eegOutlet: LslOutlet
