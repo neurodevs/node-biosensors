@@ -126,12 +126,12 @@ export default class CgxStreamProducer implements LslProducer {
             this.numPacketsOverflow++
         }
 
-        if (typeof this.packetCounter !== 'undefined') {
+        if (typeof this.packetCounter === 'undefined') {
+            this.packetCounter = packet[1]
+        } else {
             if (packet[1] !== this.packetCounter + 1) {
                 this.numPacketsDropped++
             }
-        } else {
-            this.packetCounter = packet[1]
         }
     }
 
