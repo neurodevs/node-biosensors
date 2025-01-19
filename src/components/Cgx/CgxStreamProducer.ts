@@ -24,7 +24,7 @@ export default class CgxStreamProducer implements LslProducer {
 
     public async startLslStreams() {
         await this.connectFtdi()
-        await this.startReadingData()
+        await this.startReadingPackets()
     }
 
     private async connectFtdi() {
@@ -84,9 +84,9 @@ export default class CgxStreamProducer implements LslProducer {
 
     private setDataCharacteristics() {
         this.device.setDataCharacteristics(
-            this.ftdiDataBits,
-            this.ftdiStopBits,
-            this.ftdiParityBit
+            this.eightDataBits,
+            this.oneStopBit,
+            this.noParityBit
         )
     }
 
@@ -94,7 +94,7 @@ export default class CgxStreamProducer implements LslProducer {
         this.device.setLatencyTimer(this.latencyTimerMs)
     }
 
-    private async startReadingData() {
+    private async startReadingPackets() {
         this.isRunning = true
 
         while (this.isRunning) {
@@ -146,9 +146,9 @@ export default class CgxStreamProducer implements LslProducer {
     private readonly seventeenInHex = 0x11
     private readonly nineteenInHex = 0x13
     private readonly baudRate = 1000000
-    private readonly ftdiDataBits = FTDI.FT_BITS_8
-    private readonly ftdiStopBits = FTDI.FT_STOP_BITS_1
-    private readonly ftdiParityBit = FTDI.FT_PARITY_NONE
+    private readonly eightDataBits = FTDI.FT_BITS_8
+    private readonly oneStopBit = FTDI.FT_STOP_BITS_1
+    private readonly noParityBit = FTDI.FT_PARITY_NONE
     private readonly latencyTimerMs = 4
     private readonly chunkSize = 125
     private readonly bytesPerChunk = 75
