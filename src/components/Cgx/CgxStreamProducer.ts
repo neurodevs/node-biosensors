@@ -19,14 +19,7 @@ export default class CgxStreamProducer implements LslProducer {
 
     public async startLslStreams() {
         await this.connectFtdi()
-
-        const data = await this.device.read(this.totalBytes)
-        const headerIdx = data.indexOf(0xff)
-
-        if (headerIdx === -1) {
-            this.numPacketsMissingHeader++
-            return
-        }
+        await this.startReadingData()
     }
 
     private async connectFtdi() {
@@ -94,6 +87,15 @@ export default class CgxStreamProducer implements LslProducer {
 
     private setLatencyTimer() {
         this.device.setLatencyTimer(this.latencyTimerMs)
+    }
+
+    private async startReadingData() {
+        const data = await this.device.read(this.totalBytes)
+        const headerIdx = data.indexOf(0xff)
+
+        if (headerIdx === -1) {
+            this.numPacketsMissingHeader++
+        }
     }
 
     public async stopLslStreams() {}
