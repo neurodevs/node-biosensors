@@ -1,21 +1,19 @@
-import AbstractSpruceTest, {
-    test,
-    assert,
-    errorAssert,
-} from '@sprucelabs/test-utils'
+import { test, assert, errorAssert } from '@sprucelabs/test-utils'
 import FTDI from 'ftdi-d2xx'
 import CgxStreamProducer from '../../components/Cgx/CgxStreamProducer'
+import SpyCgxProducer from '../../testDoubles/CgxProducer/SpyCgxProducer'
 import FakeDeviceFTDI from '../../testDoubles/FTDI/FakeDeviceFTDI'
 import FakeFTDI from '../../testDoubles/FTDI/FakeFTDI'
-import { LslProducer } from '../../types'
+import AbstractBiosensorsTest from '../AbstractBiosensorsTest'
 
-export default class CgxStreamProducerTest extends AbstractSpruceTest {
-    private static instance: LslProducer
+export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
+    private static instance: SpyCgxProducer
 
     protected static async beforeEach() {
         await super.beforeEach()
 
         this.setFakeFTDI()
+        this.setSpyCgxProducer()
 
         this.instance = await this.CgxStreamProducer()
     }
@@ -106,6 +104,12 @@ export default class CgxStreamProducerTest extends AbstractSpruceTest {
         assert.isEqual(FakeDeviceFTDI.callsToRead[0], this.totalBytes)
     }
 
+    @test()
+    protected static async incrementsNumPacketsMissingHeader() {
+        await this.startLslStreams()
+        assert.isEqual(this.instance.getNumPacketsMissingHeader(), 1)
+    }
+
     private static async startLslStreams() {
         await this.instance.startLslStreams()
     }
@@ -122,6 +126,6 @@ export default class CgxStreamProducerTest extends AbstractSpruceTest {
     private static readonly totalBytes = this.chunkSize * this.bytesPerChunk
 
     private static async CgxStreamProducer() {
-        return await CgxStreamProducer.Create()
+        return (await CgxStreamProducer.Create()) as SpyCgxProducer
     }
 }

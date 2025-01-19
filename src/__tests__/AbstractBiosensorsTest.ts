@@ -17,7 +17,9 @@ import {
     FakeStreamInfo,
 } from '@neurodevs/node-lsl'
 import { XdfStreamRecorder, FakeXdfRecorder } from '@neurodevs/node-xdf'
+import CgxStreamProducer from '../components/Cgx/CgxStreamProducer'
 import MuseStreamProducer from '../components/Muse/MuseStreamProducer'
+import SpyCgxProducer from '../testDoubles/CgxProducer/SpyCgxProducer'
 import FakeMuseProducer from '../testDoubles/MuseProducer/FakeMuseProducer'
 import SpyMuseProducer from '../testDoubles/MuseProducer/SpyMuseProducer'
 
@@ -70,6 +72,10 @@ export default class AbstractBiosensorsTest extends AbstractSpruceTest {
 
     protected static setSpyMuseProducer() {
         MuseStreamProducer.Class = SpyMuseProducer
+    }
+
+    protected static setSpyCgxProducer() {
+        CgxStreamProducer.Class = SpyCgxProducer
     }
 
     protected static FakeCharacteristic(uuid: string) {

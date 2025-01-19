@@ -23,3 +23,6 @@ export * from './testDoubles/MuseProducer/FakeMuseProducer'
 
 export { default as SpyMuseProducer } from './testDoubles/MuseProducer/SpyMuseProducer'
 export * from './testDoubles/MuseProducer/SpyMuseProducer'
+
+export { default as SpyCgxProducer } from './testDoubles/CgxProducer/SpyCgxProducer'
+export * from './testDoubles/CgxProducer/SpyCgxProducer'

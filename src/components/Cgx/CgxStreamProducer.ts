@@ -7,6 +7,7 @@ export default class CgxStreamProducer implements LslProducer {
     public static FTDI = FTDI
 
     public isRunning = false
+    protected numPacketsMissingHeader = 0
     private infos!: FTDI.FTDI_DeviceInfo[]
     private device!: FTDI.FTDI_Device
 
@@ -18,7 +19,14 @@ export default class CgxStreamProducer implements LslProducer {
 
     public async startLslStreams() {
         await this.connectFtdi()
-        await this.device.read(this.totalBytes)
+
+        const data = await this.device.read(this.totalBytes)
+        const headerIdx = data.indexOf(0xff)
+
+        if (headerIdx === -1) {
+            this.numPacketsMissingHeader++
+            return
+        }
     }
 
     private async connectFtdi() {
