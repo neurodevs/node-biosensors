@@ -208,7 +208,7 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
     }
 
     private static readonly samplesPerPacket = 125
-    private static readonly bytesPerSample = 75
+    private static readonly bytesPerSample = 78
 
     private static readonly totalBytes =
         this.samplesPerPacket * this.bytesPerSample

@@ -100,6 +100,23 @@ export default class CgxStreamProducer implements LslProducer {
         while (this.isRunning) {
             try {
                 const packet = await this.device.read(this.totalBytes)
+                // const indices: any = []
+
+                // packet.forEach((val, idx) => {
+                //     if (val === 255) {
+                //         indices.push(idx)
+                //     }
+                // })
+                // console.log('Headers:', indices)
+
+                // for (let i = 1; i < indices.length; i++) {
+                //     console.log(indices[i] - indices[i - 1])
+                // }
+
+                // // for (let i = 0; i < 300; i += 75) {
+                // //     console.log(packet.slice(i, i + 75))
+                // // }
+                // return
                 this.validatePacket(packet)
             } catch {
                 return
@@ -112,18 +129,22 @@ export default class CgxStreamProducer implements LslProducer {
 
         if (headerIdx === -1) {
             this.numPacketsMissingHeader++
+            console.log('Missing header')
         }
 
         if (headerIdx > 0) {
             this.numPacketsMalformedHeader++
+            console.log('Malformed header')
         }
 
         if (packet.length < this.totalBytes) {
             this.numPacketsIncomplete++
+            console.log('Incomplete packet')
         }
 
         if (packet.length > this.totalBytes) {
             this.numPacketsOverflow++
+            console.log('Overflow packet')
         }
 
         if (typeof this.packetCounter == 'undefined') {
@@ -131,6 +152,7 @@ export default class CgxStreamProducer implements LslProducer {
         } else {
             if (packet[1] !== this.packetCounter + 1) {
                 this.numPacketsDropped++
+                console.log('Dropped packet')
             }
         }
     }
@@ -153,7 +175,7 @@ export default class CgxStreamProducer implements LslProducer {
     private readonly sampleRateHz = 500
     private readonly packetsPerSec = 4
     private readonly samplesPerPacket = this.sampleRateHz / this.packetsPerSec
-    private readonly bytesPerSample = 75
+    private readonly bytesPerSample = 78
     private readonly totalBytes = this.samplesPerPacket * this.bytesPerSample
 
     private get FTDI() {
