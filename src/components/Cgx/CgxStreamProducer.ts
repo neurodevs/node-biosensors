@@ -18,6 +18,7 @@ export default class CgxStreamProducer implements LslProducer {
 
     public async startLslStreams() {
         await this.connectFtdi()
+        await this.device.read(this.totalBytes)
     }
 
     private async connectFtdi() {
@@ -102,6 +103,9 @@ export default class CgxStreamProducer implements LslProducer {
     private readonly ftdiStopBits = FTDI.FT_STOP_BITS_1
     private readonly ftdiParityBit = FTDI.FT_PARITY_NONE
     private readonly latencyTimerMs = 4
+    private readonly chunkSize = 125
+    private readonly bytesPerChunk = 75
+    private readonly totalBytes = this.chunkSize * this.bytesPerChunk
 
     private get FTDI() {
         return CgxStreamProducer.FTDI

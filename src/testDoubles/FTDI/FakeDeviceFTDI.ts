@@ -3,9 +3,9 @@ export default class FakeDeviceFTDI {
     public static callsToPurge: number[] = []
     public static callsToSetFlowControl: CallToSetFlowControl[] = []
     public static callsToSetBaudRate: number[] = []
-    public static callsToSetDataCharacteristics: CallToSetDataCharacteristics[] =
-        []
+    public static callsToSetDataCharacteristics: CallToSetDataChars[] = []
     public static callsToSetLatencyTimer: number[] = []
+    public static callsToRead: number[] = []
 
     public setTimeouts(txTimeoutMs: number, rxTimeoutMs: number) {
         FakeDeviceFTDI.callsToSetTimeouts.push({ txTimeoutMs, rxTimeoutMs })
@@ -39,6 +39,11 @@ export default class FakeDeviceFTDI {
         FakeDeviceFTDI.callsToSetLatencyTimer.push(latencyTimerMs)
     }
 
+    public async read(numBytes: number) {
+        FakeDeviceFTDI.callsToRead.push(numBytes)
+        return new Uint8Array(numBytes)
+    }
+
     public static resetTestDouble() {
         FakeDeviceFTDI.callsToSetTimeouts = []
         FakeDeviceFTDI.callsToPurge = []
@@ -60,7 +65,7 @@ export interface CallToSetFlowControl {
     xOff: number
 }
 
-export interface CallToSetDataCharacteristics {
+export interface CallToSetDataChars {
     dataBits: number
     stopBits: number
     parity: number

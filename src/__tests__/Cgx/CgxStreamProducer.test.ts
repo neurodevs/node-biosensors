@@ -100,6 +100,12 @@ export default class CgxStreamProducerTest extends AbstractSpruceTest {
         assert.isEqualDeep(FakeDeviceFTDI.callsToSetLatencyTimer[0], 4)
     }
 
+    @test()
+    protected static async callsReadOnDeviceOnce() {
+        await this.startLslStreams()
+        assert.isEqual(FakeDeviceFTDI.callsToRead[0], this.totalBytes)
+    }
+
     private static async startLslStreams() {
         await this.instance.startLslStreams()
     }
@@ -110,6 +116,10 @@ export default class CgxStreamProducerTest extends AbstractSpruceTest {
 
         FakeFTDI.setFakeDeviceInfos()
     }
+
+    private static readonly chunkSize = 125
+    private static readonly bytesPerChunk = 75
+    private static readonly totalBytes = this.chunkSize * this.bytesPerChunk
 
     private static async CgxStreamProducer() {
         return await CgxStreamProducer.Create()
