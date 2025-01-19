@@ -16,4 +16,8 @@ export default class SpyCgxProducer extends CgxStreamProducer {
     public getNumPacketsIncomplete() {
         return this.numPacketsIncomplete
     }
+
+    public getNumPacketsOverflow() {
+        return this.numPacketsOverflow
+    }
 }

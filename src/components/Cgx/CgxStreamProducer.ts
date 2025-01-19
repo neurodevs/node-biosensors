@@ -10,6 +10,7 @@ export default class CgxStreamProducer implements LslProducer {
     protected numPacketsMissingHeader = 0
     protected numPacketsMalformedHeader = 0
     protected numPacketsIncomplete = 0
+    protected numPacketsOverflow = 0
     private infos!: FTDI.FTDI_DeviceInfo[]
     private device!: FTDI.FTDI_Device
 
@@ -105,6 +106,10 @@ export default class CgxStreamProducer implements LslProducer {
 
         if (data.length < this.chunkSize) {
             this.numPacketsIncomplete++
+        }
+
+        if (data.length > this.chunkSize) {
+            this.numPacketsOverflow++
         }
     }
 

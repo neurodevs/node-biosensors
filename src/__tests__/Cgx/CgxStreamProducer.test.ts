@@ -125,6 +125,14 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
         assert.isEqual(this.instance.getNumPacketsIncomplete(), 1)
     }
 
+    @test()
+    protected static async incrementsNumPacketsOverflowWhenLengthTooLong() {
+        FakeDeviceFTDI.fakeReadData = this.generateDataWithOneExtra()
+        await this.startLslStreams()
+
+        assert.isEqual(this.instance.getNumPacketsOverflow(), 1)
+    }
+
     private static async startLslStreams() {
         await this.instance.startLslStreams()
     }
@@ -134,6 +142,12 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
             [0xff].concat(
                 Array.from({ length: this.chunkSize - 2 }, () => 0x00)
             )
+        )
+    }
+
+    private static generateDataWithOneExtra() {
+        return new Uint8Array(
+            [0xff].concat(Array.from({ length: this.chunkSize }, () => 0x00))
         )
     }
 
