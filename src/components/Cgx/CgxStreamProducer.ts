@@ -118,15 +118,15 @@ export default class CgxStreamProducer implements LslProducer {
             this.numPacketsMalformedHeader++
         }
 
-        if (packet.length < this.chunkSize) {
+        if (packet.length < this.samplesPerPacket) {
             this.numPacketsIncomplete++
         }
 
-        if (packet.length > this.chunkSize) {
+        if (packet.length > this.samplesPerPacket) {
             this.numPacketsOverflow++
         }
 
-        if (typeof this.packetCounter === 'undefined') {
+        if (typeof this.packetCounter == 'undefined') {
             this.packetCounter = packet[1]
         } else {
             if (packet[1] !== this.packetCounter + 1) {
@@ -150,9 +150,11 @@ export default class CgxStreamProducer implements LslProducer {
     private readonly oneStopBit = FTDI.FT_STOP_BITS_1
     private readonly noParityBit = FTDI.FT_PARITY_NONE
     private readonly latencyTimerMs = 4
-    private readonly chunkSize = 125
-    private readonly bytesPerChunk = 75
-    private readonly totalBytes = this.chunkSize * this.bytesPerChunk
+    private readonly sampleRateHz = 500
+    private readonly packetsPerSec = 4
+    private readonly samplesPerPacket = this.sampleRateHz / this.packetsPerSec
+    private readonly bytesPerSample = 75
+    private readonly totalBytes = this.samplesPerPacket * this.bytesPerSample
 
     private get FTDI() {
         return CgxStreamProducer.FTDI

@@ -160,7 +160,7 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
     }
 
     private static generatePacketWithOneMissingByte() {
-        return this.generateFakeReadPacket(this.chunkSize - 2)
+        return this.generateFakeReadPacket(this.samplesPerPacket - 2)
     }
 
     private static generateFakeReadPacket(numEmptyBytes: number) {
@@ -181,23 +181,23 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
     }
 
     private static generatePacketWithOneExtraByte() {
-        return this.generateFakeReadPacket(this.chunkSize)
+        return this.generateFakeReadPacket(this.samplesPerPacket)
     }
 
     private static generateTwoValidPackets() {
         return [
-            this.generateFakePacket(this.chunkSize - 1),
-            this.generateFakePacket(this.chunkSize - 1),
+            this.generateFakePacket(this.samplesPerPacket - 1),
+            this.generateFakePacket(this.samplesPerPacket - 1),
         ]
     }
 
     private static generateNonSequentialPackets() {
         const packetCounterZero = [0x00].concat(
-            this.generateEmptyPacket(this.chunkSize - 2)
+            this.generateEmptyPacket(this.samplesPerPacket - 2)
         )
 
         const packetCounterTwo = [0x02].concat(
-            this.generateEmptyPacket(this.chunkSize - 2)
+            this.generateEmptyPacket(this.samplesPerPacket - 2)
         )
 
         return [
@@ -206,9 +206,11 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
         ]
     }
 
-    private static readonly chunkSize = 125
-    private static readonly bytesPerChunk = 75
-    private static readonly totalBytes = this.chunkSize * this.bytesPerChunk
+    private static readonly samplesPerPacket = 125
+    private static readonly bytesPerSample = 75
+
+    private static readonly totalBytes =
+        this.samplesPerPacket * this.bytesPerSample
 
     private static async CgxStreamProducer() {
         return (await CgxStreamProducer.Create()) as SpyCgxProducer
