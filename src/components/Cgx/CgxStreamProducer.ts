@@ -79,7 +79,7 @@ export default class CgxStreamProducer implements LslProducer {
         this.device.setDataCharacteristics(
             this.ftdiDataBits,
             this.ftdiStopBits,
-            this.noParityBit
+            this.ftdiParityBit
         )
     }
 
@@ -100,7 +100,7 @@ export default class CgxStreamProducer implements LslProducer {
     private readonly baudRate = 1000000
     private readonly ftdiDataBits = FTDI.FT_BITS_8
     private readonly ftdiStopBits = FTDI.FT_STOP_BITS_1
-    private readonly noParityBit = FTDI.FT_PARITY_NONE
+    private readonly ftdiParityBit = FTDI.FT_PARITY_NONE
     private readonly latencyTimerMs = 4
 
     private get FTDI() {
