@@ -147,9 +147,9 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
         assert.isEqual(FakeDeviceFTDI.callsToRead.length, 2)
     }
 
-    @test.skip()
+    @test()
     protected static async incrementsNumPacketsDroppedWhenPacketCounterIsNonSequential() {
-        FakeDeviceFTDI.fakeReadPackets = [new Uint8Array([0xff, 0x01])]
+        FakeDeviceFTDI.fakeReadPackets = this.generateNonSequentialPackets()
         await this.startLslStreams()
 
         assert.isEqual(this.instance.getNumPacketsDropped(), 1)
@@ -188,6 +188,21 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
         return [
             this.generateFakePacket(this.chunkSize - 1),
             this.generateFakePacket(this.chunkSize - 1),
+        ]
+    }
+
+    private static generateNonSequentialPackets() {
+        const packetCounterZero = [0x00].concat(
+            this.generateEmptyPacket(this.chunkSize - 2)
+        )
+
+        const packetCounterTwo = [0x02].concat(
+            this.generateEmptyPacket(this.chunkSize - 2)
+        )
+
+        return [
+            this.addHeaderToPacket(packetCounterZero),
+            this.addHeaderToPacket(packetCounterTwo),
         ]
     }
 

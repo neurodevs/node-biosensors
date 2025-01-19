@@ -14,6 +14,7 @@ export default class CgxStreamProducer implements LslProducer {
     protected numPacketsDropped = 0
     private infos!: FTDI.FTDI_DeviceInfo[]
     private device!: FTDI.FTDI_Device
+    private packetCounter!: number
 
     protected constructor() {}
 
@@ -123,6 +124,14 @@ export default class CgxStreamProducer implements LslProducer {
 
         if (packet.length > this.chunkSize) {
             this.numPacketsOverflow++
+        }
+
+        if (typeof this.packetCounter !== 'undefined') {
+            if (packet[1] !== this.packetCounter + 1) {
+                this.numPacketsDropped++
+            }
+        } else {
+            this.packetCounter = packet[1]
         }
     }
 
