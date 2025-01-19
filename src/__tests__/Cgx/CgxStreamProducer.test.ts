@@ -105,9 +105,17 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
     }
 
     @test()
-    protected static async incrementsNumPacketsMissingHeader() {
+    protected static async incrementsNumPacketsMissingHeaderWhenNoHeader() {
         await this.startLslStreams()
         assert.isEqual(this.instance.getNumPacketsMissingHeader(), 1)
+    }
+
+    @test()
+    protected static async incrementsNumPacketsMalformedHeaderWhenHeaderIsNotFirst() {
+        FakeDeviceFTDI.fakeReadData = new Uint8Array([0x00, 0xff])
+        await this.startLslStreams()
+
+        assert.isEqual(this.instance.getNumPacketsMalformedHeader(), 1)
     }
 
     private static async startLslStreams() {

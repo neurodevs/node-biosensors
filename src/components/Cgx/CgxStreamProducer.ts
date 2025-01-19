@@ -8,6 +8,7 @@ export default class CgxStreamProducer implements LslProducer {
 
     public isRunning = false
     protected numPacketsMissingHeader = 0
+    protected numPacketsMalformedHeader = 0
     private infos!: FTDI.FTDI_DeviceInfo[]
     private device!: FTDI.FTDI_Device
 
@@ -95,6 +96,10 @@ export default class CgxStreamProducer implements LslProducer {
 
         if (headerIdx === -1) {
             this.numPacketsMissingHeader++
+        }
+
+        if (headerIdx > 0) {
+            this.numPacketsMalformedHeader++
         }
     }
 

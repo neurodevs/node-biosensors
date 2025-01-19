@@ -7,6 +7,8 @@ export default class FakeDeviceFTDI {
     public static callsToSetLatencyTimer: number[] = []
     public static callsToRead: number[] = []
 
+    public static fakeReadData?: Uint8Array
+
     public setTimeouts(txTimeoutMs: number, rxTimeoutMs: number) {
         FakeDeviceFTDI.callsToSetTimeouts.push({ txTimeoutMs, rxTimeoutMs })
     }
@@ -41,7 +43,7 @@ export default class FakeDeviceFTDI {
 
     public async read(numBytes: number) {
         FakeDeviceFTDI.callsToRead.push(numBytes)
-        return new Uint8Array(numBytes)
+        return FakeDeviceFTDI.fakeReadData ?? new Uint8Array(numBytes)
     }
 
     public static resetTestDouble() {
