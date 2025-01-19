@@ -118,11 +118,11 @@ export default class CgxStreamProducer implements LslProducer {
             this.numPacketsMalformedHeader++
         }
 
-        if (packet.length < this.samplesPerPacket) {
+        if (packet.length < this.totalBytes) {
             this.numPacketsIncomplete++
         }
 
-        if (packet.length > this.samplesPerPacket) {
+        if (packet.length > this.totalBytes) {
             this.numPacketsOverflow++
         }
 

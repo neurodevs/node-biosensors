@@ -160,7 +160,7 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
     }
 
     private static generatePacketWithOneMissingByte() {
-        return this.generateFakeReadPacket(this.samplesPerPacket - 2)
+        return this.generateFakeReadPacket(this.totalBytes - 2)
     }
 
     private static generateFakeReadPacket(numEmptyBytes: number) {
@@ -169,40 +169,41 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
 
     private static generateFakePacket(numEmptyBytes: number) {
         const packet = this.generateEmptyPacket(numEmptyBytes)
-        return this.addHeaderToPacket(packet)
+        return this.prependHeaderToPacket(packet)
     }
 
-    private static generateEmptyPacket(length: number) {
-        return Array.from({ length }, () => 0x00)
+    private static generateEmptyPacket(numEmptyBytes: number) {
+        return Array.from({ length: numEmptyBytes }, () => 0x00)
     }
 
-    private static addHeaderToPacket(packet: number[]) {
+    private static prependHeaderToPacket(packet: number[]) {
         return new Uint8Array([0xff].concat(packet))
     }
 
     private static generatePacketWithOneExtraByte() {
-        return this.generateFakeReadPacket(this.samplesPerPacket)
+        return this.generateFakeReadPacket(this.totalBytes)
     }
 
     private static generateTwoValidPackets() {
-        return [
-            this.generateFakePacket(this.samplesPerPacket - 1),
-            this.generateFakePacket(this.samplesPerPacket - 1),
-        ]
+        return [this.generateValidPacket(), this.generateValidPacket()]
+    }
+
+    private static generateValidPacket() {
+        return this.generateFakePacket(this.totalBytes - 1)
     }
 
     private static generateNonSequentialPackets() {
         const packetCounterZero = [0x00].concat(
-            this.generateEmptyPacket(this.samplesPerPacket - 2)
+            this.generateEmptyPacket(this.totalBytes - 2)
         )
 
         const packetCounterTwo = [0x02].concat(
-            this.generateEmptyPacket(this.samplesPerPacket - 2)
+            this.generateEmptyPacket(this.totalBytes - 2)
         )
 
         return [
-            this.addHeaderToPacket(packetCounterZero),
-            this.addHeaderToPacket(packetCounterTwo),
+            this.prependHeaderToPacket(packetCounterZero),
+            this.prependHeaderToPacket(packetCounterTwo),
         ]
     }
 
