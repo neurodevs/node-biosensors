@@ -12,7 +12,6 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
     protected static async beforeEach() {
         await super.beforeEach()
 
-        this.setFakeFTDI()
         this.setSpyCgxProducer()
 
         this.instance = await this.CgxStreamProducer()
@@ -118,15 +117,24 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
         assert.isEqual(this.instance.getNumPacketsMalformedHeader(), 1)
     }
 
+    @test()
+    protected static async incrementsNumPacketsIncompleteWhenLengthTooShort() {
+        FakeDeviceFTDI.fakeReadData = this.generateDataWithOneMissing()
+        await this.startLslStreams()
+
+        assert.isEqual(this.instance.getNumPacketsIncomplete(), 1)
+    }
+
     private static async startLslStreams() {
         await this.instance.startLslStreams()
     }
 
-    private static setFakeFTDI() {
-        CgxStreamProducer.FTDI = FakeFTDI as any
-        FakeFTDI.resetTestDouble()
-
-        FakeFTDI.setFakeDeviceInfos()
+    private static generateDataWithOneMissing() {
+        return new Uint8Array(
+            [0xff].concat(
+                Array.from({ length: this.chunkSize - 2 }, () => 0x00)
+            )
+        )
     }
 
     private static readonly chunkSize = 125
