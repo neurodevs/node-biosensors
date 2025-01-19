@@ -16,7 +16,7 @@ import { LslProducer } from '../../types'
 export default class MuseStreamProducer implements MuseLslProducer {
     public static Class?: MuseLslProducerConstructor
 
-    protected bleConnector!: BleConnector
+    private bleConnector!: BleConnector
     private scanOptions: ScanOptions
     private eegOutlet: LslOutlet
     private ppgOutlet: LslOutlet
