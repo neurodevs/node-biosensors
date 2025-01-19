@@ -20,4 +20,8 @@ export default class SpyCgxProducer extends CgxStreamProducer {
     public getNumPacketsOverflow() {
         return this.numPacketsOverflow
     }
+
+    public getNumPacketsDropped() {
+        return this.numPacketsDropped
+    }
 }

@@ -20,6 +20,7 @@ import { XdfStreamRecorder, FakeXdfRecorder } from '@neurodevs/node-xdf'
 import CgxStreamProducer from '../components/Cgx/CgxStreamProducer'
 import MuseStreamProducer from '../components/Muse/MuseStreamProducer'
 import SpyCgxProducer from '../testDoubles/CgxProducer/SpyCgxProducer'
+import FakeDeviceFTDI from '../testDoubles/FTDI/FakeDeviceFTDI'
 import FakeFTDI from '../testDoubles/FTDI/FakeFTDI'
 import FakeMuseProducer from '../testDoubles/MuseProducer/FakeMuseProducer'
 import SpyMuseProducer from '../testDoubles/MuseProducer/SpyMuseProducer'
@@ -55,6 +56,7 @@ export default class AbstractBiosensorsTest extends AbstractSpruceTest {
     protected static setFakeFTDI() {
         CgxStreamProducer.FTDI = FakeFTDI as any
         FakeFTDI.resetTestDouble()
+        FakeDeviceFTDI.resetTestDouble()
 
         FakeFTDI.setFakeDeviceInfos()
     }

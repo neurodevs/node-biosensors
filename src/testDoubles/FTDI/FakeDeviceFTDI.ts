@@ -7,7 +7,9 @@ export default class FakeDeviceFTDI {
     public static callsToSetLatencyTimer: number[] = []
     public static callsToRead: number[] = []
 
-    public static fakeReadData?: Uint8Array
+    public static fakeReadPackets?: Uint8Array[]
+
+    public currentIdx = 0
 
     public setTimeouts(txTimeoutMs: number, rxTimeoutMs: number) {
         FakeDeviceFTDI.callsToSetTimeouts.push({ txTimeoutMs, rxTimeoutMs })
@@ -42,8 +44,21 @@ export default class FakeDeviceFTDI {
     }
 
     public async read(numBytes: number) {
-        FakeDeviceFTDI.callsToRead.push(numBytes)
-        return FakeDeviceFTDI.fakeReadData ?? new Uint8Array(numBytes)
+        if (FakeDeviceFTDI.fakeReadPackets?.[this.currentIdx]) {
+            const packet = FakeDeviceFTDI.fakeReadPackets[this.currentIdx++]
+            FakeDeviceFTDI.callsToRead.push(numBytes)
+            return packet
+        } else if (FakeDeviceFTDI.fakeReadPackets) {
+            throw new Error('No more packets to read!')
+        }
+
+        if (this.currentIdx == 0) {
+            FakeDeviceFTDI.callsToRead.push(numBytes)
+            this.currentIdx++
+            return new Uint8Array(numBytes)
+        } else {
+            throw new Error('Only sends one packet!')
+        }
     }
 
     public static resetTestDouble() {
@@ -53,6 +68,7 @@ export default class FakeDeviceFTDI {
         FakeDeviceFTDI.callsToSetBaudRate = []
         FakeDeviceFTDI.callsToSetDataCharacteristics = []
         FakeDeviceFTDI.callsToSetLatencyTimer = []
+        FakeDeviceFTDI.callsToRead = []
     }
 }
 

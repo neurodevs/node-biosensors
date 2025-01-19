@@ -98,6 +98,12 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
     }
 
     @test()
+    protected static async startLslStreamsSetsIsRunningTrue() {
+        await this.startLslStreams()
+        assert.isTrue(this.instance.isRunning)
+    }
+
+    @test()
     protected static async callsReadOnDeviceOnce() {
         await this.startLslStreams()
         assert.isEqual(FakeDeviceFTDI.callsToRead[0], this.totalBytes)
@@ -111,7 +117,7 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
 
     @test()
     protected static async incrementsNumPacketsMalformedHeaderWhenHeaderIsNotFirst() {
-        FakeDeviceFTDI.fakeReadData = new Uint8Array([0x00, 0xff])
+        FakeDeviceFTDI.fakeReadPackets = [new Uint8Array([0x00, 0xff])]
         await this.startLslStreams()
 
         assert.isEqual(this.instance.getNumPacketsMalformedHeader(), 1)
@@ -119,7 +125,7 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
 
     @test()
     protected static async incrementsNumPacketsIncompleteWhenLengthTooShort() {
-        FakeDeviceFTDI.fakeReadData = this.generateDataWithOneMissing()
+        FakeDeviceFTDI.fakeReadPackets = this.generatePacketWithOneMissingByte()
         await this.startLslStreams()
 
         assert.isEqual(this.instance.getNumPacketsIncomplete(), 1)
@@ -127,28 +133,62 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
 
     @test()
     protected static async incrementsNumPacketsOverflowWhenLengthTooLong() {
-        FakeDeviceFTDI.fakeReadData = this.generateDataWithOneExtra()
+        FakeDeviceFTDI.fakeReadPackets = this.generatePacketWithOneExtraByte()
         await this.startLslStreams()
 
         assert.isEqual(this.instance.getNumPacketsOverflow(), 1)
+    }
+
+    @test()
+    protected static async callsReadOnDeviceTwice() {
+        FakeDeviceFTDI.fakeReadPackets = this.generateTwoValidPackets()
+        await this.startLslStreams()
+
+        assert.isEqual(FakeDeviceFTDI.callsToRead.length, 2)
+    }
+
+    @test.skip()
+    protected static async incrementsNumPacketsDroppedWhenPacketCounterIsNonSequential() {
+        FakeDeviceFTDI.fakeReadPackets = [new Uint8Array([0xff, 0x01])]
+        await this.startLslStreams()
+
+        assert.isEqual(this.instance.getNumPacketsDropped(), 1)
     }
 
     private static async startLslStreams() {
         await this.instance.startLslStreams()
     }
 
-    private static generateDataWithOneMissing() {
-        return new Uint8Array(
-            [0xff].concat(
-                Array.from({ length: this.chunkSize - 2 }, () => 0x00)
-            )
-        )
+    private static generatePacketWithOneMissingByte() {
+        return this.generateFakeReadPacket(this.chunkSize - 2)
     }
 
-    private static generateDataWithOneExtra() {
-        return new Uint8Array(
-            [0xff].concat(Array.from({ length: this.chunkSize }, () => 0x00))
-        )
+    private static generateFakeReadPacket(numEmptyBytes: number) {
+        return [this.generateFakePacket(numEmptyBytes)]
+    }
+
+    private static generateFakePacket(numEmptyBytes: number) {
+        const packet = this.generateEmptyPacket(numEmptyBytes)
+        return this.addHeaderToPacket(packet)
+    }
+
+    private static generateEmptyPacket(length: number) {
+        return Array.from({ length }, () => 0x00)
+    }
+
+    private static addHeaderToPacket(packet: number[]) {
+        return new Uint8Array([0xff].concat(packet))
+    }
+
+    private static generatePacketWithOneExtraByte() {
+        return this.generateFakeReadPacket(this.chunkSize)
+    }
+
+    private static generateTwoValidPackets() {
+        return [
+            this.generateFakePacket(this.chunkSize - 1),
+            this.generateFakePacket(this.chunkSize - 1),
+        ]
     }
 
     private static readonly chunkSize = 125

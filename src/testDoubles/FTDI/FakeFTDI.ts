@@ -27,7 +27,7 @@ export default class FakeFTDI {
 
     public static async openDevice(serialNumber: string) {
         FakeFTDI.callsToOpenDevice.push(serialNumber)
-        return this.FakeDeviceFTDI() as FTDI_Device
+        return this.FakeDeviceFTDI() as unknown as FTDI_Device
     }
 
     private static FakeDeviceFTDI() {
