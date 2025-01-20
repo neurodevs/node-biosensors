@@ -100,23 +100,6 @@ export default class CgxStreamProducer implements LslProducer {
         while (this.isRunning) {
             try {
                 const packet = await this.device.read(this.totalBytes)
-                // const indices: any = []
-
-                // packet.forEach((val, idx) => {
-                //     if (val === 255) {
-                //         indices.push(idx)
-                //     }
-                // })
-                // console.log('Headers:', indices)
-
-                // for (let i = 1; i < indices.length; i++) {
-                //     console.log(indices[i] - indices[i - 1])
-                // }
-
-                // // for (let i = 0; i < 300; i += 75) {
-                // //     console.log(packet.slice(i, i + 75))
-                // // }
-                // return
                 this.validatePacket(packet)
             } catch {
                 return
