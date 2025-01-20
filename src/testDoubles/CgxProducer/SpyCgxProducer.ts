@@ -5,14 +5,6 @@ export default class SpyCgxProducer extends CgxStreamProducer {
         super()
     }
 
-    public getNumPacketsMissingHeader() {
-        return this.numPacketsMissingHeader
-    }
-
-    public getNumPacketsMalformedHeader() {
-        return this.numPacketsMalformedHeader
-    }
-
     public getNumPacketsIncomplete() {
         return this.numPacketsIncomplete
     }

@@ -7,8 +7,6 @@ export default class CgxStreamProducer implements LslProducer {
     public static FTDI = FTDI
 
     public isRunning = false
-    protected numPacketsMissingHeader = 0
-    protected numPacketsMalformedHeader = 0
     protected numPacketsIncomplete = 0
     protected numPacketsOverflow = 0
     protected numPacketsDropped = 0
@@ -100,6 +98,14 @@ export default class CgxStreamProducer implements LslProducer {
         while (this.isRunning) {
             try {
                 const packet = await this.device.read(this.bytesPerSample)
+
+                if (packet[0] !== 0xff) {
+                    const idx = packet.indexOf(0xff)
+                    const partial = packet.slice(idx)
+                    const rest = await this.device.read(idx)
+                    packet.set(rest, partial.length)
+                }
+
                 this.validatePacket(packet)
             } catch {
                 return
@@ -108,18 +114,6 @@ export default class CgxStreamProducer implements LslProducer {
     }
 
     private validatePacket(packet: Uint8Array<ArrayBufferLike>) {
-        const headerIdx = packet.indexOf(0xff)
-
-        if (headerIdx === -1) {
-            this.numPacketsMissingHeader++
-            console.log('Missing header')
-        }
-
-        if (headerIdx > 0) {
-            this.numPacketsMalformedHeader++
-            console.log('Malformed header')
-        }
-
         if (packet.length < this.bytesPerSample) {
             this.numPacketsIncomplete++
             console.log('Incomplete packet')
