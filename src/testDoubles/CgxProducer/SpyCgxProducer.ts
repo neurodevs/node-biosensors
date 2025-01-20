@@ -5,14 +5,6 @@ export default class SpyCgxProducer extends CgxStreamProducer {
         super()
     }
 
-    public getNumPacketsIncomplete() {
-        return this.numPacketsIncomplete
-    }
-
-    public getNumPacketsOverflow() {
-        return this.numPacketsOverflow
-    }
-
     public getNumPacketsDropped() {
         return this.numPacketsDropped
     }

@@ -7,8 +7,6 @@ export default class CgxStreamProducer implements LslProducer {
     public static FTDI = FTDI
 
     public isRunning = false
-    protected numPacketsIncomplete = 0
-    protected numPacketsOverflow = 0
     protected numPacketsDropped = 0
     private infos!: FTDI.FTDI_DeviceInfo[]
     private device!: FTDI.FTDI_Device
@@ -116,16 +114,6 @@ export default class CgxStreamProducer implements LslProducer {
     }
 
     private validatePacket(packet: Uint8Array<ArrayBufferLike>) {
-        if (packet.length < this.bytesPerSample) {
-            this.numPacketsIncomplete++
-            console.log('Incomplete packet')
-        }
-
-        if (packet.length > this.bytesPerSample) {
-            this.numPacketsOverflow++
-            console.log('Overflow packet')
-        }
-
         if (typeof this.packetCounter == 'undefined') {
             this.packetCounter = packet[1]
         } else {

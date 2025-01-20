@@ -110,22 +110,6 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
     }
 
     @test()
-    protected static async incrementsNumPacketsIncompleteWhenLengthTooShort() {
-        FakeDeviceFTDI.fakeReadPackets = this.generatePacketWithOneMissingByte()
-        await this.startLslStreams()
-
-        assert.isEqual(this.instance.getNumPacketsIncomplete(), 1)
-    }
-
-    @test()
-    protected static async incrementsNumPacketsOverflowWhenLengthTooLong() {
-        FakeDeviceFTDI.fakeReadPackets = this.generatePacketWithOneExtraByte()
-        await this.startLslStreams()
-
-        assert.isEqual(this.instance.getNumPacketsOverflow(), 1)
-    }
-
-    @test()
     protected static async callsReadOnDeviceTwice() {
         FakeDeviceFTDI.fakeReadPackets = this.generateTwoValidPackets()
         await this.startLslStreams()
@@ -153,14 +137,6 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
         await this.instance.startLslStreams()
     }
 
-    private static generatePacketWithOneMissingByte() {
-        return this.generateFakeReadPacket(this.bytesPerSample - 2)
-    }
-
-    private static generateFakeReadPacket(numEmptyBytes: number) {
-        return [this.generateFakePacket(numEmptyBytes)]
-    }
-
     private static generateFakePacket(numEmptyBytes: number) {
         const packet = this.generateEmptyPacket(numEmptyBytes)
         return this.prependHeaderToPacket(packet)
@@ -172,10 +148,6 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
 
     private static prependHeaderToPacket(packet: number[]) {
         return new Uint8Array([0xff].concat(packet))
-    }
-
-    private static generatePacketWithOneExtraByte() {
-        return this.generateFakeReadPacket(this.bytesPerSample)
     }
 
     private static generateTwoValidPackets() {
