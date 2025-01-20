@@ -146,6 +146,25 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
     }
 
     @test()
+    protected static async resetsPacketCounterAt127() {
+        FakeDeviceFTDI.fakeReadPackets = [
+            new Uint8Array(
+                [0xff, 0x7f].concat(
+                    this.generateEmptyPacket(this.bytesPerSample - 2)
+                )
+            ),
+            new Uint8Array(
+                [0xff, 0x00].concat(
+                    this.generateEmptyPacket(this.bytesPerSample - 2)
+                )
+            ),
+        ]
+        await this.startLslStreams()
+
+        assert.isEqual(this.instance.getNumPacketsDropped(), 0)
+    }
+
+    @test()
     protected static async fixesOffsetWhenFirstByteIsNotHeader() {
         FakeDeviceFTDI.fakeReadPackets = this.generateOffsetPacket()
         await this.startLslStreams()
