@@ -99,7 +99,7 @@ export default class CgxStreamProducer implements LslProducer {
 
         while (this.isRunning) {
             try {
-                const packet = await this.device.read(this.totalBytes)
+                const packet = await this.device.read(this.bytesPerSample)
                 this.validatePacket(packet)
             } catch {
                 return
@@ -120,12 +120,12 @@ export default class CgxStreamProducer implements LslProducer {
             console.log('Malformed header')
         }
 
-        if (packet.length < this.totalBytes) {
+        if (packet.length < this.bytesPerSample) {
             this.numPacketsIncomplete++
             console.log('Incomplete packet')
         }
 
-        if (packet.length > this.totalBytes) {
+        if (packet.length > this.bytesPerSample) {
             this.numPacketsOverflow++
             console.log('Overflow packet')
         }
@@ -155,11 +155,7 @@ export default class CgxStreamProducer implements LslProducer {
     private readonly oneStopBit = FTDI.FT_STOP_BITS_1
     private readonly noParityBit = FTDI.FT_PARITY_NONE
     private readonly latencyTimerMs = 4
-    private readonly sampleRateHz = 500
-    private readonly packetsPerSec = 4
-    private readonly samplesPerPacket = this.sampleRateHz / this.packetsPerSec
     private readonly bytesPerSample = 78
-    private readonly totalBytes = this.samplesPerPacket * this.bytesPerSample
 
     private get FTDI() {
         return CgxStreamProducer.FTDI

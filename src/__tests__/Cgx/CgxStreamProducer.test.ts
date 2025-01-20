@@ -106,7 +106,7 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
     @test()
     protected static async callsReadOnDeviceOnce() {
         await this.startLslStreams()
-        assert.isEqual(FakeDeviceFTDI.callsToRead[0], this.totalBytes)
+        assert.isEqual(FakeDeviceFTDI.callsToRead[0], this.bytesPerSample)
     }
 
     @test()
@@ -160,7 +160,7 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
     }
 
     private static generatePacketWithOneMissingByte() {
-        return this.generateFakeReadPacket(this.totalBytes - 2)
+        return this.generateFakeReadPacket(this.bytesPerSample - 2)
     }
 
     private static generateFakeReadPacket(numEmptyBytes: number) {
@@ -181,7 +181,7 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
     }
 
     private static generatePacketWithOneExtraByte() {
-        return this.generateFakeReadPacket(this.totalBytes)
+        return this.generateFakeReadPacket(this.bytesPerSample)
     }
 
     private static generateTwoValidPackets() {
@@ -189,16 +189,16 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
     }
 
     private static generateValidPacket() {
-        return this.generateFakePacket(this.totalBytes - 1)
+        return this.generateFakePacket(this.bytesPerSample - 1)
     }
 
     private static generateNonSequentialPackets() {
         const packetCounterZero = [0x00].concat(
-            this.generateEmptyPacket(this.totalBytes - 2)
+            this.generateEmptyPacket(this.bytesPerSample - 2)
         )
 
         const packetCounterTwo = [0x02].concat(
-            this.generateEmptyPacket(this.totalBytes - 2)
+            this.generateEmptyPacket(this.bytesPerSample - 2)
         )
 
         return [
@@ -207,11 +207,7 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
         ]
     }
 
-    private static readonly samplesPerPacket = 125
     private static readonly bytesPerSample = 78
-
-    private static readonly totalBytes =
-        this.samplesPerPacket * this.bytesPerSample
 
     private static async CgxStreamProducer() {
         return (await CgxStreamProducer.Create()) as SpyCgxProducer
