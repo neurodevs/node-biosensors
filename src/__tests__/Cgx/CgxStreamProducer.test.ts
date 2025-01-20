@@ -134,6 +134,11 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
                     this.generateEmptyPacket(this.bytesPerSample - 2)
                 )
             ),
+            new Uint8Array(
+                [0xff, 0x04].concat(
+                    this.generateEmptyPacket(this.bytesPerSample - 2)
+                )
+            ),
         ]
         await this.startLslStreams()
 

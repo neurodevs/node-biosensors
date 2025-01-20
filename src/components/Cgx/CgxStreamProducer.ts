@@ -119,9 +119,9 @@ export default class CgxStreamProducer implements LslProducer {
         } else {
             if (packet[1] !== this.packetCounter + 1) {
                 this.numPacketsDropped++
-                this.packetCounter = packet[1]
                 console.log('Dropped packet')
             }
+            this.packetCounter = packet[1]
         }
     }
 
