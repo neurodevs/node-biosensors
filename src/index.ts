@@ -1,3 +1,6 @@
+// Generic types
+export * from './types'
+
 // CGX Cognionics Quick-20r
 
 export { default as CgxStreamProducer } from './components/Cgx/CgxStreamProducer'
