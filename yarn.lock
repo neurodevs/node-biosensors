@@ -717,10 +717,10 @@
     "@sprucelabs/spruce-core-schemas" "^40.1.547"
     "@sprucelabs/spruce-skill-utils" "^31.0.624"
 
-"@neurodevs/node-xdf@^1.3.1":
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/@neurodevs/node-xdf/-/node-xdf-1.3.1.tgz#4ceca939fa0a83318a65077649a60faea2a2f15a"
-  integrity sha512-OSwtFjmMskYs62APCtf8eSYsJ5JKt1tCFhrG2xUPMh5UHE8fHv8YTLpEhlym55k2s7Rz2Jv0g4TMzFYbfY8mFQ==
+"@neurodevs/node-xdf@^1.3.2":
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/@neurodevs/node-xdf/-/node-xdf-1.3.2.tgz#c924a6775e9da4b6b0878b3ed6600d9441377b03"
+  integrity sha512-x0wfvesXEfl9rmoIcZw934+YICkF2vPPwTTAAt8Hpk119FwcNb+EVnNg3StMX0o2MzSCsJgQMh1ey5q0f7mndw==
   dependencies:
     "@neurodevs/node-lsl" "^10.2.1"
     "@neurodevs/node-mangled-names" "^0.0.8"
@@ -860,9 +860,9 @@
     "@sprucelabs/schema" "^31.0.19"
 
 "@sprucelabs/spruce-skill-utils@^31.0.590", "@sprucelabs/spruce-skill-utils@^31.0.624", "@sprucelabs/spruce-skill-utils@^31.2.16":
-  version "31.2.16"
-  resolved "https://registry.yarnpkg.com/@sprucelabs/spruce-skill-utils/-/spruce-skill-utils-31.2.16.tgz#b7625a80ffeb4f870854aa0d4bb461d32fe5505e"
-  integrity sha512-3Dez3yVHGRqXGVrBIm5QFnD36Uoxytr/zUUtXOCJfTkhuooW7v2idZFRzZa04DPJLBxqz2uV3D82GDJf6EaT/Q==
+  version "31.2.19"
+  resolved "https://registry.yarnpkg.com/@sprucelabs/spruce-skill-utils/-/spruce-skill-utils-31.2.19.tgz#86189b3cce9303ab373d132ae9cc16c8195a7044"
+  integrity sha512-ordIVpulz3ikU0E7BAcd62cmq+Y8JNf+EDtEjnx6MJ8c8OUopkLQpnMWBl1hrt2cBtulh2Ev0D0ojEI6nrom/A==
   dependencies:
     "@sprucelabs/globby" "^2.0.501"
     "@sprucelabs/schema" "^31.0.19"
@@ -1563,9 +1563,9 @@ camelcase@^6.2.0:
   integrity sha512-Gmy6FhYlCY7uOElZUSbxo2UCDH8owEk996gkbrpsgGtrJLM3J7jGxl9Ic7Qwwj4ivOE5AWZWRMecDdF7hqGjFA==
 
 caniuse-lite@^1.0.30001688:
-  version "1.0.30001692"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001692.tgz#4585729d95e6b95be5b439da6ab55250cd125bf9"
-  integrity sha512-A95VKan0kdtrsnMubMKxEKUKImOPSuCpYgxSQBo036P5YYgVIcOYJEgt/txJWqObiRQeISNCfef9nvlQ0vbV7A==
+  version "1.0.30001695"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001695.tgz#39dfedd8f94851132795fdf9b79d29659ad9c4d4"
+  integrity sha512-vHyLade6wTgI2u1ec3WQBxv+2BrTERV28UXQu9LO6lZ9pYeMk34vjXFLOxo1A4UBA8XTL4njRQZdno/yYaSmWw==
 
 chalk@^4.0.0, chalk@^4.1.0, chalk@^4.1.2:
   version "4.1.2"
@@ -1911,9 +1911,9 @@ eastasianwidth@^0.2.0:
   integrity sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==
 
 electron-to-chromium@^1.5.73:
-  version "1.5.83"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.5.83.tgz#3f74078f0c83e24bf7e692eaa855a998d1bec34f"
-  integrity sha512-LcUDPqSt+V0QmI47XLzZrz5OqILSMGsPFkDYus22rIbgorSvBYEFqq854ltTmUdHkY92FSdAAvsh4jWEULMdfQ==
+  version "1.5.84"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.5.84.tgz#8e334ca206bb293a20b16418bf454783365b0a95"
+  integrity sha512-I+DQ8xgafao9Ha6y0qjHHvpZ9OfyA1qKlkHkjywxzniORU2awxyz7f/iVJcULmrF2yrM3nHQf+iDjJtbbexd/g==
 
 email-validator@^2.0.4:
   version "2.0.4"
@@ -2180,9 +2180,9 @@ eslint-plugin-import@^2.29.1:
     tsconfig-paths "^3.15.0"
 
 eslint-plugin-prettier@^5.1.3:
-  version "5.2.2"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-prettier/-/eslint-plugin-prettier-5.2.2.tgz#d1f068f65dc8490f102eda21d1f4cd150c205211"
-  integrity sha512-1yI3/hf35wmlq66C8yOyrujQnel+v5l1Vop5Cl2I6ylyNTT1JbuUUnV3/41PzwTzcyDp/oF0jWE3HXvcH5AQOQ==
+  version "5.2.3"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-prettier/-/eslint-plugin-prettier-5.2.3.tgz#c4af01691a6fa9905207f0fbba0d7bea0902cce5"
+  integrity sha512-qJ+y0FfCp/mQYQ/vWQ3s7eUlFEL4PyKfAJxsnYTJ4YT73nsJBWqmEpFryxV9OeUiqmsTsYJ5Y+KDNaeP31wrRw==
   dependencies:
     prettier-linter-helpers "^1.0.0"
     synckit "^0.9.1"
