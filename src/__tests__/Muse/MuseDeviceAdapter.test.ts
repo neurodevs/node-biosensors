@@ -169,6 +169,17 @@ export default class MuseDeviceAdapterTest extends AbstractBiosensorsTest {
         assert.isFalse(this.instance.isRunning, 'Should not be running!')
     }
 
+    @test()
+    protected static async disconnectCallsDisconnectOnMuseProducer() {
+        await this.disconnect()
+
+        assert.isEqual(
+            FakeMuseProducer.numCallsToDisconnect,
+            1,
+            'Should call producer.disconnect() on disconnect!'
+        )
+    }
+
     private static async startStreaming() {
         await this.instance.startStreaming()
     }

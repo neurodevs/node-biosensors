@@ -58,7 +58,12 @@ export default class MuseDeviceAdapter implements DeviceAdapter {
 
     public async disconnect() {
         await this.stopStreaming()
+        await this.disconnectMuseLslProducer()
         this.stopXdfRecorderIfEnabled()
+    }
+
+    private async disconnectMuseLslProducer() {
+        await this.lslProducer.disconnect()
     }
 
     private stopXdfRecorderIfEnabled() {
