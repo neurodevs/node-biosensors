@@ -14,4 +14,8 @@ export default class SpyMuseProducer extends MuseStreamProducer {
     public getHandlePpgChannelForChunk() {
         return this.handlePpgChannelChunk
     }
+
+    public getBleConnector() {
+        return this.bleConnector
+    }
 }

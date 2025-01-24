@@ -1,6 +1,6 @@
 {
   "name": "@neurodevs/node-biosensors",
-  "version": "0.3.6",
+  "version": "0.3.7",
   "main": "build/index.js",
   "repository": "https://github.com/neurodevs/node-biosensors.git",
   "scripts": {

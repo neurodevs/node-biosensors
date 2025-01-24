@@ -236,6 +236,17 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
         )
     }
 
+    @test()
+    protected static async disconnectClearsBleConnectorFromInstance() {
+        await this.startLslStreams()
+        await this.instance.disconnect()
+
+        assert.isUndefined(
+            this.instance.getBleConnector(),
+            'Should clear the BLE connector from the instance!'
+        )
+    }
+
     private static async startLslStreams() {
         await this.instance.startLslStreams()
     }
