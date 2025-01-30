@@ -92,7 +92,14 @@ export default class MuseStreamProducer implements MuseLslProducer {
 
     public async disconnect() {
         await this.stopLslStreams()
+        this.destroyLslOutlets()
+
         await this.disconnectBle()
+    }
+
+    private destroyLslOutlets() {
+        this.eegOutlet.destroy()
+        this.ppgOutlet.destroy()
     }
 
     private async disconnectBle() {
