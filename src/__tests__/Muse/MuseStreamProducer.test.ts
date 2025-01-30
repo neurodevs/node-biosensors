@@ -259,6 +259,28 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
         )
     }
 
+    @test()
+    protected static async stopLslStreamsDoesNothingIfNoBle() {
+        await this.stopLslStreams()
+
+        assert.isEqual(
+            FakeBleController.numCallsToDisconnect,
+            0,
+            'Should not call getCharacteristic if not connected!'
+        )
+    }
+
+    @test()
+    protected static async disconnectDoesNothingIfNoBle() {
+        await this.disconnect()
+
+        assert.isEqual(
+            FakeBleController.numCallsToDisconnect,
+            0,
+            'Should not call disconnect if not connected!'
+        )
+    }
+
     private static async startLslStreams() {
         await this.instance.startLslStreams()
     }

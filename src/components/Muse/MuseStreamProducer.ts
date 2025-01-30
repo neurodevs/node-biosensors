@@ -79,7 +79,9 @@ export default class MuseStreamProducer implements MuseLslProducer {
     }
 
     public async stopLslStreams() {
-        await this.writeHaltCommandToControl()
+        if (this.bleConnector) {
+            await this.writeHaltCommandToControl()
+        }
     }
 
     private async writeHaltCommandToControl() {
@@ -92,9 +94,9 @@ export default class MuseStreamProducer implements MuseLslProducer {
 
     public async disconnect() {
         await this.stopLslStreams()
-        this.destroyLslOutlets()
-
         await this.disconnectBle()
+
+        this.destroyLslOutlets()
     }
 
     private destroyLslOutlets() {
@@ -103,8 +105,10 @@ export default class MuseStreamProducer implements MuseLslProducer {
     }
 
     private async disconnectBle() {
-        await this.bleConnector!.disconnectBle()
-        delete this.bleConnector
+        if (this.bleConnector) {
+            await this.bleConnector!.disconnectBle()
+            delete this.bleConnector
+        }
     }
 
     private generateScanOptions() {
