@@ -10,6 +10,7 @@ export default class CgxStreamProducer implements LslProducer {
     protected numPacketsDropped = 0
     private infos!: FTDI.FTDI_DeviceInfo[]
     private device!: FTDI.FTDI_Device
+    private packet!: Uint8Array<ArrayBufferLike>
     private packetCounter!: number
 
     protected constructor() {}
@@ -95,36 +96,36 @@ export default class CgxStreamProducer implements LslProducer {
 
         while (this.isRunning) {
             try {
-                const packet = await this.device.read(this.bytesPerSample)
-                await this.offsetIfHeaderNotFirst(packet)
-                this.validatePacket(packet)
+                this.packet = await this.device.read(this.bytesPerSample)
+                await this.offsetIfHeaderNotFirst()
+                this.validatePacket()
             } catch {
                 return
             }
         }
     }
 
-    private async offsetIfHeaderNotFirst(packet: Uint8Array<ArrayBufferLike>) {
-        if (packet[0] !== 0xff) {
-            const idx = packet.indexOf(0xff)
-            const partial = packet.slice(idx)
+    private async offsetIfHeaderNotFirst() {
+        if (this.packet[0] !== 0xff) {
+            const idx = this.packet.indexOf(0xff)
+            const partial = this.packet.slice(idx)
             const rest = await this.device.read(idx)
-            packet.set(rest, partial.length)
+            this.packet.set(rest, partial.length)
         }
     }
 
-    private validatePacket(packet: Uint8Array<ArrayBufferLike>) {
+    private validatePacket() {
         if (typeof this.packetCounter == 'undefined') {
-            this.packetCounter = packet[1]
+            this.packetCounter = this.packet[1]
         } else {
-            if (packet[1] !== this.packetCounter + 1) {
-                if (packet[1] == 0) {
+            if (this.packet[1] !== this.packetCounter + 1) {
+                if (this.packet[1] == 0) {
                     this.packetCounter = 0
                 } else {
                     this.incrementNumPacketsDropped()
                 }
             }
-            this.packetCounter = packet[1]
+            this.packetCounter = this.packet[1]
         }
     }
 
