@@ -96,7 +96,7 @@ export default class CgxStreamProducer implements LslProducer {
 
         while (this.isRunning) {
             try {
-                this.packet = await this.device.read(this.bytesPerSample)
+                this.packet = await this.readPacketFromDevice()
                 await this.offsetIfHeaderNotFirst()
                 this.validatePacket()
             } catch {
@@ -105,11 +105,16 @@ export default class CgxStreamProducer implements LslProducer {
         }
     }
 
+    private async readPacketFromDevice() {
+        return await this.device.read(this.bytesPerSample)
+    }
+
     private async offsetIfHeaderNotFirst() {
         if (this.packet[0] !== 0xff) {
             const idx = this.packet.indexOf(0xff)
             const partial = this.packet.slice(idx)
             const rest = await this.device.read(idx)
+
             this.packet.set(rest, partial.length)
         }
     }
