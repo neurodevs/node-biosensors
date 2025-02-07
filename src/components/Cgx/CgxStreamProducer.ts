@@ -96,13 +96,17 @@ export default class CgxStreamProducer implements LslProducer {
 
         while (this.isRunning) {
             try {
-                this.packet = await this.readPacketFromDevice()
-                await this.offsetIfHeaderNotFirst()
-                this.validatePacket()
+                await this.readPacket()
             } catch {
                 return
             }
         }
+    }
+
+    private async readPacket() {
+        this.packet = await this.readPacketFromDevice()
+        await this.offsetIfHeaderNotFirst()
+        this.validatePacket()
     }
 
     private async readPacketFromDevice() {
