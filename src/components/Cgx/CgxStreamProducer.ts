@@ -125,17 +125,25 @@ export default class CgxStreamProducer implements LslProducer {
 
     private validatePacket() {
         if (typeof this.packetCounter == 'undefined') {
-            this.packetCounter = this.packet[1]
+            this.setPacketCounterToCurrent()
         } else {
             if (this.packet[1] !== this.packetCounter + 1) {
                 if (this.packet[1] == 0) {
-                    this.packetCounter = 0
+                    this.resetPacketCounter()
                 } else {
                     this.incrementNumPacketsDropped()
                 }
             }
-            this.packetCounter = this.packet[1]
+            this.setPacketCounterToCurrent()
         }
+    }
+
+    private setPacketCounterToCurrent() {
+        this.packetCounter = this.packet[1]
+    }
+
+    private resetPacketCounter() {
+        this.packetCounter = 0
     }
 
     private incrementNumPacketsDropped() {
