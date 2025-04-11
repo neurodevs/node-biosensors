@@ -82,15 +82,15 @@ export default class MuseDeviceAdapter implements DeviceAdapter {
         return this.lslProducer.bleName
     }
 
-    private static createXdfRecorderIfGivenPath(xdfRecordPath?: string) {
-        return xdfRecordPath ? this.XdfStreamRecorder(xdfRecordPath) : undefined
-    }
-
     private static readonly museStreamQueries = [
         'type="EEG"',
         'type="PPG"',
         'type="Markers"',
     ]
+
+    private static createXdfRecorderIfGivenPath(xdfRecordPath?: string) {
+        return xdfRecordPath ? this.XdfStreamRecorder(xdfRecordPath) : undefined
+    }
 
     private static MuseStreamProducer(options?: DeviceAdapterOptions) {
         return MuseStreamProducer.Create(options)
