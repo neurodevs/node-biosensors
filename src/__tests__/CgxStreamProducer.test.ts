@@ -1,10 +1,10 @@
 import { test, assert, errorAssert } from '@sprucelabs/test-utils'
 import FTDI from 'ftdi-d2xx'
-import CgxStreamProducer from '../../components/Cgx/CgxStreamProducer'
-import SpyCgxProducer from '../../testDoubles/CgxProducer/SpyCgxProducer'
-import FakeDeviceFTDI from '../../testDoubles/FTDI/FakeDeviceFTDI'
-import FakeFTDI from '../../testDoubles/FTDI/FakeFTDI'
-import AbstractBiosensorsTest from '../AbstractBiosensorsTest'
+import CgxStreamProducer from '../components/Cgx/CgxStreamProducer'
+import SpyCgxProducer from '../testDoubles/CgxProducer/SpyCgxProducer'
+import FakeDeviceFTDI from '../testDoubles/FTDI/FakeDeviceFTDI'
+import FakeFTDI from '../testDoubles/FTDI/FakeFTDI'
+import AbstractBiosensorsTest from './AbstractBiosensorsTest'
 
 export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
     private static instance: SpyCgxProducer

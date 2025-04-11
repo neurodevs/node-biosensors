@@ -8,10 +8,10 @@ import {
 import { FakeLslOutlet } from '@neurodevs/node-lsl'
 import MuseStreamProducer, {
     MuseLslProducerOptions,
-} from '../../components/Muse/MuseStreamProducer'
-import { MUSE_CHARACTERISTIC_UUIDS as CHAR_UUIDS } from '../../components/Muse/MuseStreamProducer'
-import SpyMuseProducer from '../../testDoubles/MuseProducer/SpyMuseProducer'
-import AbstractBiosensorsTest from '../AbstractBiosensorsTest'
+} from '../components/Muse/MuseStreamProducer'
+import { MUSE_CHARACTERISTIC_UUIDS as CHAR_UUIDS } from '../components/Muse/MuseStreamProducer'
+import SpyMuseProducer from '../testDoubles/MuseProducer/SpyMuseProducer'
+import AbstractBiosensorsTest from './AbstractBiosensorsTest'
 
 export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
     private static instance: SpyMuseProducer
@@ -493,6 +493,6 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
     })
 
     private static async MuseStreamProducer(options?: MuseLslProducerOptions) {
-        return (await MuseStreamProducer.Create(options)) as SpyMuseProducer
+y        return (await MuseStreamProducer.Create(options)) as SpyMuseProducer
     }
 }
