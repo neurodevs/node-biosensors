@@ -493,6 +493,6 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
     })
 
     private static async MuseStreamProducer(options?: MuseLslProducerOptions) {
-y        return (await MuseStreamProducer.Create(options)) as SpyMuseProducer
+        return (await MuseStreamProducer.Create(options)) as SpyMuseProducer
     }
 }
