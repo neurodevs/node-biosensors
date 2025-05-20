@@ -1,6 +1,6 @@
 import { test, assert, errorAssert } from '@sprucelabs/test-utils'
 import FTDI from 'ftdi-d2xx'
-import CgxStreamProducer from '../components/Cgx/CgxStreamProducer'
+import CgxStreamProducer from '../modules/Cgx/CgxStreamProducer'
 import SpyCgxProducer from '../testDoubles/CgxProducer/SpyCgxProducer'
 import FakeDeviceFTDI from '../testDoubles/FTDI/FakeDeviceFTDI'
 import FakeFTDI from '../testDoubles/FTDI/FakeFTDI'

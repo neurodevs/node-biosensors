@@ -1,4 +1,4 @@
-import CgxStreamProducer from '../../components/Cgx/CgxStreamProducer'
+import CgxStreamProducer from '../../modules/Cgx/CgxStreamProducer'
 
 export default class SpyCgxProducer extends CgxStreamProducer {
     public constructor() {
