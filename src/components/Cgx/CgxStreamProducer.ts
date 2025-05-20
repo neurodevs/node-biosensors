@@ -157,16 +157,16 @@ export default class CgxStreamProducer implements LslProducer {
 
     private readonly readTimeoutMs = 1000
     private readonly writeTimeoutMs = 1000
-    private readonly ftdiReadBuffer = FTDI.FT_PURGE_RX
-    private readonly ftdiFlowControlMode = FTDI.FT_FLOW_RTS_CTS
+    private readonly latencyTimerMs = 4
+    private readonly bytesPerSample = 78
+    private readonly baudRate = 1000000
     private readonly seventeenInHex = 0x11
     private readonly nineteenInHex = 0x13
-    private readonly baudRate = 1000000
+    private readonly ftdiFlowControlMode = FTDI.FT_FLOW_RTS_CTS
+    private readonly ftdiReadBuffer = FTDI.FT_PURGE_RX
     private readonly eightDataBits = FTDI.FT_BITS_8
     private readonly oneStopBit = FTDI.FT_STOP_BITS_1
     private readonly noParityBit = FTDI.FT_PARITY_NONE
-    private readonly latencyTimerMs = 4
-    private readonly bytesPerSample = 78
 
     private get FTDI() {
         return CgxStreamProducer.FTDI
