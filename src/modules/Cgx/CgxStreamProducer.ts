@@ -1,15 +1,15 @@
 // Byte definitions
-// Byte index 0: Packet header (value: 255)
-// Byte index 1: Packet counter (values: 0-127)
-// Byte index 2–61: EEG data (20 channels, 3 bytes each, values: 0–254)
-// Byte index 61–69: Accelerometer data (3 channels, 3 bytes each, values: 0–254)
-// Byte index 70: Impedance (value: 0–255)
-// Byte index 71: Battery voltage (value: 0–255)
-// Byte index 72-73: Trigger (value: 0–255)
-// Byte index 74: Packet footer (value: 255)
-// Byte index 75: Reserved / unknown
-// Byte index 76: Reserved / unknown
-// Byte index 77: Reserved / unknown
+// 0: Packet header (value: 255)
+// 1: Packet counter (values: 0-127)
+// 2–61: EEG data (20 channels, 3 bytes each, values: 0–254)
+// 61–69: Accelerometer data (3 channels, 3 bytes each, values: 0–254)
+// 70: Impedance (value: 0–255)
+// 71: Battery voltage (value: 0–255)
+// 72-73: Trigger (value: 0–255)
+// 74: Packet footer (value: 255)
+// 75: Reserved / unknown
+// 76: Reserved / unknown
+// 77: Reserved / unknown
 
 import FTDI from 'ftdi-d2xx'
 import SpruceError from '../../errors/SpruceError'
