@@ -127,7 +127,7 @@ export default class CgxStreamProducer implements LslProducer {
     }
 
     private async offsetIfHeaderNotFirst() {
-        if (this.packet[0] !== 0xff) {
+        if (this.headerByte !== 0xff) {
             const idx = this.packet.indexOf(0xff)
             const partial = this.packet.slice(idx)
             const rest = await this.device.read(idx)
@@ -140,8 +140,8 @@ export default class CgxStreamProducer implements LslProducer {
         if (typeof this.packetCounter == 'undefined') {
             this.setPacketCounterToCurrent()
         } else {
-            if (this.packet[1] !== this.packetCounter + 1) {
-                if (this.packet[1] == 0) {
+            if (this.counterByte !== this.packetCounter + 1) {
+                if (this.counterByte == 0) {
                     this.resetPacketCounter()
                 } else {
                     this.incrementNumPacketsDropped()
@@ -152,7 +152,7 @@ export default class CgxStreamProducer implements LslProducer {
     }
 
     private setPacketCounterToCurrent() {
-        this.packetCounter = this.packet[1]
+        this.packetCounter = this.counterByte
     }
 
     private resetPacketCounter() {
@@ -167,6 +167,9 @@ export default class CgxStreamProducer implements LslProducer {
     public async stopLslStreams() {}
 
     public async disconnect() {}
+
+    private readonly headerByte = this.packet[0]
+    private readonly counterByte = this.packet[1]
 
     private readonly readTimeoutMs = 1000
     private readonly writeTimeoutMs = 1000
