@@ -168,8 +168,13 @@ export default class CgxStreamProducer implements LslProducer {
 
     public async disconnect() {}
 
-    private readonly headerByte = this.packet[0]
-    private readonly counterByte = this.packet[1]
+    private get headerByte() {
+        return this.packet[0]
+    }
+
+    private get counterByte() {
+        return this.packet[1]
+    }
 
     private readonly readTimeoutMs = 1000
     private readonly writeTimeoutMs = 1000
