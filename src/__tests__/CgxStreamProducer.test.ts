@@ -197,6 +197,41 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
         )
     }
 
+    @test()
+    protected static async pushesEegDataToLslOutlet() {
+        const rawBytes = Array.from({ length: 20 }, () =>
+            Math.floor(Math.random() * 254)
+        )
+
+        const packet = this.prependHeaderToPacket([
+            ...rawBytes,
+            ...this.generateEmptyPacket(56),
+        ])
+
+        FakeDeviceFTDI.fakeReadPackets = [packet, packet]
+        await this.startLslStreams()
+
+        const eegData = []
+
+        for (let i = 0; i < 20; i++) {
+            const firstByte = packet[2 + i * 3]
+            const secondByte = packet[3 + i * 3]
+            const thirdByte = packet[4 + i * 3]
+
+            const rawValue =
+                (firstByte << 24) | (secondByte << 17) | (thirdByte << 10)
+
+            const volts = rawValue * (5.0 / 3.0) * (1.0 / Math.pow(2, 32))
+            eegData.push(volts)
+        }
+
+        assert.isEqualDeep(
+            FakeLslOutlet.callsToPushSample,
+            [eegData, eegData],
+            'Should push EEG data to LSL outlet!'
+        )
+    }
+
     private static async startLslStreams() {
         await this.instance.startLslStreams()
     }

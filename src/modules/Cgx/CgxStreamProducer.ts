@@ -11,7 +11,7 @@
 // 76: Reserved / unknown
 // 77: Reserved / unknown
 
-import { LslStreamOutlet } from '@neurodevs/node-lsl'
+import { LslOutlet, LslStreamOutlet } from '@neurodevs/node-lsl'
 import FTDI from 'ftdi-d2xx'
 import SpruceError from '../../errors/SpruceError'
 import { LslProducer } from '../../types'
@@ -26,11 +26,14 @@ export default class CgxStreamProducer implements LslProducer {
     private device!: FTDI.FTDI_Device
     private packet!: Uint8Array<ArrayBufferLike>
     private packetCounter!: number
+    private outlet: LslOutlet
 
-    protected constructor() {}
+    protected constructor(outlet: LslOutlet) {
+        this.outlet = outlet
+    }
 
     public static async Create() {
-        await LslStreamOutlet.Create({
+        const outlet = await LslStreamOutlet.Create({
             sourceId: 'cgx-quick-20r',
             name: 'CGX Quick-20r (Cognionics)',
             type: 'EEG',
@@ -42,7 +45,7 @@ export default class CgxStreamProducer implements LslProducer {
             chunkSize: 1,
             maxBuffered: 360,
         })
-        return new (this.Class ?? this)()
+        return new (this.Class ?? this)(outlet)
     }
 
     public async startLslStreams() {
@@ -133,6 +136,22 @@ export default class CgxStreamProducer implements LslProducer {
         this.packet = await this.readPacketFromDevice()
         await this.offsetIfHeaderNotFirst()
         this.validatePacket()
+
+        const eegData = []
+
+        for (let i = 0; i < 20; i++) {
+            const firstByte = this.packet[2 + i * 3]
+            const secondByte = this.packet[3 + i * 3]
+            const thirdByte = this.packet[4 + i * 3]
+
+            const rawValue =
+                (firstByte << 24) | (secondByte << 17) | (thirdByte << 10)
+
+            const volts = rawValue * (5.0 / 3.0) * (1.0 / Math.pow(2, 32))
+            eegData.push(volts)
+        }
+
+        this.outlet.pushSample(eegData)
     }
 
     private async readPacketFromDevice() {
@@ -231,4 +250,6 @@ export default class CgxStreamProducer implements LslProducer {
     }
 }
 
-export type CgxStreamProducerConstructor = new () => LslProducer
+export type CgxStreamProducerConstructor = new (
+    outlet: LslOutlet
+) => LslProducer
