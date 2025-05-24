@@ -137,6 +137,10 @@ export default class CgxStreamProducer implements LslProducer {
         await this.offsetIfHeaderNotFirst()
         this.handlePacketCounter()
 
+        this.processEegData()
+    }
+
+    private processEegData() {
         const eegData = []
 
         for (let i = 0; i < 20; i++) {
