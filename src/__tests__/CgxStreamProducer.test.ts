@@ -182,8 +182,8 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
         assert.isEqualDeep(
             FakeLslOutlet.callsToConstructor[0]?.options,
             {
-                sourceId: 'cgx-quick-20r',
-                name: 'CGX Quick-20r (Cognionics)',
+                sourceId: 'cgx-eeg',
+                name: 'CGX Quick-20r (Cognionics) - EEG',
                 type: 'EEG',
                 channelNames: this.characteristicNames,
                 sampleRate: 500,
@@ -239,7 +239,7 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
             {
                 sourceId: 'cgx-accel',
                 name: 'CGX Quick-20r (Cognionics) - Accelerometer',
-                type: 'Accelerometer',
+                type: 'ACCEL',
                 channelNames: ['X_ACCEL', 'Y_ACCEL', 'Z_ACCEL'],
                 sampleRate: 500,
                 channelFormat: 'float32',

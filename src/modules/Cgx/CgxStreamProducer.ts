@@ -11,7 +11,7 @@
 // 76: Reserved / unknown
 // 77: Reserved / unknown
 
-import { LslOutlet, LslStreamOutlet } from '@neurodevs/node-lsl'
+import { ChannelFormat, LslOutlet, LslStreamOutlet } from '@neurodevs/node-lsl'
 import FTDI from 'ftdi-d2xx'
 import SpruceError from '../../errors/SpruceError'
 import { LslProducer } from '../../types'
@@ -33,31 +33,8 @@ export default class CgxStreamProducer implements LslProducer {
     }
 
     public static async Create() {
-        const outlet = await LslStreamOutlet.Create({
-            sourceId: 'cgx-quick-20r',
-            name: 'CGX Quick-20r (Cognionics)',
-            type: 'EEG',
-            channelNames: this.characteristicNames,
-            sampleRate: 500,
-            channelFormat: 'float32',
-            manufacturer: 'CGX Systems',
-            unit: 'microvolt',
-            chunkSize: 1,
-            maxBuffered: 360,
-        })
-
-        await LslStreamOutlet.Create({
-            sourceId: 'cgx-accel',
-            name: 'CGX Quick-20r (Cognionics) - Accelerometer',
-            type: 'Accelerometer',
-            channelNames: ['X_ACCEL', 'Y_ACCEL', 'Z_ACCEL'],
-            sampleRate: 500,
-            channelFormat: 'float32',
-            manufacturer: 'CGX Systems',
-            unit: 'Unknown',
-            chunkSize: 1,
-            maxBuffered: 360,
-        })
+        const outlet = await LslStreamOutlet.Create(this.eegOutletOptions)
+        await LslStreamOutlet.Create(this.accelOutletOptions)
 
         return new (this.Class ?? this)(outlet)
     }
@@ -239,7 +216,7 @@ export default class CgxStreamProducer implements LslProducer {
     private readonly oneStopBit = FTDI.FT_STOP_BITS_1
     private readonly noParityBit = FTDI.FT_PARITY_NONE
 
-    private static readonly characteristicNames = [
+    private static readonly eegCharacteristicNames = [
         'F7',
         'Fp1',
         'Fp2',
@@ -262,6 +239,32 @@ export default class CgxStreamProducer implements LslProducer {
         'A2',
         'ExG1',
     ]
+
+    private static readonly eegOutletOptions = {
+        sourceId: 'cgx-eeg',
+        name: 'CGX Quick-20r (Cognionics) - EEG',
+        type: 'EEG',
+        channelNames: this.eegCharacteristicNames,
+        sampleRate: 500,
+        channelFormat: 'float32' as ChannelFormat,
+        manufacturer: 'CGX Systems',
+        unit: 'microvolt',
+        chunkSize: 1,
+        maxBuffered: 360,
+    }
+
+    private static readonly accelOutletOptions = {
+        sourceId: 'cgx-accel',
+        name: 'CGX Quick-20r (Cognionics) - Accelerometer',
+        type: 'ACCEL',
+        channelNames: ['X_ACCEL', 'Y_ACCEL', 'Z_ACCEL'],
+        sampleRate: 500,
+        channelFormat: 'float32' as ChannelFormat,
+        manufacturer: 'CGX Systems',
+        unit: 'Unknown',
+        chunkSize: 1,
+        maxBuffered: 360,
+    }
 
     private get FTDI() {
         return CgxStreamProducer.FTDI
