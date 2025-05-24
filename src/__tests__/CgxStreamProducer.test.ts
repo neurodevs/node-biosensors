@@ -199,9 +199,8 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
 
     @test()
     protected static async pushesEegDataToLslOutlet() {
-        const rawBytes = Array.from(
-            { length: this.eegCharacteristicNames.length * 3 },
-            () => Math.floor(Math.random() * 254)
+        const rawBytes = this.generateRandomArray(
+            this.eegCharacteristicNames.length * 3
         )
 
         const packet = this.prependHeaderToPacket([
@@ -228,7 +227,10 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
         }
 
         assert.isEqualDeep(
-            FakeLslOutlet.callsToPushSample,
+            [
+                FakeLslOutlet.callsToPushSample[0],
+                FakeLslOutlet.callsToPushSample[2],
+            ],
             [eegData, eegData],
             'Should push EEG data to LSL outlet!'
         )
@@ -251,6 +253,46 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
                 maxBuffered: 360,
             },
             'Should create an LslOutlet for accelerometer!'
+        )
+    }
+
+    @test()
+    protected static async pushesAccelerometerDataToLslOutlet() {
+        const rawBytes = this.generateRandomArray(
+            this.accelCharacteristicNames.length * 3
+        )
+
+        const packet = this.prependHeaderToPacket([
+            0,
+            ...this.generateEmptyPacket(60),
+            ...rawBytes,
+            ...this.generateEmptyPacket(7),
+        ])
+
+        FakeDeviceFTDI.fakeReadPackets = [packet, packet]
+        await this.startLslStreams()
+
+        const accelData = []
+
+        for (let i = 0; i < 3; i++) {
+            const firstByte = packet[62 + i * 3]
+            const secondByte = packet[63 + i * 3]
+            const thirdByte = packet[64 + i * 3]
+
+            const rawValue =
+                (firstByte << 24) | (secondByte << 17) | (thirdByte << 10)
+
+            const volts = rawValue * 2.5 * (1.0 / Math.pow(2, 32))
+            accelData.push(volts)
+        }
+
+        assert.isEqualDeep(
+            [
+                FakeLslOutlet.callsToPushSample[1],
+                FakeLslOutlet.callsToPushSample[3],
+            ],
+            [accelData, accelData],
+            'Should push EEG data to LSL outlet!'
         )
     }
 
@@ -301,6 +343,10 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
         ]
     }
 
+    private static generateRandomArray(length: number) {
+        return Array.from({ length }, () => Math.floor(Math.random() * 254))
+    }
+
     private static readonly bytesPerSample = 78
 
     private static readonly eegCharacteristicNames = [
@@ -325,6 +371,12 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
         'T4',
         'A2',
         'ExG1',
+    ]
+
+    private static readonly accelCharacteristicNames = [
+        'X_ACCEL',
+        'Y_ACCEL',
+        'Z_ACCEL',
     ]
 
     private static async CgxStreamProducer() {

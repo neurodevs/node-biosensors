@@ -26,17 +26,19 @@ export default class CgxStreamProducer implements LslProducer {
     private device!: FTDI.FTDI_Device
     private packet!: Uint8Array<ArrayBufferLike>
     private packetCounter!: number
-    private outlet: LslOutlet
+    private eegOutlet: LslOutlet
+    private accelOutlet: LslOutlet
 
-    protected constructor(outlet: LslOutlet) {
-        this.outlet = outlet
+    protected constructor(eegOutlet: LslOutlet, accelOutlet: LslOutlet) {
+        this.eegOutlet = eegOutlet
+        this.accelOutlet = accelOutlet
     }
 
     public static async Create() {
-        const outlet = await LslStreamOutlet.Create(this.eegOutletOptions)
-        await LslStreamOutlet.Create(this.accelOutletOptions)
+        const eegOutlet = await LslStreamOutlet.Create(this.eegOptions)
+        const accelOutlet = await LslStreamOutlet.Create(this.accelOptions)
 
-        return new (this.Class ?? this)(outlet)
+        return new (this.Class ?? this)(eegOutlet, accelOutlet)
     }
 
     public async startLslStreams() {
@@ -129,6 +131,7 @@ export default class CgxStreamProducer implements LslProducer {
         this.handlePacketCounter()
 
         this.processEegData()
+        this.processAccelerometerData()
     }
 
     private processEegData() {
@@ -146,7 +149,25 @@ export default class CgxStreamProducer implements LslProducer {
             eegData.push(volts)
         }
 
-        this.outlet.pushSample(eegData)
+        this.eegOutlet.pushSample(eegData)
+    }
+
+    private processAccelerometerData() {
+        const accelData = []
+
+        for (let i = 0; i < 3; i++) {
+            const firstByte = this.packet[62 + i * 3]
+            const secondByte = this.packet[63 + i * 3]
+            const thirdByte = this.packet[64 + i * 3]
+
+            const rawValue =
+                (firstByte << 24) | (secondByte << 17) | (thirdByte << 10)
+
+            const volts = rawValue * 2.5 * (1.0 / Math.pow(2, 32))
+            accelData.push(volts)
+        }
+
+        this.accelOutlet.pushSample(accelData)
     }
 
     private async readPacketFromDevice() {
@@ -240,7 +261,7 @@ export default class CgxStreamProducer implements LslProducer {
         'ExG1',
     ]
 
-    private static readonly eegOutletOptions = {
+    private static readonly eegOptions = {
         sourceId: 'cgx-eeg',
         name: 'CGX Quick-20r (Cognionics) - EEG',
         type: 'EEG',
@@ -253,7 +274,7 @@ export default class CgxStreamProducer implements LslProducer {
         maxBuffered: 360,
     }
 
-    private static readonly accelOutletOptions = {
+    private static readonly accelOptions = {
         sourceId: 'cgx-accel',
         name: 'CGX Quick-20r (Cognionics) - Accelerometer',
         type: 'ACCEL',
@@ -272,5 +293,6 @@ export default class CgxStreamProducer implements LslProducer {
 }
 
 export type CgxStreamProducerConstructor = new (
-    outlet: LslOutlet
+    eegOutlet: LslOutlet,
+    accelOutlet: LslOutlet
 ) => LslProducer
