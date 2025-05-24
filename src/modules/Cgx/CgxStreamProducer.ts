@@ -1,15 +1,11 @@
 // Byte definitions
 // 0: Packet header (value: 255)
 // 1: Packet counter (values: 0-127)
-// 2–61: EEG data (20 channels, 3 bytes each, values: 0–254)
-// 61–69: Accelerometer data (3 channels, 3 bytes each, values: 0–254)
-// 70: Impedance (value: 0–255)
-// 71: Battery voltage (value: 0–255)
-// 72-73: Trigger (value: 0–255)
-// 74: Packet footer (value: 255)
-// 75: Reserved / unknown
-// 76: Reserved / unknown
-// 77: Reserved / unknown
+// 2–64: EEG data (21 channels, 3 bytes each, values: 0–254)
+// 65–73: Accelerometer data (3 channels, 3 bytes each, values: 0–254)
+// 74: Impedance check (0x11 [ie. 17] ON, 0x12 [ie. 18] OFF)
+// 75: Battery voltage (value: 0–255)
+// 76-77: Trigger (value: 0–255)
 
 import { ChannelFormat, LslOutlet, LslStreamOutlet } from '@neurodevs/node-lsl'
 import FTDI from 'ftdi-d2xx'
@@ -137,7 +133,7 @@ export default class CgxStreamProducer implements LslProducer {
     private processEegData() {
         const eegData = []
 
-        for (let i = 0; i < 20; i++) {
+        for (let i = 0; i < this.numEegChannels; i++) {
             const startIdx = 2 + i * 3
             const firstByte = this.packet[startIdx]
             const secondByte = this.packet[startIdx + 1]
@@ -160,8 +156,8 @@ export default class CgxStreamProducer implements LslProducer {
     private processAccelerometerData() {
         const accelData = []
 
-        for (let i = 0; i < 3; i++) {
-            const startIdx = 62 + i * 3
+        for (let i = 0; i < this.numAccelChannels; i++) {
+            const startIdx = 65 + i * 3
             const firstByte = this.packet[startIdx]
             const secondByte = this.packet[startIdx + 1]
             const thirdByte = this.packet[startIdx + 2]
@@ -268,7 +264,7 @@ export default class CgxStreamProducer implements LslProducer {
         'C4',
         'T4',
         'A2',
-        'ExG1',
+        'A1',
     ]
 
     private static readonly eegOptions = {
@@ -284,17 +280,31 @@ export default class CgxStreamProducer implements LslProducer {
         maxBuffered: 360,
     }
 
+    private static readonly accelCharacteristicNames = [
+        'X_ACCEL',
+        'Y_ACCEL',
+        'Z_ACCEL',
+    ]
+
     private static readonly accelOptions = {
         sourceId: 'cgx-accel',
         name: 'CGX Quick-20r (Cognionics) - Accelerometer',
         type: 'ACCEL',
-        channelNames: ['X_ACCEL', 'Y_ACCEL', 'Z_ACCEL'],
+        channelNames: this.accelCharacteristicNames,
         sampleRate: 500,
         channelFormat: 'float32' as ChannelFormat,
         manufacturer: 'CGX Systems',
         unit: 'Unknown',
         chunkSize: 1,
         maxBuffered: 360,
+    }
+
+    private get numEegChannels() {
+        return CgxStreamProducer.eegCharacteristicNames.length
+    }
+
+    private get numAccelChannels() {
+        return CgxStreamProducer.accelCharacteristicNames.length
     }
 
     private get FTDI() {

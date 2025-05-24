@@ -214,7 +214,7 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
 
         const eegData = []
 
-        for (let i = 0; i < 20; i++) {
+        for (let i = 0; i < this.eegCharacteristicNames.length; i++) {
             const firstByte = packet[2 + i * 3]
             const secondByte = packet[3 + i * 3]
             const thirdByte = packet[4 + i * 3]
@@ -246,7 +246,7 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
                 sourceId: 'cgx-accel',
                 name: 'CGX Quick-20r (Cognionics) - Accelerometer',
                 type: 'ACCEL',
-                channelNames: ['X_ACCEL', 'Y_ACCEL', 'Z_ACCEL'],
+                channelNames: this.accelCharacteristicNames,
                 sampleRate: 500,
                 channelFormat: 'float32',
                 manufacturer: 'CGX Systems',
@@ -276,10 +276,10 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
 
         const accelData = []
 
-        for (let i = 0; i < 3; i++) {
-            const firstByte = packet[62 + i * 3]
-            const secondByte = packet[63 + i * 3]
-            const thirdByte = packet[64 + i * 3]
+        for (let i = 0; i < this.accelCharacteristicNames.length; i++) {
+            const firstByte = packet[65 + i * 3]
+            const secondByte = packet[66 + i * 3]
+            const thirdByte = packet[67 + i * 3]
 
             const rawValue =
                 ((firstByte << 24) >>> 0) +
@@ -374,7 +374,7 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
         'C4',
         'T4',
         'A2',
-        'ExG1',
+        'A1',
     ]
 
     private static readonly accelCharacteristicNames = [
