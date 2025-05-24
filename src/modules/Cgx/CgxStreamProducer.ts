@@ -138,9 +138,10 @@ export default class CgxStreamProducer implements LslProducer {
         const eegData = []
 
         for (let i = 0; i < 20; i++) {
-            const firstByte = this.packet[2 + i * 3]
-            const secondByte = this.packet[3 + i * 3]
-            const thirdByte = this.packet[4 + i * 3]
+            const startIdx = 2 + i * 3
+            const firstByte = this.packet[startIdx]
+            const secondByte = this.packet[startIdx + 1]
+            const thirdByte = this.packet[startIdx + 2]
 
             const rawValue =
                 ((firstByte << 24) >>> 0) +
@@ -160,9 +161,10 @@ export default class CgxStreamProducer implements LslProducer {
         const accelData = []
 
         for (let i = 0; i < 3; i++) {
-            const firstByte = this.packet[62 + i * 3]
-            const secondByte = this.packet[63 + i * 3]
-            const thirdByte = this.packet[64 + i * 3]
+            const startIdx = 62 + i * 3
+            const firstByte = this.packet[startIdx]
+            const secondByte = this.packet[startIdx + 1]
+            const thirdByte = this.packet[startIdx + 2]
 
             const rawValue =
                 ((firstByte << 24) >>> 0) +
