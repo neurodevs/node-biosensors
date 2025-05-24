@@ -45,6 +45,20 @@ export default class CgxStreamProducer implements LslProducer {
             chunkSize: 1,
             maxBuffered: 360,
         })
+
+        await LslStreamOutlet.Create({
+            sourceId: 'cgx-accel',
+            name: 'CGX Quick-20r (Cognionics) - Accelerometer',
+            type: 'Accelerometer',
+            channelNames: ['X_ACCEL', 'Y_ACCEL', 'Z_ACCEL'],
+            sampleRate: 500,
+            channelFormat: 'float32',
+            manufacturer: 'CGX Systems',
+            unit: 'Unknown',
+            chunkSize: 1,
+            maxBuffered: 360,
+        })
+
         return new (this.Class ?? this)(outlet)
     }
 

@@ -232,6 +232,26 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
         )
     }
 
+    @test()
+    protected static async createConstructsLslOutletforAccelerometer() {
+        assert.isEqualDeep(
+            FakeLslOutlet.callsToConstructor[1]?.options,
+            {
+                sourceId: 'cgx-accel',
+                name: 'CGX Quick-20r (Cognionics) - Accelerometer',
+                type: 'Accelerometer',
+                channelNames: ['X_ACCEL', 'Y_ACCEL', 'Z_ACCEL'],
+                sampleRate: 500,
+                channelFormat: 'float32',
+                manufacturer: 'CGX Systems',
+                unit: 'Unknown',
+                chunkSize: 1,
+                maxBuffered: 360,
+            },
+            'Should create an LslOutlet for accelerometer!'
+        )
+    }
+
     private static async startLslStreams() {
         await this.instance.startLslStreams()
     }
