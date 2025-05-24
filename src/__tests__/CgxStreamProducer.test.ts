@@ -185,7 +185,7 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
                 sourceId: 'cgx-eeg',
                 name: 'CGX Quick-20r (Cognionics) - EEG',
                 type: 'EEG',
-                channelNames: this.characteristicNames,
+                channelNames: this.eegCharacteristicNames,
                 sampleRate: 500,
                 channelFormat: 'float32',
                 manufacturer: 'CGX Systems',
@@ -199,13 +199,15 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
 
     @test()
     protected static async pushesEegDataToLslOutlet() {
-        const rawBytes = Array.from({ length: 20 }, () =>
-            Math.floor(Math.random() * 254)
+        const rawBytes = Array.from(
+            { length: this.eegCharacteristicNames.length * 3 },
+            () => Math.floor(Math.random() * 254)
         )
 
         const packet = this.prependHeaderToPacket([
+            0,
             ...rawBytes,
-            ...this.generateEmptyPacket(56),
+            ...this.generateEmptyPacket(16),
         ])
 
         FakeDeviceFTDI.fakeReadPackets = [packet, packet]
@@ -301,7 +303,7 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
 
     private static readonly bytesPerSample = 78
 
-    private static readonly characteristicNames = [
+    private static readonly eegCharacteristicNames = [
         'F7',
         'Fp1',
         'Fp2',
