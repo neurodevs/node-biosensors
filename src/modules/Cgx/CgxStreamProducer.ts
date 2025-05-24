@@ -135,7 +135,7 @@ export default class CgxStreamProducer implements LslProducer {
     private async readPacket() {
         this.packet = await this.readPacketFromDevice()
         await this.offsetIfHeaderNotFirst()
-        this.validatePacket()
+        this.handlePacketCounter()
 
         const eegData = []
 
@@ -168,7 +168,7 @@ export default class CgxStreamProducer implements LslProducer {
         }
     }
 
-    private validatePacket() {
+    private handlePacketCounter() {
         if (typeof this.packetCounter == 'undefined') {
             this.setPacketCounterToCurrent()
         } else {
