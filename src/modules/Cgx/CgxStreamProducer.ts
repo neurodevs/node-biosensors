@@ -143,13 +143,17 @@ export default class CgxStreamProducer implements LslProducer {
             const thirdByte = this.packet[4 + i * 3]
 
             const rawValue =
-                (firstByte << 24) | (secondByte << 17) | (thirdByte << 10)
+                ((firstByte << 24) >>> 0) +
+                ((secondByte << 17) >>> 0) +
+                ((thirdByte << 10) >>> 0)
 
             const volts = rawValue * (5.0 / 3.0) * (1.0 / Math.pow(2, 32))
             eegData.push(volts)
         }
 
         this.eegOutlet.pushSample(eegData)
+
+        console.log('EEG data:', eegData)
     }
 
     private processAccelerometerData() {
@@ -161,13 +165,17 @@ export default class CgxStreamProducer implements LslProducer {
             const thirdByte = this.packet[64 + i * 3]
 
             const rawValue =
-                (firstByte << 24) | (secondByte << 17) | (thirdByte << 10)
+                ((firstByte << 24) >>> 0) +
+                ((secondByte << 17) >>> 0) +
+                ((thirdByte << 10) >>> 0)
 
             const volts = rawValue * 2.5 * (1.0 / Math.pow(2, 32))
             accelData.push(volts)
         }
 
         this.accelOutlet.pushSample(accelData)
+
+        console.log('Accelerometer data:', accelData)
     }
 
     private async readPacketFromDevice() {

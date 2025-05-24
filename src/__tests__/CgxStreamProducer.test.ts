@@ -220,7 +220,9 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
             const thirdByte = packet[4 + i * 3]
 
             const rawValue =
-                (firstByte << 24) | (secondByte << 17) | (thirdByte << 10)
+                ((firstByte << 24) >>> 0) +
+                ((secondByte << 17) >>> 0) +
+                ((thirdByte << 10) >>> 0)
 
             const volts = rawValue * (5.0 / 3.0) * (1.0 / Math.pow(2, 32))
             eegData.push(volts)
@@ -280,7 +282,9 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
             const thirdByte = packet[64 + i * 3]
 
             const rawValue =
-                (firstByte << 24) | (secondByte << 17) | (thirdByte << 10)
+                ((firstByte << 24) >>> 0) +
+                ((secondByte << 17) >>> 0) +
+                ((thirdByte << 10) >>> 0)
 
             const volts = rawValue * 2.5 * (1.0 / Math.pow(2, 32))
             accelData.push(volts)
