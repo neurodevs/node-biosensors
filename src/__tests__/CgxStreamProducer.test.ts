@@ -112,7 +112,11 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
 
     @test()
     protected static async callsReadOnDeviceTwice() {
-        FakeDeviceFTDI.fakeReadPackets = this.generateTwoValidPackets()
+        FakeDeviceFTDI.fakeReadPackets = [
+            this.generateCorrectSizePacket(),
+            this.generateCorrectSizePacket(),
+        ]
+
         await this.startLslStreams()
 
         assert.isEqual(FakeDeviceFTDI.callsToRead.length, 2)
@@ -197,7 +201,7 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
         await this.instance.startLslStreams()
     }
 
-    private static generateFakePacket(numEmptyBytes: number) {
+    private static generatePacketWithHeader(numEmptyBytes: number) {
         const packet = this.generateEmptyPacket(numEmptyBytes)
         return this.prependHeaderToPacket(packet)
     }
@@ -210,12 +214,8 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
         return new Uint8Array([0xff].concat(packet))
     }
 
-    private static generateTwoValidPackets() {
-        return [this.generateValidPacket(), this.generateValidPacket()]
-    }
-
-    private static generateValidPacket() {
-        return this.generateFakePacket(this.bytesPerSample - 1)
+    private static generateCorrectSizePacket() {
+        return this.generatePacketWithHeader(this.bytesPerSample - 1)
     }
 
     private static generateNonSequentialPackets() {
@@ -240,7 +240,7 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
                     this.generateEmptyPacket(this.bytesPerSample - 3)
                 )
             ),
-            this.generateValidPacket(),
+            this.generateCorrectSizePacket(),
         ]
     }
 
