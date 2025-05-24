@@ -11,6 +11,7 @@
 // 76: Reserved / unknown
 // 77: Reserved / unknown
 
+import { LslStreamOutlet } from '@neurodevs/node-lsl'
 import FTDI from 'ftdi-d2xx'
 import SpruceError from '../../errors/SpruceError'
 import { LslProducer } from '../../types'
@@ -29,6 +30,18 @@ export default class CgxStreamProducer implements LslProducer {
     protected constructor() {}
 
     public static async Create() {
+        await LslStreamOutlet.Create({
+            sourceId: 'cgx-quick-20r',
+            name: 'CGX Quick-20r (Cognionics)',
+            type: 'EEG',
+            channelNames: this.characteristicNames,
+            sampleRate: 500,
+            channelFormat: 'float32',
+            manufacturer: 'CGX Systems',
+            unit: 'microvolt',
+            chunkSize: 1,
+            maxBuffered: 360,
+        })
         return new (this.Class ?? this)()
     }
 
@@ -188,6 +201,30 @@ export default class CgxStreamProducer implements LslProducer {
     private readonly eightDataBits = FTDI.FT_BITS_8
     private readonly oneStopBit = FTDI.FT_STOP_BITS_1
     private readonly noParityBit = FTDI.FT_PARITY_NONE
+
+    private static readonly characteristicNames = [
+        'F7',
+        'Fp1',
+        'Fp2',
+        'F8',
+        'F3',
+        'Fz',
+        'F4',
+        'C3',
+        'Cz',
+        'P8',
+        'P7',
+        'Pz',
+        'P4',
+        'T3',
+        'P3',
+        'O1',
+        'O2',
+        'C4',
+        'T4',
+        'A2',
+        'ExG1',
+    ]
 
     private get FTDI() {
         return CgxStreamProducer.FTDI

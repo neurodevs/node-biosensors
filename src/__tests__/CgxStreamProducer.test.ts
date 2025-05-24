@@ -1,4 +1,5 @@
 import { test, assert, errorAssert } from '@sprucelabs/test-utils'
+import { FakeLslOutlet } from '@neurodevs/node-lsl'
 import FTDI from 'ftdi-d2xx'
 import CgxStreamProducer from '../modules/Cgx/CgxStreamProducer'
 import SpyCgxProducer from '../testDoubles/CgxProducer/SpyCgxProducer'
@@ -172,6 +173,26 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
         assert.isEqual(FakeDeviceFTDI.callsToRead[1], 2)
     }
 
+    @test()
+    protected static async createConstructsLslOutletforEEG() {
+        assert.isEqualDeep(
+            FakeLslOutlet.callsToConstructor[0]?.options,
+            {
+                sourceId: 'cgx-quick-20r',
+                name: 'CGX Quick-20r (Cognionics)',
+                type: 'EEG',
+                channelNames: this.characteristicNames,
+                sampleRate: 500,
+                channelFormat: 'float32',
+                manufacturer: 'CGX Systems',
+                unit: 'microvolt',
+                chunkSize: 1,
+                maxBuffered: 360,
+            },
+            'Should create an LslOutlet!'
+        )
+    }
+
     private static async startLslStreams() {
         await this.instance.startLslStreams()
     }
@@ -224,6 +245,30 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
     }
 
     private static readonly bytesPerSample = 78
+
+    private static readonly characteristicNames = [
+        'F7',
+        'Fp1',
+        'Fp2',
+        'F8',
+        'F3',
+        'Fz',
+        'F4',
+        'C3',
+        'Cz',
+        'P8',
+        'P7',
+        'Pz',
+        'P4',
+        'T3',
+        'P3',
+        'O1',
+        'O2',
+        'C4',
+        'T4',
+        'A2',
+        'ExG1',
+    ]
 
     private static async CgxStreamProducer() {
         return (await CgxStreamProducer.Create()) as SpyCgxProducer
