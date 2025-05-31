@@ -1,4 +1,4 @@
-import CgxStreamProducer from '../modules/Cgx/CgxStreamProducer'
+import CgxStreamProducer from '../modules/CgxStreamProducer'
 
 async function main() {
     const producer = await CgxStreamProducer.Create()

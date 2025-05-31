@@ -1,6 +1,6 @@
 import MuseStreamProducer, {
     MuseLslProducerConstructorOptions,
-} from '../../modules/Muse/MuseStreamProducer'
+} from '../../modules/MuseStreamProducer'
 
 export default class SpyMuseProducer extends MuseStreamProducer {
     public constructor(options: MuseLslProducerConstructorOptions) {

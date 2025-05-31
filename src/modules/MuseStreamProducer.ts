@@ -11,7 +11,7 @@ import {
     LslOutletOptions,
     LslStreamOutlet,
 } from '@neurodevs/node-lsl'
-import { LslProducer } from '../../types'
+import { LslProducer } from '../types'
 
 export default class MuseStreamProducer implements MuseLslProducer {
     public static Class?: MuseLslProducerConstructor

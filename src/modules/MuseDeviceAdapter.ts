@@ -3,7 +3,7 @@ import {
     DeviceAdapter,
     DeviceAdapterConstructor,
     DeviceAdapterOptions,
-} from '../../types'
+} from '../types'
 import MuseStreamProducer, { MuseLslProducer } from './MuseStreamProducer'
 
 export default class MuseDeviceAdapter implements DeviceAdapter {
