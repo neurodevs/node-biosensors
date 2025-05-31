@@ -1,11 +1,11 @@
 import { assert, test, generateId } from '@sprucelabs/test-utils'
 import { FakeXdfRecorder } from '@neurodevs/node-xdf'
-import MuseDeviceAdapter from '../modules/MuseDeviceAdapter'
+import RecordableDeviceAdapter from '../modules/RecordableDeviceAdapter'
 import FakeMuseProducer from '../testDoubles/MuseProducer/FakeMuseProducer'
 import { DeviceAdapter, DeviceAdapterOptions } from '../types'
 import AbstractBiosensorsTest from './AbstractBiosensorsTest'
 
-export default class MuseDeviceAdapterTest extends AbstractBiosensorsTest {
+export default class RecordableDeviceAdapterTest extends AbstractBiosensorsTest {
     private static instance: DeviceAdapter
 
     protected static async beforeEach() {
@@ -13,11 +13,11 @@ export default class MuseDeviceAdapterTest extends AbstractBiosensorsTest {
 
         this.setFakeMuseProducer()
 
-        this.instance = await this.MuseDeviceAdapter()
+        this.instance = await this.RecordableDeviceAdapter()
     }
 
     @test()
-    protected static async canCreateMuseDeviceAdapter() {
+    protected static async canCreateRecordableDeviceAdapter() {
         assert.isTruthy(this.instance, 'Should create an instance!')
     }
 
@@ -42,7 +42,7 @@ export default class MuseDeviceAdapterTest extends AbstractBiosensorsTest {
     @test()
     protected static async doesNotConstructRecorderIfNoXdfRecordPath() {
         FakeXdfRecorder.resetTestDouble()
-        await this.MuseDeviceAdapter({ xdfRecordPath: undefined })
+        await this.RecordableDeviceAdapter({ xdfRecordPath: undefined })
 
         assert.isEqual(
             FakeXdfRecorder.callsToConstructor.length,
@@ -98,7 +98,7 @@ export default class MuseDeviceAdapterTest extends AbstractBiosensorsTest {
         FakeMuseProducer.resetTestDouble()
 
         const rssiIntervalMs = 10
-        await this.MuseDeviceAdapter({ rssiIntervalMs })
+        await this.RecordableDeviceAdapter({ rssiIntervalMs })
 
         assert.isEqual(
             FakeMuseProducer.callsToConstructor[0]?.rssiIntervalMs,
@@ -194,8 +194,10 @@ export default class MuseDeviceAdapterTest extends AbstractBiosensorsTest {
 
     private static readonly bleUuid = generateId()
 
-    private static async MuseDeviceAdapter(options?: DeviceAdapterOptions) {
-        return MuseDeviceAdapter.Create({
+    private static async RecordableDeviceAdapter(
+        options?: DeviceAdapterOptions
+    ) {
+        return RecordableDeviceAdapter.Create({
             bleUuid: this.bleUuid,
             xdfRecordPath: generateId(),
             ...options,

@@ -6,7 +6,7 @@ import {
 } from '../types'
 import MuseStreamProducer, { MuseLslProducer } from './MuseStreamProducer'
 
-export default class MuseDeviceAdapter implements DeviceAdapter {
+export default class RecordableDeviceAdapter implements DeviceAdapter {
     public static Class?: DeviceAdapterConstructor
 
     private lslProducer: MuseLslProducer

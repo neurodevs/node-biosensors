@@ -9,8 +9,8 @@ export * from './modules/CgxStreamProducer'
 // Muse S Gen 2
 
 // BLE -> LSL + XDF
-export { default as MuseDeviceAdapter } from './modules/MuseDeviceAdapter'
-export * from './modules/MuseDeviceAdapter'
+export { default as RecordableDeviceAdapter } from './modules/RecordableDeviceAdapter'
+export * from './modules/RecordableDeviceAdapter'
 
 // BLE -> LSL
 export { default as MuseStreamProducer } from './modules/MuseStreamProducer'
