@@ -126,11 +126,11 @@ export default class CgxStreamProducer implements LslProducer {
         await this.offsetIfHeaderNotFirst()
         this.handlePacketCounter()
 
-        this.processEegData()
-        this.processAccelerometerData()
+        this.decode24BitEeg()
+        this.decode24BitAccerlerometer()
     }
 
-    private processEegData() {
+    private decode24BitEeg() {
         const eegData = []
 
         for (let i = 0; i < this.numEegChannels; i++) {
@@ -153,7 +153,7 @@ export default class CgxStreamProducer implements LslProducer {
         console.log('EEG data:', eegData)
     }
 
-    private processAccelerometerData() {
+    private decode24BitAccerlerometer() {
         const accelData = []
 
         for (let i = 0; i < this.numAccelChannels; i++) {
