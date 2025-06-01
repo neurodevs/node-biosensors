@@ -35,6 +35,8 @@ export default class FakeMuseProducer implements LslProducer {
         FakeMuseProducer.numCallsToDisconnect++
     }
 
+    public readonly streamQueries = []
+
     public static resetTestDouble() {
         this.callsToConstructor = []
         this.numCallsToConnectBle = 0

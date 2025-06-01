@@ -300,6 +300,15 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
         )
     }
 
+    @test()
+    protected static async exposesStreamQueriesReadonlyField() {
+        assert.isEqualDeep(
+            this.instance.streamQueries,
+            ['type="EEG"', 'type="ACCEL"'],
+            'Should expose stream queries!'
+        )
+    }
+
     private static async startLslStreams() {
         await this.instance.startLslStreams()
     }

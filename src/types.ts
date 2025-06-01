@@ -23,4 +23,5 @@ export interface LslProducer {
     startLslStreams(): Promise<void>
     stopLslStreams(): Promise<void>
     disconnect(): Promise<void>
+    readonly streamQueries: string[]
 }

@@ -222,6 +222,8 @@ export default class CgxStreamProducer implements LslProducer {
 
     public async disconnect() {}
 
+    public readonly streamQueries = ['type="EEG"', 'type="ACCEL"']
+
     private get headerByte() {
         return this.packet[0]
     }

@@ -251,6 +251,8 @@ export default class MuseStreamProducer implements MuseLslProducer {
         this.ppgChannelChunks = this.generateEmptyPpgMatrix()
     }
 
+    public readonly streamQueries = ['type="EEG"', 'type="PPG"']
+
     public get bleUuid() {
         return this.bleController.uuid
     }

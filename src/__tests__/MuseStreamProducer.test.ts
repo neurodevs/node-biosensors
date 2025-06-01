@@ -281,6 +281,17 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
         )
     }
 
+    @test()
+    protected static async exposesStreamQueriesReadonlyField() {
+        const producer = await this.MuseStreamProducer()
+
+        assert.isEqualDeep(
+            producer.streamQueries,
+            ['type="EEG"', 'type="PPG"'],
+            'Should expose stream queries!'
+        )
+    }
+
     private static async startLslStreams() {
         await this.instance.startLslStreams()
     }
