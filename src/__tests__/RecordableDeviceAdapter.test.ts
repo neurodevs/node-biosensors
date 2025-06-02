@@ -1,7 +1,7 @@
 import { assert, test, generateId } from '@sprucelabs/test-utils'
 import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 import RecordableDeviceAdapter from '../modules/RecordableDeviceAdapter'
-import FakeMuseProducer from '../testDoubles/MuseProducer/FakeMuseProducer'
+import FakeDeviceStreamer from '../testDoubles/FakeDeviceStreamer'
 import { DeviceAdapter, DeviceAdapterOptions } from '../types'
 import AbstractBiosensorsTest from './AbstractBiosensorsTest'
 
@@ -11,7 +11,7 @@ export default class RecordableDeviceAdapterTest extends AbstractBiosensorsTest 
     protected static async beforeEach() {
         await super.beforeEach()
 
-        this.setFakeMuseProducer()
+        this.setFakeDeviceStreamer()
 
         this.instance = await this.RecordableDeviceAdapter()
     }
@@ -22,11 +22,11 @@ export default class RecordableDeviceAdapterTest extends AbstractBiosensorsTest 
     }
 
     @test()
-    protected static async constructsMuseStreamProducer() {
+    protected static async constructsMuseDeviceStreamer() {
         assert.isEqual(
-            FakeMuseProducer.callsToConstructor.length,
+            FakeDeviceStreamer.callsToConstructor.length,
             1,
-            'Should construct MuseStreamProducer!'
+            'Should construct MuseDeviceStreamer!'
         )
     }
 
@@ -63,58 +63,58 @@ export default class RecordableDeviceAdapterTest extends AbstractBiosensorsTest 
     }
 
     @test()
-    protected static async startStreamingCallsStartLslStreamsOnProducer() {
+    protected static async startStreamingCallsStartStreamingOnStreamer() {
         await this.startStreaming()
 
         assert.isEqual(
-            FakeMuseProducer.numCallsToStartLslStreams,
+            FakeDeviceStreamer.numCallsToStartStreaming,
             1,
-            'Should call startLslStreams on MuseStreamProducer!'
+            'Should call startLslStreams on MuseDeviceStreamer!'
         )
     }
 
     @test()
-    protected static async passesOptionalBleUuidToProducerForSpeedOptimization() {
+    protected static async passesOptionalBleUuidToStreamerForSpeedOptimization() {
         assert.isEqual(
-            FakeMuseProducer.callsToConstructor[0]?.bleUuid,
+            FakeDeviceStreamer.callsToConstructor[0]?.bleUuid,
             this.bleUuid,
-            'Should pass bleUuid to MuseStreamProducer!'
+            'Should pass bleUuid to MuseDeviceStreamer!'
         )
     }
 
     @test()
-    protected static async stopStreamingCallsStopLslStreamsOnProducer() {
+    protected static async stopStreamingCallsStopStreamingOnStreamer() {
         await this.stopStreaming()
 
         assert.isEqual(
-            FakeMuseProducer.numCallsToStopLslStreams,
+            FakeDeviceStreamer.numCallsToStopStreaming,
             1,
-            'Should call stopLslStreams on MuseStreamProducer!'
+            'Should call stopStreaming on MuseDeviceStreamer!'
         )
     }
 
     @test()
-    protected static async passesOptionalRssiIntervalMsToProducer() {
-        FakeMuseProducer.resetTestDouble()
+    protected static async passesOptionalRssiIntervalMsToStreamer() {
+        FakeDeviceStreamer.resetTestDouble()
 
         const rssiIntervalMs = 10
         await this.RecordableDeviceAdapter({ rssiIntervalMs })
 
         assert.isEqual(
-            FakeMuseProducer.callsToConstructor[0]?.rssiIntervalMs,
+            FakeDeviceStreamer.callsToConstructor[0]?.rssiIntervalMs,
             rssiIntervalMs,
-            'Should pass rssiIntervalMs to MuseStreamProducer!'
+            'Should pass rssiIntervalMs to MuseDeviceStreamer!'
         )
     }
 
     @test()
-    protected static async disconnectCallsStopLslStreamsOnProducer() {
+    protected static async disconnectCallsStopStreamingOnStreamer() {
         await this.disconnect()
 
         assert.isEqual(
-            FakeMuseProducer.numCallsToStopLslStreams,
+            FakeDeviceStreamer.numCallsToStopStreaming,
             1,
-            'Should call producer.stopLslStreams() on disconnect!'
+            'Should call streamer.stopStreaming() on disconnect!'
         )
     }
 
@@ -170,13 +170,13 @@ export default class RecordableDeviceAdapterTest extends AbstractBiosensorsTest 
     }
 
     @test()
-    protected static async disconnectCallsDisconnectOnMuseProducer() {
+    protected static async disconnectCallsDisconnectOnStreamer() {
         await this.disconnect()
 
         assert.isEqual(
-            FakeMuseProducer.numCallsToDisconnect,
+            FakeDeviceStreamer.numCallsToDisconnect,
             1,
-            'Should call producer.disconnect() on disconnect!'
+            'Should call streamer.disconnect() on disconnect!'
         )
     }
 

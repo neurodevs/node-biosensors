@@ -10,10 +10,10 @@
 import { ChannelFormat, LslOutlet, LslStreamOutlet } from '@neurodevs/node-lsl'
 import FTDI from 'ftdi-d2xx'
 import SpruceError from '../errors/SpruceError'
-import { LslProducer } from '../types'
+import { DeviceStreamer } from '../types'
 
-export default class CgxStreamProducer implements LslProducer {
-    public static Class?: CgxStreamProducerConstructor
+export default class CgxDeviceStreamer implements DeviceStreamer {
+    public static Class?: CgxDeviceStreamerConstructor
     public static FTDI = FTDI
 
     public isRunning = false
@@ -37,7 +37,7 @@ export default class CgxStreamProducer implements LslProducer {
         return new (this.Class ?? this)(eegOutlet, accelOutlet)
     }
 
-    public async startLslStreams() {
+    public async startStreaming() {
         await this.connectFtdi()
         await this.startReadingPackets()
     }
@@ -218,7 +218,7 @@ export default class CgxStreamProducer implements LslProducer {
         console.log('Dropped packet')
     }
 
-    public async stopLslStreams() {}
+    public async stopStreaming() {}
 
     public async disconnect() {}
 
@@ -302,19 +302,19 @@ export default class CgxStreamProducer implements LslProducer {
     }
 
     private get numEegChannels() {
-        return CgxStreamProducer.eegCharacteristicNames.length
+        return CgxDeviceStreamer.eegCharacteristicNames.length
     }
 
     private get numAccelChannels() {
-        return CgxStreamProducer.accelCharacteristicNames.length
+        return CgxDeviceStreamer.accelCharacteristicNames.length
     }
 
     private get FTDI() {
-        return CgxStreamProducer.FTDI
+        return CgxDeviceStreamer.FTDI
     }
 }
 
-export type CgxStreamProducerConstructor = new (
+export type CgxDeviceStreamerConstructor = new (
     eegOutlet: LslOutlet,
     accelOutlet: LslOutlet
-) => LslProducer
+) => DeviceStreamer

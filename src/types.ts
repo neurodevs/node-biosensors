@@ -17,11 +17,11 @@ export interface DeviceAdapterOptions {
 
 export type DeviceAdapterConstructor = new () => DeviceAdapter
 
-// LslProducer
+// StreamableDevice
 
-export interface LslProducer {
-    startLslStreams(): Promise<void>
-    stopLslStreams(): Promise<void>
+export interface DeviceStreamer {
+    startStreaming(): Promise<void>
+    stopStreaming(): Promise<void>
     disconnect(): Promise<void>
     readonly streamQueries: string[]
 }

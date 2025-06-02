@@ -11,10 +11,10 @@ import {
     LslOutletOptions,
     LslStreamOutlet,
 } from '@neurodevs/node-lsl'
-import { LslProducer } from '../types'
+import { DeviceStreamer as DeviceStreamer } from '../types'
 
-export default class MuseStreamProducer implements MuseLslProducer {
-    public static Class?: MuseLslProducerConstructor
+export default class MuseDeviceStreamer implements BleDeviceStreamer {
+    public static Class?: MuseDeviceStreamerConstructor
 
     protected bleConnector?: BleConnector
     private scanOptions: ScanOptions
@@ -26,7 +26,7 @@ export default class MuseStreamProducer implements MuseLslProducer {
     private ppgChannelChunks = this.generateEmptyPpgMatrix()
     private encoder: TextEncoder
 
-    protected constructor(options: MuseLslProducerConstructorOptions) {
+    protected constructor(options: MuseDeviceStreamerConstructorOptions) {
         const { eegOutlet, ppgOutlet, bleUuid, rssiIntervalMs } = options
 
         this.eegOutlet = eegOutlet
@@ -38,7 +38,7 @@ export default class MuseStreamProducer implements MuseLslProducer {
         this.scanOptions = this.generateScanOptions()
     }
 
-    public static async Create(options?: MuseLslProducerOptions) {
+    public static async Create(options?: MuseDeviceStreamerOptions) {
         return new (this.Class ?? this)({
             ...options,
             eegOutlet: await this.LslStreamOutlet(this.eegOutletOptions),
@@ -46,7 +46,7 @@ export default class MuseStreamProducer implements MuseLslProducer {
         })
     }
 
-    public async startLslStreams() {
+    public async startStreaming() {
         await this.createBleConnectorIfNotExists()
         await this.writeStartCommandsToControl()
     }
@@ -78,7 +78,7 @@ export default class MuseStreamProducer implements MuseLslProducer {
         return Buffer.from(encoded)
     }
 
-    public async stopLslStreams() {
+    public async stopStreaming() {
         if (this.bleConnector) {
             await this.writeHaltCommandToControl()
         }
@@ -93,7 +93,7 @@ export default class MuseStreamProducer implements MuseLslProducer {
     }
 
     public async disconnect() {
-        await this.stopLslStreams()
+        await this.stopStreaming()
         await this.disconnectBle()
 
         this.destroyLslOutlets()
@@ -281,12 +281,12 @@ export default class MuseStreamProducer implements MuseLslProducer {
 
     private readonly bleLocalName = 'MuseS'
 
-    private readonly eegCharNames = MuseStreamProducer.eegCharacteristicNames
-    private readonly eegChunkSize = MuseStreamProducer.eegChunkSize
+    private readonly eegCharNames = MuseDeviceStreamer.eegCharacteristicNames
+    private readonly eegChunkSize = MuseDeviceStreamer.eegChunkSize
     private readonly eegNumChannels = this.eegCharNames.length
 
-    private readonly ppgCharNames = MuseStreamProducer.ppgCharacteristicNames
-    private readonly ppgChunkSize = MuseStreamProducer.ppgChunkSize
+    private readonly ppgCharNames = MuseDeviceStreamer.ppgCharacteristicNames
+    private readonly ppgChunkSize = MuseDeviceStreamer.ppgChunkSize
     private readonly ppgNumChannels = this.ppgCharNames.length
 
     private readonly eegCharUuids = this.eegCharNames.map(
@@ -360,21 +360,21 @@ export default class MuseStreamProducer implements MuseLslProducer {
     }
 }
 
-export interface MuseLslProducer extends LslProducer {
+export interface BleDeviceStreamer extends DeviceStreamer {
     readonly bleUuid: string
     readonly bleName: string
 }
 
-export interface MuseLslProducerOptions {
+export interface MuseDeviceStreamerOptions {
     bleUuid?: string
     rssiIntervalMs?: number
 }
 
-export type MuseLslProducerConstructor = new (
-    options: MuseLslProducerConstructorOptions
-) => MuseLslProducer
+export type MuseDeviceStreamerConstructor = new (
+    options: MuseDeviceStreamerConstructorOptions
+) => BleDeviceStreamer
 
-export interface MuseLslProducerConstructorOptions {
+export interface MuseDeviceStreamerConstructorOptions {
     eegOutlet: LslOutlet
     ppgOutlet: LslOutlet
     bleUuid?: string

@@ -6,15 +6,15 @@ import {
     FakeCharacteristic,
 } from '@neurodevs/node-ble'
 import { FakeLslOutlet } from '@neurodevs/node-lsl'
-import MuseStreamProducer, {
-    MuseLslProducerOptions,
-} from '../modules/MuseStreamProducer'
-import { MUSE_CHARACTERISTIC_UUIDS as CHAR_UUIDS } from '../modules/MuseStreamProducer'
-import SpyMuseProducer from '../testDoubles/MuseProducer/SpyMuseProducer'
+import MuseDeviceStreamer, {
+    MuseDeviceStreamerOptions,
+} from '../modules/MuseDeviceStreamer'
+import { MUSE_CHARACTERISTIC_UUIDS as CHAR_UUIDS } from '../modules/MuseDeviceStreamer'
+import SpyMuseDeviceStreamer from '../testDoubles/SpyMuseDeviceStreamer'
 import AbstractBiosensorsTest from './AbstractBiosensorsTest'
 
-export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
-    private static instance: SpyMuseProducer
+export default class MuseDeviceStreamerTest extends AbstractBiosensorsTest {
+    private static instance: SpyMuseDeviceStreamer
     private static museCharCallbacks: Record<string, (data: Buffer) => void>
     private static eegChars: FakeCharacteristic[]
     private static ppgChars: FakeCharacteristic[]
@@ -23,11 +23,11 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
     protected static async beforeEach() {
         await super.beforeEach()
 
-        this.setSpyMuseProducer()
+        this.setSpyMuseDeviceStreamer()
 
         FakeBleScanner.fakedPeripherals = [this.peripheral]
 
-        this.instance = await this.MuseStreamProducer()
+        this.instance = await this.MuseDeviceStreamer()
 
         this.museCharCallbacks = this.generateCallbacks()
         this.controlChar = this.fakeControlChar()
@@ -36,20 +36,20 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
     }
 
     @test()
-    protected static async canCreateMuseStreamProducer() {
+    protected static async canCreateMuseDeviceStreamer() {
         assert.isTruthy(this.instance, 'Should create an instance!')
     }
 
     @test()
     protected static async startCallsGetCharacteristicForControlUuid() {
-        await this.startLslStreams()
+        await this.startStreaming()
 
         assert.isEqual(this.callsToGetCharacteristic[0], CHAR_UUIDS.CONTROL)
     }
 
     @test()
     protected static async startWritesControlCommands() {
-        await this.startLslStreams()
+        await this.startStreaming()
 
         assert.isEqualDeep(
             this.controlChar.callsToWriteAsync,
@@ -165,10 +165,10 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
     }
 
     @test()
-    protected static async stopLslStreamsSendsHaltCmdToMuse() {
-        await this.startLslStreams()
+    protected static async stopStreamingSendsHaltCmdToMuse() {
+        await this.startStreaming()
         this.controlChar.resetTestDouble()
-        await this.stopLslStreams()
+        await this.stopStreaming()
 
         assert.isEqualDeep(
             this.controlChar.callsToWriteAsync,
@@ -201,8 +201,8 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
 
     @test()
     protected static async doesNotCreateSecondBleDeviceConnector() {
-        await this.startLslStreams()
-        await this.startLslStreams()
+        await this.startStreaming()
+        await this.startStreaming()
 
         assert.isEqual(
             FakeBleConnector.numCallsToConnectBle,
@@ -212,21 +212,21 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
     }
 
     @test()
-    protected static async disconnectCallsStopLslStreams() {
+    protected static async disconnectCallsStopStreaming() {
         let wasHit = false
 
-        this.instance.stopLslStreams = async () => {
+        this.instance.stopStreaming = async () => {
             wasHit = true
         }
 
-        await this.startLslStreamsThenDisconnect()
+        await this.startStreamingThenDisconnect()
 
-        assert.isTrue(wasHit, 'Should call stopLslStreams on disconnect!')
+        assert.isTrue(wasHit, 'Should call stopStreaming on disconnect!')
     }
 
     @test()
     protected static async disconnectCallsDisconnectBleOnConnector() {
-        await this.startLslStreams()
+        await this.startStreaming()
         await this.instance.disconnect()
 
         assert.isEqual(
@@ -238,7 +238,7 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
 
     @test()
     protected static async disconnectClearsBleConnectorFromInstance() {
-        await this.startLslStreams()
+        await this.startStreaming()
         await this.disconnect()
 
         assert.isUndefined(
@@ -249,7 +249,7 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
 
     @test()
     protected static async callsDestroyOnLslOutletsOnDisconnect() {
-        await this.startLslStreams()
+        await this.startStreaming()
         await this.disconnect()
 
         assert.isEqual(
@@ -260,8 +260,8 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
     }
 
     @test()
-    protected static async stopLslStreamsDoesNothingIfNoBle() {
-        await this.stopLslStreams()
+    protected static async stopStreamingDoesNothingIfNoBle() {
+        await this.stopStreaming()
 
         assert.isEqual(
             FakeBleController.numCallsToDisconnect,
@@ -283,25 +283,25 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
 
     @test()
     protected static async exposesStreamQueriesReadonlyField() {
-        const producer = await this.MuseStreamProducer()
+        const streamer = await this.MuseDeviceStreamer()
 
         assert.isEqualDeep(
-            producer.streamQueries,
+            streamer.streamQueries,
             ['type="EEG"', 'type="PPG"'],
             'Should expose stream queries!'
         )
     }
 
-    private static async startLslStreams() {
-        await this.instance.startLslStreams()
+    private static async startStreaming() {
+        await this.instance.startStreaming()
     }
 
-    private static async stopLslStreams() {
-        await this.instance.stopLslStreams()
+    private static async stopStreaming() {
+        await this.instance.stopStreaming()
     }
 
-    private static async startLslStreamsThenDisconnect() {
-        await this.startLslStreams()
+    private static async startStreamingThenDisconnect() {
+        await this.startStreaming()
         await this.disconnect()
     }
 
@@ -503,7 +503,11 @@ export default class MuseStreamProducerTest extends AbstractBiosensorsTest {
         localName: this.bleLocalName,
     })
 
-    private static async MuseStreamProducer(options?: MuseLslProducerOptions) {
-        return (await MuseStreamProducer.Create(options)) as SpyMuseProducer
+    private static async MuseDeviceStreamer(
+        options?: MuseDeviceStreamerOptions
+    ) {
+        return (await MuseDeviceStreamer.Create(
+            options
+        )) as SpyMuseDeviceStreamer
     }
 }

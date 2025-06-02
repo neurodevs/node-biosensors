@@ -3,8 +3,8 @@ export * from './types'
 
 // CGX Cognionics Quick-20r
 
-export { default as CgxStreamProducer } from './modules/CgxStreamProducer'
-export * from './modules/CgxStreamProducer'
+export { default as CgxDeviceStreamer } from './modules/CgxDeviceStreamer'
+export * from './modules/CgxDeviceStreamer'
 
 // Muse S Gen 2
 
@@ -13,19 +13,19 @@ export { default as RecordableDeviceAdapter } from './modules/RecordableDeviceAd
 export * from './modules/RecordableDeviceAdapter'
 
 // BLE -> LSL
-export { default as MuseStreamProducer } from './modules/MuseStreamProducer'
-export * from './modules/MuseStreamProducer'
+export { default as MuseDeviceStreamer } from './modules/MuseDeviceStreamer'
+export * from './modules/MuseDeviceStreamer'
 
 // Test doubles
 
-export { default as FakeMuseAdapter } from './testDoubles/MuseAdapter/FakeMuseAdapter'
-export * from './testDoubles/MuseAdapter/FakeMuseAdapter'
+export { default as FakeMuseAdapter } from './testDoubles/FakeDeviceAdapter'
+export * from './testDoubles/FakeDeviceAdapter'
 
-export { default as FakeMuseProducer } from './testDoubles/MuseProducer/FakeMuseProducer'
-export * from './testDoubles/MuseProducer/FakeMuseProducer'
+export { default as FakeDeviceStreamer } from './testDoubles/FakeDeviceStreamer'
+export * from './testDoubles/FakeDeviceStreamer'
 
-export { default as SpyMuseProducer } from './testDoubles/MuseProducer/SpyMuseProducer'
-export * from './testDoubles/MuseProducer/SpyMuseProducer'
+export { default as SpyMuseDeviceStreamer } from './testDoubles/SpyMuseDeviceStreamer'
+export * from './testDoubles/SpyMuseDeviceStreamer'
 
-export { default as SpyCgxProducer } from './testDoubles/CgxProducer/SpyCgxProducer'
-export * from './testDoubles/CgxProducer/SpyCgxProducer'
+export { default as SpyCgxDeviceStreamer } from './testDoubles/SpyCgxDeviceStreamer'
+export * from './testDoubles/SpyCgxDeviceStreamer'

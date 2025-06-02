@@ -1,31 +1,31 @@
 import { test, assert, errorAssert } from '@sprucelabs/test-utils'
 import { FakeLslOutlet } from '@neurodevs/node-lsl'
 import FTDI from 'ftdi-d2xx'
-import CgxStreamProducer from '../modules/CgxStreamProducer'
-import SpyCgxProducer from '../testDoubles/CgxProducer/SpyCgxProducer'
+import CgxDeviceStreamer from '../modules/CgxDeviceStreamer'
 import FakeDeviceFTDI from '../testDoubles/FTDI/FakeDeviceFTDI'
 import FakeFTDI from '../testDoubles/FTDI/FakeFTDI'
+import SpyCgxDeviceStreamer from '../testDoubles/SpyCgxDeviceStreamer'
 import AbstractBiosensorsTest from './AbstractBiosensorsTest'
 
-export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
-    private static instance: SpyCgxProducer
+export default class CgxDeviceStreamerTest extends AbstractBiosensorsTest {
+    private static instance: SpyCgxDeviceStreamer
 
     protected static async beforeEach() {
         await super.beforeEach()
 
-        this.setSpyCgxProducer()
+        this.setSpyCgxDeviceStreamer()
 
-        this.instance = await this.CgxStreamProducer()
+        this.instance = await this.CgxDeviceStreamer()
     }
 
     @test()
-    protected static async createsCgxStreamProducerInstance() {
+    protected static async createsCgxDeviceStreamerInstance() {
         assert.isTruthy(this.instance, 'Should create an instance!')
     }
 
     @test()
     protected static async callsGetDeviceInfoListOnFtdi() {
-        await this.startLslStreams()
+        await this.startStreaming()
         assert.isEqual(FakeFTDI.numCallsToGetDeviceInfoList, 1)
     }
 
@@ -33,13 +33,13 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
     protected static async throwsIfFtdiDeviceNotFound() {
         FakeFTDI.fakeDeviceInfos = []
 
-        const err = await assert.doesThrowAsync(() => this.startLslStreams())
+        const err = await assert.doesThrowAsync(() => this.startStreaming())
         errorAssert.assertError(err, 'CGX_FTDI_DEVICE_NOT_FOUND')
     }
 
     @test()
     protected static async callsOpenDeviceOnSerialNumber() {
-        await this.startLslStreams()
+        await this.startStreaming()
 
         assert.isEqualDeep(
             FakeFTDI.callsToOpenDevice[0],
@@ -49,7 +49,7 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
 
     @test()
     protected static async callsSetTimeoutsOnDevice() {
-        await this.startLslStreams()
+        await this.startStreaming()
 
         assert.isEqualDeep(FakeDeviceFTDI.callsToSetTimeouts[0], {
             txTimeoutMs: 1000,
@@ -59,14 +59,14 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
 
     @test()
     protected static async callsPurgeOnDeviceToClearPreviousData() {
-        await this.startLslStreams()
+        await this.startStreaming()
 
         assert.isEqualDeep(FakeDeviceFTDI.callsToPurge[0], FTDI.FT_PURGE_RX)
     }
 
     @test()
     protected static async setsFlowControlOnDevice() {
-        await this.startLslStreams()
+        await this.startStreaming()
 
         assert.isEqualDeep(FakeDeviceFTDI.callsToSetFlowControl[0], {
             flowControl: FTDI.FT_FLOW_RTS_CTS,
@@ -77,13 +77,13 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
 
     @test()
     protected static async setsBaudRateOnDevice() {
-        await this.startLslStreams()
+        await this.startStreaming()
         assert.isEqualDeep(FakeDeviceFTDI.callsToSetBaudRate[0], 1000000)
     }
 
     @test()
     protected static async setsDataCharacteristicsOnDevice() {
-        await this.startLslStreams()
+        await this.startStreaming()
 
         assert.isEqualDeep(FakeDeviceFTDI.callsToSetDataCharacteristics[0], {
             dataBits: FTDI.FT_BITS_8,
@@ -94,19 +94,19 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
 
     @test()
     protected static async setsLatencyTimerOnDevice() {
-        await this.startLslStreams()
+        await this.startStreaming()
         assert.isEqualDeep(FakeDeviceFTDI.callsToSetLatencyTimer[0], 4)
     }
 
     @test()
-    protected static async startLslStreamsSetsIsRunningTrue() {
-        await this.startLslStreams()
+    protected static async startStreamingSetsIsRunningTrue() {
+        await this.startStreaming()
         assert.isTrue(this.instance.isRunning)
     }
 
     @test()
     protected static async callsReadOnDeviceOnce() {
-        await this.startLslStreams()
+        await this.startStreaming()
         assert.isEqual(FakeDeviceFTDI.callsToRead[0], this.bytesPerSample)
     }
 
@@ -117,7 +117,7 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
             this.generateCorrectSizePacket(),
         ]
 
-        await this.startLslStreams()
+        await this.startStreaming()
 
         assert.isEqual(FakeDeviceFTDI.callsToRead.length, 2)
     }
@@ -125,7 +125,7 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
     @test()
     protected static async incrementsNumPacketsDroppedWhenPacketCounterIsNonSequential() {
         FakeDeviceFTDI.fakeReadPackets = this.generateNonSequentialPackets()
-        await this.startLslStreams()
+        await this.startStreaming()
 
         assert.isEqual(this.instance.getNumPacketsDropped(), 1)
     }
@@ -145,7 +145,7 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
                 )
             ),
         ]
-        await this.startLslStreams()
+        await this.startStreaming()
 
         assert.isEqual(this.instance.getNumPacketsDropped(), 1)
     }
@@ -164,7 +164,7 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
                 )
             ),
         ]
-        await this.startLslStreams()
+        await this.startStreaming()
 
         assert.isEqual(this.instance.getNumPacketsDropped(), 0)
     }
@@ -172,7 +172,7 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
     @test()
     protected static async fixesOffsetWhenFirstByteIsNotHeader() {
         FakeDeviceFTDI.fakeReadPackets = this.generateOffsetPacket()
-        await this.startLslStreams()
+        await this.startStreaming()
 
         assert.isEqual(FakeDeviceFTDI.callsToRead[1], 2)
     }
@@ -210,7 +210,7 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
         ])
 
         FakeDeviceFTDI.fakeReadPackets = [packet, packet]
-        await this.startLslStreams()
+        await this.startStreaming()
 
         const eegData = []
 
@@ -272,7 +272,7 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
         ])
 
         FakeDeviceFTDI.fakeReadPackets = [packet, packet]
-        await this.startLslStreams()
+        await this.startStreaming()
 
         const accelData = []
 
@@ -309,8 +309,8 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
         )
     }
 
-    private static async startLslStreams() {
-        await this.instance.startLslStreams()
+    private static async startStreaming() {
+        await this.instance.startStreaming()
     }
 
     private static generatePacketWithHeader(numEmptyBytes: number) {
@@ -392,7 +392,7 @@ export default class CgxStreamProducerTest extends AbstractBiosensorsTest {
         'Z_ACCEL',
     ]
 
-    private static async CgxStreamProducer() {
-        return (await CgxStreamProducer.Create()) as SpyCgxProducer
+    private static async CgxDeviceStreamer() {
+        return (await CgxDeviceStreamer.Create()) as SpyCgxDeviceStreamer
     }
 }

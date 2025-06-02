@@ -1,9 +1,9 @@
-import MuseStreamProducer, {
-    MuseLslProducerConstructorOptions,
-} from '../../modules/MuseStreamProducer'
+import MuseDeviceStreamer, {
+    MuseDeviceStreamerConstructorOptions,
+} from '../modules/MuseDeviceStreamer'
 
-export default class SpyMuseProducer extends MuseStreamProducer {
-    public constructor(options: MuseLslProducerConstructorOptions) {
+export default class SpyMuseDeviceStreamer extends MuseDeviceStreamer {
+    public constructor(options: MuseDeviceStreamerConstructorOptions) {
         super(options)
     }
 

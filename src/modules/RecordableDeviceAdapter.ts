@@ -4,27 +4,27 @@ import {
     DeviceAdapterConstructor,
     DeviceAdapterOptions,
 } from '../types'
-import MuseStreamProducer, { MuseLslProducer } from './MuseStreamProducer'
+import MuseDeviceStreamer, { BleDeviceStreamer } from './MuseDeviceStreamer'
 
 export default class RecordableDeviceAdapter implements DeviceAdapter {
     public static Class?: DeviceAdapterConstructor
 
-    private lslProducer: MuseLslProducer
-    private xdfRecorder?: XdfRecorder
+    private streamer: BleDeviceStreamer
+    private recorder?: XdfRecorder
     private _isRunning = false
 
-    protected constructor(producer: MuseLslProducer, recorder?: XdfRecorder) {
-        this.lslProducer = producer
-        this.xdfRecorder = recorder
+    protected constructor(streamer: BleDeviceStreamer, recorder?: XdfRecorder) {
+        this.streamer = streamer
+        this.recorder = recorder
     }
 
     public static async Create(options?: DeviceAdapterOptions) {
-        const { xdfRecordPath, ...producerOptions } = options ?? {}
+        const { xdfRecordPath, ...streamerOptions } = options ?? {}
 
-        const producer = await this.MuseStreamProducer(producerOptions)
+        const streamer = await this.MuseDeviceStreamer(streamerOptions)
         const recorder = this.createXdfRecorderIfGivenPath(xdfRecordPath)
 
-        return new (this.Class ?? this)(producer, recorder)
+        return new (this.Class ?? this)(streamer, recorder)
     }
 
     public async startStreaming() {
@@ -35,16 +35,16 @@ export default class RecordableDeviceAdapter implements DeviceAdapter {
 
     private startXdfRecorderIfEnabled() {
         if (!this.recorderIsRunning) {
-            this.xdfRecorder?.start()
+            this.recorder?.start()
         }
     }
 
     private get recorderIsRunning() {
-        return this.xdfRecorder?.isRunning
+        return this.recorder?.isRunning
     }
 
     private async startLslStreams() {
-        await this.lslProducer.startLslStreams()
+        await this.streamer.startStreaming()
     }
 
     public async stopStreaming() {
@@ -53,21 +53,21 @@ export default class RecordableDeviceAdapter implements DeviceAdapter {
     }
 
     private async stopLslStreams() {
-        await this.lslProducer.stopLslStreams()
+        await this.streamer.stopStreaming()
     }
 
     public async disconnect() {
         await this.stopStreaming()
-        await this.disconnectMuseLslProducer()
+        await this.disconnectMuseDeviceStreamer()
         this.stopXdfRecorderIfEnabled()
     }
 
-    private async disconnectMuseLslProducer() {
-        await this.lslProducer.disconnect()
+    private async disconnectMuseDeviceStreamer() {
+        await this.streamer.disconnect()
     }
 
     private stopXdfRecorderIfEnabled() {
-        this.xdfRecorder?.stop()
+        this.recorder?.stop()
     }
 
     public get isRunning() {
@@ -75,11 +75,11 @@ export default class RecordableDeviceAdapter implements DeviceAdapter {
     }
 
     public get bleUuid() {
-        return this.lslProducer.bleUuid
+        return this.streamer.bleUuid
     }
 
     public get bleName() {
-        return this.lslProducer.bleName
+        return this.streamer.bleName
     }
 
     private static readonly museStreamQueries = [
@@ -92,8 +92,8 @@ export default class RecordableDeviceAdapter implements DeviceAdapter {
         return xdfRecordPath ? this.XdfStreamRecorder(xdfRecordPath) : undefined
     }
 
-    private static MuseStreamProducer(options?: DeviceAdapterOptions) {
-        return MuseStreamProducer.Create(options)
+    private static MuseDeviceStreamer(options?: DeviceAdapterOptions) {
+        return MuseDeviceStreamer.Create(options)
     }
 
     private static XdfStreamRecorder(xdfRecordPath: string) {

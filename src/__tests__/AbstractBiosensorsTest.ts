@@ -17,13 +17,13 @@ import {
     FakeStreamInfo,
 } from '@neurodevs/node-lsl'
 import { XdfStreamRecorder, FakeXdfRecorder } from '@neurodevs/node-xdf'
-import CgxStreamProducer from '../modules/CgxStreamProducer'
-import MuseStreamProducer from '../modules/MuseStreamProducer'
-import SpyCgxProducer from '../testDoubles/CgxProducer/SpyCgxProducer'
+import CgxDeviceStreamer from '../modules/CgxDeviceStreamer'
+import MuseDeviceStreamer from '../modules/MuseDeviceStreamer'
+import FakeDeviceStreamer from '../testDoubles/FakeDeviceStreamer'
 import FakeDeviceFTDI from '../testDoubles/FTDI/FakeDeviceFTDI'
 import FakeFTDI from '../testDoubles/FTDI/FakeFTDI'
-import FakeMuseProducer from '../testDoubles/MuseProducer/FakeMuseProducer'
-import SpyMuseProducer from '../testDoubles/MuseProducer/SpyMuseProducer'
+import SpyCgxDeviceStreamer from '../testDoubles/SpyCgxDeviceStreamer'
+import SpyMuseDeviceStreamer from '../testDoubles/SpyMuseDeviceStreamer'
 
 export default class AbstractBiosensorsTest extends AbstractSpruceTest {
     protected static async beforeEach() {
@@ -54,7 +54,7 @@ export default class AbstractBiosensorsTest extends AbstractSpruceTest {
     }
 
     protected static setFakeFTDI() {
-        CgxStreamProducer.FTDI = FakeFTDI as any
+        CgxDeviceStreamer.FTDI = FakeFTDI as any
         FakeFTDI.resetTestDouble()
         FakeDeviceFTDI.resetTestDouble()
 
@@ -66,9 +66,9 @@ export default class AbstractBiosensorsTest extends AbstractSpruceTest {
         FakeLslOutlet.resetTestDouble()
     }
 
-    protected static setFakeMuseProducer() {
-        MuseStreamProducer.Class = FakeMuseProducer
-        FakeMuseProducer.resetTestDouble()
+    protected static setFakeDeviceStreamer() {
+        MuseDeviceStreamer.Class = FakeDeviceStreamer
+        FakeDeviceStreamer.resetTestDouble()
     }
 
     protected static setFakeStreamInfo() {
@@ -81,12 +81,12 @@ export default class AbstractBiosensorsTest extends AbstractSpruceTest {
         FakeXdfRecorder.resetTestDouble()
     }
 
-    protected static setSpyMuseProducer() {
-        MuseStreamProducer.Class = SpyMuseProducer
+    protected static setSpyMuseDeviceStreamer() {
+        MuseDeviceStreamer.Class = SpyMuseDeviceStreamer
     }
 
-    protected static setSpyCgxProducer() {
-        CgxStreamProducer.Class = SpyCgxProducer
+    protected static setSpyCgxDeviceStreamer() {
+        CgxDeviceStreamer.Class = SpyCgxDeviceStreamer
     }
 
     protected static FakeCharacteristic(uuid: string) {

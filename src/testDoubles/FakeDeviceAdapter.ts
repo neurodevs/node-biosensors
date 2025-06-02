@@ -1,9 +1,9 @@
 import { generateId } from '@sprucelabs/test-utils'
 import { XdfRecorder } from '@neurodevs/node-xdf'
 
-import { DeviceAdapter, LslProducer } from '../../types'
+import { DeviceAdapter, DeviceStreamer } from '../types'
 
-export default class FakeMuseAdapter implements DeviceAdapter {
+export default class FakeDeviceAdapter implements DeviceAdapter {
     public static callsToConstructor: FakeMuseAdapterCallToConstructor[] = []
     public static numCallsToStartStreaming = 0
     public static numCallsToStopStreaming = 0
@@ -11,22 +11,22 @@ export default class FakeMuseAdapter implements DeviceAdapter {
 
     public isRunning = false
 
-    public constructor(producer?: LslProducer, recorder?: XdfRecorder) {
-        FakeMuseAdapter.callsToConstructor.push({ producer, recorder })
+    public constructor(streamer?: DeviceStreamer, recorder?: XdfRecorder) {
+        FakeDeviceAdapter.callsToConstructor.push({ streamer, recorder })
     }
 
     public async startStreaming() {
-        FakeMuseAdapter.numCallsToStartStreaming++
+        FakeDeviceAdapter.numCallsToStartStreaming++
         this.isRunning = true
     }
 
     public async stopStreaming() {
-        FakeMuseAdapter.numCallsToStopStreaming++
+        FakeDeviceAdapter.numCallsToStopStreaming++
         this.isRunning = false
     }
 
     public async disconnect() {
-        FakeMuseAdapter.numCallsToDisconnect++
+        FakeDeviceAdapter.numCallsToDisconnect++
         this.isRunning = false
     }
 
@@ -42,6 +42,6 @@ export default class FakeMuseAdapter implements DeviceAdapter {
 }
 
 export interface FakeMuseAdapterCallToConstructor {
-    producer?: LslProducer
+    streamer?: DeviceStreamer
     recorder?: XdfRecorder
 }
