@@ -17,7 +17,7 @@ export interface DeviceAdapterOptions {
 
 export type DeviceAdapterConstructor = new () => DeviceAdapter
 
-// StreamableDevice
+// DeviceStreamer
 
 export interface DeviceStreamer {
     startStreaming(): Promise<void>
