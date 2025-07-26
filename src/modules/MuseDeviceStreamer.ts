@@ -11,7 +11,7 @@ import {
     LslOutletOptions,
     LslStreamOutlet,
 } from '@neurodevs/node-lsl'
-import { DeviceStreamer as DeviceStreamer } from '../types'
+import { DeviceStreamer } from '../types'
 
 export default class MuseDeviceStreamer implements BleDeviceStreamer {
     public static Class?: MuseDeviceStreamerConstructor
@@ -64,18 +64,18 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
         }
     }
 
+    private createBufferFrom(cmd: string) {
+        const encoded = this.encoder.encode(`X${cmd}\n`)
+        encoded[0] = encoded.length - 1
+        return Buffer.from(encoded)
+    }
+
     private get control() {
         return this.bleController.getCharacteristic(this.controlUuid)!
     }
 
     private get controlUuid() {
         return CHAR_UUIDS.CONTROL
-    }
-
-    private createBufferFrom(cmd: string) {
-        const encoded = this.encoder.encode(`X${cmd}\n`)
-        encoded[0] = encoded.length - 1
-        return Buffer.from(encoded)
     }
 
     public async stopStreaming() {
