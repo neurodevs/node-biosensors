@@ -1,5 +1,3 @@
-// DeviceAdapter
-
 export interface DeviceAdapter {
     startStreaming(): Promise<void>
     stopStreaming(): Promise<void>
@@ -16,8 +14,6 @@ export interface DeviceAdapterOptions {
 }
 
 export type DeviceAdapterConstructor = new () => DeviceAdapter
-
-// DeviceStreamer
 
 export interface DeviceStreamer {
     startStreaming(): Promise<void>
