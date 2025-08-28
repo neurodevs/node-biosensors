@@ -21,8 +21,11 @@ export * from './modules/MuseDeviceStreamer'
 export { default as FakeMuseAdapter } from './testDoubles/FakeDeviceAdapter'
 export * from './testDoubles/FakeDeviceAdapter'
 
-export { default as FakeDeviceStreamer } from './testDoubles/FakeDeviceStreamer'
-export * from './testDoubles/FakeDeviceStreamer'
+export { default as FakeMuseDeviceStreamer } from './testDoubles/FakeMuseDeviceStreamer'
+export * from './testDoubles/FakeMuseDeviceStreamer'
+
+export { default as FakeCgxDeviceStreamer } from './testDoubles/FakeCgxDeviceStreamer'
+export * from './testDoubles/FakeCgxDeviceStreamer'
 
 export { default as SpyMuseDeviceStreamer } from './testDoubles/SpyMuseDeviceStreamer'
 export * from './testDoubles/SpyMuseDeviceStreamer'

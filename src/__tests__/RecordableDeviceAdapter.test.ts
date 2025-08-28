@@ -1,7 +1,7 @@
 import { assert, test, generateId } from '@sprucelabs/test-utils'
 import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 import RecordableDeviceAdapter from '../modules/RecordableDeviceAdapter'
-import FakeDeviceStreamer from '../testDoubles/FakeDeviceStreamer'
+import FakeMuseDeviceStreamer from '../testDoubles/FakeMuseDeviceStreamer'
 import { DeviceAdapter, DeviceAdapterOptions } from '../types'
 import AbstractBiosensorsTest from './AbstractBiosensorsTest'
 
@@ -24,7 +24,7 @@ export default class RecordableDeviceAdapterTest extends AbstractBiosensorsTest 
     @test()
     protected static async constructsMuseDeviceStreamer() {
         assert.isEqual(
-            FakeDeviceStreamer.callsToConstructor.length,
+            FakeMuseDeviceStreamer.callsToConstructor.length,
             1,
             'Should construct MuseDeviceStreamer!'
         )
@@ -67,7 +67,7 @@ export default class RecordableDeviceAdapterTest extends AbstractBiosensorsTest 
         await this.startStreaming()
 
         assert.isEqual(
-            FakeDeviceStreamer.numCallsToStartStreaming,
+            FakeMuseDeviceStreamer.numCallsToStartStreaming,
             1,
             'Should call startLslStreams on MuseDeviceStreamer!'
         )
@@ -76,7 +76,7 @@ export default class RecordableDeviceAdapterTest extends AbstractBiosensorsTest 
     @test()
     protected static async passesOptionalBleUuidToStreamerForSpeedOptimization() {
         assert.isEqual(
-            FakeDeviceStreamer.callsToConstructor[0]?.bleUuid,
+            FakeMuseDeviceStreamer.callsToConstructor[0]?.bleUuid,
             this.bleUuid,
             'Should pass bleUuid to MuseDeviceStreamer!'
         )
@@ -87,7 +87,7 @@ export default class RecordableDeviceAdapterTest extends AbstractBiosensorsTest 
         await this.stopStreaming()
 
         assert.isEqual(
-            FakeDeviceStreamer.numCallsToStopStreaming,
+            FakeMuseDeviceStreamer.numCallsToStopStreaming,
             1,
             'Should call stopStreaming on MuseDeviceStreamer!'
         )
@@ -95,13 +95,13 @@ export default class RecordableDeviceAdapterTest extends AbstractBiosensorsTest 
 
     @test()
     protected static async passesOptionalRssiIntervalMsToStreamer() {
-        FakeDeviceStreamer.resetTestDouble()
+        FakeMuseDeviceStreamer.resetTestDouble()
 
         const rssiIntervalMs = 10
         await this.RecordableDeviceAdapter({ rssiIntervalMs })
 
         assert.isEqual(
-            FakeDeviceStreamer.callsToConstructor[0]?.rssiIntervalMs,
+            FakeMuseDeviceStreamer.callsToConstructor[0]?.rssiIntervalMs,
             rssiIntervalMs,
             'Should pass rssiIntervalMs to MuseDeviceStreamer!'
         )
@@ -112,7 +112,7 @@ export default class RecordableDeviceAdapterTest extends AbstractBiosensorsTest 
         await this.disconnect()
 
         assert.isEqual(
-            FakeDeviceStreamer.numCallsToStopStreaming,
+            FakeMuseDeviceStreamer.numCallsToStopStreaming,
             1,
             'Should call streamer.stopStreaming() on disconnect!'
         )
@@ -174,7 +174,7 @@ export default class RecordableDeviceAdapterTest extends AbstractBiosensorsTest 
         await this.disconnect()
 
         assert.isEqual(
-            FakeDeviceStreamer.numCallsToDisconnect,
+            FakeMuseDeviceStreamer.numCallsToDisconnect,
             1,
             'Should call streamer.disconnect() on disconnect!'
         )

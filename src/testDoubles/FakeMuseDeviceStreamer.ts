@@ -2,8 +2,8 @@ import { generateId } from '@sprucelabs/test-utils'
 import { DeviceStreamer } from 'types'
 import { MuseDeviceStreamerConstructorOptions } from '../modules/MuseDeviceStreamer'
 
-export default class FakeDeviceStreamer implements DeviceStreamer {
-    public static callsToConstructor: CallToConstructor[] = []
+export default class FakeMuseDeviceStreamer implements DeviceStreamer {
+    public static callsToConstructor: CallToMuseConstructor[] = []
     public static numCallsToConnectBle = 0
     public static numCallsToStartStreaming = 0
     public static numCallsToStopStreaming = 0
@@ -16,26 +16,26 @@ export default class FakeDeviceStreamer implements DeviceStreamer {
         const { bleUuid } = options ?? {}
         this.bleUuid = bleUuid ?? `fake-${generateId()}`
 
-        FakeDeviceStreamer.callsToConstructor.push(options)
+        FakeMuseDeviceStreamer.callsToConstructor.push(options)
     }
 
     public async connectBle() {
-        FakeDeviceStreamer.numCallsToConnectBle++
+        FakeMuseDeviceStreamer.numCallsToConnectBle++
     }
 
     public async startStreaming() {
-        FakeDeviceStreamer.numCallsToStartStreaming++
+        FakeMuseDeviceStreamer.numCallsToStartStreaming++
     }
 
     public async stopStreaming() {
-        FakeDeviceStreamer.numCallsToStopStreaming++
+        FakeMuseDeviceStreamer.numCallsToStopStreaming++
     }
 
     public async disconnect() {
-        FakeDeviceStreamer.numCallsToDisconnect++
+        FakeMuseDeviceStreamer.numCallsToDisconnect++
     }
 
-    public readonly streamQueries = []
+    public streamQueries = []
 
     public static resetTestDouble() {
         this.callsToConstructor = []
@@ -46,4 +46,6 @@ export default class FakeDeviceStreamer implements DeviceStreamer {
     }
 }
 
-export type CallToConstructor = MuseDeviceStreamerConstructorOptions | undefined
+export type CallToMuseConstructor =
+    | MuseDeviceStreamerConstructorOptions
+    | undefined
