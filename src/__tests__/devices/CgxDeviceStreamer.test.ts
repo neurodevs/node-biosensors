@@ -20,7 +20,7 @@ export default class CgxDeviceStreamerTest extends AbstractDeviceStreamerTest {
 
     @test()
     protected static async createsInstance() {
-        assert.isTruthy(this.instance, 'Should create an instance!')
+        assert.isTruthy(this.instance, 'Failed to create instance!')
     }
 
     @test()
