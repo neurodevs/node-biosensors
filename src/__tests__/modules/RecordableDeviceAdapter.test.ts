@@ -1,9 +1,9 @@
 import { assert, test, generateId } from '@sprucelabs/test-utils'
 import { FakeXdfRecorder } from '@neurodevs/node-xdf'
-import RecordableDeviceAdapter from '../modules/RecordableDeviceAdapter'
-import FakeMuseDeviceStreamer from '../testDoubles/FakeMuseDeviceStreamer'
-import { DeviceAdapter, DeviceAdapterOptions } from '../types'
-import AbstractBiosensorsTest from './AbstractBiosensorsTest'
+import RecordableDeviceAdapter from '../../modules/RecordableDeviceAdapter'
+import FakeMuseDeviceStreamer from '../../testDoubles/FakeMuseDeviceStreamer'
+import { DeviceAdapter, DeviceAdapterOptions } from '../../types'
+import AbstractBiosensorsTest from '../AbstractBiosensorsTest'
 
 export default class RecordableDeviceAdapterTest extends AbstractBiosensorsTest {
     private static instance: DeviceAdapter

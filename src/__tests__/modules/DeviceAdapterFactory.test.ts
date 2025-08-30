@@ -1,6 +1,6 @@
 import AbstractSpruceTest, { test, assert } from '@sprucelabs/test-utils'
-import DeviceAdapterFactory from '../modules/DeviceAdapterFactory'
-import { DeviceAdapter } from '../types'
+import DeviceAdapterFactory from '../../modules/DeviceAdapterFactory'
+import { DeviceAdapter } from '../../types'
 
 export default class DeviceAdapterFactoryTest extends AbstractSpruceTest {
     private static adapter: DeviceAdapter
