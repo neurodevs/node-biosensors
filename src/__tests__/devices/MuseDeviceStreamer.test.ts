@@ -10,7 +10,7 @@ import MuseDeviceStreamer, {
     MuseDeviceStreamerOptions,
 } from '../../devices/MuseDeviceStreamer'
 import { MUSE_CHARACTERISTIC_UUIDS as CHAR_UUIDS } from '../../devices/MuseDeviceStreamer'
-import SpyMuseDeviceStreamer from '../../testDoubles/SpyMuseDeviceStreamer'
+import SpyMuseDeviceStreamer from '../../testDoubles/devices/SpyMuseDeviceStreamer'
 import AbstractDeviceStreamerTest from '../AbstractDeviceStreamerTest'
 
 export default class MuseDeviceStreamerTest extends AbstractDeviceStreamerTest {

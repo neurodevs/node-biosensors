@@ -19,11 +19,11 @@ import {
 import { XdfStreamRecorder, FakeXdfRecorder } from '@neurodevs/node-xdf'
 import CgxDeviceStreamer from '../devices/CgxDeviceStreamer'
 import MuseDeviceStreamer from '../devices/MuseDeviceStreamer'
-import FakeMuseDeviceStreamer from '../testDoubles/FakeMuseDeviceStreamer'
+import FakeMuseDeviceStreamer from '../testDoubles/devices/FakeMuseDeviceStreamer'
+import SpyCgxDeviceStreamer from '../testDoubles/devices/SpyCgxDeviceStreamer'
+import SpyMuseDeviceStreamer from '../testDoubles/devices/SpyMuseDeviceStreamer'
 import FakeDeviceFTDI from '../testDoubles/FTDI/FakeDeviceFTDI'
 import FakeFTDI from '../testDoubles/FTDI/FakeFTDI'
-import SpyCgxDeviceStreamer from '../testDoubles/SpyCgxDeviceStreamer'
-import SpyMuseDeviceStreamer from '../testDoubles/SpyMuseDeviceStreamer'
 
 export default class AbstractBiosensorsTest extends AbstractSpruceTest {
     protected static async beforeEach() {

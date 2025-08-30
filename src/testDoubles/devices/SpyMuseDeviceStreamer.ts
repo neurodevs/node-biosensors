@@ -1,6 +1,6 @@
 import MuseDeviceStreamer, {
     MuseDeviceStreamerConstructorOptions,
-} from '../devices/MuseDeviceStreamer'
+} from '../../devices/MuseDeviceStreamer'
 
 export default class SpyMuseDeviceStreamer extends MuseDeviceStreamer {
     public constructor(options: MuseDeviceStreamerConstructorOptions) {

@@ -2,9 +2,9 @@ import { test, assert, errorAssert } from '@sprucelabs/test-utils'
 import { FakeLslOutlet } from '@neurodevs/node-lsl'
 import FTDI from 'ftdi-d2xx'
 import CgxDeviceStreamer from '../../devices/CgxDeviceStreamer'
+import SpyCgxDeviceStreamer from '../../testDoubles/devices/SpyCgxDeviceStreamer'
 import FakeDeviceFTDI from '../../testDoubles/FTDI/FakeDeviceFTDI'
 import FakeFTDI from '../../testDoubles/FTDI/FakeFTDI'
-import SpyCgxDeviceStreamer from '../../testDoubles/SpyCgxDeviceStreamer'
 import AbstractDeviceStreamerTest from '../AbstractDeviceStreamerTest'
 
 export default class CgxDeviceStreamerTest extends AbstractDeviceStreamerTest {
