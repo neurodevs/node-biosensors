@@ -1,5 +1,11 @@
 export * from './types'
 
+export { default as BiosensorDeviceFactory } from './modules/BiosensorDeviceFactory'
+export * from './modules/BiosensorDeviceFactory'
+
+export { default as FakeDeviceFactory } from './testDoubles/modules/FakeDeviceFactory'
+export * from './testDoubles/modules/FakeDeviceFactory'
+
 // Cognionics Quick-20r
 
 export { default as CgxDeviceStreamer } from './devices/CgxDeviceStreamer'
