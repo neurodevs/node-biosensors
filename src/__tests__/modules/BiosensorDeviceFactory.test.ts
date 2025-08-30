@@ -1,10 +1,10 @@
 import { test, assert } from '@sprucelabs/test-utils'
-import DeviceAdapterFactory from '../../modules/DeviceAdapterFactory'
-import { DeviceAdapter } from '../../types'
+import BiosensorDeviceFactory from '../../modules/BiosensorDeviceFactory'
+import { DeviceStreamer } from '../../types'
 import AbstractBiosensorsTest from '../AbstractBiosensorsTest'
 
-export default class DeviceAdapterFactoryTest extends AbstractBiosensorsTest {
-    private static adapter: DeviceAdapter
+export default class BiosensorDeviceFactoryTest extends AbstractBiosensorsTest {
+    private static adapter: DeviceStreamer
 
     protected static async beforeEach() {
         await super.beforeEach()
@@ -13,11 +13,11 @@ export default class DeviceAdapterFactoryTest extends AbstractBiosensorsTest {
     }
 
     @test()
-    protected static async createsDeviceAdapterFactoryInstance() {
+    protected static async createsInstance() {
         assert.isTruthy(this.adapter, 'Factory should create an adapter!')
     }
 
     private static CreateAdapter() {
-        return DeviceAdapterFactory.CreateAdapter()
+        return BiosensorDeviceFactory.CreateDevices()
     }
 }

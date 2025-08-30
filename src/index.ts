@@ -1,7 +1,5 @@
 export * from './types'
 
-// Devices
-
 // Cognionics Quick-20r
 
 export { default as CgxDeviceStreamer } from './devices/CgxDeviceStreamer'
@@ -31,11 +29,3 @@ export * from './devices/ZephyrDeviceStreamer'
 
 export { default as FakeZephyrDeviceStreamer } from './testDoubles/FakeZephyrDeviceStreamer'
 export * from './testDoubles/FakeZephyrDeviceStreamer'
-
-// Modules
-
-export { default as FakeMuseAdapter } from './testDoubles/FakeDeviceAdapter'
-export * from './testDoubles/FakeDeviceAdapter'
-
-export { default as RecordableDeviceAdapter } from './modules/RecordableDeviceAdapter'
-export * from './modules/RecordableDeviceAdapter'

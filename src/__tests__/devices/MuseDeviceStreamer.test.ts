@@ -36,7 +36,7 @@ export default class MuseDeviceStreamerTest extends AbstractDeviceStreamerTest {
     }
 
     @test()
-    protected static async canCreateMuseDeviceStreamer() {
+    protected static async createsInstance() {
         assert.isTruthy(this.instance, 'Should create an instance!')
     }
 
