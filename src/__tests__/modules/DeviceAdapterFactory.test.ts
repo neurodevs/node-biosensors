@@ -1,8 +1,9 @@
-import AbstractSpruceTest, { test, assert } from '@sprucelabs/test-utils'
+import { test, assert } from '@sprucelabs/test-utils'
 import DeviceAdapterFactory from '../../modules/DeviceAdapterFactory'
 import { DeviceAdapter } from '../../types'
+import AbstractBiosensorsTest from '../AbstractBiosensorsTest'
 
-export default class DeviceAdapterFactoryTest extends AbstractSpruceTest {
+export default class DeviceAdapterFactoryTest extends AbstractBiosensorsTest {
     private static adapter: DeviceAdapter
 
     protected static async beforeEach() {
