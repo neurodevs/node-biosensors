@@ -1,6 +1,6 @@
 import { generateId } from '@sprucelabs/test-utils'
 import { DeviceStreamer } from 'types'
-import { MuseDeviceStreamerConstructorOptions } from '../modules/MuseDeviceStreamer'
+import { MuseDeviceStreamerConstructorOptions } from '../devices/MuseDeviceStreamer'
 
 export default class FakeMuseDeviceStreamer implements DeviceStreamer {
     public static callsToConstructor: CallToMuseConstructor[] = []

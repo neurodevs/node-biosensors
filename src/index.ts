@@ -3,8 +3,8 @@ export * from './types'
 
 // CGX Cognionics Quick-20r
 
-export { default as CgxDeviceStreamer } from './modules/CgxDeviceStreamer'
-export * from './modules/CgxDeviceStreamer'
+export { default as CgxDeviceStreamer } from './devices/CgxDeviceStreamer'
+export * from './devices/CgxDeviceStreamer'
 
 // Muse S Gen 2
 
@@ -13,8 +13,8 @@ export { default as RecordableDeviceAdapter } from './modules/RecordableDeviceAd
 export * from './modules/RecordableDeviceAdapter'
 
 // BLE -> LSL
-export { default as MuseDeviceStreamer } from './modules/MuseDeviceStreamer'
-export * from './modules/MuseDeviceStreamer'
+export { default as MuseDeviceStreamer } from './devices/MuseDeviceStreamer'
+export * from './devices/MuseDeviceStreamer'
 
 // Test doubles
 

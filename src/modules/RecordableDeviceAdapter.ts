@@ -1,10 +1,12 @@
 import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
+import MuseDeviceStreamer, {
+    BleDeviceStreamer,
+} from '../devices/MuseDeviceStreamer'
 import {
     DeviceAdapter,
     DeviceAdapterConstructor,
     DeviceAdapterOptions,
 } from '../types'
-import MuseDeviceStreamer, { BleDeviceStreamer } from './MuseDeviceStreamer'
 
 export default class RecordableDeviceAdapter implements DeviceAdapter {
     public static Class?: DeviceAdapterConstructor
