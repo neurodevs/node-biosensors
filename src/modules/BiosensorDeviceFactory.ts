@@ -66,7 +66,7 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
 }
 
 export interface DeviceFactory {
-    createDevice<K extends keyof DeviceOptionsMap>(
+    createDevice<K extends DeviceName>(
         name: K,
         options?: DeviceOptionsMap[K]
     ): Promise<DeviceStreamer>
@@ -80,6 +80,8 @@ export type DeviceName =
     | 'Cognionics Quick-20r'
     | 'Muse S Gen 2'
     | 'Zephyr BioHarness 3'
+
+export type DeviceOptions = DeviceOptionsMap[DeviceName]
 
 export interface DeviceOptionsMap {
     'Cognionics Quick-20r': never

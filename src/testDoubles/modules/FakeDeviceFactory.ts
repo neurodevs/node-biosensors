@@ -1,13 +1,14 @@
 import {
     DeviceFactory,
     DeviceName,
+    DeviceOptions,
     DeviceSpecification,
 } from '../../modules/BiosensorDeviceFactory'
 import { DeviceStreamer } from '../../types'
 
 export default class FakeDeviceFactory implements DeviceFactory {
     public static numCallsToConstructor = 0
-    public static callsToCreateDevice: string[] = []
+    public static callsToCreateDevice: CallToCreateDevice[] = []
     public static callsToCreateDevices: DeviceSpecification[][] = []
 
     public static fakeDevice = {} as DeviceStreamer
@@ -16,8 +17,8 @@ export default class FakeDeviceFactory implements DeviceFactory {
         FakeDeviceFactory.numCallsToConstructor++
     }
 
-    public async createDevice(name: DeviceName) {
-        FakeDeviceFactory.callsToCreateDevice.push(name)
+    public async createDevice(name: DeviceName, options?: DeviceOptions) {
+        FakeDeviceFactory.callsToCreateDevice.push({ name, options })
         return FakeDeviceFactory.fakeDevice
     }
 
@@ -34,4 +35,9 @@ export default class FakeDeviceFactory implements DeviceFactory {
         FakeDeviceFactory.callsToCreateDevice = []
         FakeDeviceFactory.callsToCreateDevices = []
     }
+}
+
+export interface CallToCreateDevice {
+    name: DeviceName
+    options?: DeviceOptions
 }
