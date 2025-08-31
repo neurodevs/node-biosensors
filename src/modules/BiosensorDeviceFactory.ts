@@ -26,7 +26,9 @@ export default class BiosensorDeviceFactory {
             case 'Zephyr BioHarness 3':
                 return ZephyrDeviceStreamer.Create()
             default:
-                throw new Error()
+                throw new Error(
+                    `\n\nInvalid device name: ${name}!\n\nPlease choose from:\n\n- Cognionics Quick-20r\n- Muse S Gen 2\n- Zephyr BioHarness 3\n\n`
+                )
         }
     }
 }
