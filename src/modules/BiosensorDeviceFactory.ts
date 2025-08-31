@@ -8,6 +8,9 @@ import { DeviceStreamer } from '../types'
 export default class BiosensorDeviceFactory {
     public static Class?: DeviceFactoryConstructor
 
+    private currentName!: DeviceName
+    private currentOptions?: DeviceOptionsMap[DeviceName]
+
     protected constructor() {}
 
     public static Create() {
@@ -18,18 +21,39 @@ export default class BiosensorDeviceFactory {
         name: K,
         options?: DeviceOptionsMap[K]
     ) {
-        switch (name) {
+        this.currentName = name
+        this.currentOptions = options
+
+        return this.createDeviceByName()
+    }
+
+    private createDeviceByName() {
+        switch (this.currentName) {
             case 'Cognionics Quick-20r':
-                return CgxDeviceStreamer.Create()
+                return this.CgxDeviceStreamer()
             case 'Muse S Gen 2':
-                return MuseDeviceStreamer.Create(options)
+                return this.MuseDeviceStreamer()
             case 'Zephyr BioHarness 3':
-                return ZephyrDeviceStreamer.Create()
+                return this.ZephyrDeviceStreamer()
             default:
-                throw new Error(
-                    `\n\nInvalid device name: ${name}!\n\nPlease choose from:\n\n- Cognionics Quick-20r\n- Muse S Gen 2\n- Zephyr BioHarness 3\n\n`
-                )
+                throw new Error(this.invalidNameError)
         }
+    }
+
+    private get invalidNameError() {
+        return `\n\nInvalid device name: ${this.currentName}!\n\nPlease choose from:\n\n- Cognionics Quick-20r\n- Muse S Gen 2\n- Zephyr BioHarness 3\n\n`
+    }
+
+    private CgxDeviceStreamer() {
+        return CgxDeviceStreamer.Create()
+    }
+
+    private MuseDeviceStreamer() {
+        return MuseDeviceStreamer.Create(this.currentOptions)
+    }
+
+    private ZephyrDeviceStreamer() {
+        return ZephyrDeviceStreamer.Create()
     }
 }
 
