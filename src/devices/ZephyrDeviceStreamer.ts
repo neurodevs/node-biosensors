@@ -1,6 +1,6 @@
 import { DeviceStreamer } from '../types'
 
-export default class DeviceStreamerImpl implements DeviceStreamer {
+export default class ZephyrDeviceStreamer implements DeviceStreamer {
     public static Class?: DeviceStreamerConstructor
 
     protected constructor() {}

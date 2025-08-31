@@ -1,4 +1,5 @@
 import CgxDeviceStreamer from '../devices/CgxDeviceStreamer'
+import MuseDeviceStreamer from '../devices/MuseDeviceStreamer'
 import { DeviceStreamer } from '../types'
 
 export default class BiosensorDeviceFactory {
@@ -14,6 +15,8 @@ export default class BiosensorDeviceFactory {
         switch (name) {
             case 'Cognionics Quick-20r':
                 return CgxDeviceStreamer.Create()
+            case 'Muse S Gen 2':
+                return MuseDeviceStreamer.Create()
             default:
                 throw new Error()
         }

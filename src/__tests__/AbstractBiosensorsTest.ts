@@ -19,7 +19,10 @@ import {
 import { XdfStreamRecorder, FakeXdfRecorder } from '@neurodevs/node-xdf'
 import CgxDeviceStreamer from '../devices/CgxDeviceStreamer'
 import MuseDeviceStreamer from '../devices/MuseDeviceStreamer'
+import ZephyrDeviceStreamer from '../devices/ZephyrDeviceStreamer'
+import FakeCgxDeviceStreamer from '../testDoubles/devices/FakeCgxDeviceStreamer'
 import FakeMuseDeviceStreamer from '../testDoubles/devices/FakeMuseDeviceStreamer'
+import FakeZephyrDeviceStreamer from '../testDoubles/devices/FakeZephyrDeviceStreamer'
 import SpyCgxDeviceStreamer from '../testDoubles/devices/SpyCgxDeviceStreamer'
 import SpyMuseDeviceStreamer from '../testDoubles/devices/SpyMuseDeviceStreamer'
 import FakeDeviceFTDI from '../testDoubles/FTDI/FakeDeviceFTDI'
@@ -38,6 +41,12 @@ export default class AbstractBiosensorsTest extends AbstractSpruceTest {
         this.setFakeXdfRecorder()
     }
 
+    protected static setFakeDevices() {
+        this.setFakeCgxDeviceStreamer()
+        this.setFakeMuseDeviceStreamer()
+        this.setFakeZephyrDeviceStreamer()
+    }
+
     protected static setFakeBleController() {
         BleDeviceController.Class = FakeBleController
         FakeBleController.resetTestDouble()
@@ -53,6 +62,11 @@ export default class AbstractBiosensorsTest extends AbstractSpruceTest {
         FakeBleScanner.resetTestDouble()
     }
 
+    private static setFakeCgxDeviceStreamer() {
+        CgxDeviceStreamer.Class = FakeCgxDeviceStreamer
+        FakeCgxDeviceStreamer.resetTestDouble()
+    }
+
     protected static setFakeFTDI() {
         CgxDeviceStreamer.FTDI = FakeFTDI as any
         FakeFTDI.resetTestDouble()
@@ -66,7 +80,7 @@ export default class AbstractBiosensorsTest extends AbstractSpruceTest {
         FakeLslOutlet.resetTestDouble()
     }
 
-    protected static setFakeDeviceStreamer() {
+    protected static setFakeMuseDeviceStreamer() {
         MuseDeviceStreamer.Class = FakeMuseDeviceStreamer
         FakeMuseDeviceStreamer.resetTestDouble()
     }
@@ -81,12 +95,17 @@ export default class AbstractBiosensorsTest extends AbstractSpruceTest {
         FakeXdfRecorder.resetTestDouble()
     }
 
-    protected static setSpyMuseDeviceStreamer() {
-        MuseDeviceStreamer.Class = SpyMuseDeviceStreamer
+    protected static setFakeZephyrDeviceStreamer() {
+        ZephyrDeviceStreamer.Class = FakeZephyrDeviceStreamer
+        FakeZephyrDeviceStreamer.resetTestDouble()
     }
 
     protected static setSpyCgxDeviceStreamer() {
         CgxDeviceStreamer.Class = SpyCgxDeviceStreamer
+    }
+
+    protected static setSpyMuseDeviceStreamer() {
+        MuseDeviceStreamer.Class = SpyMuseDeviceStreamer
     }
 
     protected static FakeCharacteristic(uuid: string) {
