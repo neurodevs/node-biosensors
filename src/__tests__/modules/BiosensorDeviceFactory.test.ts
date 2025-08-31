@@ -34,12 +34,22 @@ export default class BiosensorDeviceFactoryTest extends AbstractBiosensorsTest {
         this.assertDeviceIsTruthy(device)
     }
 
+    @test()
+    protected static async createsDeviceForZephyrDeviceStreamer() {
+        const device = this.createZephyrDeviceStreamer()
+        this.assertDeviceIsTruthy(device)
+    }
+
     private static createCgxDeviceStreamer() {
         return this.createDevice('Cognionics Quick-20r')
     }
 
     private static createMuseDeviceStreamer() {
         return this.createDevice('Muse S Gen 2')
+    }
+
+    private static createZephyrDeviceStreamer() {
+        return this.createDevice('Zephyr BioHarness 3')
     }
 
     private static createDevice(name: DeviceName) {

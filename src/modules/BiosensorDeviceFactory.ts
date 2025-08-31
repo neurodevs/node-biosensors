@@ -1,5 +1,6 @@
 import CgxDeviceStreamer from '../devices/CgxDeviceStreamer'
 import MuseDeviceStreamer from '../devices/MuseDeviceStreamer'
+import ZephyrDeviceStreamer from '../devices/ZephyrDeviceStreamer'
 import { DeviceStreamer } from '../types'
 
 export default class BiosensorDeviceFactory {
@@ -17,6 +18,8 @@ export default class BiosensorDeviceFactory {
                 return CgxDeviceStreamer.Create()
             case 'Muse S Gen 2':
                 return MuseDeviceStreamer.Create()
+            case 'Zephyr BioHarness 3':
+                return ZephyrDeviceStreamer.Create()
             default:
                 throw new Error()
         }
