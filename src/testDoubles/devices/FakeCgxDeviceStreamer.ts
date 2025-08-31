@@ -8,7 +8,7 @@ export default class FakeCgxDeviceStreamer implements DeviceStreamer {
     public static numCallsToStopStreaming = 0
     public static numCallsToDisconnect = 0
 
-    public constructor(eegOutlet: LslOutlet, accelOutlet: LslOutlet) {
+    public constructor(eegOutlet?: LslOutlet, accelOutlet?: LslOutlet) {
         FakeCgxDeviceStreamer.callsToConstructor.push({
             eegOutlet,
             accelOutlet,
@@ -43,6 +43,6 @@ export default class FakeCgxDeviceStreamer implements DeviceStreamer {
 }
 
 export interface CallToCgxConstructor {
-    eegOutlet: LslOutlet
-    accelOutlet: LslOutlet
+    eegOutlet?: LslOutlet
+    accelOutlet?: LslOutlet
 }
