@@ -18,6 +18,12 @@ export default class BiosensorDeviceFactoryTest extends AbstractBiosensorsTest {
         assert.isTruthy(this.instance, 'Failed to create instance!')
     }
 
+    @test()
+    protected static async createsDeviceForCgxDeviceStreamer() {
+        const device = this.instance.createDevice('Cognionics Quick-20r')
+        assert.isTruthy(device, 'Failed to create device!')
+    }
+
     private static BiosensorDeviceFactory() {
         return BiosensorDeviceFactory.Create()
     }
