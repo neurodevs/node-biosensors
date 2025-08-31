@@ -1,8 +1,10 @@
-import { test, assert } from '@sprucelabs/test-utils'
+import { test, assert, generateId } from '@sprucelabs/test-utils'
+import { MuseDeviceStreamerOptions } from '../../devices/MuseDeviceStreamer'
 import BiosensorDeviceFactory, {
     DeviceFactory,
-    DeviceName,
+    DeviceOptionsMap,
 } from '../../modules/BiosensorDeviceFactory'
+import FakeMuseDeviceStreamer from '../../testDoubles/devices/FakeMuseDeviceStreamer'
 import { DeviceStreamer } from '../../types'
 import AbstractBiosensorsTest from '../AbstractBiosensorsTest'
 
@@ -35,6 +37,25 @@ export default class BiosensorDeviceFactoryTest extends AbstractBiosensorsTest {
     }
 
     @test()
+    protected static async createsDeviceForMuseDeviceStreamerWithOptions() {
+        const options = {
+            bleUuid: generateId(),
+            rssiIntervalMs: Math.random(),
+        }
+
+        await this.createMuseDeviceStreamer(options)
+
+        const { bleUuid, rssiIntervalMs } =
+            FakeMuseDeviceStreamer.callsToConstructor[1]!
+
+        assert.isEqualDeep(
+            { bleUuid, rssiIntervalMs },
+            options,
+            'Options do not match!'
+        )
+    }
+
+    @test()
     protected static async createsDeviceForZephyrDeviceStreamer() {
         const device = this.createZephyrDeviceStreamer()
         this.assertDeviceIsTruthy(device)
@@ -44,16 +65,21 @@ export default class BiosensorDeviceFactoryTest extends AbstractBiosensorsTest {
         return this.createDevice('Cognionics Quick-20r')
     }
 
-    private static createMuseDeviceStreamer() {
-        return this.createDevice('Muse S Gen 2')
+    private static createMuseDeviceStreamer(
+        options?: MuseDeviceStreamerOptions
+    ) {
+        return this.createDevice('Muse S Gen 2', options)
     }
 
     private static createZephyrDeviceStreamer() {
         return this.createDevice('Zephyr BioHarness 3')
     }
 
-    private static createDevice(name: DeviceName) {
-        return this.instance.createDevice(name)
+    private static createDevice<K extends keyof DeviceOptionsMap>(
+        name: K,
+        options?: DeviceOptionsMap[K]
+    ) {
+        return this.instance.createDevice(name, options)
     }
 
     private static assertDeviceIsTruthy(device: Promise<DeviceStreamer>) {
