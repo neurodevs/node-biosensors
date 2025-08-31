@@ -5,6 +5,10 @@ export default class ZephyrDeviceStreamer implements DeviceStreamer {
 
     protected constructor() {}
 
+    public static Create() {
+        return new (this.Class ?? this)()
+    }
+
     public async startStreaming() {
         throw new Error('Method not implemented.')
     }
@@ -18,10 +22,6 @@ export default class ZephyrDeviceStreamer implements DeviceStreamer {
     }
 
     public streamQueries: string[] = []
-
-    public static Create() {
-        return new (this.Class ?? this)()
-    }
 }
 
 export type DeviceStreamerConstructor = new () => DeviceStreamer
