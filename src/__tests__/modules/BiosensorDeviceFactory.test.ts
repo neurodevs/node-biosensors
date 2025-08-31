@@ -3,6 +3,7 @@ import { MuseDeviceStreamerOptions } from '../../devices/MuseDeviceStreamer'
 import BiosensorDeviceFactory, {
     DeviceFactory,
     DeviceOptionsMap,
+    DeviceSpecification,
 } from '../../modules/BiosensorDeviceFactory'
 import FakeMuseDeviceStreamer from '../../testDoubles/devices/FakeMuseDeviceStreamer'
 import { DeviceStreamer } from '../../types'
@@ -26,13 +27,13 @@ export default class BiosensorDeviceFactoryTest extends AbstractBiosensorsTest {
 
     @test()
     protected static async createsDeviceForCgxDeviceStreamer() {
-        const device = this.createCgxDeviceStreamer()
+        const device = await this.createCgxDeviceStreamer()
         this.assertDeviceIsTruthy(device)
     }
 
     @test()
     protected static async createsDeviceForMuseDeviceStreamer() {
-        const device = this.createMuseDeviceStreamer()
+        const device = await this.createMuseDeviceStreamer()
         this.assertDeviceIsTruthy(device)
     }
 
@@ -46,7 +47,7 @@ export default class BiosensorDeviceFactoryTest extends AbstractBiosensorsTest {
         await this.createMuseDeviceStreamer(options)
 
         const { bleUuid, rssiIntervalMs } =
-            FakeMuseDeviceStreamer.callsToConstructor[1]!
+            FakeMuseDeviceStreamer.callsToConstructor[0]!
 
         assert.isEqualDeep(
             { bleUuid, rssiIntervalMs },
@@ -57,7 +58,7 @@ export default class BiosensorDeviceFactoryTest extends AbstractBiosensorsTest {
 
     @test()
     protected static async createsDeviceForZephyrDeviceStreamer() {
-        const device = this.createZephyrDeviceStreamer()
+        const device = await this.createZephyrDeviceStreamer()
         this.assertDeviceIsTruthy(device)
     }
 
@@ -69,6 +70,18 @@ export default class BiosensorDeviceFactoryTest extends AbstractBiosensorsTest {
             async () => await this.createDevice(invalidName),
             `\n\nInvalid device name: ${invalidName}!\n\nPlease choose from:\n\n- Cognionics Quick-20r\n- Muse S Gen 2\n- Zephyr BioHarness 3\n\n`
         )
+    }
+
+    @test()
+    protected static async createsMultipleDevicesAtOnce() {
+        const specs: DeviceSpecification[] = [
+            { name: 'Cognionics Quick-20r' },
+            { name: 'Muse S Gen 2' },
+        ]
+
+        const devices = await this.instance.createDevices(specs)
+
+        assert.isEqual(devices.length, specs.length, 'Incorrect length!')
     }
 
     private static createCgxDeviceStreamer() {
@@ -92,7 +105,7 @@ export default class BiosensorDeviceFactoryTest extends AbstractBiosensorsTest {
         return this.instance.createDevice(name, options)
     }
 
-    private static assertDeviceIsTruthy(device: Promise<DeviceStreamer>) {
+    private static assertDeviceIsTruthy(device: DeviceStreamer) {
         assert.isTruthy(device, 'Failed to create device!')
     }
 

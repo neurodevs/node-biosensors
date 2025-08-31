@@ -5,7 +5,7 @@ import MuseDeviceStreamer, {
 import ZephyrDeviceStreamer from '../devices/ZephyrDeviceStreamer'
 import { DeviceStreamer } from '../types'
 
-export default class BiosensorDeviceFactory {
+export default class BiosensorDeviceFactory implements DeviceFactory {
     public static Class?: DeviceFactoryConstructor
 
     private currentName!: DeviceName
@@ -44,6 +44,14 @@ export default class BiosensorDeviceFactory {
         return `\n\nInvalid device name: ${this.currentName}!\n\nPlease choose from:\n\n- Cognionics Quick-20r\n- Muse S Gen 2\n- Zephyr BioHarness 3\n\n`
     }
 
+    public async createDevices(devices: DeviceSpecification[]) {
+        return Promise.all(
+            devices.map((device) =>
+                this.createDevice(device.name, device.options)
+            )
+        )
+    }
+
     private CgxDeviceStreamer() {
         return CgxDeviceStreamer.Create()
     }
@@ -62,6 +70,8 @@ export interface DeviceFactory {
         name: K,
         options?: DeviceOptionsMap[K]
     ): Promise<DeviceStreamer>
+
+    createDevices(devices: DeviceSpecification[]): Promise<DeviceStreamer[]>
 }
 
 export type DeviceFactoryConstructor = new () => DeviceFactory
@@ -75,4 +85,9 @@ export interface DeviceOptionsMap {
     'Cognionics Quick-20r': never
     'Muse S Gen 2': MuseDeviceStreamerOptions
     'Zephyr BioHarness 3': never
+}
+
+export interface DeviceSpecification {
+    name: DeviceName
+    options?: DeviceOptionsMap[DeviceName]
 }
