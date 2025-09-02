@@ -1,5 +1,7 @@
 export * from './types'
 
+// BiosensorDeviceFactory
+
 export { default as BiosensorDeviceFactory } from './modules/BiosensorDeviceFactory'
 export * from './modules/BiosensorDeviceFactory'
 
