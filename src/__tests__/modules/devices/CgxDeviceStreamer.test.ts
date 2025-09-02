@@ -342,6 +342,18 @@ export default class CgxDeviceStreamerTest extends AbstractDeviceStreamerTest {
         )
     }
 
+    @test()
+    protected static async startStreamingCallsStartOnXdfRecorder() {
+        const instance = await this.createStreamerWithRecorder()
+        await instance.startStreaming()
+
+        assert.isEqual(
+            FakeXdfRecorder.numCallsToStart,
+            1,
+            'Should call start on XdfRecorder!'
+        )
+    }
+
     private static async startStreaming() {
         await this.instance.startStreaming()
     }
@@ -427,7 +439,7 @@ export default class CgxDeviceStreamerTest extends AbstractDeviceStreamerTest {
     ]
 
     private static async createStreamerWithRecorder() {
-        await this.CgxDeviceStreamer(this.xdfRecordPath)
+        return await this.CgxDeviceStreamer(this.xdfRecordPath)
     }
 
     private static async CgxDeviceStreamer(xdfRecordPath?: string) {

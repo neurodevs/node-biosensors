@@ -23,6 +23,7 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
 
     private eegOutlet: LslOutlet
     private accelOutlet: LslOutlet
+    private xdfRecorder?: XdfRecorder
 
     private infos!: FTDI.FTDI_DeviceInfo[]
     private device!: FTDI.FTDI_Device
@@ -30,10 +31,11 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
     private packetCounter!: number
 
     protected constructor(options: CgxDeviceStreamerConstructorOptions) {
-        const { eegOutlet, accelOutlet } = options
+        const { eegOutlet, accelOutlet, xdfRecorder } = options
 
         this.eegOutlet = eegOutlet
         this.accelOutlet = accelOutlet
+        this.xdfRecorder = xdfRecorder
     }
 
     public static async Create(options?: CgxDeviceStreamerOptions) {
@@ -48,13 +50,21 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
             eegOutlet,
             accelOutlet,
             xdfRecorder,
-            ...options,
+            xdfRecordPath,
         })
     }
 
     public async startStreaming() {
+        this.startXdfRecorderIfDefined()
+
         await this.connectFtdi()
         await this.startReadingPackets()
+    }
+
+    private startXdfRecorderIfDefined() {
+        if (this.xdfRecorder) {
+            this.xdfRecorder.start()
+        }
     }
 
     private async connectFtdi() {
