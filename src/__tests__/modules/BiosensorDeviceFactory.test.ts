@@ -1,11 +1,11 @@
 import { test, assert, generateId } from '@sprucelabs/test-utils'
-import { MuseDeviceStreamerOptions } from '../../devices/MuseDeviceStreamer'
+import { MuseDeviceStreamerOptions } from '../../modules/MuseDeviceStreamer'
 import BiosensorDeviceFactory, {
     DeviceFactory,
     DeviceOptionsMap,
     DeviceSpecification,
 } from '../../modules/BiosensorDeviceFactory'
-import FakeMuseDeviceStreamer from '../../testDoubles/devices/FakeMuseDeviceStreamer'
+import FakeMuseDeviceStreamer from '../../testDoubles/DeviceStreamer/MuseDeviceStreamer/FakeMuseDeviceStreamer'
 import { DeviceStreamer } from '../../types'
 import AbstractBiosensorsTest from '../AbstractBiosensorsTest'
 

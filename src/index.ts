@@ -3,35 +3,35 @@ export * from './types'
 export { default as BiosensorDeviceFactory } from './modules/BiosensorDeviceFactory'
 export * from './modules/BiosensorDeviceFactory'
 
-export { default as FakeDeviceFactory } from './testDoubles/modules/FakeDeviceFactory'
-export * from './testDoubles/modules/FakeDeviceFactory'
+export { default as FakeDeviceFactory } from './testDoubles/DeviceFactory/FakeDeviceFactory'
+export * from './testDoubles/DeviceFactory/FakeDeviceFactory'
 
 // Cognionics Quick-20r
 
-export { default as CgxDeviceStreamer } from './devices/CgxDeviceStreamer'
-export * from './devices/CgxDeviceStreamer'
+export { default as CgxDeviceStreamer } from './modules/CgxDeviceStreamer'
+export * from './modules/CgxDeviceStreamer'
 
-export { default as SpyCgxDeviceStreamer } from './testDoubles/devices/SpyCgxDeviceStreamer'
-export * from './testDoubles/devices/SpyCgxDeviceStreamer'
+export { default as SpyCgxDeviceStreamer } from './testDoubles/DeviceStreamer/CgxDeviceStreamer/SpyCgxDeviceStreamer'
+export * from './testDoubles/DeviceStreamer/CgxDeviceStreamer/SpyCgxDeviceStreamer'
 
-export { default as FakeCgxDeviceStreamer } from './testDoubles/devices/FakeCgxDeviceStreamer'
-export * from './testDoubles/devices/FakeCgxDeviceStreamer'
+export { default as FakeCgxDeviceStreamer } from './testDoubles/DeviceStreamer/CgxDeviceStreamer/FakeCgxDeviceStreamer'
+export * from './testDoubles/DeviceStreamer/CgxDeviceStreamer/FakeCgxDeviceStreamer'
 
 // Muse S Gen 2
 
-export { default as MuseDeviceStreamer } from './devices/MuseDeviceStreamer'
-export * from './devices/MuseDeviceStreamer'
+export { default as MuseDeviceStreamer } from './modules/MuseDeviceStreamer'
+export * from './modules/MuseDeviceStreamer'
 
-export { default as SpyMuseDeviceStreamer } from './testDoubles/devices/SpyMuseDeviceStreamer'
-export * from './testDoubles/devices/SpyMuseDeviceStreamer'
+export { default as SpyMuseDeviceStreamer } from './testDoubles/DeviceStreamer/MuseDeviceStreamer/SpyMuseDeviceStreamer'
+export * from './testDoubles/DeviceStreamer/MuseDeviceStreamer/SpyMuseDeviceStreamer'
 
-export { default as FakeMuseDeviceStreamer } from './testDoubles/devices/FakeMuseDeviceStreamer'
-export * from './testDoubles/devices/FakeMuseDeviceStreamer'
+export { default as FakeMuseDeviceStreamer } from './testDoubles/DeviceStreamer/MuseDeviceStreamer/FakeMuseDeviceStreamer'
+export * from './testDoubles/DeviceStreamer/MuseDeviceStreamer/FakeMuseDeviceStreamer'
 
 // Zephyr BioHarness 3
 
-export { default as ZephyrDeviceStreamer } from './devices/ZephyrDeviceStreamer'
-export * from './devices/ZephyrDeviceStreamer'
+export { default as ZephyrDeviceStreamer } from './modules/ZephyrDeviceStreamer'
+export * from './modules/ZephyrDeviceStreamer'
 
-export { default as FakeZephyrDeviceStreamer } from './testDoubles/devices/FakeZephyrDeviceStreamer'
-export * from './testDoubles/devices/FakeZephyrDeviceStreamer'
+export { default as FakeZephyrDeviceStreamer } from './testDoubles/DeviceStreamer/ZephyrDeviceStreamer/FakeZephyrDeviceStreamer'
+export * from './testDoubles/DeviceStreamer/ZephyrDeviceStreamer/FakeZephyrDeviceStreamer'
