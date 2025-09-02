@@ -243,7 +243,15 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
         console.log('Dropped packet')
     }
 
-    public async stopStreaming() {}
+    public async stopStreaming() {
+        this.stopXdfRecorderIfDefined()
+    }
+
+    private stopXdfRecorderIfDefined() {
+        if (this.xdfRecorder) {
+            this.xdfRecorder.stop()
+        }
+    }
 
     public async disconnect() {}
 

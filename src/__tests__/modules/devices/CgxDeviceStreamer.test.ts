@@ -354,6 +354,18 @@ export default class CgxDeviceStreamerTest extends AbstractDeviceStreamerTest {
         )
     }
 
+    @test()
+    protected static async stopStreamingCallsStopOnXdfRecorder() {
+        const instance = await this.createStreamerWithRecorder()
+        await instance.stopStreaming()
+
+        assert.isEqual(
+            FakeXdfRecorder.numCallsToStop,
+            1,
+            'Should call stop on XdfRecorder!'
+        )
+    }
+
     private static async startStreaming() {
         await this.instance.startStreaming()
     }
