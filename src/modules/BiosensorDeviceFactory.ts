@@ -12,6 +12,11 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
     private currentName!: DeviceName
     private currentOptions?: DeviceOptionsMap[DeviceName]
 
+    private currentDevices!: DeviceSpecification[]
+    private currentXdfRecordPath?: string
+    private createdDevices!: DeviceStreamer[]
+    private createdRecorder?: XdfRecorder
+
     protected constructor() {}
 
     public static Create() {
@@ -52,24 +57,32 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
     public async createDevices(
         devices: DeviceSpecification[],
         options?: CreateDevicesOptions
-    ): Promise<[DeviceStreamer[], XdfRecorder | undefined]> {
+    ): Promise<StreamersAndRecorderTuple> {
         const { xdfRecordPath } = options ?? {}
 
-        const createdDevices = await Promise.all(
-            devices.map((device) =>
+        this.currentDevices = devices
+        this.currentXdfRecordPath = xdfRecordPath
+
+        this.createdDevices = await this.createAllDevices()
+        this.createdRecorder = this.createXdfRecorderIfPath()
+
+        return [this.createdDevices, this.createdRecorder]
+    }
+
+    private async createAllDevices() {
+        return await Promise.all(
+            this.currentDevices.map((device) =>
                 this.createDevice(device.name, device.options)
             )
         )
+    }
 
-        const streamQueries = createdDevices.flatMap(
-            (device) => device.streamQueries
-        )
+    private createXdfRecorderIfPath() {
+        return this.currentXdfRecordPath ? this.XdfStreamRecorder() : undefined
+    }
 
-        const recorder = xdfRecordPath
-            ? XdfStreamRecorder.Create(xdfRecordPath, streamQueries)
-            : undefined
-
-        return [createdDevices, recorder]
+    private get allStreamQueries() {
+        return this.createdDevices.flatMap((device) => device.streamQueries)
     }
 
     private CgxDeviceStreamer() {
@@ -83,6 +96,13 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
     private ZephyrDeviceStreamer() {
         return ZephyrDeviceStreamer.Create()
     }
+
+    private XdfStreamRecorder() {
+        return XdfStreamRecorder.Create(
+            this.currentXdfRecordPath!,
+            this.allStreamQueries
+        )
+    }
 }
 
 export interface DeviceFactory {
@@ -94,7 +114,7 @@ export interface DeviceFactory {
     createDevices(
         devices: DeviceSpecification[],
         options?: CreateDevicesOptions
-    ): Promise<[DeviceStreamer[], XdfRecorder | undefined]>
+    ): Promise<StreamersAndRecorderTuple>
 }
 
 export type DeviceFactoryConstructor = new () => DeviceFactory
@@ -120,3 +140,8 @@ export interface DeviceSpecification {
     name: DeviceName
     options?: DeviceOptionsMap[DeviceName]
 }
+
+export type StreamersAndRecorderTuple = [
+    DeviceStreamer[],
+    XdfRecorder | undefined,
+]
