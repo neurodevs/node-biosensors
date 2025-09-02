@@ -36,11 +36,15 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
             case 'Zephyr BioHarness 3':
                 return this.ZephyrDeviceStreamer()
             default:
-                throw new Error(this.invalidNameError)
+                throw this.invalidNameError
         }
     }
 
     private get invalidNameError() {
+        return new Error(this.invalidNameErrorMessage)
+    }
+
+    private get invalidNameErrorMessage() {
         return `\n\nInvalid device name: ${this.currentName}!\n\nPlease choose from:\n\n- Cognionics Quick-20r\n- Muse S Gen 2\n- Zephyr BioHarness 3\n\n`
     }
 
