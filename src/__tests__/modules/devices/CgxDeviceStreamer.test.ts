@@ -1,5 +1,6 @@
-import { test, assert, errorAssert } from '@sprucelabs/test-utils'
+import { test, assert, errorAssert, generateId } from '@sprucelabs/test-utils'
 import { FakeLslOutlet } from '@neurodevs/node-lsl'
+import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 import FTDI from 'ftdi-d2xx'
 import CgxDeviceStreamer from '../../../modules/devices/CgxDeviceStreamer'
 import SpyCgxDeviceStreamer from '../../../testDoubles/DeviceStreamer/CgxDeviceStreamer/SpyCgxDeviceStreamer'
@@ -309,6 +310,38 @@ export default class CgxDeviceStreamerTest extends AbstractDeviceStreamerTest {
         )
     }
 
+    @test()
+    protected static async createsXdfRecorderIfPassedPath() {
+        await this.createStreamerWithRecorder()
+
+        assert.isEqual(
+            FakeXdfRecorder.callsToConstructor.length,
+            1,
+            'Should create XdfRecorder!'
+        )
+    }
+
+    @test()
+    protected static async passesXdfRecordPathToRecorder() {
+        await this.createStreamerWithRecorder()
+
+        const { xdfRecordPath } = FakeXdfRecorder.callsToConstructor[0]
+        assert.isEqual(xdfRecordPath, this.xdfRecordPath, 'Incorrect path!')
+    }
+
+    @test()
+    protected static async passesStreamQueriesToRecorder() {
+        await this.createStreamerWithRecorder()
+
+        const { streamQueries } = FakeXdfRecorder.callsToConstructor[0]
+
+        assert.isEqualDeep(
+            streamQueries,
+            this.instance.streamQueries,
+            'Incorrect stream queries!'
+        )
+    }
+
     private static async startStreaming() {
         await this.instance.startStreaming()
     }
@@ -360,6 +393,7 @@ export default class CgxDeviceStreamerTest extends AbstractDeviceStreamerTest {
         return Array.from({ length }, () => Math.floor(Math.random() * 254))
     }
 
+    private static readonly xdfRecordPath = generateId()
     private static readonly bytesPerSample = 78
 
     private static readonly eegCharacteristicNames = [
@@ -392,7 +426,13 @@ export default class CgxDeviceStreamerTest extends AbstractDeviceStreamerTest {
         'Z_ACCEL',
     ]
 
-    private static async CgxDeviceStreamer() {
-        return (await CgxDeviceStreamer.Create()) as SpyCgxDeviceStreamer
+    private static async createStreamerWithRecorder() {
+        await this.CgxDeviceStreamer(this.xdfRecordPath)
+    }
+
+    private static async CgxDeviceStreamer(xdfRecordPath?: string) {
+        return (await CgxDeviceStreamer.Create({
+            xdfRecordPath,
+        })) as SpyCgxDeviceStreamer
     }
 }

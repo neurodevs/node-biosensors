@@ -8,6 +8,7 @@
 // 76-77: Trigger (value: 0–255)
 
 import { ChannelFormat, LslOutlet, LslStreamOutlet } from '@neurodevs/node-lsl'
+import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 import FTDI from 'ftdi-d2xx'
 import SpruceError from '../../errors/SpruceError'
 import { DeviceStreamer } from '../../types'
@@ -18,23 +19,36 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
 
     public isRunning = false
     protected numPacketsDropped = 0
+
+    private eegOutlet: LslOutlet
+    private accelOutlet: LslOutlet
+
     private infos!: FTDI.FTDI_DeviceInfo[]
     private device!: FTDI.FTDI_Device
     private packet!: Uint8Array<ArrayBufferLike>
     private packetCounter!: number
-    private eegOutlet: LslOutlet
-    private accelOutlet: LslOutlet
 
-    protected constructor(eegOutlet: LslOutlet, accelOutlet: LslOutlet) {
+    protected constructor(options: CgxDeviceStreamerConstructorOptions) {
+        const { eegOutlet, accelOutlet } = options
+
         this.eegOutlet = eegOutlet
         this.accelOutlet = accelOutlet
     }
 
-    public static async Create() {
+    public static async Create(options?: CgxDeviceStreamerOptions) {
+        const { xdfRecordPath } = options ?? {}
+
         const eegOutlet = await LslStreamOutlet.Create(this.eegOptions)
         const accelOutlet = await LslStreamOutlet.Create(this.accelOptions)
 
-        return new (this.Class ?? this)(eegOutlet, accelOutlet)
+        return new (this.Class ?? this)({
+            eegOutlet,
+            accelOutlet,
+            xdfRecorder: xdfRecordPath
+                ? XdfStreamRecorder.Create(xdfRecordPath, this.streamQueries)
+                : undefined,
+            ...options,
+        })
     }
 
     public async startStreaming() {
@@ -222,7 +236,9 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
 
     public async disconnect() {}
 
-    public readonly streamQueries = ['type="EEG"', 'type="ACCEL"']
+    public readonly streamQueries = CgxDeviceStreamer.streamQueries
+
+    private static readonly streamQueries = ['type="EEG"', 'type="ACCEL"']
 
     private get headerByte() {
         return this.packet[0]
@@ -314,7 +330,17 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
     }
 }
 
+export interface CgxDeviceStreamerOptions {
+    xdfRecordPath?: string
+}
+
 export type CgxDeviceStreamerConstructor = new (
-    eegOutlet: LslOutlet,
-    accelOutlet: LslOutlet
+    options: CgxDeviceStreamerConstructorOptions
 ) => DeviceStreamer
+
+export interface CgxDeviceStreamerConstructorOptions {
+    eegOutlet: LslOutlet
+    accelOutlet: LslOutlet
+    xdfRecorder?: XdfRecorder
+    xdfRecordPath?: string
+}

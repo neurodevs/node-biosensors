@@ -1,18 +1,16 @@
 import { LslOutlet } from '@neurodevs/node-lsl'
 import { DeviceStreamer } from 'types'
+import { CgxDeviceStreamerConstructorOptions } from '../../../modules/devices/CgxDeviceStreamer'
 
 export default class FakeCgxDeviceStreamer implements DeviceStreamer {
-    public static callsToConstructor: CallToCgxConstructor[] = []
+    public static callsToConstructor: (CallToCgxConstructor | undefined)[] = []
     public static numCallsToConnectBle = 0
     public static numCallsToStartStreaming = 0
     public static numCallsToStopStreaming = 0
     public static numCallsToDisconnect = 0
 
-    public constructor(eegOutlet?: LslOutlet, accelOutlet?: LslOutlet) {
-        FakeCgxDeviceStreamer.callsToConstructor.push({
-            eegOutlet,
-            accelOutlet,
-        })
+    public constructor(options?: CgxDeviceStreamerConstructorOptions) {
+        FakeCgxDeviceStreamer.callsToConstructor.push(options)
     }
 
     public async connectBle() {
@@ -42,7 +40,9 @@ export default class FakeCgxDeviceStreamer implements DeviceStreamer {
     }
 }
 
-export interface CallToCgxConstructor {
-    eegOutlet?: LslOutlet
-    accelOutlet?: LslOutlet
-}
+export type CallToCgxConstructor =
+    | {
+          eegOutlet?: LslOutlet
+          accelOutlet?: LslOutlet
+      }
+    | undefined
