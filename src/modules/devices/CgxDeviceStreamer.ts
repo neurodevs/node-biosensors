@@ -16,6 +16,7 @@ import { DeviceStreamer } from '../../types'
 export default class CgxDeviceStreamer implements DeviceStreamer {
     public static Class?: CgxDeviceStreamerConstructor
     public static FTDI = FTDI
+    private static readonly streamQueries = ['type="EEG"', 'type="ACCEL"']
 
     public isRunning = false
     protected numPacketsDropped = 0
@@ -38,15 +39,15 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
     public static async Create(options?: CgxDeviceStreamerOptions) {
         const { xdfRecordPath } = options ?? {}
 
-        const eegOutlet = await LslStreamOutlet.Create(this.eegOptions)
-        const accelOutlet = await LslStreamOutlet.Create(this.accelOptions)
+        const eegOutlet = await this.EegOutlet()
+        const accelOutlet = await this.AccelOutlet()
+
+        const xdfRecorder = this.createXdfRecorderIfPath(xdfRecordPath)
 
         return new (this.Class ?? this)({
             eegOutlet,
             accelOutlet,
-            xdfRecorder: xdfRecordPath
-                ? XdfStreamRecorder.Create(xdfRecordPath, this.streamQueries)
-                : undefined,
+            xdfRecorder,
             ...options,
         })
     }
@@ -238,14 +239,24 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
 
     public readonly streamQueries = CgxDeviceStreamer.streamQueries
 
-    private static readonly streamQueries = ['type="EEG"', 'type="ACCEL"']
-
     private get headerByte() {
         return this.packet[0]
     }
 
     private get counterByte() {
         return this.packet[1]
+    }
+
+    private get numEegChannels() {
+        return CgxDeviceStreamer.eegCharacteristicNames.length
+    }
+
+    private get numAccelChannels() {
+        return CgxDeviceStreamer.accelCharacteristicNames.length
+    }
+
+    private get FTDI() {
+        return CgxDeviceStreamer.FTDI
     }
 
     private readonly readTimeoutMs = 1000
@@ -317,16 +328,18 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
         maxBuffered: 360,
     }
 
-    private get numEegChannels() {
-        return CgxDeviceStreamer.eegCharacteristicNames.length
+    private static createXdfRecorderIfPath(xdfRecordPath?: string) {
+        return xdfRecordPath
+            ? XdfStreamRecorder.Create(xdfRecordPath, this.streamQueries)
+            : undefined
     }
 
-    private get numAccelChannels() {
-        return CgxDeviceStreamer.accelCharacteristicNames.length
+    private static async EegOutlet() {
+        return await LslStreamOutlet.Create(this.eegOptions)
     }
 
-    private get FTDI() {
-        return CgxDeviceStreamer.FTDI
+    private static async AccelOutlet() {
+        return await LslStreamOutlet.Create(this.accelOptions)
     }
 }
 
