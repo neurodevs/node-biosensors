@@ -1,4 +1,4 @@
-import CgxDeviceStreamer from '../modules/CgxDeviceStreamer'
+import CgxDeviceStreamer from '../modules/devices/CgxDeviceStreamer'
 
 async function main() {
     const streamer = await CgxDeviceStreamer.Create()

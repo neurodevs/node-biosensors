@@ -1,5 +1,5 @@
 import { LslOutlet } from '@neurodevs/node-lsl'
-import CgxDeviceStreamer from '../../../modules/CgxDeviceStreamer'
+import CgxDeviceStreamer from '../../../modules/devices/CgxDeviceStreamer'
 
 export default class SpyCgxDeviceStreamer extends CgxDeviceStreamer {
     public constructor(eegOutlet: LslOutlet, accelOutlet: LslOutlet) {

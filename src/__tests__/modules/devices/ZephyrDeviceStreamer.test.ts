@@ -1,6 +1,6 @@
 import AbstractSpruceTest, { test, assert } from '@sprucelabs/test-utils'
-import ZephyrDeviceStreamer from '../../modules/ZephyrDeviceStreamer'
-import { DeviceStreamer } from '../../types'
+import ZephyrDeviceStreamer from '../../../modules/devices/ZephyrDeviceStreamer'
+import { DeviceStreamer } from '../../../types'
 
 export default class ZephyrDeviceStreamerTest extends AbstractSpruceTest {
     private static instance: DeviceStreamer

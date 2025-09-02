@@ -1,9 +1,9 @@
 import { DeviceStreamer } from '../types'
-import CgxDeviceStreamer from './CgxDeviceStreamer'
+import CgxDeviceStreamer from './devices/CgxDeviceStreamer'
 import MuseDeviceStreamer, {
     MuseDeviceStreamerOptions,
-} from './MuseDeviceStreamer'
-import ZephyrDeviceStreamer from './ZephyrDeviceStreamer'
+} from './devices/MuseDeviceStreamer'
+import ZephyrDeviceStreamer from './devices/ZephyrDeviceStreamer'
 
 export default class BiosensorDeviceFactory implements DeviceFactory {
     public static Class?: DeviceFactoryConstructor

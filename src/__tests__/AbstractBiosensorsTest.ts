@@ -17,9 +17,9 @@ import {
     FakeStreamInfo,
 } from '@neurodevs/node-lsl'
 import { XdfStreamRecorder, FakeXdfRecorder } from '@neurodevs/node-xdf'
-import CgxDeviceStreamer from '../modules/CgxDeviceStreamer'
-import MuseDeviceStreamer from '../modules/MuseDeviceStreamer'
-import ZephyrDeviceStreamer from '../modules/ZephyrDeviceStreamer'
+import CgxDeviceStreamer from '../modules/devices/CgxDeviceStreamer'
+import MuseDeviceStreamer from '../modules/devices/MuseDeviceStreamer'
+import ZephyrDeviceStreamer from '../modules/devices/ZephyrDeviceStreamer'
 import FakeCgxDeviceStreamer from '../testDoubles/DeviceStreamer/CgxDeviceStreamer/FakeCgxDeviceStreamer'
 import FakeMuseDeviceStreamer from '../testDoubles/DeviceStreamer/MuseDeviceStreamer/FakeMuseDeviceStreamer'
 import FakeZephyrDeviceStreamer from '../testDoubles/DeviceStreamer/ZephyrDeviceStreamer/FakeZephyrDeviceStreamer'

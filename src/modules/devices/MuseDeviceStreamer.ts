@@ -11,7 +11,7 @@ import {
     LslOutletOptions,
     LslStreamOutlet,
 } from '@neurodevs/node-lsl'
-import { DeviceStreamer } from '../types'
+import { DeviceStreamer } from '../../types'
 
 export default class MuseDeviceStreamer implements BleDeviceStreamer {
     public static Class?: MuseDeviceStreamerConstructor

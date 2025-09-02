@@ -8,8 +8,8 @@ export * from './testDoubles/DeviceFactory/FakeDeviceFactory'
 
 // Cognionics Quick-20r
 
-export { default as CgxDeviceStreamer } from './modules/CgxDeviceStreamer'
-export * from './modules/CgxDeviceStreamer'
+export { default as CgxDeviceStreamer } from './modules/devices/CgxDeviceStreamer'
+export * from './modules/devices/CgxDeviceStreamer'
 
 export { default as SpyCgxDeviceStreamer } from './testDoubles/DeviceStreamer/CgxDeviceStreamer/SpyCgxDeviceStreamer'
 export * from './testDoubles/DeviceStreamer/CgxDeviceStreamer/SpyCgxDeviceStreamer'
@@ -19,8 +19,8 @@ export * from './testDoubles/DeviceStreamer/CgxDeviceStreamer/FakeCgxDeviceStrea
 
 // Muse S Gen 2
 
-export { default as MuseDeviceStreamer } from './modules/MuseDeviceStreamer'
-export * from './modules/MuseDeviceStreamer'
+export { default as MuseDeviceStreamer } from './modules/devices/MuseDeviceStreamer'
+export * from './modules/devices/MuseDeviceStreamer'
 
 export { default as SpyMuseDeviceStreamer } from './testDoubles/DeviceStreamer/MuseDeviceStreamer/SpyMuseDeviceStreamer'
 export * from './testDoubles/DeviceStreamer/MuseDeviceStreamer/SpyMuseDeviceStreamer'
@@ -30,8 +30,8 @@ export * from './testDoubles/DeviceStreamer/MuseDeviceStreamer/FakeMuseDeviceStr
 
 // Zephyr BioHarness 3
 
-export { default as ZephyrDeviceStreamer } from './modules/ZephyrDeviceStreamer'
-export * from './modules/ZephyrDeviceStreamer'
+export { default as ZephyrDeviceStreamer } from './modules/devices/ZephyrDeviceStreamer'
+export * from './modules/devices/ZephyrDeviceStreamer'
 
 export { default as FakeZephyrDeviceStreamer } from './testDoubles/DeviceStreamer/ZephyrDeviceStreamer/FakeZephyrDeviceStreamer'
 export * from './testDoubles/DeviceStreamer/ZephyrDeviceStreamer/FakeZephyrDeviceStreamer'

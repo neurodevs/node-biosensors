@@ -9,8 +9,8 @@
 
 import { ChannelFormat, LslOutlet, LslStreamOutlet } from '@neurodevs/node-lsl'
 import FTDI from 'ftdi-d2xx'
-import SpruceError from '../errors/SpruceError'
-import { DeviceStreamer } from '../types'
+import SpruceError from '../../errors/SpruceError'
+import { DeviceStreamer } from '../../types'
 
 export default class CgxDeviceStreamer implements DeviceStreamer {
     public static Class?: CgxDeviceStreamerConstructor
