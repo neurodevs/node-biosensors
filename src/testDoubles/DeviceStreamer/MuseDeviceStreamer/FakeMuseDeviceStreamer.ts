@@ -35,7 +35,7 @@ export default class FakeMuseDeviceStreamer implements DeviceStreamer {
         FakeMuseDeviceStreamer.numCallsToDisconnect++
     }
 
-    public streamQueries = []
+    public streamQueries = ['type="EEG"', 'type="PPG"']
 
     public static resetTestDouble() {
         this.callsToConstructor = []

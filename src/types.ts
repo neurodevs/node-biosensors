@@ -4,3 +4,7 @@ export interface DeviceStreamer {
     disconnect(): Promise<void>
     readonly streamQueries: string[]
 }
+
+export interface DeviceStreamerOptions {
+    xdfRecordPath?: string
+}

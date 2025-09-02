@@ -29,7 +29,7 @@ export default class FakeCgxDeviceStreamer implements DeviceStreamer {
         FakeCgxDeviceStreamer.numCallsToDisconnect++
     }
 
-    public streamQueries = []
+    public streamQueries = ['type="EEG"', 'type="ACCEL"']
 
     public static resetTestDouble() {
         this.callsToConstructor = []

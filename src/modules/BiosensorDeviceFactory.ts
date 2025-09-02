@@ -1,4 +1,5 @@
-import { DeviceStreamer } from '../types'
+import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
+import { DeviceStreamer, DeviceStreamerOptions } from '../types'
 import CgxDeviceStreamer from './devices/CgxDeviceStreamer'
 import MuseDeviceStreamer, {
     MuseDeviceStreamerOptions,
@@ -48,12 +49,27 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         return `\n\nInvalid device name: ${this.currentName}!\n\nPlease choose from:\n\n- Cognionics Quick-20r\n- Muse S Gen 2\n- Zephyr BioHarness 3\n\n`
     }
 
-    public async createDevices(devices: DeviceSpecification[]) {
-        return Promise.all(
+    public async createDevices(
+        devices: DeviceSpecification[],
+        options?: CreateDevicesOptions
+    ): Promise<[DeviceStreamer[], XdfRecorder | undefined]> {
+        const { xdfRecordPath } = options ?? {}
+
+        const createdDevices = await Promise.all(
             devices.map((device) =>
                 this.createDevice(device.name, device.options)
             )
         )
+
+        const streamQueries = createdDevices.flatMap(
+            (device) => device.streamQueries
+        )
+
+        const recorder = xdfRecordPath
+            ? XdfStreamRecorder.Create(xdfRecordPath, streamQueries)
+            : undefined
+
+        return [createdDevices, recorder]
     }
 
     private CgxDeviceStreamer() {
@@ -75,10 +91,17 @@ export interface DeviceFactory {
         options?: DeviceOptionsMap[K]
     ): Promise<DeviceStreamer>
 
-    createDevices(devices: DeviceSpecification[]): Promise<DeviceStreamer[]>
+    createDevices(
+        devices: DeviceSpecification[],
+        options?: CreateDevicesOptions
+    ): Promise<[DeviceStreamer[], XdfRecorder | undefined]>
 }
 
 export type DeviceFactoryConstructor = new () => DeviceFactory
+
+export interface CreateDevicesOptions {
+    xdfRecordPath?: string
+}
 
 export type DeviceName =
     | 'Cognionics Quick-20r'
@@ -88,9 +111,9 @@ export type DeviceName =
 export type DeviceOptions = DeviceOptionsMap[DeviceName]
 
 export interface DeviceOptionsMap {
-    'Cognionics Quick-20r': never
+    'Cognionics Quick-20r': DeviceStreamerOptions
     'Muse S Gen 2': MuseDeviceStreamerOptions
-    'Zephyr BioHarness 3': never
+    'Zephyr BioHarness 3': DeviceStreamerOptions
 }
 
 export interface DeviceSpecification {

@@ -2,6 +2,7 @@ import { DeviceStreamer } from '../../types'
 
 export default class ZephyrDeviceStreamer implements DeviceStreamer {
     public static Class?: DeviceStreamerConstructor
+    public static readonly streamQueries = []
 
     protected constructor() {}
 
@@ -21,7 +22,7 @@ export default class ZephyrDeviceStreamer implements DeviceStreamer {
         throw new Error('Method not implemented.')
     }
 
-    public streamQueries: string[] = []
+    public streamQueries = ZephyrDeviceStreamer.streamQueries
 }
 
 export type DeviceStreamerConstructor = new () => DeviceStreamer

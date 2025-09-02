@@ -1,4 +1,6 @@
+import { XdfRecorder } from '@neurodevs/node-xdf'
 import {
+    CreateDevicesOptions,
     DeviceFactory,
     DeviceName,
     DeviceOptions,
@@ -22,12 +24,23 @@ export default class FakeDeviceFactory implements DeviceFactory {
         return FakeDeviceFactory.fakeDevice
     }
 
-    public async createDevices(devices: DeviceSpecification[]) {
+    public async createDevices(
+        devices: DeviceSpecification[],
+        options?: CreateDevicesOptions
+    ) {
         FakeDeviceFactory.callsToCreateDevices.push(devices)
+        const { xdfRecordPath } = options ?? {}
 
-        return Promise.all(
+        const recorder = xdfRecordPath ? ({} as XdfRecorder) : undefined
+
+        const createdDevices = await Promise.all(
             devices.map((device) => this.createDevice(device.name))
         )
+
+        return [createdDevices, recorder] as [
+            DeviceStreamer[],
+            XdfRecorder | undefined,
+        ]
     }
 
     public static resetTestDouble() {

@@ -11,10 +11,11 @@ import {
     LslOutletOptions,
     LslStreamOutlet,
 } from '@neurodevs/node-lsl'
-import { DeviceStreamer } from '../../types'
+import { DeviceStreamer, DeviceStreamerOptions } from '../../types'
 
 export default class MuseDeviceStreamer implements BleDeviceStreamer {
     public static Class?: MuseDeviceStreamerConstructor
+    public static readonly streamQueries = ['type="EEG"', 'type="PPG"']
 
     protected bleConnector?: BleConnector
     private scanOptions: ScanOptions
@@ -251,7 +252,7 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
         this.ppgChannelChunks = this.generateEmptyPpgMatrix()
     }
 
-    public readonly streamQueries = ['type="EEG"', 'type="PPG"']
+    public readonly streamQueries = MuseDeviceStreamer.streamQueries
 
     public get bleUuid() {
         return this.bleController.uuid
@@ -365,7 +366,7 @@ export interface BleDeviceStreamer extends DeviceStreamer {
     readonly bleName: string
 }
 
-export interface MuseDeviceStreamerOptions {
+export interface MuseDeviceStreamerOptions extends DeviceStreamerOptions {
     bleUuid?: string
     rssiIntervalMs?: number
 }

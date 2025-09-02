@@ -16,7 +16,7 @@ import { DeviceStreamer } from '../../types'
 export default class CgxDeviceStreamer implements DeviceStreamer {
     public static Class?: CgxDeviceStreamerConstructor
     public static FTDI = FTDI
-    private static readonly streamQueries = ['type="EEG"', 'type="ACCEL"']
+    public static readonly streamQueries = ['type="EEG"', 'type="ACCEL"']
 
     public isRunning = false
     protected numPacketsDropped = 0
