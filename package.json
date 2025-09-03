@@ -64,8 +64,8 @@
     }
   },
   "dependencies": {
-    "@neurodevs/node-ble": "^0.11.1",
-    "@neurodevs/node-lsl": "^11.2.0",
+    "@neurodevs/node-ble": "^1.0.0",
+    "@neurodevs/node-lsl": "^11.2.1",
     "@neurodevs/node-xdf": "^1.4.2",
     "@sprucelabs/error": "^6.0.566",
     "@sprucelabs/schema": "^31.0.19",
