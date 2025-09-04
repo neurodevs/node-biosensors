@@ -135,7 +135,7 @@ export default class BiosensorDeviceFactoryTest extends AbstractBiosensorsTest {
         assert.isTruthy(recorder, 'Did not return XdfRecorder!')
     }
 
-    @test.only()
+    @test()
     protected static async onlyCreatesOneInstanceOfXdfRecorder() {
         await this.createDevices(true)
 

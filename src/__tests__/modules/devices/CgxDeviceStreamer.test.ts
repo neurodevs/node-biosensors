@@ -325,7 +325,7 @@ export default class CgxDeviceStreamerTest extends AbstractDeviceStreamerTest {
     protected static async passesXdfRecordPathToRecorder() {
         await this.createStreamerWithRecorder()
 
-        const { xdfRecordPath } = FakeXdfRecorder.callsToConstructor[0]
+        const { xdfRecordPath } = FakeXdfRecorder.callsToConstructor[0] ?? {}
         assert.isEqual(xdfRecordPath, this.xdfRecordPath, 'Incorrect path!')
     }
 
@@ -333,7 +333,7 @@ export default class CgxDeviceStreamerTest extends AbstractDeviceStreamerTest {
     protected static async passesStreamQueriesToRecorder() {
         await this.createStreamerWithRecorder()
 
-        const { streamQueries } = FakeXdfRecorder.callsToConstructor[0]
+        const { streamQueries } = FakeXdfRecorder.callsToConstructor[0] ?? {}
 
         assert.isEqualDeep(
             streamQueries,
