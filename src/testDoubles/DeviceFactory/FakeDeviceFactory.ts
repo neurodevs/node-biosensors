@@ -37,11 +37,13 @@ export default class FakeDeviceFactory implements DeviceFactory {
         const { xdfRecordPath } = options ?? {}
 
         if (xdfRecordPath) {
-            const recorder = {} as XdfRecorder
-            return [FakeDeviceFactory.fakeDevice, recorder]
+            return [this.fakeDevice, this.fakeRecorder] as [
+                DeviceStreamer,
+                XdfRecorder,
+            ]
         }
 
-        return FakeDeviceFactory.fakeDevice
+        return this.fakeDevice
     }
 
     public async createDevices(
@@ -66,11 +68,21 @@ export default class FakeDeviceFactory implements DeviceFactory {
         )
 
         if (xdfRecordPath) {
-            const recorder = {} as XdfRecorder
-            return [createdDevices, recorder]
+            return [createdDevices, this.fakeRecorder] as [
+                DeviceStreamer[],
+                XdfRecorder,
+            ]
         }
 
         return createdDevices
+    }
+
+    public get fakeDevice() {
+        return FakeDeviceFactory.fakeDevice
+    }
+
+    public get fakeRecorder() {
+        return FakeDeviceFactory.fakeRecorder
     }
 
     public static resetTestDouble() {
