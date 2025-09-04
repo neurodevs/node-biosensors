@@ -1,8 +1,7 @@
 import { test, assert, generateId } from '@sprucelabs/test-utils'
-import { FakeXdfRecorder } from '@neurodevs/node-xdf'
+import { FakeXdfRecorder, XdfRecorder } from '@neurodevs/node-xdf'
 import BiosensorDeviceFactory, {
     DeviceFactory,
-    DeviceOptionsMap,
     DeviceSpecification,
 } from '../../modules/BiosensorDeviceFactory'
 import CgxDeviceStreamer from '../../modules/devices/CgxDeviceStreamer'
@@ -10,7 +9,7 @@ import MuseDeviceStreamer, {
     MuseDeviceStreamerOptions,
 } from '../../modules/devices/MuseDeviceStreamer'
 import FakeMuseDeviceStreamer from '../../testDoubles/DeviceStreamer/MuseDeviceStreamer/FakeMuseDeviceStreamer'
-import { DeviceStreamer } from '../../types'
+import { DeviceStreamer, DeviceStreamerOptions } from '../../types'
 import AbstractBiosensorsTest from '../AbstractBiosensorsTest'
 
 export default class BiosensorDeviceFactoryTest extends AbstractBiosensorsTest {
@@ -71,7 +70,7 @@ export default class BiosensorDeviceFactoryTest extends AbstractBiosensorsTest {
         const invalidName = generateId() as any
 
         await assert.doesThrowAsync(
-            async () => await this.createDevice(invalidName),
+            async () => await this.instance.createDevice(invalidName),
             `\n\nInvalid device name: ${invalidName}!\n\nPlease choose from:\n\n- Cognionics Quick-20r\n- Muse S Gen 2\n- Zephyr BioHarness 3\n\n`
         )
     }
@@ -113,6 +112,46 @@ export default class BiosensorDeviceFactoryTest extends AbstractBiosensorsTest {
         assert.isTruthy(recorder, 'Did not return XdfRecorder!')
     }
 
+    @test()
+    protected static async createDeviceCreatesXdfRecorder() {
+        await this.createCgxWithXdfRecorder()
+
+        const { xdfRecordPath, streamQueries } =
+            FakeXdfRecorder.callsToConstructor[0]!
+
+        assert.isEqualDeep(
+            { xdfRecordPath, streamQueries },
+            {
+                xdfRecordPath: this.xdfRecordPath,
+                streamQueries: [...CgxDeviceStreamer.streamQueries],
+            },
+            'Passed incorrect options to XdfRecorder!'
+        )
+    }
+
+    @test()
+    protected static async createDeviceReturnsXdfRecorder() {
+        const [, recorder] = await this.createCgxWithXdfRecorder()
+        assert.isTruthy(recorder, 'Did not return XdfRecorder!')
+    }
+
+    @test.only()
+    protected static async onlyCreatesOneInstanceOfXdfRecorder() {
+        await this.createDevices(true)
+
+        assert.isEqual(
+            FakeXdfRecorder.callsToConstructor.length,
+            1,
+            'Created multiple instances of XdfRecorder!'
+        )
+    }
+
+    private static async createCgxWithXdfRecorder() {
+        return (await this.createCgxDeviceStreamer({
+            xdfRecordPath: this.xdfRecordPath,
+        })) as unknown as [DeviceStreamer, XdfRecorder]
+    }
+
     private static async createDevices(includeXdfRecorder = false) {
         return await this.instance.createDevices(this.specs, {
             xdfRecordPath: includeXdfRecorder ? this.xdfRecordPath : undefined,
@@ -126,25 +165,18 @@ export default class BiosensorDeviceFactoryTest extends AbstractBiosensorsTest {
         { name: 'Muse S Gen 2' },
     ]
 
-    private static createCgxDeviceStreamer() {
-        return this.createDevice('Cognionics Quick-20r')
+    private static createCgxDeviceStreamer(options?: DeviceStreamerOptions) {
+        return this.instance.createDevice('Cognionics Quick-20r', options)
     }
 
     private static createMuseDeviceStreamer(
         options?: MuseDeviceStreamerOptions
     ) {
-        return this.createDevice('Muse S Gen 2', options)
+        return this.instance.createDevice('Muse S Gen 2', options)
     }
 
-    private static createZephyrDeviceStreamer() {
-        return this.createDevice('Zephyr BioHarness 3')
-    }
-
-    private static createDevice<K extends keyof DeviceOptionsMap>(
-        name: K,
-        options?: DeviceOptionsMap[K]
-    ) {
-        return this.instance.createDevice(name, options)
+    private static createZephyrDeviceStreamer(options?: DeviceStreamerOptions) {
+        return this.instance.createDevice('Zephyr BioHarness 3', options)
     }
 
     private static assertDeviceIsTruthy(device: DeviceStreamer) {

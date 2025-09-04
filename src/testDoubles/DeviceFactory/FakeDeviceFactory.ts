@@ -19,10 +19,38 @@ export default class FakeDeviceFactory implements DeviceFactory {
         FakeDeviceFactory.numCallsToConstructor++
     }
 
+    public async createDevice(
+        name: DeviceName,
+        options: DeviceOptions & { xdfRecordPath: string }
+    ): Promise<[DeviceStreamer, XdfRecorder]>
+
+    public async createDevice(
+        name: DeviceName,
+        options?: DeviceOptions
+    ): Promise<DeviceStreamer>
+
     public async createDevice(name: DeviceName, options?: DeviceOptions) {
         FakeDeviceFactory.callsToCreateDevice.push({ name, options })
+
+        const { xdfRecordPath } = options ?? {}
+
+        if (xdfRecordPath) {
+            const recorder = {} as XdfRecorder
+            return [FakeDeviceFactory.fakeDevice, recorder]
+        }
+
         return FakeDeviceFactory.fakeDevice
     }
+
+    public async createDevices(
+        devices: DeviceSpecification[],
+        options: CreateDevicesOptions & { xdfRecordPath: string }
+    ): Promise<[DeviceStreamer[], XdfRecorder]>
+
+    public async createDevices(
+        devices: DeviceSpecification[],
+        options?: CreateDevicesOptions
+    ): Promise<DeviceStreamer[]>
 
     public async createDevices(
         devices: DeviceSpecification[],
@@ -37,7 +65,7 @@ export default class FakeDeviceFactory implements DeviceFactory {
 
         if (xdfRecordPath) {
             const recorder = {} as XdfRecorder
-            return [createdDevices, recorder] as [DeviceStreamer[], XdfRecorder]
+            return [createdDevices, recorder]
         }
 
         return createdDevices

@@ -9,13 +9,12 @@ import ZephyrDeviceStreamer from './devices/ZephyrDeviceStreamer'
 export default class BiosensorDeviceFactory implements DeviceFactory {
     public static Class?: DeviceFactoryConstructor
 
-    private currentName!: DeviceName
-    private currentOptions?: DeviceOptionsMap[DeviceName]
+    private deviceName!: DeviceName
+    private deviceOptions?: DeviceOptionsMap[DeviceName]
+    private createdDevice!: DeviceStreamer
 
-    private currentDevices!: DeviceSpecification[]
-    private currentXdfRecordPath?: string
+    private deviceSpecifications!: DeviceSpecification[]
     private createdDevices!: DeviceStreamer[]
-    private createdRecorder?: XdfRecorder
 
     protected constructor() {}
 
@@ -25,16 +24,38 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
 
     public async createDevice<K extends keyof DeviceOptionsMap>(
         name: K,
+        options?: DeviceOptionsMap[K] & { xdfRecordPath: string }
+    ): Promise<[DeviceStreamer, XdfRecorder]>
+
+    public async createDevice<K extends keyof DeviceOptionsMap>(
+        name: K,
+        options?: DeviceOptionsMap[K]
+    ): Promise<DeviceStreamer>
+
+    public async createDevice<K extends keyof DeviceOptionsMap>(
+        name: K,
         options?: DeviceOptionsMap[K]
     ) {
-        this.currentName = name
-        this.currentOptions = options
+        this.deviceName = name
+        this.deviceOptions = options
 
-        return this.createDeviceByName()
+        const { xdfRecordPath } = options ?? {}
+
+        this.createdDevice = await this.createDeviceByName()
+
+        if (xdfRecordPath) {
+            const recorder = this.XdfStreamRecorder(
+                xdfRecordPath,
+                this.deviceStreamQueries
+            )
+            return [this.createdDevice, recorder]
+        }
+
+        return this.createdDevice
     }
 
-    private createDeviceByName() {
-        switch (this.currentName) {
+    private async createDeviceByName() {
+        switch (this.deviceName) {
             case 'Cognionics Quick-20r':
                 return this.CgxDeviceStreamer()
             case 'Muse S Gen 2':
@@ -51,23 +72,35 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
     }
 
     private get invalidNameErrorMessage() {
-        return `\n\nInvalid device name: ${this.currentName}!\n\nPlease choose from:\n\n- Cognionics Quick-20r\n- Muse S Gen 2\n- Zephyr BioHarness 3\n\n`
+        return `\n\nInvalid device name: ${this.deviceName}!\n\nPlease choose from:\n\n- Cognionics Quick-20r\n- Muse S Gen 2\n- Zephyr BioHarness 3\n\n`
     }
 
     public async createDevices(
         devices: DeviceSpecification[],
+        options?: CreateDevicesOptions & { xdfRecordPath: string }
+    ): Promise<[DeviceStreamer[], XdfRecorder]>
+
+    public async createDevices(
+        devices: DeviceSpecification[],
         options?: CreateDevicesOptions
-    ): Promise<DeviceStreamer[] | [DeviceStreamer[], XdfRecorder]> {
+    ): Promise<DeviceStreamer[]>
+
+    public async createDevices(
+        devices: DeviceSpecification[],
+        options?: CreateDevicesOptions
+    ) {
         const { xdfRecordPath } = options ?? {}
 
-        this.currentDevices = devices
-        this.currentXdfRecordPath = xdfRecordPath
-
+        this.deviceSpecifications = devices
         this.createdDevices = await this.createAllDevices()
 
-        if (this.currentXdfRecordPath) {
-            this.createdRecorder = this.XdfStreamRecorder()
-            return [this.createdDevices, this.createdRecorder!]
+        if (xdfRecordPath) {
+            const recorder = this.XdfStreamRecorder(
+                xdfRecordPath,
+                this.allStreamQueries
+            )
+
+            return [this.createdDevices, recorder]
         }
 
         return this.createdDevices
@@ -75,10 +108,14 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
 
     private async createAllDevices() {
         return await Promise.all(
-            this.currentDevices.map((device) =>
+            this.deviceSpecifications.map((device) =>
                 this.createDevice(device.name, device.options)
             )
         )
+    }
+
+    private get deviceStreamQueries() {
+        return this.createdDevice.streamQueries
     }
 
     private get allStreamQueries() {
@@ -90,22 +127,24 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
     }
 
     private MuseDeviceStreamer() {
-        return MuseDeviceStreamer.Create(this.currentOptions)
+        return MuseDeviceStreamer.Create(this.deviceOptions)
     }
 
     private ZephyrDeviceStreamer() {
         return ZephyrDeviceStreamer.Create()
     }
 
-    private XdfStreamRecorder() {
-        return XdfStreamRecorder.Create(
-            this.currentXdfRecordPath!,
-            this.allStreamQueries
-        )
+    private XdfStreamRecorder(xdfRecordPath: string, streamQueries: string[]) {
+        return XdfStreamRecorder.Create(xdfRecordPath, streamQueries)
     }
 }
 
 export interface DeviceFactory {
+    createDevice<K extends DeviceName>(
+        name: K,
+        options: DeviceOptionsMap[K] & { xdfRecordPath: string }
+    ): Promise<[DeviceStreamer, XdfRecorder]>
+
     createDevice<K extends DeviceName>(
         name: K,
         options?: DeviceOptionsMap[K]
@@ -113,8 +152,13 @@ export interface DeviceFactory {
 
     createDevices(
         devices: DeviceSpecification[],
+        options: CreateDevicesOptions & { xdfRecordPath: string }
+    ): Promise<[DeviceStreamer[], XdfRecorder]>
+
+    createDevices(
+        devices: DeviceSpecification[],
         options?: CreateDevicesOptions
-    ): Promise<DeviceStreamer[] | [DeviceStreamer[], XdfRecorder]>
+    ): Promise<DeviceStreamer[]>
 }
 
 export type DeviceFactoryConstructor = new () => DeviceFactory
