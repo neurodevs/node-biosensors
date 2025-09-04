@@ -31,16 +31,16 @@ export default class FakeDeviceFactory implements DeviceFactory {
         FakeDeviceFactory.callsToCreateDevices.push(devices)
         const { xdfRecordPath } = options ?? {}
 
-        const recorder = xdfRecordPath ? ({} as XdfRecorder) : undefined
-
         const createdDevices = await Promise.all(
             devices.map((device) => this.createDevice(device.name))
         )
 
-        return [createdDevices, recorder] as [
-            DeviceStreamer[],
-            XdfRecorder | undefined,
-        ]
+        if (xdfRecordPath) {
+            const recorder = {} as XdfRecorder
+            return [createdDevices, recorder] as [DeviceStreamer[], XdfRecorder]
+        }
+
+        return createdDevices
     }
 
     public static resetTestDouble() {

@@ -57,16 +57,20 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
     public async createDevices(
         devices: DeviceSpecification[],
         options?: CreateDevicesOptions
-    ): Promise<StreamersAndRecorderTuple> {
+    ): Promise<DeviceStreamer[] | [DeviceStreamer[], XdfRecorder]> {
         const { xdfRecordPath } = options ?? {}
 
         this.currentDevices = devices
         this.currentXdfRecordPath = xdfRecordPath
 
         this.createdDevices = await this.createAllDevices()
-        this.createdRecorder = this.createXdfRecorderIfPath()
 
-        return [this.createdDevices, this.createdRecorder]
+        if (this.currentXdfRecordPath) {
+            this.createdRecorder = this.XdfStreamRecorder()
+            return [this.createdDevices, this.createdRecorder!]
+        }
+
+        return this.createdDevices
     }
 
     private async createAllDevices() {
@@ -75,10 +79,6 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
                 this.createDevice(device.name, device.options)
             )
         )
-    }
-
-    private createXdfRecorderIfPath() {
-        return this.currentXdfRecordPath ? this.XdfStreamRecorder() : undefined
     }
 
     private get allStreamQueries() {
@@ -114,7 +114,7 @@ export interface DeviceFactory {
     createDevices(
         devices: DeviceSpecification[],
         options?: CreateDevicesOptions
-    ): Promise<StreamersAndRecorderTuple>
+    ): Promise<DeviceStreamer[] | [DeviceStreamer[], XdfRecorder]>
 }
 
 export type DeviceFactoryConstructor = new () => DeviceFactory
@@ -140,8 +140,3 @@ export interface DeviceSpecification {
     name: DeviceName
     options?: DeviceOptionsMap[DeviceName]
 }
-
-export type StreamersAndRecorderTuple = [
-    DeviceStreamer[],
-    XdfRecorder | undefined,
-]
