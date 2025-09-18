@@ -1,6 +1,6 @@
 {
   "name": "@neurodevs/node-biosensors",
-  "version": "4.0.2",
+  "version": "4.1.0",
   "main": "build/index.js",
   "repository": "https://github.com/neurodevs/node-biosensors.git",
   "scripts": {
@@ -65,7 +65,7 @@
   },
   "dependencies": {
     "@neurodevs/node-ble": "^1.0.0",
-    "@neurodevs/node-lsl": "^11.2.1",
+    "@neurodevs/node-lsl": "^11.4.1",
     "@neurodevs/node-xdf": "^1.4.3",
     "@sprucelabs/error": "^6.0.566",
     "@sprucelabs/schema": "^31.0.19",

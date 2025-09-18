@@ -22,6 +22,10 @@ export default class FakeZephyrDeviceStreamer implements DeviceStreamer {
         FakeZephyrDeviceStreamer.numCallsToDisconnect++
     }
 
+    public get outlets() {
+        return []
+    }
+
     public streamQueries = []
 
     public static resetTestDouble() {

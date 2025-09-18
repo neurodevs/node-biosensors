@@ -22,6 +22,10 @@ export default class ZephyrDeviceStreamer implements DeviceStreamer {
         throw new Error('Method not implemented.')
     }
 
+    public get outlets() {
+        return []
+    }
+
     public streamQueries = ZephyrDeviceStreamer.streamQueries
 }
 

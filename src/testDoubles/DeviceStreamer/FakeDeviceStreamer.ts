@@ -1,3 +1,4 @@
+import { FakeLslOutlet } from '@neurodevs/node-lsl'
 import { DeviceStreamer, DeviceStreamerOptions } from 'types'
 
 export default class FakeDeviceStreamer implements DeviceStreamer {
@@ -22,6 +23,10 @@ export default class FakeDeviceStreamer implements DeviceStreamer {
 
     public async disconnect() {
         FakeDeviceStreamer.numCallsToDisconnect++
+    }
+
+    public get outlets() {
+        return this.streamQueries.map(() => new FakeLslOutlet())
     }
 
     public streamQueries = FakeDeviceStreamer.fakeStreamQueries

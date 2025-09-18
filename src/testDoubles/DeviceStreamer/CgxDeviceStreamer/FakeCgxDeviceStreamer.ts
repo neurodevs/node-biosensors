@@ -1,4 +1,4 @@
-import { LslOutlet } from '@neurodevs/node-lsl'
+import { FakeLslOutlet, LslOutlet } from '@neurodevs/node-lsl'
 import { DeviceStreamer } from 'types'
 import { CgxDeviceStreamerConstructorOptions } from '../../../modules/devices/CgxDeviceStreamer'
 
@@ -22,6 +22,13 @@ export default class FakeCgxDeviceStreamer implements DeviceStreamer {
 
     public async disconnect() {
         FakeCgxDeviceStreamer.numCallsToDisconnect++
+    }
+
+    public fakeEegOutlet = new FakeLslOutlet()
+    public fakeAccelOutlet = new FakeLslOutlet()
+
+    public get outlets() {
+        return [this.fakeEegOutlet, this.fakeAccelOutlet]
     }
 
     public streamQueries = ['type="EEG"', 'type="ACCEL"']

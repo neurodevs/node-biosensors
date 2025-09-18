@@ -43,7 +43,7 @@ export default class FakeDeviceFactory implements DeviceFactory {
             ]
         }
 
-        return this.fakeDevice
+        return this.fakeDevice as DeviceStreamer
     }
 
     public async createDevices(

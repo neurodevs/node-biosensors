@@ -252,6 +252,10 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
         this.ppgChannelChunks = this.generateEmptyPpgMatrix()
     }
 
+    public get outlets() {
+        return [this.eegOutlet, this.ppgOutlet]
+    }
+
     public readonly streamQueries = MuseDeviceStreamer.streamQueries
 
     public get bleUuid() {

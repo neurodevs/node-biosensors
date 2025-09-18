@@ -1,4 +1,5 @@
 import { generateId } from '@sprucelabs/test-utils'
+import { FakeLslOutlet } from '@neurodevs/node-lsl'
 import { DeviceStreamer } from 'types'
 import { MuseDeviceStreamerConstructorOptions } from '../../../modules/devices/MuseDeviceStreamer'
 
@@ -32,6 +33,13 @@ export default class FakeMuseDeviceStreamer implements DeviceStreamer {
 
     public async disconnect() {
         FakeMuseDeviceStreamer.numCallsToDisconnect++
+    }
+
+    public fakeEegOutlet = new FakeLslOutlet()
+    public fakePpgOutlet = new FakeLslOutlet()
+
+    public get outlets() {
+        return [this.fakeEegOutlet, this.fakePpgOutlet]
     }
 
     public streamQueries = ['type="EEG"', 'type="PPG"']

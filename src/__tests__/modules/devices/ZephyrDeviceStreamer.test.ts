@@ -16,6 +16,15 @@ export default class ZephyrDeviceStreamerTest extends AbstractSpruceTest {
         assert.isTruthy(this.instance, 'Failed to create instance!')
     }
 
+    @test()
+    protected static async exposesLslOutlets() {
+        assert.isEqual(
+            this.instance.outlets.length,
+            0,
+            'Did not expose outlets!'
+        )
+    }
+
     private static ZephyrDeviceStreamer() {
         return ZephyrDeviceStreamer.Create()
     }

@@ -366,6 +366,15 @@ export default class CgxDeviceStreamerTest extends AbstractDeviceStreamerTest {
         )
     }
 
+    @test()
+    protected static async exposesLslOutlets() {
+        assert.isEqual(
+            this.instance.outlets.length,
+            2,
+            'Did not expose outlets!'
+        )
+    }
+
     private static async startStreaming() {
         await this.instance.startStreaming()
     }

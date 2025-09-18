@@ -255,6 +255,10 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
 
     public async disconnect() {}
 
+    public get outlets() {
+        return [this.eegOutlet, this.accelOutlet]
+    }
+
     public readonly streamQueries = CgxDeviceStreamer.streamQueries
 
     private get headerByte() {
