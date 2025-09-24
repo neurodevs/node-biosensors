@@ -11,9 +11,9 @@ import MuseDeviceStreamer, {
 } from '../../../modules/devices/MuseDeviceStreamer'
 import { MUSE_CHARACTERISTIC_UUIDS as CHAR_UUIDS } from '../../../modules/devices/MuseDeviceStreamer'
 import SpyMuseDeviceStreamer from '../../../testDoubles/DeviceStreamer/MuseDeviceStreamer/SpyMuseDeviceStreamer'
-import AbstractDeviceStreamerTest from '../../AbstractDeviceStreamerTest'
+import AbstractPackageTest from '../../AbstractPackageTest'
 
-export default class MuseDeviceStreamerTest extends AbstractDeviceStreamerTest {
+export default class MuseDeviceStreamerTest extends AbstractPackageTest {
     private static instance: SpyMuseDeviceStreamer
     private static museCharCallbacks: Record<string, (data: Buffer) => void>
     private static eegChars: FakeCharacteristic[]

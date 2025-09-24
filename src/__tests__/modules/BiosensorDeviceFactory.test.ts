@@ -10,9 +10,9 @@ import MuseDeviceStreamer, {
 } from '../../modules/devices/MuseDeviceStreamer'
 import FakeMuseDeviceStreamer from '../../testDoubles/DeviceStreamer/MuseDeviceStreamer/FakeMuseDeviceStreamer'
 import { DeviceStreamer, DeviceStreamerOptions } from '../../types'
-import AbstractBiosensorsTest from '../AbstractBiosensorsTest'
+import AbstractPackageTest from '../AbstractPackageTest'
 
-export default class BiosensorDeviceFactoryTest extends AbstractBiosensorsTest {
+export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
     private static instance: DeviceFactory
 
     protected static async beforeEach() {

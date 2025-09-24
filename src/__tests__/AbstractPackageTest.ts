@@ -28,7 +28,7 @@ import FakeZephyrDeviceStreamer from '../testDoubles/DeviceStreamer/ZephyrDevice
 import FakeDeviceFTDI from '../testDoubles/FTDI/FakeDeviceFTDI'
 import FakeFTDI from '../testDoubles/FTDI/FakeFTDI'
 
-export default class AbstractBiosensorsTest extends AbstractSpruceTest {
+export default class AbstractPackageTest extends AbstractSpruceTest {
     protected static async beforeEach() {
         await super.beforeEach()
 

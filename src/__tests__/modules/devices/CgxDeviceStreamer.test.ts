@@ -6,9 +6,9 @@ import CgxDeviceStreamer from '../../../modules/devices/CgxDeviceStreamer'
 import SpyCgxDeviceStreamer from '../../../testDoubles/DeviceStreamer/CgxDeviceStreamer/SpyCgxDeviceStreamer'
 import FakeDeviceFTDI from '../../../testDoubles/FTDI/FakeDeviceFTDI'
 import FakeFTDI from '../../../testDoubles/FTDI/FakeFTDI'
-import AbstractDeviceStreamerTest from '../../AbstractDeviceStreamerTest'
+import AbstractPackageTest from '../../AbstractPackageTest'
 
-export default class CgxDeviceStreamerTest extends AbstractDeviceStreamerTest {
+export default class CgxDeviceStreamerTest extends AbstractPackageTest {
     private static instance: SpyCgxDeviceStreamer
 
     protected static async beforeEach() {
