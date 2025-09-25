@@ -8,10 +8,10 @@ export * from './modules/BiosensorDeviceFactory'
 export { default as FakeDeviceFactory } from './testDoubles/DeviceFactory/FakeDeviceFactory'
 export * from './testDoubles/DeviceFactory/FakeDeviceFactory'
 
-// BiosensorStreamViewer
+// BiosensorArrayMonitor
 
-export { default as BiosensorStreamViewer } from './modules/BiosensorStreamViewer'
-export * from './modules/BiosensorStreamViewer'
+export { default as BiosensorArrayMonitor } from './modules/BiosensorArrayMonitor'
+export * from './modules/BiosensorArrayMonitor'
 
 // Cognionics Quick-20r
 
