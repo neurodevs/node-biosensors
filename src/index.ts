@@ -1,5 +1,7 @@
 export * from './types'
 
+// Node Class Modules --------------------------------------------------------------
+
 // BiosensorDeviceFactory
 
 export { default as BiosensorDeviceFactory } from './modules/BiosensorDeviceFactory'
@@ -42,3 +44,10 @@ export * from './modules/devices/ZephyrDeviceStreamer'
 
 export { default as FakeZephyrDeviceStreamer } from './testDoubles/DeviceStreamer/ZephyrDeviceStreamer/FakeZephyrDeviceStreamer'
 export * from './testDoubles/DeviceStreamer/ZephyrDeviceStreamer/FakeZephyrDeviceStreamer'
+
+// React UI Components ---------------------------------------------------------
+
+// BiosensorStreamViewer
+
+export { default as BiosensorStreamViewer } from './ui/BiosensorStreamViewer'
+export * from './ui/BiosensorStreamViewer'

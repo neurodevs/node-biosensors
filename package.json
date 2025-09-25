@@ -1,6 +1,6 @@
 {
   "name": "@neurodevs/node-biosensors",
-  "version": "5.0.0",
+  "version": "5.2.0",
   "main": "build/index.js",
   "repository": "https://github.com/neurodevs/node-biosensors.git",
   "scripts": {
@@ -30,7 +30,10 @@
     "@sprucelabs/resolve-path-aliases": "^2.0.527",
     "@sprucelabs/test": "^9.0.53",
     "@sprucelabs/test-utils": "^5.1.443",
+    "@testing-library/react": "^16.3.0",
     "@types/node": "^22.7.7",
+    "@types/react": "^19.1.13",
+    "@types/react-dom": "^19.1.9",
     "chokidar-cli": "^3.0.0",
     "eslint": "^9.13.0",
     "eslint-config-spruce": "^11.2.26",
@@ -61,7 +64,10 @@
     ],
     "moduleNameMapper": {
       "^#spruce/(.*)$": "<rootDir>/build/.spruce/$1"
-    }
+    },
+    "setupFiles": [
+      "<rootDir>/build/__tests__/setupTests.js"
+    ]
   },
   "dependencies": {
     "@neurodevs/node-ble": "^1.0.0",
@@ -71,6 +77,11 @@
     "@sprucelabs/schema": "^31.0.19",
     "@sprucelabs/spruce-core-schemas": "^40.1.605",
     "@sprucelabs/spruce-skill-utils": "^31.2.16",
-    "ftdi-d2xx": "^1.3.1"
+    "@testing-library/dom": "^10.4.1",
+    "@types/jsdom": "^21.1.7",
+    "ftdi-d2xx": "^1.3.1",
+    "jsdom": "^27.0.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
   }
 }
