@@ -1,4 +1,5 @@
-import { FakeLslOutlet } from '@neurodevs/node-lsl'
+import { generateId } from '@sprucelabs/test-utils'
+import { ChannelFormat, FakeLslOutlet } from '@neurodevs/node-lsl'
 import { DeviceStreamer, DeviceStreamerOptions } from 'types'
 
 export default class FakeDeviceStreamer implements DeviceStreamer {
@@ -7,7 +8,18 @@ export default class FakeDeviceStreamer implements DeviceStreamer {
     public static numCallsToStopStreaming = 0
     public static numCallsToDisconnect = 0
 
-    public static fakeStreamQueries: string[] = []
+    public fakeStreamQueries: string[] = [generateId(), generateId()]
+
+    public static fakeSourceId = generateId()
+    public static fakeType = generateId()
+    public static fakeName = generateId()
+    public static fakeSampleRate = this.generateRandomInt()
+    public static fakeChannelNames = [generateId(), generateId()]
+    public static fakeChannelFormat = 'float32' as ChannelFormat
+    public static fakeChunkSize = this.generateRandomInt()
+    public static fakeMaxBuffered = this.generateRandomInt()
+    public static fakeManufacturer = generateId()
+    public static fakeUnit = generateId()
 
     public constructor(options?: DeviceStreamerOptions) {
         FakeDeviceStreamer.callsToConstructor.push(options)
@@ -25,11 +37,27 @@ export default class FakeDeviceStreamer implements DeviceStreamer {
         FakeDeviceStreamer.numCallsToDisconnect++
     }
 
-    public get outlets() {
-        return this.streamQueries.map(() => new FakeLslOutlet())
-    }
+    public streamQueries = this.fakeStreamQueries
 
-    public streamQueries = FakeDeviceStreamer.fakeStreamQueries
+    public outlets = this.streamQueries.map(
+        () =>
+            new FakeLslOutlet(undefined, {
+                sourceId: FakeDeviceStreamer.fakeSourceId,
+                type: FakeDeviceStreamer.fakeType,
+                name: FakeDeviceStreamer.fakeName,
+                sampleRate: FakeDeviceStreamer.fakeSampleRate,
+                channelNames: FakeDeviceStreamer.fakeChannelNames,
+                channelFormat: FakeDeviceStreamer.fakeChannelFormat,
+                chunkSize: FakeDeviceStreamer.fakeChunkSize,
+                maxBuffered: FakeDeviceStreamer.fakeMaxBuffered,
+                manufacturer: FakeDeviceStreamer.fakeManufacturer,
+                unit: FakeDeviceStreamer.fakeUnit,
+            })
+    )
+
+    private static generateRandomInt() {
+        return Math.ceil(Math.random() * 10)
+    }
 
     public static resetTestDouble() {
         this.callsToConstructor = []

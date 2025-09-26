@@ -15,6 +15,8 @@ import {
     FakeLslOutlet,
     LslStreamInfo,
     FakeStreamInfo,
+    LslStreamInlet,
+    FakeLslInlet,
 } from '@neurodevs/node-lsl'
 import { XdfStreamRecorder, FakeXdfRecorder } from '@neurodevs/node-xdf'
 import CgxDeviceStreamer from '../modules/devices/CgxDeviceStreamer'
@@ -22,11 +24,13 @@ import MuseDeviceStreamer from '../modules/devices/MuseDeviceStreamer'
 import ZephyrDeviceStreamer from '../modules/devices/ZephyrDeviceStreamer'
 import FakeCgxDeviceStreamer from '../testDoubles/DeviceStreamer/CgxDeviceStreamer/FakeCgxDeviceStreamer'
 import SpyCgxDeviceStreamer from '../testDoubles/DeviceStreamer/CgxDeviceStreamer/SpyCgxDeviceStreamer'
+import FakeDeviceStreamer from '../testDoubles/DeviceStreamer/FakeDeviceStreamer'
 import FakeMuseDeviceStreamer from '../testDoubles/DeviceStreamer/MuseDeviceStreamer/FakeMuseDeviceStreamer'
 import SpyMuseDeviceStreamer from '../testDoubles/DeviceStreamer/MuseDeviceStreamer/SpyMuseDeviceStreamer'
 import FakeZephyrDeviceStreamer from '../testDoubles/DeviceStreamer/ZephyrDeviceStreamer/FakeZephyrDeviceStreamer'
 import FakeDeviceFTDI from '../testDoubles/FTDI/FakeDeviceFTDI'
 import FakeFTDI from '../testDoubles/FTDI/FakeFTDI'
+import { DeviceStreamerOptions } from '../types'
 
 export default class AbstractPackageTest extends AbstractSpruceTest {
     protected static async beforeEach() {
@@ -36,6 +40,7 @@ export default class AbstractPackageTest extends AbstractSpruceTest {
         this.setFakeBleConnector()
         this.setFakeBleScanner()
         this.setFakeFTDI()
+        this.setFakeLslInlet()
         this.setFakeLslOutlet()
         this.setFakeStreamInfo()
         this.setFakeXdfRecorder()
@@ -62,7 +67,7 @@ export default class AbstractPackageTest extends AbstractSpruceTest {
         FakeBleScanner.resetTestDouble()
     }
 
-    private static setFakeCgxDeviceStreamer() {
+    protected static setFakeCgxDeviceStreamer() {
         CgxDeviceStreamer.Class = FakeCgxDeviceStreamer
         FakeCgxDeviceStreamer.resetTestDouble()
     }
@@ -73,6 +78,11 @@ export default class AbstractPackageTest extends AbstractSpruceTest {
         FakeDeviceFTDI.resetTestDouble()
 
         FakeFTDI.setFakeDeviceInfos()
+    }
+
+    protected static setFakeLslInlet() {
+        LslStreamInlet.Class = FakeLslInlet
+        FakeLslInlet.resetTestDouble()
     }
 
     protected static setFakeLslOutlet() {
@@ -110,6 +120,10 @@ export default class AbstractPackageTest extends AbstractSpruceTest {
 
     protected static FakeCharacteristic(uuid: string) {
         return new FakeCharacteristic({ uuid })
+    }
+
+    protected static FakeDeviceStreamer(options?: DeviceStreamerOptions) {
+        return new FakeDeviceStreamer(options)
     }
 
     protected static FakePeripheral(options?: PeripheralOptions) {
