@@ -51,3 +51,6 @@ export * from './testDoubles/DeviceStreamer/ZephyrDeviceStreamer/FakeZephyrDevic
 
 export { default as BiosensorStreamViewer } from './ui/BiosensorStreamViewer'
 export * from './ui/BiosensorStreamViewer'
+
+export { default as FakeStreamViewer } from './testDoubles/StreamViewer/FakeStreamViewer'
+export * from './testDoubles/StreamViewer/FakeStreamViewer'
