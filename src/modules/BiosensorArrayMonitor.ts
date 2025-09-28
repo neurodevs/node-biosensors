@@ -1,5 +1,8 @@
 import { LslInletOptions, LslStreamInlet } from '@neurodevs/node-lsl'
+import React from 'react'
+import ReactDOMServer from 'react-dom/server'
 import { DeviceStreamer } from '../types'
+import BiosensorStreamViewer from '../ui/BiosensorStreamViewer'
 
 export default class BiosensorArrayMonitor implements ArrayMonitor {
     public static Class?: ArrayMonitorConstructor
@@ -8,6 +11,7 @@ export default class BiosensorArrayMonitor implements ArrayMonitor {
 
     public static Create(devices: DeviceStreamer[]) {
         this.createLslInlets(devices)
+        this.renderStreamViewer()
 
         return new (this.Class ?? this)()
     }
@@ -26,6 +30,12 @@ export default class BiosensorArrayMonitor implements ArrayMonitor {
         })
     }
 
+    private static renderStreamViewer() {
+        ReactDOMServer.renderToStaticMarkup(
+            React.createElement(ViewerComponent)
+        )
+    }
+
     private static LslStreamInlet(options: LslInletOptions) {
         return LslStreamInlet.Create(options)
     }
@@ -34,3 +44,11 @@ export default class BiosensorArrayMonitor implements ArrayMonitor {
 export interface ArrayMonitor {}
 
 export type ArrayMonitorConstructor = new () => ArrayMonitor
+
+// For test doubles
+
+export let ViewerComponent = BiosensorStreamViewer
+
+export function setViewerComponent(component: React.FC) {
+    ViewerComponent = component
+}
