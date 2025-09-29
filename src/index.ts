@@ -15,6 +15,9 @@ export * from './testDoubles/DeviceFactory/FakeDeviceFactory'
 export { default as BiosensorArrayMonitor } from './modules/BiosensorArrayMonitor'
 export * from './modules/BiosensorArrayMonitor'
 
+export { default as FakeArrayMonitor } from './testDoubles/ArrayMonitor/FakeArrayMonitor'
+export * from './testDoubles/ArrayMonitor/FakeArrayMonitor'
+
 // Cognionics Quick-20r
 
 export { default as CgxDeviceStreamer } from './modules/devices/CgxDeviceStreamer'
