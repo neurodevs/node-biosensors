@@ -1,5 +1,6 @@
 import { test, assert, generateId } from '@sprucelabs/test-utils'
 import { FakeXdfRecorder, XdfRecorder } from '@neurodevs/node-xdf'
+import BiosensorArrayMonitor from '../../modules/BiosensorArrayMonitor'
 import BiosensorDeviceFactory, {
     DeviceFactory,
     DeviceSpecification,
@@ -8,6 +9,7 @@ import CgxDeviceStreamer from '../../modules/devices/CgxDeviceStreamer'
 import MuseDeviceStreamer, {
     MuseDeviceStreamerOptions,
 } from '../../modules/devices/MuseDeviceStreamer'
+import FakeArrayMonitor from '../../testDoubles/ArrayMonitor/FakeArrayMonitor'
 import FakeMuseDeviceStreamer from '../../testDoubles/DeviceStreamer/MuseDeviceStreamer/FakeMuseDeviceStreamer'
 import { DeviceStreamer, DeviceStreamerOptions } from '../../types'
 import AbstractPackageTest from '../AbstractPackageTest'
@@ -19,6 +21,7 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
         await super.beforeEach()
 
         this.setFakeDevices()
+        this.setFakeArrayMonitor()
 
         this.instance = this.BiosensorDeviceFactory()
     }
@@ -146,6 +149,17 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
         )
     }
 
+    @test()
+    protected static async createsBiosensorArrayMonitor() {
+        await this.createDevices()
+
+        assert.isEqual(
+            FakeArrayMonitor.callsToConstructor.length,
+            1,
+            'Did not create class as expected!'
+        )
+    }
+
     private static async createCgxWithXdfRecorder() {
         return (await this.createCgxDeviceStreamer({
             xdfRecordPath: this.xdfRecordPath,
@@ -181,6 +195,11 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
 
     private static assertDeviceIsTruthy(device: DeviceStreamer) {
         assert.isTruthy(device, 'Failed to create device!')
+    }
+
+    private static setFakeArrayMonitor() {
+        BiosensorArrayMonitor.Class = FakeArrayMonitor
+        FakeArrayMonitor.resetTestDouble()
     }
 
     private static BiosensorDeviceFactory() {

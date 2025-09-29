@@ -1,5 +1,6 @@
 import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 import { DeviceStreamer, DeviceStreamerOptions } from '../types'
+import BiosensorArrayMonitor from './BiosensorArrayMonitor'
 import CgxDeviceStreamer from './devices/CgxDeviceStreamer'
 import MuseDeviceStreamer, {
     MuseDeviceStreamerOptions,
@@ -102,6 +103,8 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
 
             return [this.createdDevices, recorder]
         }
+
+        BiosensorArrayMonitor.Create(this.createdDevices)
 
         return this.createdDevices
     }
