@@ -11,7 +11,7 @@ import { ChannelFormat, LslOutlet, LslStreamOutlet } from '@neurodevs/node-lsl'
 import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 import FTDI from 'ftdi-d2xx'
 import SpruceError from '../../errors/SpruceError'
-import { DeviceStreamer } from '../../types'
+import { DeviceStreamer } from 'modules/BiosensorDeviceFactory'
 
 export default class CgxDeviceStreamer implements DeviceStreamer {
     public static Class?: CgxDeviceStreamerConstructor

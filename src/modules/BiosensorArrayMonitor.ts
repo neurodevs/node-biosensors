@@ -1,8 +1,8 @@
 import { LslInletOptions, LslStreamInlet } from '@neurodevs/node-lsl'
 import React from 'react'
 import ReactDOMServer from 'react-dom/server'
-import { DeviceStreamer } from '../types'
 import BiosensorStreamViewer from '../ui/BiosensorStreamViewer'
+import { DeviceStreamer } from './BiosensorDeviceFactory'
 
 export default class BiosensorArrayMonitor implements ArrayMonitor {
     public static Class?: ArrayMonitorConstructor

@@ -1,6 +1,6 @@
 import { generateId } from '@sprucelabs/test-utils'
 import { FakeLslOutlet } from '@neurodevs/node-lsl'
-import { DeviceStreamer } from 'types'
+import { DeviceStreamer } from 'modules/BiosensorDeviceFactory'
 import { MuseDeviceStreamerConstructorOptions } from '../../../modules/devices/MuseDeviceStreamer'
 
 export default class FakeMuseDeviceStreamer implements DeviceStreamer {

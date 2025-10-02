@@ -6,7 +6,7 @@ import {
     DeviceOptions,
     DeviceSpecification,
 } from '../../modules/BiosensorDeviceFactory'
-import { DeviceStreamer } from '../../types'
+import { DeviceStreamer } from 'modules/BiosensorDeviceFactory'
 import FakeDeviceStreamer from '../DeviceStreamer/FakeDeviceStreamer'
 
 export default class FakeDeviceFactory implements DeviceFactory {

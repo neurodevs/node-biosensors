@@ -1,5 +1,5 @@
 import { FakeLslOutlet, LslOutlet } from '@neurodevs/node-lsl'
-import { DeviceStreamer } from 'types'
+import { DeviceStreamer } from 'modules/BiosensorDeviceFactory'
 import { CgxDeviceStreamerConstructorOptions } from '../../../modules/devices/CgxDeviceStreamer'
 
 export default class FakeCgxDeviceStreamer implements DeviceStreamer {

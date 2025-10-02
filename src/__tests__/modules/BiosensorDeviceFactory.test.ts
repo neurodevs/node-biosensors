@@ -1,5 +1,9 @@
 import { test, assert, generateId } from '@sprucelabs/test-utils'
 import { FakeXdfRecorder, XdfRecorder } from '@neurodevs/node-xdf'
+import {
+    DeviceStreamer,
+    DeviceStreamerOptions,
+} from 'modules/BiosensorDeviceFactory'
 import BiosensorArrayMonitor from '../../modules/BiosensorArrayMonitor'
 import BiosensorDeviceFactory, {
     DeviceFactory,
@@ -11,7 +15,6 @@ import MuseDeviceStreamer, {
 } from '../../modules/devices/MuseDeviceStreamer'
 import FakeArrayMonitor from '../../testDoubles/ArrayMonitor/FakeArrayMonitor'
 import FakeMuseDeviceStreamer from '../../testDoubles/DeviceStreamer/MuseDeviceStreamer/FakeMuseDeviceStreamer'
-import { DeviceStreamer, DeviceStreamerOptions } from '../../types'
 import AbstractPackageTest from '../AbstractPackageTest'
 
 export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {

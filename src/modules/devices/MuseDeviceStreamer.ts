@@ -11,7 +11,7 @@ import {
     LslOutletOptions,
     LslStreamOutlet,
 } from '@neurodevs/node-lsl'
-import { DeviceStreamer, DeviceStreamerOptions } from '../../types'
+import { DeviceStreamer, DeviceStreamerOptions } from 'modules/BiosensorDeviceFactory'
 
 export default class MuseDeviceStreamer implements BleDeviceStreamer {
     public static Class?: MuseDeviceStreamerConstructor

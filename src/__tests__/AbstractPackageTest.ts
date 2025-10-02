@@ -30,7 +30,7 @@ import SpyMuseDeviceStreamer from '../testDoubles/DeviceStreamer/MuseDeviceStrea
 import FakeZephyrDeviceStreamer from '../testDoubles/DeviceStreamer/ZephyrDeviceStreamer/FakeZephyrDeviceStreamer'
 import FakeDeviceFTDI from '../testDoubles/FTDI/FakeDeviceFTDI'
 import FakeFTDI from '../testDoubles/FTDI/FakeFTDI'
-import { DeviceStreamerOptions } from '../types'
+import { DeviceStreamerOptions } from 'modules/BiosensorDeviceFactory'
 
 export default class AbstractPackageTest extends AbstractSpruceTest {
     protected static async beforeEach() {

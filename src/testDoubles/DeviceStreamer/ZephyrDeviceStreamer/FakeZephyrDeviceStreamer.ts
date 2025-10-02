@@ -1,4 +1,4 @@
-import { DeviceStreamer } from 'types'
+import { DeviceStreamer } from 'modules/BiosensorDeviceFactory'
 
 export default class FakeZephyrDeviceStreamer implements DeviceStreamer {
     public static numCallsToConstructor = 0

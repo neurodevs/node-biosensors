@@ -1,5 +1,5 @@
+import { LslOutlet } from '@neurodevs/node-lsl'
 import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
-import { DeviceStreamer, DeviceStreamerOptions } from '../types'
 import BiosensorArrayMonitor from './BiosensorArrayMonitor'
 import CgxDeviceStreamer from './devices/CgxDeviceStreamer'
 import MuseDeviceStreamer, {
@@ -167,6 +167,18 @@ export interface DeviceFactory {
 export type DeviceFactoryConstructor = new () => DeviceFactory
 
 export interface CreateDevicesOptions {
+    xdfRecordPath?: string
+}
+
+export interface DeviceStreamer {
+    startStreaming(): Promise<void>
+    stopStreaming(): Promise<void>
+    disconnect(): Promise<void>
+    readonly outlets: LslOutlet[]
+    readonly streamQueries: string[]
+}
+
+export interface DeviceStreamerOptions {
     xdfRecordPath?: string
 }
 
