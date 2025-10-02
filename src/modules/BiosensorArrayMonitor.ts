@@ -1,4 +1,4 @@
-import { LslInletOptions, LslStreamInlet } from '@neurodevs/node-lsl'
+import { LslInletOptions, LslOutlet, LslStreamInlet } from '@neurodevs/node-lsl'
 import React from 'react'
 import ReactDOMServer from 'react-dom/server'
 import BiosensorStreamViewer from '../ui/BiosensorStreamViewer'
@@ -18,15 +18,23 @@ export default class BiosensorArrayMonitor implements ArrayMonitor {
 
     private static createLslInlets(devices: DeviceStreamer[]) {
         devices.flatMap((device) => {
-            return device.outlets.map((outlet) => {
-                return this.LslStreamInlet({
-                    sampleRate: outlet.sampleRate,
-                    channelNames: outlet.channelNames,
-                    channelFormat: outlet.channelFormat,
-                    chunkSize: outlet.chunkSize,
-                    maxBuffered: outlet.maxBuffered,
-                })
-            })
+            return this.createInletsFrom(device)
+        })
+    }
+
+    private static createInletsFrom(device: DeviceStreamer) {
+        return device.outlets.map((outlet) => {
+            return this.createInletFrom(outlet)
+        })
+    }
+
+    private static createInletFrom(outlet: LslOutlet) {
+        return this.LslStreamInlet({
+            sampleRate: outlet.sampleRate,
+            channelNames: outlet.channelNames,
+            channelFormat: outlet.channelFormat,
+            chunkSize: outlet.chunkSize,
+            maxBuffered: outlet.maxBuffered,
         })
     }
 
