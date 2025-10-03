@@ -1,6 +1,6 @@
 import { test, assert } from '@sprucelabs/test-utils'
-import ZephyrDeviceStreamer from '../../../modules/devices/ZephyrDeviceStreamer'
 import { DeviceStreamer } from 'modules/BiosensorDeviceFactory'
+import ZephyrDeviceStreamer from '../../../modules/devices/ZephyrDeviceStreamer'
 import AbstractPackageTest from '../../AbstractPackageTest'
 
 export default class ZephyrDeviceStreamerTest extends AbstractPackageTest {

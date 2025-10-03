@@ -1,6 +1,9 @@
 import { generateId } from '@sprucelabs/test-utils'
 import { ChannelFormat, FakeLslOutlet } from '@neurodevs/node-lsl'
-import { DeviceStreamer, DeviceStreamerOptions } from 'modules/BiosensorDeviceFactory'
+import {
+    DeviceStreamer,
+    DeviceStreamerOptions,
+} from 'modules/BiosensorDeviceFactory'
 
 export default class FakeDeviceStreamer implements DeviceStreamer {
     public static callsToConstructor: (DeviceStreamerOptions | undefined)[] = []
