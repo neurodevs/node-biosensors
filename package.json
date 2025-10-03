@@ -1,6 +1,7 @@
 {
   "name": "@neurodevs/node-biosensors",
-  "version": "5.2.0",
+  "version": "5.2.1",
+  "license": "MIT",
   "main": "build/index.js",
   "repository": "https://github.com/neurodevs/node-biosensors.git",
   "scripts": {
