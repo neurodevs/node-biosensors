@@ -1,14 +1,34 @@
 {
   "name": "@neurodevs/node-biosensors",
-  "version": "5.2.3",
-  "description": "A Node.js library for interfacing with various biosensors.",
-  "main": "build/index.js",
+  "version": "5.2.4",
+  "description": "A Node.js package for various biosensors and associated biosignals.",
+  "keywords": [
+    "nodejs",
+    "typescript",
+    "tdd",
+    "biosensors",
+    "biosignals",
+    "real-time",
+    "neurotech",
+    "bci",
+    "lsl",
+    "xdf",
+    "ble",
+    "eeg",
+    "ecg",
+    "ppg"
+  ],
   "license": "MIT",
   "author": "Eric Yates <hello@ericthecurious.com>",
+  "homepage": "https://github.com/neurodevs/node-biosensors",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/neurodevs/node-biosensors.git"
+    "url": "https://github.com/neurodevs/node-biosensors.git"
   },
+  "bugs": {
+    "url": "https://github.com/neurodevs/node-biosensors/issues"
+  },
+  "main": "build/index.js",
   "scripts": {
     "build.ci": "yarn run build.tsc && yarn run build.resolve-paths && yarn run lint",
     "build.dev": "yarn run build.tsc --sourceMap ; yarn run resolve-paths.lint",
