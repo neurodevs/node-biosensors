@@ -102,7 +102,7 @@
       "<rootDir>/build/__tests__/setupTests.js"
     ]
   },
-    "skill": {
-      "namespace": "node-biosensors"
-    }
+  "skill": {
+    "namespace": "node-biosensors"
+  }
 }
