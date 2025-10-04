@@ -1,4 +1,4 @@
-import { test, assert, errorAssert, generateId } from '@sprucelabs/test-utils'
+import { test, assert, generateId } from '@sprucelabs/test-utils'
 import { FakeLslOutlet } from '@neurodevs/node-lsl'
 import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 import FTDI from 'ftdi-d2xx'
@@ -35,7 +35,11 @@ export default class CgxDeviceStreamerTest extends AbstractPackageTest {
         FakeFTDI.fakeDeviceInfos = []
 
         const err = await assert.doesThrowAsync(() => this.startStreaming())
-        errorAssert.assertError(err, 'CGX_FTDI_DEVICE_NOT_FOUND')
+
+        assert.isTrue(
+            err.message.includes(this.notFoundError),
+            'Did not receive the expected error!'
+        )
     }
 
     @test()
@@ -458,6 +462,13 @@ export default class CgxDeviceStreamerTest extends AbstractPackageTest {
         'Y_ACCEL',
         'Z_ACCEL',
     ]
+
+    private static readonly notFoundError = `
+        \n FTDI device not found for the CGX headset!
+        \n Please make sure the Bluetooth dongle is connected and FTDI D2XX drivers are installed: 
+        \n - https://ftdichip.com/drivers/d2xx-drivers/
+        \n
+    `
 
     private static async createStreamerWithRecorder() {
         return await this.CgxDeviceStreamer(this.xdfRecordPath)

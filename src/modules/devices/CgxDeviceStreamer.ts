@@ -11,7 +11,6 @@ import { ChannelFormat, LslOutlet, LslStreamOutlet } from '@neurodevs/node-lsl'
 import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 import FTDI from 'ftdi-d2xx'
 import { DeviceStreamer } from 'modules/BiosensorDeviceFactory'
-import SpruceError from '../../errors/SpruceError'
 
 export default class CgxDeviceStreamer implements DeviceStreamer {
     public static Class?: CgxDeviceStreamerConstructor
@@ -81,9 +80,16 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
 
     private throwIfDeviceNotFound() {
         if (this.infos.length === 0) {
-            throw new SpruceError({ code: 'CGX_FTDI_DEVICE_NOT_FOUND' })
+            throw new Error(this.notFoundError)
         }
     }
+
+    private readonly notFoundError = `
+        \n FTDI device not found for the CGX headset!
+        \n Please make sure the Bluetooth dongle is connected and FTDI D2XX drivers are installed: 
+        \n - https://ftdichip.com/drivers/d2xx-drivers/
+        \n
+    `
 
     private async openDeviceBySerialNumber() {
         this.device = await this.FTDI.openDevice(this.serialNumber)
