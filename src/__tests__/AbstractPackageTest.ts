@@ -1,4 +1,5 @@
 import AbstractSpruceTest from '@sprucelabs/test-utils'
+import generateId from '@neurodevs/generate-id'
 import {
     BleDeviceController,
     FakeBleController,
@@ -116,6 +117,10 @@ export default class AbstractPackageTest extends AbstractSpruceTest {
 
     protected static setSpyMuseDeviceStreamer() {
         MuseDeviceStreamer.Class = SpyMuseDeviceStreamer
+    }
+
+    protected static generateId() {
+        return generateId()
     }
 
     protected static FakeCharacteristic(uuid: string) {

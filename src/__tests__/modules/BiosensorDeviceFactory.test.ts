@@ -1,4 +1,4 @@
-import { test, assert, generateId } from '@sprucelabs/test-utils'
+import { test, assert } from '@sprucelabs/test-utils'
 import { FakeXdfRecorder, XdfRecorder } from '@neurodevs/node-xdf'
 import {
     DeviceStreamer,
@@ -49,7 +49,7 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
     @test()
     protected static async createsDeviceForMuseDeviceStreamerWithOptions() {
         const options = {
-            bleUuid: generateId(),
+            bleUuid: this.generateId(),
             rssiIntervalMs: Math.random(),
         }
 
@@ -73,7 +73,7 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
 
     @test()
     protected static async throwsWithInvalidDeviceName() {
-        const invalidName = generateId() as any
+        const invalidName = this.generateId() as any
 
         await assert.doesThrowAsync(
             async () => await this.instance.createDevice(invalidName),
@@ -175,7 +175,7 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
         })
     }
 
-    private static xdfRecordPath = generateId()
+    private static xdfRecordPath = this.generateId()
 
     private static specs: DeviceSpecification[] = [
         { name: 'Cognionics Quick-20r' },

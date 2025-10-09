@@ -734,6 +734,11 @@
     semver "^7.3.5"
     tar "^6.1.11"
 
+"@neurodevs/generate-id@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@neurodevs/generate-id/-/generate-id-0.1.0.tgz#36aa1add2017cb70f49854f79b68b47d514d46f3"
+  integrity sha512-fXTemTAZdBhO+edohSU0tAMy5Q7jNe0skz+SBiV68JZwvRYBap2eguPOa3ig+7nsba+PKUlLzZbFfNbBRzbNug==
+
 "@neurodevs/node-ble@^1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@neurodevs/node-ble/-/node-ble-1.0.1.tgz#9224aed252ffafb8c981ea5236647d6946a04ca0"

@@ -1,4 +1,4 @@
-import { generateId } from '@sprucelabs/test-utils'
+import generateId from '@neurodevs/generate-id'
 import { FakeLslOutlet } from '@neurodevs/node-lsl'
 import { DeviceStreamer } from 'modules/BiosensorDeviceFactory'
 import { MuseDeviceStreamerConstructorOptions } from '../../../modules/devices/MuseDeviceStreamer'

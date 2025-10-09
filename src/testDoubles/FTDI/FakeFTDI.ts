@@ -1,4 +1,4 @@
-import { generateId } from '@sprucelabs/test-utils'
+import generateId from '@neurodevs/generate-id'
 import { FTDI_Device, FTDI_DeviceInfo } from 'ftdi-d2xx'
 import FakeDeviceFTDI from './FakeDeviceFTDI'
 

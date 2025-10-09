@@ -1,4 +1,4 @@
-import { generateId } from '@sprucelabs/test-utils'
+import generateId from '@neurodevs/generate-id'
 import { ChannelFormat, FakeLslOutlet } from '@neurodevs/node-lsl'
 import {
     DeviceStreamer,
