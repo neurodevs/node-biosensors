@@ -1,4 +1,5 @@
 import { test, assert } from '@sprucelabs/test-utils'
+import generateId from '@neurodevs/generate-id'
 import { FakeLslOutlet } from '@neurodevs/node-lsl'
 import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 import FTDI from 'ftdi-d2xx'
@@ -430,7 +431,7 @@ export default class CgxDeviceStreamerTest extends AbstractPackageTest {
         return Array.from({ length }, () => Math.floor(Math.random() * 254))
     }
 
-    private static readonly xdfRecordPath = this.generateId()
+    private static readonly xdfRecordPath = generateId()
     private static readonly bytesPerSample = 78
 
     private static readonly eegCharacteristicNames = [
