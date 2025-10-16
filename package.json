@@ -23,7 +23,7 @@
   "homepage": "https://github.com/neurodevs/node-biosensors",
   "repository": {
     "type": "git",
-    "url": "https://github.com/neurodevs/node-biosensors.git"
+    "url": "git+https://github.com/neurodevs/node-biosensors.git"
   },
   "bugs": {
     "url": "https://github.com/neurodevs/node-biosensors/issues"
