@@ -1,6 +1,6 @@
 import { FakeLslOutlet, LslOutlet } from '@neurodevs/node-lsl'
-import { DeviceStreamer } from 'modules/BiosensorDeviceFactory'
-import { CgxDeviceStreamerConstructorOptions } from '../../../modules/devices/CgxDeviceStreamer'
+import { DeviceStreamer } from 'impl/BiosensorDeviceFactory'
+import { CgxDeviceStreamerConstructorOptions } from '../../../impl/devices/CgxDeviceStreamer'
 
 export default class FakeCgxDeviceStreamer implements DeviceStreamer {
     public static callsToConstructor: (CallToCgxConstructor | undefined)[] = []

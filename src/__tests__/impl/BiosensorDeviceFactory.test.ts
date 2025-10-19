@@ -4,16 +4,16 @@ import { FakeXdfRecorder, XdfRecorder } from '@neurodevs/node-xdf'
 import {
     DeviceStreamer,
     DeviceStreamerOptions,
-} from 'modules/BiosensorDeviceFactory'
-import BiosensorArrayMonitor from '../../modules/BiosensorArrayMonitor'
+} from 'impl/BiosensorDeviceFactory'
+import BiosensorArrayMonitor from '../../impl/BiosensorArrayMonitor'
 import BiosensorDeviceFactory, {
     DeviceFactory,
     DeviceSpecification,
-} from '../../modules/BiosensorDeviceFactory'
-import CgxDeviceStreamer from '../../modules/devices/CgxDeviceStreamer'
+} from '../../impl/BiosensorDeviceFactory'
+import CgxDeviceStreamer from '../../impl/devices/CgxDeviceStreamer'
 import MuseDeviceStreamer, {
     MuseDeviceStreamerOptions,
-} from '../../modules/devices/MuseDeviceStreamer'
+} from '../../impl/devices/MuseDeviceStreamer'
 import FakeArrayMonitor from '../../testDoubles/ArrayMonitor/FakeArrayMonitor'
 import FakeMuseDeviceStreamer from '../../testDoubles/DeviceStreamer/MuseDeviceStreamer/FakeMuseDeviceStreamer'
 import AbstractPackageTest from '../AbstractPackageTest'

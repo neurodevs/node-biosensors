@@ -1,12 +1,12 @@
 import { FakeXdfRecorder, XdfRecorder } from '@neurodevs/node-xdf'
-import { DeviceStreamer } from 'modules/BiosensorDeviceFactory'
+import { DeviceStreamer } from 'impl/BiosensorDeviceFactory'
 import {
     CreateDevicesOptions,
     DeviceFactory,
     DeviceName,
     DeviceOptions,
     DeviceSpecification,
-} from '../../modules/BiosensorDeviceFactory'
+} from '../../impl/BiosensorDeviceFactory'
 import FakeDeviceStreamer from '../DeviceStreamer/FakeDeviceStreamer'
 
 export default class FakeDeviceFactory implements DeviceFactory {

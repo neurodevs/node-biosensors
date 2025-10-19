@@ -1,4 +1,4 @@
-import { DeviceStreamer } from 'modules/BiosensorDeviceFactory'
+import { DeviceStreamer } from 'impl/BiosensorDeviceFactory'
 
 export default class ZephyrDeviceStreamer implements DeviceStreamer {
     public static Class?: DeviceStreamerConstructor

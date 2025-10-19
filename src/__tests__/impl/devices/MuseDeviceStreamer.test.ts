@@ -8,8 +8,8 @@ import {
 import { FakeLslOutlet } from '@neurodevs/node-lsl'
 import MuseDeviceStreamer, {
     MuseDeviceStreamerOptions,
-} from '../../../modules/devices/MuseDeviceStreamer'
-import { MUSE_CHARACTERISTIC_UUIDS as CHAR_UUIDS } from '../../../modules/devices/MuseDeviceStreamer'
+} from '../../../impl/devices/MuseDeviceStreamer'
+import { MUSE_CHARACTERISTIC_UUIDS as CHAR_UUIDS } from '../../../impl/devices/MuseDeviceStreamer'
 import SpyMuseDeviceStreamer from '../../../testDoubles/DeviceStreamer/MuseDeviceStreamer/SpyMuseDeviceStreamer'
 import AbstractPackageTest from '../../AbstractPackageTest'
 

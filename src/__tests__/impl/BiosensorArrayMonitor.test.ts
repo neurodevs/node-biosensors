@@ -3,7 +3,7 @@ import { FakeLslInlet } from '@neurodevs/node-lsl'
 import BiosensorArrayMonitor, {
     ArrayMonitor,
     setViewerComponent,
-} from '../../modules/BiosensorArrayMonitor'
+} from '../../impl/BiosensorArrayMonitor'
 import FakeStreamViewer, {
     passedFakeStreamViewerProps,
     resetFakeStreamViewer,

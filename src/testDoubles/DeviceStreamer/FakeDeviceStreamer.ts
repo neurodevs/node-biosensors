@@ -3,7 +3,7 @@ import { ChannelFormat, FakeLslOutlet } from '@neurodevs/node-lsl'
 import {
     DeviceStreamer,
     DeviceStreamerOptions,
-} from 'modules/BiosensorDeviceFactory'
+} from 'impl/BiosensorDeviceFactory'
 
 export default class FakeDeviceStreamer implements DeviceStreamer {
     public static callsToConstructor: (DeviceStreamerOptions | undefined)[] = []

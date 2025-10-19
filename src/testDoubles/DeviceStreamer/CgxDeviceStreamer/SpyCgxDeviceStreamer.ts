@@ -1,6 +1,6 @@
 import CgxDeviceStreamer, {
     CgxDeviceStreamerConstructorOptions,
-} from '../../../modules/devices/CgxDeviceStreamer'
+} from '../../../impl/devices/CgxDeviceStreamer'
 
 export default class SpyCgxDeviceStreamer extends CgxDeviceStreamer {
     public constructor(options: CgxDeviceStreamerConstructorOptions) {

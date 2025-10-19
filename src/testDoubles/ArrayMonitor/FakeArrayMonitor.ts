@@ -1,5 +1,5 @@
-import { DeviceStreamer } from 'modules/BiosensorDeviceFactory'
-import { ArrayMonitor } from '../../modules/BiosensorArrayMonitor'
+import { DeviceStreamer } from 'impl/BiosensorDeviceFactory'
+import { ArrayMonitor } from '../../impl/BiosensorArrayMonitor'
 
 export default class FakeArrayMonitor implements ArrayMonitor {
     public static callsToConstructor: (DeviceStreamer[] | undefined)[] = []

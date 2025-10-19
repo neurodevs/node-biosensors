@@ -1,23 +1,31 @@
-// BiosensorDeviceFactory
-
-export { default as BiosensorDeviceFactory } from './modules/BiosensorDeviceFactory'
-export * from './modules/BiosensorDeviceFactory'
-
-export { default as FakeDeviceFactory } from './testDoubles/DeviceFactory/FakeDeviceFactory'
-export * from './testDoubles/DeviceFactory/FakeDeviceFactory'
-
 // BiosensorArrayMonitor
 
-export { default as BiosensorArrayMonitor } from './modules/BiosensorArrayMonitor'
-export * from './modules/BiosensorArrayMonitor'
+export { default as BiosensorArrayMonitor } from './impl/BiosensorArrayMonitor'
+export * from './impl/BiosensorArrayMonitor'
 
 export { default as FakeArrayMonitor } from './testDoubles/ArrayMonitor/FakeArrayMonitor'
 export * from './testDoubles/ArrayMonitor/FakeArrayMonitor'
 
+// BiosensorDeviceFactory
+
+export { default as BiosensorDeviceFactory } from './impl/BiosensorDeviceFactory'
+export * from './impl/BiosensorDeviceFactory'
+
+export { default as FakeDeviceFactory } from './testDoubles/DeviceFactory/FakeDeviceFactory'
+export * from './testDoubles/DeviceFactory/FakeDeviceFactory'
+
+// BiosensorStreamViewer
+
+export { default as BiosensorStreamViewer } from './ui/BiosensorStreamViewer'
+export * from './ui/BiosensorStreamViewer'
+
+export { default as FakeStreamViewer } from './testDoubles/StreamViewer/FakeStreamViewer'
+export * from './testDoubles/StreamViewer/FakeStreamViewer'
+
 // Cognionics Quick-20r
 
-export { default as CgxDeviceStreamer } from './modules/devices/CgxDeviceStreamer'
-export * from './modules/devices/CgxDeviceStreamer'
+export { default as CgxDeviceStreamer } from './impl/devices/CgxDeviceStreamer'
+export * from './impl/devices/CgxDeviceStreamer'
 
 export { default as SpyCgxDeviceStreamer } from './testDoubles/DeviceStreamer/CgxDeviceStreamer/SpyCgxDeviceStreamer'
 export * from './testDoubles/DeviceStreamer/CgxDeviceStreamer/SpyCgxDeviceStreamer'
@@ -27,8 +35,8 @@ export * from './testDoubles/DeviceStreamer/CgxDeviceStreamer/FakeCgxDeviceStrea
 
 // Muse S Gen 2
 
-export { default as MuseDeviceStreamer } from './modules/devices/MuseDeviceStreamer'
-export * from './modules/devices/MuseDeviceStreamer'
+export { default as MuseDeviceStreamer } from './impl/devices/MuseDeviceStreamer'
+export * from './impl/devices/MuseDeviceStreamer'
 
 export { default as SpyMuseDeviceStreamer } from './testDoubles/DeviceStreamer/MuseDeviceStreamer/SpyMuseDeviceStreamer'
 export * from './testDoubles/DeviceStreamer/MuseDeviceStreamer/SpyMuseDeviceStreamer'
@@ -38,16 +46,8 @@ export * from './testDoubles/DeviceStreamer/MuseDeviceStreamer/FakeMuseDeviceStr
 
 // Zephyr BioHarness 3
 
-export { default as ZephyrDeviceStreamer } from './modules/devices/ZephyrDeviceStreamer'
-export * from './modules/devices/ZephyrDeviceStreamer'
+export { default as ZephyrDeviceStreamer } from './impl/devices/ZephyrDeviceStreamer'
+export * from './impl/devices/ZephyrDeviceStreamer'
 
 export { default as FakeZephyrDeviceStreamer } from './testDoubles/DeviceStreamer/ZephyrDeviceStreamer/FakeZephyrDeviceStreamer'
 export * from './testDoubles/DeviceStreamer/ZephyrDeviceStreamer/FakeZephyrDeviceStreamer'
-
-// BiosensorStreamViewer
-
-export { default as BiosensorStreamViewer } from './ui/BiosensorStreamViewer'
-export * from './ui/BiosensorStreamViewer'
-
-export { default as FakeStreamViewer } from './testDoubles/StreamViewer/FakeStreamViewer'
-export * from './testDoubles/StreamViewer/FakeStreamViewer'
