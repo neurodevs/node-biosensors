@@ -950,6 +950,17 @@
     ref-array-napi "^1.2.2"
     ref-napi "^3.0.3"
 
+"@neurodevs/node-lsl@^12.0.5":
+  version "12.0.5"
+  resolved "https://registry.yarnpkg.com/@neurodevs/node-lsl/-/node-lsl-12.0.5.tgz#591300f5b5213ea7ba52bb81459e016b36f695f0"
+  integrity sha512-K4A+6El1471yntb1KYkybsifjQb1crMyXF1s4eBBm0qrHUc3/TS3JGVv9biB2Kmmg/g7F7obRzYkKvpNmBYIDg==
+  dependencies:
+    "@neurodevs/generate-id" "^1.0.9"
+    ffi-rs "^1.0.98"
+    node-gyp "^10.2.0"
+    ref-array-napi "^1.2.2"
+    ref-napi "^3.0.3"
+
 "@neurodevs/node-mangled-names@^1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@neurodevs/node-mangled-names/-/node-mangled-names-1.0.1.tgz#165a4ee32879b7ab2019fd7f48c7ca1459332966"
