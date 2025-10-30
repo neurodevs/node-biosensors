@@ -1,3 +1,4 @@
+import { TextEncoder } from 'util'
 import {
     SimpleCharacteristic,
     Characteristic,
@@ -7,14 +8,15 @@ import {
 } from '@neurodevs/node-ble'
 import {
     ChannelFormat,
-    LslOutlet,
-    LslOutletOptions,
+    StreamOutlet,
+    StreamOutletOptions,
     LslStreamOutlet,
 } from '@neurodevs/node-lsl'
+
 import {
     DeviceStreamer,
     DeviceStreamerOptions,
-} from 'impl/BiosensorDeviceFactory'
+} from 'impl/BiosensorDeviceFactory.js'
 
 export default class MuseDeviceStreamer implements BleDeviceStreamer {
     public static Class?: MuseDeviceStreamerConstructor
@@ -22,8 +24,8 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
 
     protected bleConnector?: BleConnector
     private scanOptions: ScanOptions
-    private eegOutlet: LslOutlet
-    private ppgOutlet: LslOutlet
+    private eegOutlet: StreamOutlet
+    private ppgOutlet: StreamOutlet
     private _bleUuid?: string
     private rssiIntervalMs?: number
     private eegChannelChunks = this.generateEmptyEegMatrix()
@@ -100,10 +102,10 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
         await this.stopStreaming()
         await this.disconnectBle()
 
-        this.destroyLslOutlets()
+        this.destroyStreamOutlets()
     }
 
-    private destroyLslOutlets() {
+    private destroyStreamOutlets() {
         this.eegOutlet.destroy()
         this.ppgOutlet.destroy()
     }
@@ -287,24 +289,6 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
         ) as number[][]
     }
 
-    private readonly bleLocalName = 'MuseS'
-
-    private readonly eegCharNames = MuseDeviceStreamer.eegCharacteristicNames
-    private readonly eegChunkSize = MuseDeviceStreamer.eegChunkSize
-    private readonly eegNumChannels = this.eegCharNames.length
-
-    private readonly ppgCharNames = MuseDeviceStreamer.ppgCharacteristicNames
-    private readonly ppgChunkSize = MuseDeviceStreamer.ppgChunkSize
-    private readonly ppgNumChannels = this.ppgCharNames.length
-
-    private readonly eegCharUuids = this.eegCharNames.map(
-        (name) => CHAR_UUIDS[name]
-    )
-
-    private readonly ppgCharUuids = this.ppgCharNames.map(
-        (name) => CHAR_UUIDS[name]
-    )
-
     private static readonly eegChunkSize = 12
     private static readonly eegSampleRate = 256
     private static readonly ppgChunkSize = 6
@@ -350,6 +334,24 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
         maxBuffered: 360,
     }
 
+    private readonly bleLocalName = 'MuseS'
+
+    private readonly eegCharNames = MuseDeviceStreamer.eegCharacteristicNames
+    private readonly eegChunkSize = MuseDeviceStreamer.eegChunkSize
+    private readonly eegNumChannels = this.eegCharNames.length
+
+    private readonly ppgCharNames = MuseDeviceStreamer.ppgCharacteristicNames
+    private readonly ppgChunkSize = MuseDeviceStreamer.ppgChunkSize
+    private readonly ppgNumChannels = this.ppgCharNames.length
+
+    private readonly eegCharUuids = this.eegCharNames.map(
+        (name) => CHAR_UUIDS[name]
+    )
+
+    private readonly ppgCharUuids = this.ppgCharNames.map(
+        (name) => CHAR_UUIDS[name]
+    )
+
     private TextEncoder() {
         return new TextEncoder()
     }
@@ -363,7 +365,7 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
         })
     }
 
-    private static async LslStreamOutlet(options: LslOutletOptions) {
+    private static async LslStreamOutlet(options: StreamOutletOptions) {
         return await LslStreamOutlet.Create(options)
     }
 }
@@ -383,8 +385,8 @@ export type MuseDeviceStreamerConstructor = new (
 ) => BleDeviceStreamer
 
 export interface MuseDeviceStreamerConstructorOptions {
-    eegOutlet: LslOutlet
-    ppgOutlet: LslOutlet
+    eegOutlet: StreamOutlet
+    ppgOutlet: StreamOutlet
     bleUuid?: string
     rssiIntervalMs?: number
 }

@@ -1,4 +1,3 @@
-import AbstractSpruceTest from '@sprucelabs/test-utils'
 import {
     BleDeviceController,
     FakeBleController,
@@ -12,25 +11,27 @@ import {
 } from '@neurodevs/node-ble'
 import {
     LslStreamOutlet,
-    FakeLslOutlet,
+    FakeStreamOutlet,
     LslStreamInfo,
     FakeStreamInfo,
     LslStreamInlet,
-    FakeLslInlet,
+    FakeStreamInlet,
 } from '@neurodevs/node-lsl'
+import AbstractSpruceTest from '@neurodevs/node-tdd'
 import { XdfStreamRecorder, FakeXdfRecorder } from '@neurodevs/node-xdf'
-import { DeviceStreamerOptions } from 'impl/BiosensorDeviceFactory'
-import CgxDeviceStreamer from '../impl/devices/CgxDeviceStreamer'
-import MuseDeviceStreamer from '../impl/devices/MuseDeviceStreamer'
-import ZephyrDeviceStreamer from '../impl/devices/ZephyrDeviceStreamer'
-import FakeCgxDeviceStreamer from '../testDoubles/DeviceStreamer/CgxDeviceStreamer/FakeCgxDeviceStreamer'
-import SpyCgxDeviceStreamer from '../testDoubles/DeviceStreamer/CgxDeviceStreamer/SpyCgxDeviceStreamer'
-import FakeDeviceStreamer from '../testDoubles/DeviceStreamer/FakeDeviceStreamer'
-import FakeMuseDeviceStreamer from '../testDoubles/DeviceStreamer/MuseDeviceStreamer/FakeMuseDeviceStreamer'
-import SpyMuseDeviceStreamer from '../testDoubles/DeviceStreamer/MuseDeviceStreamer/SpyMuseDeviceStreamer'
-import FakeZephyrDeviceStreamer from '../testDoubles/DeviceStreamer/ZephyrDeviceStreamer/FakeZephyrDeviceStreamer'
-import FakeDeviceFTDI from '../testDoubles/FTDI/FakeDeviceFTDI'
-import FakeFTDI from '../testDoubles/FTDI/FakeFTDI'
+
+import { DeviceStreamerOptions } from 'impl/BiosensorDeviceFactory.js'
+import CgxDeviceStreamer from '../impl/devices/CgxDeviceStreamer.js'
+import MuseDeviceStreamer from '../impl/devices/MuseDeviceStreamer.js'
+import ZephyrDeviceStreamer from '../impl/devices/ZephyrDeviceStreamer.js'
+import FakeCgxDeviceStreamer from '../testDoubles/DeviceStreamer/CgxDeviceStreamer/FakeCgxDeviceStreamer.js'
+import SpyCgxDeviceStreamer from '../testDoubles/DeviceStreamer/CgxDeviceStreamer/SpyCgxDeviceStreamer.js'
+import FakeDeviceStreamer from '../testDoubles/DeviceStreamer/FakeDeviceStreamer.js'
+import FakeMuseDeviceStreamer from '../testDoubles/DeviceStreamer/MuseDeviceStreamer/FakeMuseDeviceStreamer.js'
+import SpyMuseDeviceStreamer from '../testDoubles/DeviceStreamer/MuseDeviceStreamer/SpyMuseDeviceStreamer.js'
+import FakeZephyrDeviceStreamer from '../testDoubles/DeviceStreamer/ZephyrDeviceStreamer/FakeZephyrDeviceStreamer.js'
+import FakeDeviceFTDI from '../testDoubles/FTDI/FakeDeviceFTDI.js'
+import FakeFTDI from '../testDoubles/FTDI/FakeFTDI.js'
 
 export default class AbstractPackageTest extends AbstractSpruceTest {
     protected static async beforeEach() {
@@ -40,8 +41,8 @@ export default class AbstractPackageTest extends AbstractSpruceTest {
         this.setFakeBleConnector()
         this.setFakeBleScanner()
         this.setFakeFTDI()
-        this.setFakeLslInlet()
-        this.setFakeLslOutlet()
+        this.setFakeStreamInlet()
+        this.setFakeStreamOutlet()
         this.setFakeStreamInfo()
         this.setFakeXdfRecorder()
     }
@@ -80,14 +81,14 @@ export default class AbstractPackageTest extends AbstractSpruceTest {
         FakeFTDI.setFakeDeviceInfos()
     }
 
-    protected static setFakeLslInlet() {
-        LslStreamInlet.Class = FakeLslInlet
-        FakeLslInlet.resetTestDouble()
+    protected static setFakeStreamInlet() {
+        LslStreamInlet.Class = FakeStreamInlet
+        FakeStreamInlet.resetTestDouble()
     }
 
-    protected static setFakeLslOutlet() {
-        LslStreamOutlet.Class = FakeLslOutlet
-        FakeLslOutlet.resetTestDouble()
+    protected static setFakeStreamOutlet() {
+        LslStreamOutlet.Class = FakeStreamOutlet
+        FakeStreamOutlet.resetTestDouble()
     }
 
     protected static setFakeMuseDeviceStreamer() {

@@ -1,9 +1,10 @@
 import generateId from '@neurodevs/generate-id'
-import { ChannelFormat, FakeLslOutlet } from '@neurodevs/node-lsl'
+import { ChannelFormat, FakeStreamOutlet } from '@neurodevs/node-lsl'
+
 import {
     DeviceStreamer,
     DeviceStreamerOptions,
-} from 'impl/BiosensorDeviceFactory'
+} from 'impl/BiosensorDeviceFactory.js'
 
 export default class FakeDeviceStreamer implements DeviceStreamer {
     public static callsToConstructor: (DeviceStreamerOptions | undefined)[] = []
@@ -44,7 +45,7 @@ export default class FakeDeviceStreamer implements DeviceStreamer {
 
     public outlets = this.streamQueries.map(
         () =>
-            new FakeLslOutlet(undefined, {
+            new FakeStreamOutlet(undefined, {
                 sourceId: FakeDeviceStreamer.fakeSourceId,
                 type: FakeDeviceStreamer.fakeType,
                 name: FakeDeviceStreamer.fakeName,

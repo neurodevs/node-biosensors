@@ -1,7 +1,8 @@
-import { test, assert } from '@sprucelabs/test-utils'
-import { DeviceStreamer } from 'impl/BiosensorDeviceFactory'
-import ZephyrDeviceStreamer from '../../../impl/devices/ZephyrDeviceStreamer'
-import AbstractPackageTest from '../../AbstractPackageTest'
+import { test, assert } from '@neurodevs/node-tdd'
+
+import { DeviceStreamer } from 'impl/BiosensorDeviceFactory.js'
+import ZephyrDeviceStreamer from '../../../impl/devices/ZephyrDeviceStreamer.js'
+import AbstractPackageTest from '../../AbstractPackageTest.js'
 
 export default class ZephyrDeviceStreamerTest extends AbstractPackageTest {
     private static instance: DeviceStreamer

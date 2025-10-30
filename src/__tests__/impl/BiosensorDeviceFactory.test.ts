@@ -1,22 +1,23 @@
-import { test, assert } from '@sprucelabs/test-utils'
 import generateId from '@neurodevs/generate-id'
+import { test, assert } from '@neurodevs/node-tdd'
 import { FakeXdfRecorder, XdfRecorder } from '@neurodevs/node-xdf'
+
 import {
     DeviceStreamer,
     DeviceStreamerOptions,
-} from 'impl/BiosensorDeviceFactory'
-import BiosensorArrayMonitor from '../../impl/BiosensorArrayMonitor'
+} from 'impl/BiosensorDeviceFactory.js'
+import BiosensorArrayMonitor from '../../impl/BiosensorArrayMonitor.js'
 import BiosensorDeviceFactory, {
     DeviceFactory,
     DeviceSpecification,
-} from '../../impl/BiosensorDeviceFactory'
-import CgxDeviceStreamer from '../../impl/devices/CgxDeviceStreamer'
+} from '../../impl/BiosensorDeviceFactory.js'
+import CgxDeviceStreamer from '../../impl/devices/CgxDeviceStreamer.js'
 import MuseDeviceStreamer, {
     MuseDeviceStreamerOptions,
-} from '../../impl/devices/MuseDeviceStreamer'
-import FakeArrayMonitor from '../../testDoubles/ArrayMonitor/FakeArrayMonitor'
-import FakeMuseDeviceStreamer from '../../testDoubles/DeviceStreamer/MuseDeviceStreamer/FakeMuseDeviceStreamer'
-import AbstractPackageTest from '../AbstractPackageTest'
+} from '../../impl/devices/MuseDeviceStreamer.js'
+import FakeArrayMonitor from '../../testDoubles/ArrayMonitor/FakeArrayMonitor.js'
+import FakeMuseDeviceStreamer from '../../testDoubles/DeviceStreamer/MuseDeviceStreamer/FakeMuseDeviceStreamer.js'
+import AbstractPackageTest from '../AbstractPackageTest.js'
 
 export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
     private static instance: DeviceFactory

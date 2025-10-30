@@ -1,11 +1,12 @@
-import { LslOutlet } from '@neurodevs/node-lsl'
+import { StreamOutlet } from '@neurodevs/node-lsl'
 import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
-import BiosensorArrayMonitor from './BiosensorArrayMonitor'
-import CgxDeviceStreamer from './devices/CgxDeviceStreamer'
+
+import BiosensorArrayMonitor from './BiosensorArrayMonitor.js'
+import CgxDeviceStreamer from './devices/CgxDeviceStreamer.js'
 import MuseDeviceStreamer, {
     MuseDeviceStreamerOptions,
-} from './devices/MuseDeviceStreamer'
-import ZephyrDeviceStreamer from './devices/ZephyrDeviceStreamer'
+} from './devices/MuseDeviceStreamer.js'
+import ZephyrDeviceStreamer from './devices/ZephyrDeviceStreamer.js'
 
 export default class BiosensorDeviceFactory implements DeviceFactory {
     public static Class?: DeviceFactoryConstructor
@@ -174,7 +175,7 @@ export interface DeviceStreamer {
     startStreaming(): Promise<void>
     stopStreaming(): Promise<void>
     disconnect(): Promise<void>
-    readonly outlets: LslOutlet[]
+    readonly outlets: StreamOutlet[]
     readonly streamQueries: string[]
 }
 

@@ -1,6 +1,7 @@
 import generateId from '@neurodevs/generate-id'
 import { FTDI_Device, FTDI_DeviceInfo } from 'ftdi-d2xx'
-import FakeDeviceFTDI from './FakeDeviceFTDI'
+
+import FakeDeviceFTDI from './FakeDeviceFTDI.js'
 
 export default class FakeFTDI {
     public static numCallsToGetDeviceInfoList = 0

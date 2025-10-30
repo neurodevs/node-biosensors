@@ -1,13 +1,14 @@
-import { test, assert } from '@sprucelabs/test-utils'
 import generateId from '@neurodevs/generate-id'
-import { FakeLslOutlet } from '@neurodevs/node-lsl'
+import { FakeStreamOutlet } from '@neurodevs/node-lsl'
+import { test, assert } from '@neurodevs/node-tdd'
 import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 import FTDI from 'ftdi-d2xx'
-import CgxDeviceStreamer from '../../../impl/devices/CgxDeviceStreamer'
-import SpyCgxDeviceStreamer from '../../../testDoubles/DeviceStreamer/CgxDeviceStreamer/SpyCgxDeviceStreamer'
-import FakeDeviceFTDI from '../../../testDoubles/FTDI/FakeDeviceFTDI'
-import FakeFTDI from '../../../testDoubles/FTDI/FakeFTDI'
-import AbstractPackageTest from '../../AbstractPackageTest'
+
+import CgxDeviceStreamer from '../../../impl/devices/CgxDeviceStreamer.js'
+import SpyCgxDeviceStreamer from '../../../testDoubles/DeviceStreamer/CgxDeviceStreamer/SpyCgxDeviceStreamer.js'
+import FakeDeviceFTDI from '../../../testDoubles/FTDI/FakeDeviceFTDI.js'
+import FakeFTDI from '../../../testDoubles/FTDI/FakeFTDI.js'
+import AbstractPackageTest from '../../AbstractPackageTest.js'
 
 export default class CgxDeviceStreamerTest extends AbstractPackageTest {
     private static instance: SpyCgxDeviceStreamer
@@ -186,7 +187,7 @@ export default class CgxDeviceStreamerTest extends AbstractPackageTest {
     @test()
     protected static async createConstructsLslOutletforEEG() {
         assert.isEqualDeep(
-            FakeLslOutlet.callsToConstructor[0]?.options,
+            FakeStreamOutlet.callsToConstructor[0]?.options,
             {
                 sourceId: 'cgx-eeg',
                 name: 'CGX Quick-20r (Cognionics) - EEG',
@@ -236,8 +237,8 @@ export default class CgxDeviceStreamerTest extends AbstractPackageTest {
 
         assert.isEqualDeep(
             [
-                FakeLslOutlet.callsToPushSample[0],
-                FakeLslOutlet.callsToPushSample[2],
+                FakeStreamOutlet.callsToPushSample[0],
+                FakeStreamOutlet.callsToPushSample[2],
             ],
             [eegData, eegData],
             'Should push EEG data to LSL outlet!'
@@ -247,7 +248,7 @@ export default class CgxDeviceStreamerTest extends AbstractPackageTest {
     @test()
     protected static async createConstructsLslOutletforAccelerometer() {
         assert.isEqualDeep(
-            FakeLslOutlet.callsToConstructor[1]?.options,
+            FakeStreamOutlet.callsToConstructor[1]?.options,
             {
                 sourceId: 'cgx-accel',
                 name: 'CGX Quick-20r (Cognionics) - Accelerometer',
@@ -298,8 +299,8 @@ export default class CgxDeviceStreamerTest extends AbstractPackageTest {
 
         assert.isEqualDeep(
             [
-                FakeLslOutlet.callsToPushSample[1],
-                FakeLslOutlet.callsToPushSample[3],
+                FakeStreamOutlet.callsToPushSample[1],
+                FakeStreamOutlet.callsToPushSample[3],
             ],
             [accelData, accelData],
             'Should push EEG data to LSL outlet!'

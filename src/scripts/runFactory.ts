@@ -1,4 +1,4 @@
-import BiosensorDeviceFactory from '../impl/BiosensorDeviceFactory'
+import BiosensorDeviceFactory from '../impl/BiosensorDeviceFactory.js'
 
 async function main() {
     const factory = BiosensorDeviceFactory.Create()

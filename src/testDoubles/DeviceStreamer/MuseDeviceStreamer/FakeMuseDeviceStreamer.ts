@@ -1,7 +1,8 @@
 import generateId from '@neurodevs/generate-id'
-import { FakeLslOutlet } from '@neurodevs/node-lsl'
-import { DeviceStreamer } from 'impl/BiosensorDeviceFactory'
-import { MuseDeviceStreamerConstructorOptions } from '../../../impl/devices/MuseDeviceStreamer'
+import { FakeStreamOutlet } from '@neurodevs/node-lsl'
+
+import { DeviceStreamer } from 'impl/BiosensorDeviceFactory.js'
+import { MuseDeviceStreamerConstructorOptions } from '../../../impl/devices/MuseDeviceStreamer.js'
 
 export default class FakeMuseDeviceStreamer implements DeviceStreamer {
     public static callsToConstructor: (
@@ -35,8 +36,8 @@ export default class FakeMuseDeviceStreamer implements DeviceStreamer {
         FakeMuseDeviceStreamer.numCallsToDisconnect++
     }
 
-    public fakeEegOutlet = new FakeLslOutlet()
-    public fakePpgOutlet = new FakeLslOutlet()
+    public fakeEegOutlet = new FakeStreamOutlet()
+    public fakePpgOutlet = new FakeStreamOutlet()
 
     public get outlets() {
         return [this.fakeEegOutlet, this.fakePpgOutlet]

@@ -1,22 +1,17 @@
-import { test, assert } from '@sprucelabs/test-utils'
-import { FakeLslInlet } from '@neurodevs/node-lsl'
+import { FakeStreamInlet } from '@neurodevs/node-lsl'
+import { test, assert } from '@neurodevs/node-tdd'
+
 import BiosensorArrayMonitor, {
     ArrayMonitor,
-    setViewerComponent,
-} from '../../impl/BiosensorArrayMonitor'
-import FakeStreamViewer, {
-    passedFakeStreamViewerProps,
-    resetFakeStreamViewer,
-} from '../../testDoubles/StreamViewer/FakeStreamViewer'
-import AbstractPackageTest from '../AbstractPackageTest'
+} from '../../impl/BiosensorArrayMonitor.js'
+
+import AbstractPackageTest from '../AbstractPackageTest.js'
 
 export default class BiosensorArrayMonitorTest extends AbstractPackageTest {
     private static instance: ArrayMonitor
 
     protected static async beforeEach() {
         await super.beforeEach()
-
-        this.setFakeStreamViewer()
 
         this.instance = this.BiosensorArrayMonitor()
     }
@@ -29,18 +24,9 @@ export default class BiosensorArrayMonitorTest extends AbstractPackageTest {
     @test()
     protected static async createsLslInletsForEachStream() {
         assert.isEqualDeep(
-            FakeLslInlet.callsToConstructor.map((c) => c.options),
+            FakeStreamInlet.callsToConstructor.map((c) => c.options),
             this.expectedInletOptions,
             'Did not create expected inlets!'
-        )
-    }
-
-    @test()
-    protected static async createsBiosensorStreamViewer() {
-        assert.isEqualDeep(
-            passedFakeStreamViewerProps.length,
-            1,
-            'Incorrect number of stream viewers created!'
         )
     }
 
@@ -60,11 +46,6 @@ export default class BiosensorArrayMonitorTest extends AbstractPackageTest {
             }
         })
     })
-
-    private static setFakeStreamViewer() {
-        setViewerComponent(FakeStreamViewer)
-        resetFakeStreamViewer()
-    }
 
     private static BiosensorArrayMonitor() {
         return BiosensorArrayMonitor.Create(this.devices)

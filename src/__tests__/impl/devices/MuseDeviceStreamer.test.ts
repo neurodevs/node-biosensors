@@ -1,17 +1,18 @@
-import { test, assert } from '@sprucelabs/test-utils'
 import {
     FakeBleController,
     FakeBleConnector,
     FakeBleScanner,
     FakeCharacteristic,
 } from '@neurodevs/node-ble'
-import { FakeLslOutlet } from '@neurodevs/node-lsl'
+import { FakeStreamOutlet } from '@neurodevs/node-lsl'
+import { test, assert } from '@neurodevs/node-tdd'
+
 import MuseDeviceStreamer, {
     MuseDeviceStreamerOptions,
-} from '../../../impl/devices/MuseDeviceStreamer'
-import { MUSE_CHARACTERISTIC_UUIDS as CHAR_UUIDS } from '../../../impl/devices/MuseDeviceStreamer'
-import SpyMuseDeviceStreamer from '../../../testDoubles/DeviceStreamer/MuseDeviceStreamer/SpyMuseDeviceStreamer'
-import AbstractPackageTest from '../../AbstractPackageTest'
+} from '../../../impl/devices/MuseDeviceStreamer.js'
+import { MUSE_CHARACTERISTIC_UUIDS as CHAR_UUIDS } from '../../../impl/devices/MuseDeviceStreamer.js'
+import SpyMuseDeviceStreamer from '../../../testDoubles/DeviceStreamer/MuseDeviceStreamer/SpyMuseDeviceStreamer.js'
+import AbstractPackageTest from '../../AbstractPackageTest.js'
 
 export default class MuseDeviceStreamerTest extends AbstractPackageTest {
     private static instance: SpyMuseDeviceStreamer
@@ -65,7 +66,7 @@ export default class MuseDeviceStreamerTest extends AbstractPackageTest {
 
     @test()
     protected static async createsLslOutletForEegChannels() {
-        const firstCall = FakeLslOutlet.callsToConstructor[0]
+        const firstCall = FakeStreamOutlet.callsToConstructor[0]
 
         assert.isEqualDeep(firstCall.options, {
             name: 'Muse S Gen 2 EEG',
@@ -117,7 +118,7 @@ export default class MuseDeviceStreamerTest extends AbstractPackageTest {
 
     @test()
     protected static async createsLslOutletForPpgChannels() {
-        const secondCall = FakeLslOutlet.callsToConstructor[1]
+        const secondCall = FakeStreamOutlet.callsToConstructor[1]
 
         assert.isEqualDeep(secondCall.options, {
             name: 'Muse S Gen 2 PPG',
@@ -253,7 +254,7 @@ export default class MuseDeviceStreamerTest extends AbstractPackageTest {
         await this.disconnect()
 
         assert.isEqual(
-            FakeLslOutlet.numCallsToDestroy,
+            FakeStreamOutlet.numCallsToDestroy,
             2,
             'Should call destroy on both LSL outlets!'
         )
@@ -461,11 +462,11 @@ export default class MuseDeviceStreamerTest extends AbstractPackageTest {
     }
 
     private static get callsToPushSample() {
-        return FakeLslOutlet.callsToPushSample
+        return FakeStreamOutlet.callsToPushSample
     }
 
     private static get firstCallToPushSample() {
-        return FakeLslOutlet.callsToPushSample[0]
+        return FakeStreamOutlet.callsToPushSample[0]
     }
 
     private static readonly eegCharNames = [

@@ -7,10 +7,15 @@
 // 75: Battery voltage (value: 0–255)
 // 76-77: Trigger (value: 0–255)
 
-import { ChannelFormat, LslOutlet, LslStreamOutlet } from '@neurodevs/node-lsl'
+import {
+    ChannelFormat,
+    StreamOutlet,
+    LslStreamOutlet,
+} from '@neurodevs/node-lsl'
 import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 import FTDI from 'ftdi-d2xx'
-import { DeviceStreamer } from 'impl/BiosensorDeviceFactory'
+
+import { DeviceStreamer } from 'impl/BiosensorDeviceFactory.js'
 
 export default class CgxDeviceStreamer implements DeviceStreamer {
     public static Class?: CgxDeviceStreamerConstructor
@@ -20,8 +25,8 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
     public isRunning = false
     protected numPacketsDropped = 0
 
-    private eegOutlet: LslOutlet
-    private accelOutlet: LslOutlet
+    private eegOutlet: StreamOutlet
+    private accelOutlet: StreamOutlet
     private xdfRecorder?: XdfRecorder
 
     private infos!: FTDI.FTDI_DeviceInfo[]
@@ -380,8 +385,8 @@ export type CgxDeviceStreamerConstructor = new (
 ) => DeviceStreamer
 
 export interface CgxDeviceStreamerConstructorOptions {
-    eegOutlet: LslOutlet
-    accelOutlet: LslOutlet
+    eegOutlet: StreamOutlet
+    accelOutlet: StreamOutlet
     xdfRecorder?: XdfRecorder
     xdfRecordPath?: string
 }

@@ -1,8 +1,10 @@
-import { LslInletOptions, LslOutlet, LslStreamInlet } from '@neurodevs/node-lsl'
-import React from 'react'
-import ReactDOMServer from 'react-dom/server'
-import BiosensorStreamViewer from '../ui/BiosensorStreamViewer'
-import { DeviceStreamer } from './BiosensorDeviceFactory'
+import {
+    StreamInletOptions,
+    StreamOutlet,
+    LslStreamInlet,
+} from '@neurodevs/node-lsl'
+
+import { DeviceStreamer } from './BiosensorDeviceFactory.js'
 
 export default class BiosensorArrayMonitor implements ArrayMonitor {
     public static Class?: ArrayMonitorConstructor
@@ -10,13 +12,12 @@ export default class BiosensorArrayMonitor implements ArrayMonitor {
     protected constructor() {}
 
     public static Create(devices: DeviceStreamer[]) {
-        this.createLslInlets(devices)
-        this.renderStreamViewer()
+        this.createStreamInlets(devices)
 
         return new (this.Class ?? this)()
     }
 
-    private static createLslInlets(devices: DeviceStreamer[]) {
+    private static createStreamInlets(devices: DeviceStreamer[]) {
         devices.flatMap((device) => {
             return this.createInletsFrom(device)
         })
@@ -28,7 +29,7 @@ export default class BiosensorArrayMonitor implements ArrayMonitor {
         })
     }
 
-    private static createInletFrom(outlet: LslOutlet) {
+    private static createInletFrom(outlet: StreamOutlet) {
         return this.LslStreamInlet({
             sampleRate: outlet.sampleRate,
             channelNames: outlet.channelNames,
@@ -38,13 +39,7 @@ export default class BiosensorArrayMonitor implements ArrayMonitor {
         })
     }
 
-    private static renderStreamViewer() {
-        ReactDOMServer.renderToStaticMarkup(
-            React.createElement(ViewerComponent)
-        )
-    }
-
-    private static LslStreamInlet(options: LslInletOptions) {
+    private static LslStreamInlet(options: StreamInletOptions) {
         return LslStreamInlet.Create(options)
     }
 }
@@ -52,11 +47,3 @@ export default class BiosensorArrayMonitor implements ArrayMonitor {
 export interface ArrayMonitor {}
 
 export type ArrayMonitorConstructor = new () => ArrayMonitor
-
-// For test doubles
-
-export let ViewerComponent = BiosensorStreamViewer
-
-export function setViewerComponent(component: React.FC) {
-    ViewerComponent = component
-}
