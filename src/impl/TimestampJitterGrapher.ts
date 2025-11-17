@@ -10,7 +10,7 @@ export default class TimestampJitterGrapher implements JitterGrapher {
         return new (this.Class ?? this)()
     }
 
-    private static XdfFileLoader() {
+    private static async XdfFileLoader() {
         return XdfFileLoader.Create()
     }
 }
