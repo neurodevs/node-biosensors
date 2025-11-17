@@ -1,10 +1,10 @@
-import AbstractSpruceTest, { test, assert } from '@neurodevs/node-tdd'
+import AbstractModuleTest, { test, assert } from '@neurodevs/node-tdd'
 
 import TimestampJitterGrapher, {
     JitterGrapher,
 } from '../../impl/TimestampJitterGrapher.js'
 
-export default class TimestampJitterGrapherTest extends AbstractSpruceTest {
+export default class TimestampJitterGrapherTest extends AbstractModuleTest {
     private static instance: JitterGrapher
 
     protected static async beforeEach() {

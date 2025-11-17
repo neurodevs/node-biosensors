@@ -17,7 +17,7 @@ import {
     LslStreamInlet,
     FakeStreamInlet,
 } from '@neurodevs/node-lsl'
-import AbstractSpruceTest from '@neurodevs/node-tdd'
+import AbstractModuleTest from '@neurodevs/node-tdd'
 import { XdfStreamRecorder, FakeXdfRecorder } from '@neurodevs/node-xdf'
 
 import { DeviceStreamerOptions } from 'impl/BiosensorDeviceFactory.js'
@@ -33,7 +33,7 @@ import FakeZephyrDeviceStreamer from '../testDoubles/DeviceStreamer/ZephyrDevice
 import FakeDeviceFTDI from '../testDoubles/FTDI/FakeDeviceFTDI.js'
 import FakeFTDI from '../testDoubles/FTDI/FakeFTDI.js'
 
-export default class AbstractPackageTest extends AbstractSpruceTest {
+export default class AbstractPackageTest extends AbstractModuleTest {
     protected static async beforeEach() {
         await super.beforeEach()
 
