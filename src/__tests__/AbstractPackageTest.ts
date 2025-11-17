@@ -18,7 +18,12 @@ import {
     FakeStreamInlet,
 } from '@neurodevs/node-lsl'
 import AbstractModuleTest from '@neurodevs/node-tdd'
-import { XdfStreamRecorder, FakeXdfRecorder } from '@neurodevs/node-xdf'
+import {
+    XdfStreamRecorder,
+    FakeXdfRecorder,
+    XdfFileLoader,
+    FakeXdfLoader,
+} from '@neurodevs/node-xdf'
 
 import { DeviceStreamerOptions } from 'impl/BiosensorDeviceFactory.js'
 import CgxDeviceStreamer from '../impl/devices/CgxDeviceStreamer.js'
@@ -44,6 +49,7 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         this.setFakeStreamInlet()
         this.setFakeStreamOutlet()
         this.setFakeStreamInfo()
+        this.setFakeXdfLoader()
         this.setFakeXdfRecorder()
     }
 
@@ -99,6 +105,11 @@ export default class AbstractPackageTest extends AbstractModuleTest {
     protected static setFakeStreamInfo() {
         LslStreamInfo.Class = FakeStreamInfo
         FakeStreamInfo.resetTestDouble()
+    }
+
+    protected static setFakeXdfLoader() {
+        XdfFileLoader.Class = FakeXdfLoader
+        FakeXdfLoader.resetTestDouble()
     }
 
     protected static setFakeXdfRecorder() {

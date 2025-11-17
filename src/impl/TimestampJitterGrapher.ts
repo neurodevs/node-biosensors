@@ -1,10 +1,17 @@
+import { XdfFileLoader } from '@neurodevs/node-xdf'
+
 export default class TimestampJitterGrapher implements JitterGrapher {
     public static Class?: JitterGrapherConstructor
 
     protected constructor() {}
 
-    public static Create() {
+    public static async Create() {
+        await this.XdfFileLoader()
         return new (this.Class ?? this)()
+    }
+
+    private static XdfFileLoader() {
+        return XdfFileLoader.Create()
     }
 }
 
