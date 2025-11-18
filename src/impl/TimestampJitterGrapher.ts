@@ -1,13 +1,25 @@
-import { XdfFileLoader } from '@neurodevs/node-xdf'
+import { XdfFileLoader, XdfLoader } from '@neurodevs/node-xdf'
 
 export default class TimestampJitterGrapher implements JitterGrapher {
     public static Class?: JitterGrapherConstructor
 
-    protected constructor() {}
+    private xdfInputPath: string
+    private loader: XdfLoader
 
-    public static async Create() {
-        await this.XdfFileLoader()
-        return new (this.Class ?? this)()
+    protected constructor(options: JitterGrapherConstructorOptions) {
+        const { xdfInputPath, loader } = options
+
+        this.xdfInputPath = xdfInputPath
+        this.loader = loader
+    }
+
+    public static async Create(options: JitterGrapherOptions) {
+        const loader = await this.XdfFileLoader()
+        return new (this.Class ?? this)({ ...options, loader })
+    }
+
+    public async run() {
+        await this.loader.load(this.xdfInputPath)
     }
 
     private static async XdfFileLoader() {
@@ -15,6 +27,20 @@ export default class TimestampJitterGrapher implements JitterGrapher {
     }
 }
 
-export interface JitterGrapher {}
+export interface JitterGrapher {
+    run(): Promise<void>
+}
 
-export type JitterGrapherConstructor = new () => JitterGrapher
+export type JitterGrapherConstructor = new (
+    options: JitterGrapherConstructorOptions
+) => JitterGrapher
+
+export interface JitterGrapherOptions {
+    xdfInputPath: string
+    outputDir: string
+    sampleRateHz: number
+}
+
+export interface JitterGrapherConstructorOptions extends JitterGrapherOptions {
+    loader: XdfLoader
+}
