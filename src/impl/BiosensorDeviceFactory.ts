@@ -146,7 +146,7 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
 export interface DeviceFactory {
     createDevice<K extends DeviceName>(
         name: K,
-        options: DeviceOptionsMap[K] & { xdfRecordPath: string }
+        options?: DeviceOptionsMap[K] & { xdfRecordPath: string }
     ): Promise<[DeviceStreamer, XdfRecorder]>
 
     createDevice<K extends DeviceName>(
