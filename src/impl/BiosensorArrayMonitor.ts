@@ -2,6 +2,7 @@ import {
     StreamInletOptions,
     StreamOutlet,
     LslWebSocketBridge,
+    StreamTransportBridge,
 } from '@neurodevs/node-lsl'
 
 import { DeviceStreamer } from './BiosensorDeviceFactory.js'
@@ -9,11 +10,19 @@ import { DeviceStreamer } from './BiosensorDeviceFactory.js'
 export default class BiosensorArrayMonitor implements ArrayMonitor {
     public static Class?: ArrayMonitorConstructor
 
-    protected constructor() {}
+    private bridges: StreamTransportBridge[]
+
+    protected constructor(bridges: StreamTransportBridge[]) {
+        this.bridges = bridges
+    }
 
     public static Create(devices: DeviceStreamer[]) {
-        this.createBridgesFrom(devices)
-        return new (this.Class ?? this)()
+        const bridges = this.createBridgesFrom(devices)
+        return new (this.Class ?? this)(bridges)
+    }
+
+    public start() {
+        this.bridges.forEach((bridge) => bridge.activate())
     }
 
     private static createBridgesFrom(devices: DeviceStreamer[]) {
@@ -47,6 +56,8 @@ export default class BiosensorArrayMonitor implements ArrayMonitor {
     }
 }
 
-export interface ArrayMonitor {}
+export interface ArrayMonitor {
+    start(): void
+}
 
 export type ArrayMonitorConstructor = new () => ArrayMonitor

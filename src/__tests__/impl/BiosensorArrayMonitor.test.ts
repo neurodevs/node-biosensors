@@ -1,4 +1,4 @@
-import { FakeStreamInlet } from '@neurodevs/node-lsl'
+import { FakeStreamInlet, FakeStreamTransportBridge } from '@neurodevs/node-lsl'
 import { test, assert } from '@neurodevs/node-tdd'
 
 import BiosensorArrayMonitor, {
@@ -27,6 +27,17 @@ export default class BiosensorArrayMonitorTest extends AbstractPackageTest {
             FakeStreamInlet.callsToConstructor.map((c) => c.options),
             this.expectedBridgeOptions,
             'Did not create expected bridges!'
+        )
+    }
+
+    @test()
+    protected static async startCallsActivateOnAllBridges() {
+        this.instance.start()
+
+        assert.isEqualDeep(
+            FakeStreamTransportBridge.numCallsToActivate,
+            4,
+            'Did not activate bridges!'
         )
     }
 
