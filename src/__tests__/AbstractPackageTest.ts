@@ -16,6 +16,9 @@ import {
     FakeStreamInfo,
     LslStreamInlet,
     FakeStreamInlet,
+    LslWebSocketBridge,
+    FakeStreamTransportBridge,
+    FakeWebSocketServer,
 } from '@neurodevs/node-lsl'
 import AbstractModuleTest from '@neurodevs/node-tdd'
 import {
@@ -49,6 +52,7 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         this.setFakeStreamInlet()
         this.setFakeStreamOutlet()
         this.setFakeStreamInfo()
+        this.setFakeStreamTransportBridge()
         this.setFakeXdfLoader()
         this.setFakeXdfRecorder()
     }
@@ -105,6 +109,14 @@ export default class AbstractPackageTest extends AbstractModuleTest {
     protected static setFakeStreamInfo() {
         LslStreamInfo.Class = FakeStreamInfo
         FakeStreamInfo.resetTestDouble()
+    }
+
+    protected static setFakeStreamTransportBridge() {
+        LslWebSocketBridge.Class = FakeStreamTransportBridge
+        FakeStreamTransportBridge.resetTestDouble()
+
+        LslWebSocketBridge.WSS = FakeWebSocketServer
+        FakeWebSocketServer.resetTestDouble()
     }
 
     protected static setFakeXdfLoader() {

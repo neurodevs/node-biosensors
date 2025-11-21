@@ -1,7 +1,7 @@
 import {
     StreamInletOptions,
     StreamOutlet,
-    LslStreamInlet,
+    LslWebSocketBridge,
 } from '@neurodevs/node-lsl'
 
 import { DeviceStreamer } from './BiosensorDeviceFactory.js'
@@ -12,35 +12,38 @@ export default class BiosensorArrayMonitor implements ArrayMonitor {
     protected constructor() {}
 
     public static Create(devices: DeviceStreamer[]) {
-        this.createStreamInlets(devices)
-
+        this.createBridgesFrom(devices)
         return new (this.Class ?? this)()
     }
 
-    private static createStreamInlets(devices: DeviceStreamer[]) {
-        devices.flatMap((device) => {
-            return this.createInletsFrom(device)
+    private static createBridgesFrom(devices: DeviceStreamer[]) {
+        return devices.flatMap((device) => {
+            return device.outlets.map((outlet) => {
+                return this.createBridgeFrom(outlet)
+            })
         })
     }
 
-    private static createInletsFrom(device: DeviceStreamer) {
-        return device.outlets.map((outlet) => {
-            return this.createInletFrom(outlet)
+    private static createBridgeFrom(outlet: StreamOutlet) {
+        const {
+            sampleRateHz,
+            channelNames,
+            channelFormat,
+            chunkSize,
+            maxBufferedMs,
+        } = outlet
+
+        return this.LslWebSocketBridge({
+            sampleRateHz,
+            channelNames,
+            channelFormat,
+            chunkSize,
+            maxBufferedMs,
         })
     }
 
-    private static createInletFrom(outlet: StreamOutlet) {
-        return this.LslStreamInlet({
-            sampleRateHz: outlet.sampleRateHz,
-            channelNames: outlet.channelNames,
-            channelFormat: outlet.channelFormat,
-            chunkSize: outlet.chunkSize,
-            maxBufferedMs: outlet.maxBufferedMs,
-        })
-    }
-
-    private static LslStreamInlet(options: StreamInletOptions) {
-        return LslStreamInlet.Create(options, () => {})
+    private static LslWebSocketBridge(options: StreamInletOptions) {
+        return LslWebSocketBridge.Create(options)
     }
 }
 

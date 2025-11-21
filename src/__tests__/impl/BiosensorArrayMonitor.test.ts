@@ -22,11 +22,11 @@ export default class BiosensorArrayMonitorTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async createsLslInletsForEachStream() {
+    protected static async createsLslWebSocketBridgeForEachStream() {
         assert.isEqualDeep(
             FakeStreamInlet.callsToConstructor.map((c) => c.options),
-            this.expectedInletOptions,
-            'Did not create expected inlets!'
+            this.expectedBridgeOptions,
+            'Did not create expected bridges!'
         )
     }
 
@@ -35,7 +35,7 @@ export default class BiosensorArrayMonitorTest extends AbstractPackageTest {
         this.FakeDeviceStreamer(),
     ]
 
-    private static expectedInletOptions = this.devices.flatMap((device) => {
+    private static expectedBridgeOptions = this.devices.flatMap((device) => {
         return device.outlets.map((outlet) => {
             return {
                 sampleRateHz: outlet.sampleRateHz,
