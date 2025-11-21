@@ -25,6 +25,10 @@ export default class BiosensorArrayMonitor implements ArrayMonitor {
         this.bridges.forEach((bridge) => bridge.activate())
     }
 
+    public stop() {
+        this.bridges.forEach((bridge) => bridge.deactivate())
+    }
+
     private static createBridgesFrom(devices: DeviceStreamer[]) {
         return devices.flatMap((device) => {
             return device.outlets.map((outlet) => {
@@ -58,6 +62,7 @@ export default class BiosensorArrayMonitor implements ArrayMonitor {
 
 export interface ArrayMonitor {
     start(): void
+    stop(): void
 }
 
 export type ArrayMonitorConstructor = new () => ArrayMonitor
