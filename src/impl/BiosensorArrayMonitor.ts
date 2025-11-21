@@ -22,14 +22,26 @@ export default class BiosensorArrayMonitor implements ArrayMonitor {
     }
 
     public start() {
+        this.activateLslWebSocketBridges()
+    }
+
+    private activateLslWebSocketBridges() {
         this.bridges.forEach((bridge) => bridge.activate())
     }
 
     public stop() {
+        this.deactivateLslWebSocketBridges()
+    }
+
+    private deactivateLslWebSocketBridges() {
         this.bridges.forEach((bridge) => bridge.deactivate())
     }
 
     public destroy() {
+        this.destroyLslWebSocketBridges()
+    }
+
+    private destroyLslWebSocketBridges() {
         this.bridges.forEach((bridge) => bridge.destroy())
     }
 
