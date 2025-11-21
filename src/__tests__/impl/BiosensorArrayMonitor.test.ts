@@ -32,7 +32,7 @@ export default class BiosensorArrayMonitorTest extends AbstractPackageTest {
 
     @test()
     protected static async startCallsActivateOnAllBridges() {
-        this.instance.start()
+        this.start()
 
         assert.isEqualDeep(
             FakeStreamTransportBridge.numCallsToActivate,
@@ -43,7 +43,7 @@ export default class BiosensorArrayMonitorTest extends AbstractPackageTest {
 
     @test()
     protected static async stopCallsDeactivateOnAllBridges() {
-        this.instance.stop()
+        this.stop()
 
         assert.isEqualDeep(
             FakeStreamTransportBridge.numCallsToDeactivate,
@@ -54,13 +54,34 @@ export default class BiosensorArrayMonitorTest extends AbstractPackageTest {
 
     @test()
     protected static async destroyCallsDestroyOnAllBridges() {
-        this.instance.destroy()
+        this.destroy()
 
         assert.isEqualDeep(
             FakeStreamTransportBridge.numCallsToDestroy,
             4,
             'Did not destroy bridges!'
         )
+    }
+
+    @test()
+    protected static async throwsIfStartIsCalledAfterDestroy() {
+        this.destroy()
+
+        assert.doesThrow(() => {
+            this.start()
+        }, `\n\n Cannot re-start monitor after destroying it! \n\n Please create and start a new instance. \n`)
+    }
+
+    private static start() {
+        this.instance.start()
+    }
+
+    private static stop() {
+        this.instance.stop()
+    }
+
+    private static destroy() {
+        this.instance.destroy()
     }
 
     private static devices = [

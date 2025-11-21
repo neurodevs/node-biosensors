@@ -11,6 +11,7 @@ export default class BiosensorArrayMonitor implements ArrayMonitor {
     public static Class?: ArrayMonitorConstructor
 
     private bridges: StreamTransportBridge[]
+    private isDestroyed = false
 
     protected constructor(bridges: StreamTransportBridge[]) {
         this.bridges = bridges
@@ -22,7 +23,16 @@ export default class BiosensorArrayMonitor implements ArrayMonitor {
     }
 
     public start() {
+        this.throwIfMonitorIsDestroyed()
         this.activateLslWebSocketBridges()
+    }
+
+    private throwIfMonitorIsDestroyed() {
+        if (this.isDestroyed) {
+            throw new Error(
+                `\n\n Cannot re-start monitor after destroying it! \n\n Please create and start a new instance. \n`
+            )
+        }
     }
 
     private activateLslWebSocketBridges() {
@@ -39,6 +49,7 @@ export default class BiosensorArrayMonitor implements ArrayMonitor {
 
     public destroy() {
         this.destroyLslWebSocketBridges()
+        this.isDestroyed = true
     }
 
     private destroyLslWebSocketBridges() {
