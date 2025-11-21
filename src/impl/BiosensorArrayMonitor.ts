@@ -31,16 +31,16 @@ export default class BiosensorArrayMonitor implements ArrayMonitor {
 
     private static createInletFrom(outlet: StreamOutlet) {
         return this.LslStreamInlet({
-            sampleRate: outlet.sampleRate,
+            sampleRateHz: outlet.sampleRateHz,
             channelNames: outlet.channelNames,
             channelFormat: outlet.channelFormat,
             chunkSize: outlet.chunkSize,
-            maxBuffered: outlet.maxBuffered,
+            maxBufferedMs: outlet.maxBufferedMs,
         })
     }
 
     private static LslStreamInlet(options: StreamInletOptions) {
-        return LslStreamInlet.Create(options)
+        return LslStreamInlet.Create(options, () => {})
     }
 }
 

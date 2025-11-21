@@ -290,9 +290,9 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
     }
 
     private static readonly eegChunkSize = 12
-    private static readonly eegSampleRate = 256
+    private static readonly eegsampleRateHz = 256
     private static readonly ppgChunkSize = 6
-    private static readonly ppgSampleRate = 64
+    private static readonly ppgsampleRateHz = 64
 
     private static readonly eegCharacteristicNames = [
         'EEG_TP9',
@@ -312,26 +312,26 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
         name: 'Muse S Gen 2 EEG',
         type: 'EEG',
         channelNames: this.eegCharacteristicNames,
-        sampleRate: this.eegSampleRate,
+        sampleRateHz: this.eegsampleRateHz,
         channelFormat: 'float32' as ChannelFormat,
         sourceId: 'muse-eeg',
         manufacturer: 'Interaxon Inc.',
-        unit: 'microvolt',
+        units: 'microvolt',
         chunkSize: this.eegChunkSize,
-        maxBuffered: 360,
+        maxBufferedMs: 360,
     }
 
     private static readonly ppgOutletOptions = {
         name: 'Muse S Gen 2 PPG',
         type: 'PPG',
         channelNames: this.ppgCharacteristicNames,
-        sampleRate: this.ppgSampleRate,
+        sampleRateHz: this.ppgsampleRateHz,
         channelFormat: 'float32' as ChannelFormat,
         sourceId: 'muse-s-ppg',
         manufacturer: 'Interaxon Inc.',
-        unit: 'N/A',
+        units: 'N/A',
         chunkSize: this.ppgChunkSize,
-        maxBuffered: 360,
+        maxBufferedMs: 360,
     }
 
     private readonly bleLocalName = 'MuseS'

@@ -38,11 +38,11 @@ export default class BiosensorArrayMonitorTest extends AbstractPackageTest {
     private static expectedInletOptions = this.devices.flatMap((device) => {
         return device.outlets.map((outlet) => {
             return {
-                sampleRate: outlet.sampleRate,
+                sampleRateHz: outlet.sampleRateHz,
                 channelNames: outlet.channelNames,
                 channelFormat: outlet.channelFormat,
                 chunkSize: outlet.chunkSize,
-                maxBuffered: outlet.maxBuffered,
+                maxBufferedMs: outlet.maxBufferedMs,
             }
         })
     })

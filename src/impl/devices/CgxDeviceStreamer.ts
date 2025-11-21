@@ -334,12 +334,12 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
         name: 'CGX Quick-20r (Cognionics) - EEG',
         type: 'EEG',
         channelNames: this.eegCharacteristicNames,
-        sampleRate: 500,
+        sampleRateHz: 500,
         channelFormat: 'float32' as ChannelFormat,
         manufacturer: 'CGX Systems',
-        unit: 'microvolt',
+        units: 'microvolt',
         chunkSize: 1,
-        maxBuffered: 360,
+        maxBufferedMs: 360,
     }
 
     private static readonly accelCharacteristicNames = [
@@ -353,12 +353,12 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
         name: 'CGX Quick-20r (Cognionics) - Accelerometer',
         type: 'ACCEL',
         channelNames: this.accelCharacteristicNames,
-        sampleRate: 500,
+        sampleRateHz: 500,
         channelFormat: 'float32' as ChannelFormat,
         manufacturer: 'CGX Systems',
-        unit: 'Unknown',
+        units: 'Unknown',
         chunkSize: 1,
-        maxBuffered: 360,
+        maxBufferedMs: 360,
     }
 
     private static createXdfRecorderIfPath(xdfRecordPath?: string) {

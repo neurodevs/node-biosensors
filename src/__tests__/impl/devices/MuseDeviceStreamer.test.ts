@@ -72,13 +72,13 @@ export default class MuseDeviceStreamerTest extends AbstractPackageTest {
             name: 'Muse S Gen 2 EEG',
             type: 'EEG',
             channelNames: this.eegCharNames,
-            sampleRate: this.eegSampleRate,
+            sampleRateHz: this.eegsampleRateHz,
             channelFormat: 'float32',
             sourceId: 'muse-eeg',
             manufacturer: 'Interaxon Inc.',
-            unit: 'microvolt',
+            units: 'microvolt',
             chunkSize: this.eegChunkSize,
-            maxBuffered: 360,
+            maxBufferedMs: 360,
         })
     }
 
@@ -124,13 +124,13 @@ export default class MuseDeviceStreamerTest extends AbstractPackageTest {
             name: 'Muse S Gen 2 PPG',
             type: 'PPG',
             channelNames: this.ppgCharNames,
-            sampleRate: this.ppgSampleRate,
+            sampleRateHz: this.ppgsampleRateHz,
             channelFormat: 'float32',
             sourceId: 'muse-s-ppg',
             manufacturer: 'Interaxon Inc.',
-            unit: 'N/A',
+            units: 'N/A',
             chunkSize: this.ppgChunkSize,
-            maxBuffered: 360,
+            maxBufferedMs: 360,
         })
     }
 
@@ -495,14 +495,14 @@ export default class MuseDeviceStreamerTest extends AbstractPackageTest {
     private static readonly controlUuid: string = CHAR_UUIDS.CONTROL
     private static readonly numTimestamps = 2
 
-    private static readonly eegSampleRate = 256
+    private static readonly eegsampleRateHz = 256
     private static readonly eegChunkSize = 12
     private static readonly eegSize = this.numTimestamps + this.eegChunkSize
     private static readonly emptyEegChunk = Array(this.eegSize).fill(0)
     private static readonly emptyEegBuffer = Buffer.from(this.emptyEegChunk)
     private static readonly eegNumChannels = this.eegCharNames.length
 
-    private static readonly ppgSampleRate = 64
+    private static readonly ppgsampleRateHz = 64
     private static readonly ppgChunkSize = 6
     private static readonly bytesPerSample = 3
     private static readonly ppgBytes = this.bytesPerSample * this.ppgChunkSize

@@ -17,13 +17,13 @@ export default class FakeDeviceStreamer implements DeviceStreamer {
     public static fakeSourceId = generateId()
     public static fakeType = generateId()
     public static fakeName = generateId()
-    public static fakeSampleRate = this.generateRandomInt()
+    public static fakesampleRateHz = this.generateRandomInt()
     public static fakeChannelNames = [generateId(), generateId()]
     public static fakeChannelFormat = 'float32' as ChannelFormat
     public static fakeChunkSize = this.generateRandomInt()
-    public static fakeMaxBuffered = this.generateRandomInt()
+    public static fakemaxBufferedMs = this.generateRandomInt()
     public static fakeManufacturer = generateId()
-    public static fakeUnit = generateId()
+    public static fakeUnits = generateId()
 
     public constructor(options?: DeviceStreamerOptions) {
         FakeDeviceStreamer.callsToConstructor.push(options)
@@ -49,13 +49,13 @@ export default class FakeDeviceStreamer implements DeviceStreamer {
                 sourceId: FakeDeviceStreamer.fakeSourceId,
                 type: FakeDeviceStreamer.fakeType,
                 name: FakeDeviceStreamer.fakeName,
-                sampleRate: FakeDeviceStreamer.fakeSampleRate,
+                sampleRateHz: FakeDeviceStreamer.fakesampleRateHz,
                 channelNames: FakeDeviceStreamer.fakeChannelNames,
                 channelFormat: FakeDeviceStreamer.fakeChannelFormat,
                 chunkSize: FakeDeviceStreamer.fakeChunkSize,
-                maxBuffered: FakeDeviceStreamer.fakeMaxBuffered,
+                maxBufferedMs: FakeDeviceStreamer.fakemaxBufferedMs,
                 manufacturer: FakeDeviceStreamer.fakeManufacturer,
-                unit: FakeDeviceStreamer.fakeUnit,
+                units: FakeDeviceStreamer.fakeUnits,
             })
     )
 

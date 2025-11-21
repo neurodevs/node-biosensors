@@ -193,12 +193,12 @@ export default class CgxDeviceStreamerTest extends AbstractPackageTest {
                 name: 'CGX Quick-20r (Cognionics) - EEG',
                 type: 'EEG',
                 channelNames: this.eegCharacteristicNames,
-                sampleRate: 500,
+                sampleRateHz: 500,
                 channelFormat: 'float32',
                 manufacturer: 'CGX Systems',
-                unit: 'microvolt',
+                units: 'microvolt',
                 chunkSize: 1,
-                maxBuffered: 360,
+                maxBufferedMs: 360,
             },
             'Should create an LslOutlet!'
         )
@@ -254,12 +254,12 @@ export default class CgxDeviceStreamerTest extends AbstractPackageTest {
                 name: 'CGX Quick-20r (Cognionics) - Accelerometer',
                 type: 'ACCEL',
                 channelNames: this.accelCharacteristicNames,
-                sampleRate: 500,
+                sampleRateHz: 500,
                 channelFormat: 'float32',
                 manufacturer: 'CGX Systems',
-                unit: 'Unknown',
+                units: 'Unknown',
                 chunkSize: 1,
-                maxBuffered: 360,
+                maxBufferedMs: 360,
             },
             'Should create an LslOutlet for accelerometer!'
         )
