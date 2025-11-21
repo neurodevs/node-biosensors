@@ -52,6 +52,17 @@ export default class BiosensorArrayMonitorTest extends AbstractPackageTest {
         )
     }
 
+    @test()
+    protected static async destroyCallsDestroyOnAllBridges() {
+        this.instance.destroy()
+
+        assert.isEqualDeep(
+            FakeStreamTransportBridge.numCallsToDestroy,
+            4,
+            'Did not destroy bridges!'
+        )
+    }
+
     private static devices = [
         this.FakeDeviceStreamer(),
         this.FakeDeviceStreamer(),

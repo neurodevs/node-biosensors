@@ -6,6 +6,7 @@ export default class FakeArrayMonitor implements ArrayMonitor {
 
     public static numCallsToStart = 0
     public static numCallsToStop = 0
+    public static numCallsToDestroy = 0
 
     public constructor(devices?: DeviceStreamer[]) {
         FakeArrayMonitor.callsToConstructor.push(devices ?? [])
@@ -19,9 +20,14 @@ export default class FakeArrayMonitor implements ArrayMonitor {
         FakeArrayMonitor.numCallsToStop++
     }
 
+    public destroy() {
+        FakeArrayMonitor.numCallsToDestroy++
+    }
+
     public static resetTestDouble() {
         this.callsToConstructor = []
         this.numCallsToStart = 0
         this.numCallsToStop = 0
+        this.numCallsToDestroy = 0
     }
 }
