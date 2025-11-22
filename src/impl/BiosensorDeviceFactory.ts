@@ -1,7 +1,7 @@
 import { StreamOutlet } from '@neurodevs/node-lsl'
 import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 
-import BiosensorArrayMonitor from './BiosensorArrayMonitor.js'
+import BiosensorWebSocketGateway from './BiosensorWebSocketGateway.js'
 import CgxDeviceStreamer from './devices/CgxDeviceStreamer.js'
 import MuseDeviceStreamer, {
     MuseDeviceStreamerOptions,
@@ -105,7 +105,7 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
             return [this.createdDevices, recorder]
         }
 
-        BiosensorArrayMonitor.Create(this.createdDevices)
+        BiosensorWebSocketGateway.Create(this.createdDevices)
 
         return this.createdDevices
     }

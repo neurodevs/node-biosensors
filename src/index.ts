@@ -1,11 +1,3 @@
-// BiosensorArrayMonitor
-
-export { default as BiosensorArrayMonitor } from './impl/BiosensorArrayMonitor.js'
-export * from './impl/BiosensorArrayMonitor.js'
-
-export { default as FakeArrayMonitor } from './testDoubles/ArrayMonitor/FakeArrayMonitor.js'
-export * from './testDoubles/ArrayMonitor/FakeArrayMonitor.js'
-
 // BiosensorDeviceFactory
 
 export { default as BiosensorDeviceFactory } from './impl/BiosensorDeviceFactory.js'
@@ -43,3 +35,11 @@ export * from './impl/devices/ZephyrDeviceStreamer.js'
 
 export { default as FakeZephyrDeviceStreamer } from './testDoubles/DeviceStreamer/ZephyrDeviceStreamer/FakeZephyrDeviceStreamer.js'
 export * from './testDoubles/DeviceStreamer/ZephyrDeviceStreamer/FakeZephyrDeviceStreamer.js'
+
+// WebSocketGateway
+
+export { default as BiosensorWebSocketGateway } from './impl/BiosensorWebSocketGateway.js'
+export * from './impl/BiosensorWebSocketGateway.js'
+
+export { default as FakeWebSocketGateway } from './testDoubles/WebSocketGateway/FakeWebSocketGateway.js'
+export * from './testDoubles/WebSocketGateway/FakeWebSocketGateway.js'

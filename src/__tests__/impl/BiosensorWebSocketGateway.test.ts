@@ -1,19 +1,19 @@
 import { FakeStreamInlet, FakeStreamTransportBridge } from '@neurodevs/node-lsl'
 import { test, assert } from '@neurodevs/node-tdd'
 
-import BiosensorArrayMonitor, {
-    ArrayMonitor,
-} from '../../impl/BiosensorArrayMonitor.js'
+import BiosensorWebSocketGateway, {
+    WebSocketGateway,
+} from '../../impl/BiosensorWebSocketGateway.js'
 
 import AbstractPackageTest from '../AbstractPackageTest.js'
 
-export default class BiosensorArrayMonitorTest extends AbstractPackageTest {
-    private static instance: ArrayMonitor
+export default class BiosensorWebSocketGatewayTest extends AbstractPackageTest {
+    private static instance: WebSocketGateway
 
     protected static async beforeEach() {
         await super.beforeEach()
 
-        this.instance = this.BiosensorArrayMonitor()
+        this.instance = this.BiosensorWebSocketGateway()
     }
 
     @test()
@@ -31,8 +31,8 @@ export default class BiosensorArrayMonitorTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async startCallsActivateOnAllBridges() {
-        this.start()
+    protected static async openCallsActivateOnAllBridges() {
+        this.open()
 
         assert.isEqualDeep(
             FakeStreamTransportBridge.numCallsToActivate,
@@ -42,8 +42,8 @@ export default class BiosensorArrayMonitorTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async stopCallsDeactivateOnAllBridges() {
-        this.stop()
+    protected static async closeCallsDeactivateOnAllBridges() {
+        this.close()
 
         assert.isEqualDeep(
             FakeStreamTransportBridge.numCallsToDeactivate,
@@ -64,20 +64,20 @@ export default class BiosensorArrayMonitorTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async throwsIfStartIsCalledAfterDestroy() {
+    protected static async throwsIfOpenIsCalledAfterDestroy() {
         this.destroy()
 
         assert.doesThrow(() => {
-            this.start()
-        }, `\n\n Cannot re-start monitor after destroying it! \n\n Please create and start a new instance. \n`)
+            this.open()
+        }, `\n\n Cannot re-open gateway after destroying it! \n\n Please create and open a new instance. \n`)
     }
 
-    private static start() {
-        this.instance.start()
+    private static open() {
+        this.instance.open()
     }
 
-    private static stop() {
-        this.instance.stop()
+    private static close() {
+        this.instance.close()
     }
 
     private static destroy() {
@@ -103,7 +103,7 @@ export default class BiosensorArrayMonitorTest extends AbstractPackageTest {
         })
     })
 
-    private static BiosensorArrayMonitor() {
-        return BiosensorArrayMonitor.Create(this.devices)
+    private static BiosensorWebSocketGateway() {
+        return BiosensorWebSocketGateway.Create(this.devices)
     }
 }

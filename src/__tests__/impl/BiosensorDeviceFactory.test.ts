@@ -6,17 +6,17 @@ import {
     DeviceStreamer,
     DeviceStreamerOptions,
 } from 'impl/BiosensorDeviceFactory.js'
-import BiosensorArrayMonitor from '../../impl/BiosensorArrayMonitor.js'
 import BiosensorDeviceFactory, {
     DeviceFactory,
     DeviceSpecification,
 } from '../../impl/BiosensorDeviceFactory.js'
+import BiosensorWebSocketGateway from '../../impl/BiosensorWebSocketGateway.js'
 import CgxDeviceStreamer from '../../impl/devices/CgxDeviceStreamer.js'
 import MuseDeviceStreamer, {
     MuseDeviceStreamerOptions,
 } from '../../impl/devices/MuseDeviceStreamer.js'
-import FakeArrayMonitor from '../../testDoubles/ArrayMonitor/FakeArrayMonitor.js'
 import FakeMuseDeviceStreamer from '../../testDoubles/DeviceStreamer/MuseDeviceStreamer/FakeMuseDeviceStreamer.js'
+import FakeWebSocketGateway from '../../testDoubles/WebSocketGateway/FakeWebSocketGateway.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 
 export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
@@ -26,7 +26,7 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
         await super.beforeEach()
 
         this.setFakeDevices()
-        this.setFakeArrayMonitor()
+        this.setFakeWebSocketGateway()
 
         this.instance = this.BiosensorDeviceFactory()
     }
@@ -155,13 +155,13 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async createsBiosensorArrayMonitor() {
+    protected static async createsBiosensorWebSocketGateway() {
         await this.createDevices()
 
         assert.isEqual(
-            FakeArrayMonitor.callsToConstructor.length,
+            FakeWebSocketGateway.callsToConstructor.length,
             1,
-            'Did not create class as expected!'
+            'Did not create gateway!'
         )
     }
 
@@ -202,9 +202,9 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
         assert.isTruthy(device, 'Failed to create device!')
     }
 
-    private static setFakeArrayMonitor() {
-        BiosensorArrayMonitor.Class = FakeArrayMonitor
-        FakeArrayMonitor.resetTestDouble()
+    private static setFakeWebSocketGateway() {
+        BiosensorWebSocketGateway.Class = FakeWebSocketGateway
+        FakeWebSocketGateway.resetTestDouble()
     }
 
     private static BiosensorDeviceFactory() {

@@ -7,8 +7,8 @@ import {
 
 import { DeviceStreamer } from './BiosensorDeviceFactory.js'
 
-export default class BiosensorArrayMonitor implements ArrayMonitor {
-    public static Class?: ArrayMonitorConstructor
+export default class BiosensorWebSocketGateway implements WebSocketGateway {
+    public static Class?: WebSocketGatewayConstructor
 
     private bridges: StreamTransportBridge[]
     private isDestroyed = false
@@ -22,15 +22,15 @@ export default class BiosensorArrayMonitor implements ArrayMonitor {
         return new (this.Class ?? this)(bridges)
     }
 
-    public start() {
-        this.throwIfMonitorIsDestroyed()
+    public open() {
+        this.throwIfGatewayIsDestroyed()
         this.activateLslWebSocketBridges()
     }
 
-    private throwIfMonitorIsDestroyed() {
+    private throwIfGatewayIsDestroyed() {
         if (this.isDestroyed) {
             throw new Error(
-                `\n\n Cannot re-start monitor after destroying it! \n\n Please create and start a new instance. \n`
+                `\n\n Cannot re-open gateway after destroying it! \n\n Please create and open a new instance. \n`
             )
         }
     }
@@ -39,7 +39,7 @@ export default class BiosensorArrayMonitor implements ArrayMonitor {
         this.bridges.forEach((bridge) => bridge.activate())
     }
 
-    public stop() {
+    public close() {
         this.deactivateLslWebSocketBridges()
     }
 
@@ -83,10 +83,12 @@ export default class BiosensorArrayMonitor implements ArrayMonitor {
     }
 }
 
-export interface ArrayMonitor {
-    start(): void
-    stop(): void
+export interface WebSocketGateway {
+    open(): void
+    close(): void
     destroy(): void
 }
 
-export type ArrayMonitorConstructor = new () => ArrayMonitor
+export type WebSocketGatewayConstructor = new (
+    bridges: StreamTransportBridge[]
+) => WebSocketGateway
