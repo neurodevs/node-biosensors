@@ -53,6 +53,7 @@ export default class BiosensorWebSocketGateway implements WebSocketGateway {
         if (!this.isClosed) {
             this.throwIfGatewayIsDestroyed(this.cannotCloseMessage)
             this.deactivateLslWebSocketBridges()
+            this.isOpen = false
             this.isClosed = true
         } else {
             console.warn('Cannot close gateway because it is already closed.')
