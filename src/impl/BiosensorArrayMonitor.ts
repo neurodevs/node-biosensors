@@ -1,8 +1,8 @@
 import {
-    StreamInletOptions,
     StreamOutlet,
     LslWebSocketBridge,
     StreamTransportBridge,
+    StreamTransportBridgeOptions,
 } from '@neurodevs/node-lsl'
 
 import { DeviceStreamer } from './BiosensorDeviceFactory.js'
@@ -57,32 +57,28 @@ export default class BiosensorArrayMonitor implements ArrayMonitor {
     }
 
     private static createBridgesFrom(devices: DeviceStreamer[]) {
+        let currentWssPort = 8080
+
         return devices.flatMap((device) => {
             return device.outlets.map((outlet) => {
-                return this.createBridgeFrom(outlet)
+                return this.createBridgeFrom(outlet, currentWssPort++)
             })
         })
     }
 
-    private static createBridgeFrom(outlet: StreamOutlet) {
-        const {
-            sampleRateHz,
-            channelNames,
-            channelFormat,
-            chunkSize,
-            maxBufferedMs,
-        } = outlet
+    private static createBridgeFrom(outlet: StreamOutlet, wssPort: number) {
+        const { sampleRateHz, channelNames, channelFormat, chunkSize } = outlet
 
         return this.LslWebSocketBridge({
             sampleRateHz,
             channelNames,
             channelFormat,
             chunkSize,
-            maxBufferedMs,
+            wssPort,
         })
     }
 
-    private static LslWebSocketBridge(options: StreamInletOptions) {
+    private static LslWebSocketBridge(options: StreamTransportBridgeOptions) {
         return LslWebSocketBridge.Create(options)
     }
 }

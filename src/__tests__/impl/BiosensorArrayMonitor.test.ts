@@ -89,6 +89,8 @@ export default class BiosensorArrayMonitorTest extends AbstractPackageTest {
         this.FakeDeviceStreamer(),
     ]
 
+    private static currentWssPort = 8080
+
     private static expectedBridgeOptions = this.devices.flatMap((device) => {
         return device.outlets.map((outlet) => {
             return {
@@ -96,7 +98,7 @@ export default class BiosensorArrayMonitorTest extends AbstractPackageTest {
                 channelNames: outlet.channelNames,
                 channelFormat: outlet.channelFormat,
                 chunkSize: outlet.chunkSize,
-                maxBufferedMs: outlet.maxBufferedMs,
+                wssPort: this.currentWssPort++,
             }
         })
     })
