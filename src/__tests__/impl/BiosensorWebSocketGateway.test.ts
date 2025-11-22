@@ -142,6 +142,18 @@ export default class BiosensorWebSocketGatewayTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async doesNotDestroyBridgesTwiceAfterDestroyingTwice() {
+        this.destroy()
+        this.destroy()
+
+        assert.isEqualDeep(
+            FakeStreamTransportBridge.numCallsToDestroy,
+            4,
+            'Destroyed bridges more than once!'
+        )
+    }
+
+    @test()
     protected static async throwsIfOpenIsCalledAfterDestroy() {
         this.destroy()
 
@@ -158,15 +170,6 @@ export default class BiosensorWebSocketGatewayTest extends AbstractPackageTest {
         assert.doesThrow(() => {
             this.close()
         }, `\n\n Cannot close gateway after destroying it! \n\n Please create a new instance. \n`)
-    }
-
-    @test()
-    protected static async throwsIfDestroyIsCalledAfterDestroy() {
-        this.destroy()
-
-        assert.doesThrow(() => {
-            this.destroy()
-        }, `\n\n Cannot destroy gateway after destroying it! \n\n Please create a new instance. \n`)
     }
 
     private static open() {

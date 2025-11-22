@@ -65,9 +65,12 @@ export default class BiosensorWebSocketGateway implements WebSocketGateway {
     }
 
     public destroy() {
-        this.throwIfGatewayIsDestroyed(this.cannotDestroyMessage)
-        this.destroyLslWebSocketBridges()
-        this.isDestroyed = true
+        if (!this.isDestroyed) {
+            this.destroyLslWebSocketBridges()
+            this.isDestroyed = true
+        } else {
+            console.warn(this.cannotDestroyMessage)
+        }
     }
 
     private readonly cannotDestroyMessage = `\n\n Cannot destroy gateway after destroying it! \n\n Please create a new instance. \n`
