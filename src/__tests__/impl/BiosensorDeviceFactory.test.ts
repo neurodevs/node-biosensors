@@ -79,7 +79,7 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
 
         await assert.doesThrowAsync(
             async () => await this.instance.createDevice(invalidName),
-            `\n\nInvalid device name: ${invalidName}!\n\nPlease choose from:\n\n- Cognionics Quick-20r\n- Muse S Gen 2\n- Zephyr BioHarness 3\n\n`
+            `\n\n Invalid device name: ${invalidName}! \n\n Please choose from: \n\n - Cognionics Quick-20r \n - Muse S Gen 2 \n - Zephyr BioHarness 3 \n\n`
         )
     }
 

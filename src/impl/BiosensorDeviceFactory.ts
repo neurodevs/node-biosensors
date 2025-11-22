@@ -74,7 +74,7 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
     }
 
     private get invalidNameErrorMessage() {
-        return `\n\nInvalid device name: ${this.deviceName}!\n\nPlease choose from:\n\n- Cognionics Quick-20r\n- Muse S Gen 2\n- Zephyr BioHarness 3\n\n`
+        return `\n\n Invalid device name: ${this.deviceName}! \n\n Please choose from: \n\n - Cognionics Quick-20r \n - Muse S Gen 2 \n - Zephyr BioHarness 3 \n\n`
     }
 
     public async createDevices(
