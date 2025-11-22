@@ -17,8 +17,11 @@ export default class BiosensorWebSocketGateway implements WebSocketGateway {
         this.bridges = bridges
     }
 
-    public static Create(devices: DeviceStreamer[]) {
-        const bridges = this.createBridgesFrom(devices)
+    public static Create(
+        devices: DeviceStreamer[],
+        options?: WebSocketGatewayOptions
+    ) {
+        const bridges = this.createBridgesFrom(devices, options)
         return new (this.Class ?? this)(bridges)
     }
 
@@ -56,8 +59,12 @@ export default class BiosensorWebSocketGateway implements WebSocketGateway {
         this.bridges.forEach((bridge) => bridge.destroy())
     }
 
-    private static createBridgesFrom(devices: DeviceStreamer[]) {
-        let currentWssPort = 8080
+    private static createBridgesFrom(
+        devices: DeviceStreamer[],
+        options?: WebSocketGatewayOptions
+    ) {
+        const { wssPortStart = 8080 } = options ?? {}
+        let currentWssPort = wssPortStart
 
         return devices.flatMap((device) => {
             return device.outlets.map((outlet) => {
@@ -87,6 +94,10 @@ export interface WebSocketGateway {
     open(): void
     close(): void
     destroy(): void
+}
+
+export interface WebSocketGatewayOptions {
+    wssPortStart?: number
 }
 
 export type WebSocketGatewayConstructor = new (

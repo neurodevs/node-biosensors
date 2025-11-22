@@ -1,8 +1,14 @@
-import { FakeStreamInlet, FakeStreamTransportBridge } from '@neurodevs/node-lsl'
+import { randomInt } from 'crypto'
+import {
+    FakeStreamInlet,
+    FakeStreamTransportBridge,
+    FakeWebSocketServer,
+} from '@neurodevs/node-lsl'
 import { test, assert } from '@neurodevs/node-tdd'
 
 import BiosensorWebSocketGateway, {
     WebSocketGateway,
+    WebSocketGatewayOptions,
 } from '../../impl/BiosensorWebSocketGateway.js'
 
 import AbstractPackageTest from '../AbstractPackageTest.js'
@@ -27,6 +33,25 @@ export default class BiosensorWebSocketGatewayTest extends AbstractPackageTest {
             FakeStreamInlet.callsToConstructor.map((c) => c.options),
             this.expectedBridgeOptions,
             'Did not create expected bridges!'
+        )
+    }
+
+    @test()
+    protected static async acceptsOptionalWssPortStart() {
+        FakeWebSocketServer.resetTestDouble()
+
+        const wssPortStart = randomInt(1000, 10000)
+        this.BiosensorWebSocketGateway({ wssPortStart })
+
+        assert.isEqualDeep(
+            FakeWebSocketServer.callsToConstructor.map((c) => c.port),
+            [
+                wssPortStart,
+                wssPortStart + 1,
+                wssPortStart + 2,
+                wssPortStart + 3,
+            ],
+            'Did not set expected wssPortStart!'
         )
     }
 
@@ -103,7 +128,9 @@ export default class BiosensorWebSocketGatewayTest extends AbstractPackageTest {
         })
     })
 
-    private static BiosensorWebSocketGateway() {
-        return BiosensorWebSocketGateway.Create(this.devices)
+    private static BiosensorWebSocketGateway(
+        options?: WebSocketGatewayOptions
+    ) {
+        return BiosensorWebSocketGateway.Create(this.devices, options)
     }
 }
