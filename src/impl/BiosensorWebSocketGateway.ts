@@ -26,25 +26,28 @@ export default class BiosensorWebSocketGateway implements WebSocketGateway {
     }
 
     public open() {
-        this.throwIfGatewayIsDestroyed()
+        this.throwIfGatewayIsDestroyed(this.cannotOpenMessage)
         this.activateLslWebSocketBridges()
     }
 
-    private throwIfGatewayIsDestroyed() {
+    private throwIfGatewayIsDestroyed(err: string) {
         if (this.isDestroyed) {
-            throw new Error(
-                `\n\n Cannot re-open gateway after destroying it! \n\n Please create and open a new instance. \n`
-            )
+            throw new Error(err)
         }
     }
+
+    private readonly cannotOpenMessage = `\n\n Cannot open gateway after destroying it! \n\n Please create and open a new instance. \n`
 
     private activateLslWebSocketBridges() {
         this.bridges.forEach((bridge) => bridge.activate())
     }
 
     public close() {
+        this.throwIfGatewayIsDestroyed(this.cannotCloseMessage)
         this.deactivateLslWebSocketBridges()
     }
+
+    private readonly cannotCloseMessage = `\n\n Cannot close gateway after destroying it! \n\n Please create a new instance. \n`
 
     private deactivateLslWebSocketBridges() {
         this.bridges.forEach((bridge) => bridge.deactivate())

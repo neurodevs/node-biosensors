@@ -94,7 +94,16 @@ export default class BiosensorWebSocketGatewayTest extends AbstractPackageTest {
 
         assert.doesThrow(() => {
             this.open()
-        }, `\n\n Cannot re-open gateway after destroying it! \n\n Please create and open a new instance. \n`)
+        }, `\n\n Cannot open gateway after destroying it! \n\n Please create and open a new instance. \n`)
+    }
+
+    @test()
+    protected static async throwsIfCloseIsCalledAfterDestroy() {
+        this.destroy()
+
+        assert.doesThrow(() => {
+            this.close()
+        }, `\n\n Cannot close gateway after destroying it! \n\n Please create a new instance. \n`)
     }
 
     private static open() {
