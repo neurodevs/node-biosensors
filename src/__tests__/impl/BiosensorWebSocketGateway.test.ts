@@ -1,7 +1,7 @@
 import { randomInt } from 'crypto'
 import {
     FakeStreamInlet,
-    FakeStreamTransportBridge,
+    FakeWebSocketBridge,
     FakeWebSocketServer,
 } from '@neurodevs/node-lsl'
 import { test, assert } from '@neurodevs/node-tdd'
@@ -60,7 +60,7 @@ export default class BiosensorWebSocketGatewayTest extends AbstractPackageTest {
         this.open()
 
         assert.isEqualDeep(
-            FakeStreamTransportBridge.numCallsToActivate,
+            FakeWebSocketBridge.numCallsToActivate,
             4,
             'Did not activate bridges!'
         )
@@ -72,7 +72,7 @@ export default class BiosensorWebSocketGatewayTest extends AbstractPackageTest {
         this.close()
 
         assert.isEqualDeep(
-            FakeStreamTransportBridge.numCallsToDeactivate,
+            FakeWebSocketBridge.numCallsToDeactivate,
             4,
             'Did not deactivate bridges!'
         )
@@ -83,7 +83,7 @@ export default class BiosensorWebSocketGatewayTest extends AbstractPackageTest {
         this.destroy()
 
         assert.isEqualDeep(
-            FakeStreamTransportBridge.numCallsToDestroy,
+            FakeWebSocketBridge.numCallsToDestroy,
             4,
             'Did not destroy bridges!'
         )
@@ -95,7 +95,7 @@ export default class BiosensorWebSocketGatewayTest extends AbstractPackageTest {
         this.open()
 
         assert.isEqualDeep(
-            FakeStreamTransportBridge.numCallsToActivate,
+            FakeWebSocketBridge.numCallsToActivate,
             4,
             'Activated bridges more than once!'
         )
@@ -108,7 +108,7 @@ export default class BiosensorWebSocketGatewayTest extends AbstractPackageTest {
         this.close()
 
         assert.isEqualDeep(
-            FakeStreamTransportBridge.numCallsToDeactivate,
+            FakeWebSocketBridge.numCallsToDeactivate,
             4,
             'Deactivated bridges more than once!'
         )
@@ -121,7 +121,7 @@ export default class BiosensorWebSocketGatewayTest extends AbstractPackageTest {
         this.open()
 
         assert.isEqualDeep(
-            FakeStreamTransportBridge.numCallsToActivate,
+            FakeWebSocketBridge.numCallsToActivate,
             8,
             'Did not activate bridges again after closing!'
         )
@@ -135,7 +135,7 @@ export default class BiosensorWebSocketGatewayTest extends AbstractPackageTest {
         this.close()
 
         assert.isEqualDeep(
-            FakeStreamTransportBridge.numCallsToDeactivate,
+            FakeWebSocketBridge.numCallsToDeactivate,
             8,
             'Did not deactivate bridges again after opening twice!'
         )
@@ -147,7 +147,7 @@ export default class BiosensorWebSocketGatewayTest extends AbstractPackageTest {
         this.destroy()
 
         assert.isEqualDeep(
-            FakeStreamTransportBridge.numCallsToDestroy,
+            FakeWebSocketBridge.numCallsToDestroy,
             4,
             'Destroyed bridges more than once!'
         )

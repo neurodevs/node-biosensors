@@ -1,8 +1,8 @@
 import {
     StreamOutlet,
     LslWebSocketBridge,
-    StreamTransportBridge,
-    StreamTransportBridgeOptions,
+    WebSocketBridge,
+    WebSocketBridgeOptions,
 } from '@neurodevs/node-lsl'
 
 import { DeviceStreamer } from './BiosensorDeviceFactory.js'
@@ -10,11 +10,11 @@ import { DeviceStreamer } from './BiosensorDeviceFactory.js'
 export default class BiosensorWebSocketGateway implements WebSocketGateway {
     public static Class?: WebSocketGatewayConstructor
 
-    private bridges: StreamTransportBridge[]
+    private bridges: WebSocketBridge[]
     private isOpen = false
     private isDestroyed = false
 
-    protected constructor(bridges: StreamTransportBridge[]) {
+    protected constructor(bridges: WebSocketBridge[]) {
         this.bridges = bridges
     }
 
@@ -105,7 +105,7 @@ export default class BiosensorWebSocketGateway implements WebSocketGateway {
         })
     }
 
-    private static LslWebSocketBridge(options: StreamTransportBridgeOptions) {
+    private static LslWebSocketBridge(options: WebSocketBridgeOptions) {
         return LslWebSocketBridge.Create(options)
     }
 }
@@ -121,5 +121,5 @@ export interface WebSocketGatewayOptions {
 }
 
 export type WebSocketGatewayConstructor = new (
-    bridges: StreamTransportBridge[]
+    bridges: WebSocketBridge[]
 ) => WebSocketGateway
