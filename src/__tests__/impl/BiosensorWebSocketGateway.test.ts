@@ -101,6 +101,18 @@ export default class BiosensorWebSocketGatewayTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async doesNotDeactivateBridgesTwiceIfCloseCalledTwice() {
+        this.close()
+        this.close()
+
+        assert.isEqualDeep(
+            FakeStreamTransportBridge.numCallsToDeactivate,
+            4,
+            'Deactivated bridges more than once!'
+        )
+    }
+
+    @test()
     protected static async throwsIfOpenIsCalledAfterDestroy() {
         this.destroy()
 
