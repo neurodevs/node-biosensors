@@ -68,6 +68,7 @@ export default class BiosensorWebSocketGatewayTest extends AbstractPackageTest {
 
     @test()
     protected static async closeCallsDeactivateOnAllBridges() {
+        this.open()
         this.close()
 
         assert.isEqualDeep(
@@ -102,6 +103,7 @@ export default class BiosensorWebSocketGatewayTest extends AbstractPackageTest {
 
     @test()
     protected static async doesNotDeactivateBridgesTwiceIfCloseCalledTwice() {
+        this.open()
         this.close()
         this.close()
 
@@ -150,6 +152,7 @@ export default class BiosensorWebSocketGatewayTest extends AbstractPackageTest {
 
     @test()
     protected static async throwsIfCloseIsCalledAfterDestroy() {
+        this.open()
         this.destroy()
 
         assert.doesThrow(() => {

@@ -12,7 +12,6 @@ export default class BiosensorWebSocketGateway implements WebSocketGateway {
 
     private bridges: StreamTransportBridge[]
     private isOpen = false
-    private isClosed = false
     private isDestroyed = false
 
     protected constructor(bridges: StreamTransportBridge[]) {
@@ -32,7 +31,6 @@ export default class BiosensorWebSocketGateway implements WebSocketGateway {
             this.throwIfGatewayIsDestroyed(this.cannotOpenMessage)
             this.activateLslWebSocketBridges()
             this.isOpen = true
-            this.isClosed = false
         } else {
             console.warn('Cannot open gateway because it is already open.')
         }
@@ -51,11 +49,10 @@ export default class BiosensorWebSocketGateway implements WebSocketGateway {
     }
 
     public close() {
-        if (!this.isClosed) {
+        if (this.isOpen) {
             this.throwIfGatewayIsDestroyed(this.cannotCloseMessage)
             this.deactivateLslWebSocketBridges()
             this.isOpen = false
-            this.isClosed = true
         } else {
             console.warn('Cannot close gateway because it is already closed.')
         }
