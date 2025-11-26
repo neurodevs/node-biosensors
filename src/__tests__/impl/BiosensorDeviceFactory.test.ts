@@ -1,4 +1,6 @@
+import { randomInt } from 'crypto'
 import generateId from '@neurodevs/generate-id'
+import { FakeWebSocketServer } from '@neurodevs/node-lsl'
 import { test, assert } from '@neurodevs/node-tdd'
 import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 
@@ -96,7 +98,7 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
 
     @test()
     protected static async createsXdfRecorderWithXdfRecordPath() {
-        await this.createDevices(true)
+        await this.createDevicesWithXdfRecorder()
 
         assert.isEqualDeep(
             FakeXdfRecorder.callsToConstructor[0]?.xdfRecordPath,
@@ -107,7 +109,7 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
 
     @test()
     protected static async createsXdfRecorderWithStreamQueries() {
-        await this.createDevices(true)
+        await this.createDevicesWithXdfRecorder()
 
         assert.isEqualDeep(
             FakeXdfRecorder.callsToConstructor[0]?.streamQueries,
@@ -121,7 +123,7 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
 
     @test()
     protected static async returnsXdfRecorder() {
-        const { recorder } = await this.createDevices(true)
+        const { recorder } = await this.createDevicesWithXdfRecorder()
         assert.isTruthy(recorder, 'Did not return XdfRecorder!')
     }
 
@@ -150,7 +152,7 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
 
     @test()
     protected static async onlyCreatesOneInstanceOfXdfRecorder() {
-        await this.createDevices(true)
+        await this.createDevicesWithXdfRecorder()
 
         assert.isEqual(
             FakeXdfRecorder.callsToConstructor.length,
@@ -161,13 +163,24 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
 
     @test()
     protected static async createsBiosensorWebSocketGateway() {
-        await this.createDevices()
+        await this.createDevicesWithGateway()
 
-        assert.isEqual(
-            FakeWebSocketGateway.callsToConstructor.length,
-            1,
-            'Did not create gateway!'
+        assert.isEqualDeep(
+            FakeWebSocketServer.callsToConstructor,
+            [
+                { port: this.wssPortStart },
+                { port: this.wssPortStart + 1 },
+                { port: this.wssPortStart + 2 },
+                { port: this.wssPortStart + 3 },
+            ],
+            'Did not create gateway with expected devices!'
         )
+    }
+
+    @test()
+    protected static async returnsBiosensorWebSocketGateway() {
+        const { gateway } = await this.createDevicesWithGateway()
+        assert.isTruthy(gateway, 'Did not return gateway!')
     }
 
     private static async createCgxWithXdfRecorder() {
@@ -176,13 +189,26 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
         })
     }
 
-    private static async createDevices(includeXdfRecorder = false) {
+    private static createDevicesWithXdfRecorder() {
+        return this.createDevices({ includeXdfRecorder: true })
+    }
+
+    private static createDevicesWithGateway() {
+        return this.createDevices({ useWebSocketGateway: true })
+    }
+
+    private static async createDevices({
+        includeXdfRecorder = false,
+        useWebSocketGateway = false,
+    } = {}) {
         return await this.instance.createDevices(this.deviceSpecifications, {
             xdfRecordPath: includeXdfRecorder ? this.xdfRecordPath : undefined,
+            wssPortStart: useWebSocketGateway ? this.wssPortStart : undefined,
         })
     }
 
-    private static xdfRecordPath = generateId()
+    private static readonly xdfRecordPath = generateId()
+    private static readonly wssPortStart = randomInt(1000, 5000)
 
     private static deviceSpecifications: DeviceSpecification[] = [
         { deviceName: 'Cognionics Quick-20r' },

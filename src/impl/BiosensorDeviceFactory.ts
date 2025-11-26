@@ -1,7 +1,9 @@
 import { StreamOutlet } from '@neurodevs/node-lsl'
 import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 
-import BiosensorWebSocketGateway from './BiosensorWebSocketGateway.js'
+import BiosensorWebSocketGateway, {
+    WebSocketGateway,
+} from './BiosensorWebSocketGateway.js'
 import CgxDeviceStreamer from './devices/CgxDeviceStreamer.js'
 import MuseDeviceStreamer, {
     MuseDeviceStreamerOptions,
@@ -72,7 +74,7 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         deviceSpecifications: DeviceSpecification[],
         options?: DeviceOptions
     ) {
-        const { xdfRecordPath } = options ?? {}
+        const { xdfRecordPath, wssPortStart } = options ?? {}
 
         this.deviceSpecifications = deviceSpecifications
         this.createdBundles = await this.createAllDevices()
@@ -86,7 +88,9 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
             )
         }
 
-        BiosensorWebSocketGateway.Create(this.createdDevices)
+        if (wssPortStart) {
+            bundle.gateway = this.BiosensorWebSocketGateway(wssPortStart)
+        }
 
         return bundle
     }
@@ -127,6 +131,12 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
     private XdfStreamRecorder(xdfRecordPath: string, streamQueries: string[]) {
         return XdfStreamRecorder.Create(xdfRecordPath, streamQueries)
     }
+
+    private BiosensorWebSocketGateway(wssPortStart: number) {
+        return BiosensorWebSocketGateway.Create(this.createdDevices, {
+            wssPortStart,
+        })
+    }
 }
 
 export interface DeviceFactory {
@@ -153,6 +163,7 @@ export interface DeviceStreamer {
 
 export interface DeviceStreamerOptions {
     xdfRecordPath?: string
+    wssPortStart?: number
 }
 
 export type DeviceName =
@@ -181,4 +192,5 @@ export interface SingleDeviceBundle {
 export interface MultipleDeviceBundle {
     devices: DeviceStreamer[]
     recorder?: XdfRecorder
+    gateway?: WebSocketGateway
 }
