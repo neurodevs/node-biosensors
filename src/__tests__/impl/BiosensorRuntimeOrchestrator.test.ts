@@ -4,6 +4,7 @@ import { DeviceName } from '../../impl/BiosensorDeviceFactory.js'
 import BiosensorRuntimeOrchestrator, {
     RuntimeOrchestrator,
 } from '../../impl/BiosensorRuntimeOrchestrator.js'
+import FakeDeviceFactory from '../../testDoubles/DeviceFactory/FakeDeviceFactory.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 
 export default class BiosensorRuntimeOrchestratorTest extends AbstractPackageTest {
@@ -12,12 +13,23 @@ export default class BiosensorRuntimeOrchestratorTest extends AbstractPackageTes
     protected static async beforeEach() {
         await super.beforeEach()
 
+        this.setFakeDeviceFactory()
+
         this.instance = await this.BiosensorRuntimeOrchestrator()
     }
 
     @test()
     protected static async createsInstance() {
         assert.isTruthy(this.instance, 'Failed to create instance!')
+    }
+
+    @test()
+    protected static async createsBiosensorDeviceFactory() {
+        assert.isEqual(
+            FakeDeviceFactory.numCallsToConstructor,
+            1,
+            'Did not create device factory!'
+        )
     }
 
     private static readonly deviceNames: DeviceName[] = [

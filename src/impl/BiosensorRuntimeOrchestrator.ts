@@ -1,4 +1,4 @@
-import { DeviceName } from './BiosensorDeviceFactory.js'
+import BiosensorDeviceFactory, { DeviceName } from './BiosensorDeviceFactory.js'
 
 export default class BiosensorRuntimeOrchestrator
     implements RuntimeOrchestrator
@@ -8,7 +8,12 @@ export default class BiosensorRuntimeOrchestrator
     protected constructor(_options: RuntimeOrchestratorOptions) {}
 
     public static async Create(options: RuntimeOrchestratorOptions) {
+        this.BiosensorDeviceFactory()
         return new (this.Class ?? this)(options)
+    }
+
+    private static BiosensorDeviceFactory() {
+        BiosensorDeviceFactory.Create()
     }
 }
 

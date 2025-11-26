@@ -28,10 +28,13 @@ import {
     FakeXdfLoader,
 } from '@neurodevs/node-xdf'
 
-import { DeviceStreamerOptions } from 'impl/BiosensorDeviceFactory.js'
+import BiosensorDeviceFactory, {
+    DeviceStreamerOptions,
+} from '../impl/BiosensorDeviceFactory.js'
 import CgxDeviceStreamer from '../impl/devices/CgxDeviceStreamer.js'
 import MuseDeviceStreamer from '../impl/devices/MuseDeviceStreamer.js'
 import ZephyrDeviceStreamer from '../impl/devices/ZephyrDeviceStreamer.js'
+import FakeDeviceFactory from '../testDoubles/DeviceFactory/FakeDeviceFactory.js'
 import FakeCgxDeviceStreamer from '../testDoubles/DeviceStreamer/CgxDeviceStreamer/FakeCgxDeviceStreamer.js'
 import SpyCgxDeviceStreamer from '../testDoubles/DeviceStreamer/CgxDeviceStreamer/SpyCgxDeviceStreamer.js'
 import FakeDeviceStreamer from '../testDoubles/DeviceStreamer/FakeDeviceStreamer.js'
@@ -81,6 +84,11 @@ export default class AbstractPackageTest extends AbstractModuleTest {
     protected static setFakeCgxDeviceStreamer() {
         CgxDeviceStreamer.Class = FakeCgxDeviceStreamer
         FakeCgxDeviceStreamer.resetTestDouble()
+    }
+
+    protected static setFakeDeviceFactory() {
+        BiosensorDeviceFactory.Class = FakeDeviceFactory
+        FakeDeviceFactory.resetTestDouble()
     }
 
     protected static setFakeFTDI() {
