@@ -35,14 +35,16 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
 
         this.createdDevice = await this.createDeviceByName()
 
+        const bundle: SingleDeviceBundle = { device: this.createdDevice }
+
         if (xdfRecordPath) {
-            const recorder = this.XdfStreamRecorder(
+            bundle.recorder = this.XdfStreamRecorder(
                 xdfRecordPath,
                 this.deviceStreamQueries
             )
-            return { device: this.createdDevice, recorder }
         }
-        return { device: this.createdDevice }
+
+        return bundle
     }
 
     private async createDeviceByName() {
@@ -75,18 +77,18 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         this.deviceSpecifications = deviceSpecifications
         this.createdBundles = await this.createAllDevices()
 
+        const bundle: MultipleDeviceBundle = { devices: this.createdDevices }
+
         if (xdfRecordPath) {
-            const recorder = this.XdfStreamRecorder(
+            bundle.recorder = this.XdfStreamRecorder(
                 xdfRecordPath,
                 this.allStreamQueries
             )
-
-            return { devices: this.createdDevices, recorder }
         }
 
         BiosensorWebSocketGateway.Create(this.createdDevices)
 
-        return { devices: this.createdDevices }
+        return bundle
     }
 
     private async createAllDevices() {
