@@ -16,7 +16,7 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
     private createdDevice!: DeviceStreamer
 
     private deviceSpecifications!: DeviceSpecification[]
-    private createdDevices!: DeviceStreamer[]
+    private createdBundles!: SingleDeviceBundle[]
 
     protected constructor() {}
 
@@ -24,21 +24,11 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         return new (this.Class ?? this)()
     }
 
-    public async createDevice<K extends keyof DeviceOptionsMap>(
-        name: K,
-        options?: DeviceOptionsMap[K] & { xdfRecordPath: string }
-    ): Promise<[DeviceStreamer, XdfRecorder]>
-
-    public async createDevice<K extends keyof DeviceOptionsMap>(
-        name: K,
-        options?: DeviceOptionsMap[K]
-    ): Promise<DeviceStreamer>
-
-    public async createDevice<K extends keyof DeviceOptionsMap>(
-        name: K,
+    public async createDevice<K extends DeviceName>(
+        deviceName: K,
         options?: DeviceOptionsMap[K]
     ) {
-        this.deviceName = name
+        this.deviceName = deviceName
         this.deviceOptions = options
 
         const { xdfRecordPath } = options ?? {}
@@ -50,10 +40,9 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
                 xdfRecordPath,
                 this.deviceStreamQueries
             )
-            return [this.createdDevice, recorder]
+            return { device: this.createdDevice, recorder }
         }
-
-        return this.createdDevice
+        return { device: this.createdDevice }
     }
 
     private async createDeviceByName() {
@@ -78,23 +67,13 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
     }
 
     public async createDevices(
-        devices: DeviceSpecification[],
-        options?: DeviceOptions & { xdfRecordPath: string }
-    ): Promise<[DeviceStreamer[], XdfRecorder]>
-
-    public async createDevices(
-        devices: DeviceSpecification[],
-        options?: DeviceOptions
-    ): Promise<DeviceStreamer[]>
-
-    public async createDevices(
-        devices: DeviceSpecification[],
+        deviceSpecifications: DeviceSpecification[],
         options?: DeviceOptions
     ) {
         const { xdfRecordPath } = options ?? {}
 
-        this.deviceSpecifications = devices
-        this.createdDevices = await this.createAllDevices()
+        this.deviceSpecifications = deviceSpecifications
+        this.createdBundles = await this.createAllDevices()
 
         if (xdfRecordPath) {
             const recorder = this.XdfStreamRecorder(
@@ -102,20 +81,25 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
                 this.allStreamQueries
             )
 
-            return [this.createdDevices, recorder]
+            return { devices: this.createdDevices, recorder }
         }
 
         BiosensorWebSocketGateway.Create(this.createdDevices)
 
-        return this.createdDevices
+        return { devices: this.createdDevices }
     }
 
     private async createAllDevices() {
         return await Promise.all(
-            this.deviceSpecifications.map((device) =>
-                this.createDevice(device.name, device.options)
-            )
+            this.deviceSpecifications.map((device) => {
+                const { deviceName, options } = device
+                return this.createDevice(deviceName, options)
+            })
         )
+    }
+
+    private get createdDevices() {
+        return this.createdBundles.map(({ device }) => device)
     }
 
     private get deviceStreamQueries() {
@@ -123,7 +107,7 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
     }
 
     private get allStreamQueries() {
-        return this.createdDevices.flatMap((device) => device.streamQueries)
+        return this.createdBundles.flatMap(({ device }) => device.streamQueries)
     }
 
     private CgxDeviceStreamer() {
@@ -145,24 +129,14 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
 
 export interface DeviceFactory {
     createDevice<K extends DeviceName>(
-        name: K,
-        options?: DeviceOptionsMap[K] & { xdfRecordPath: string }
-    ): Promise<[DeviceStreamer, XdfRecorder]>
-
-    createDevice<K extends DeviceName>(
-        name: K,
+        deviceName: K,
         options?: DeviceOptionsMap[K]
-    ): Promise<DeviceStreamer>
+    ): Promise<SingleDeviceBundle>
 
     createDevices(
-        devices: DeviceSpecification[],
-        options: DeviceOptions & { xdfRecordPath: string }
-    ): Promise<[DeviceStreamer[], XdfRecorder]>
-
-    createDevices(
-        devices: DeviceSpecification[],
+        deviceSpecifications: DeviceSpecification[],
         options?: DeviceOptions
-    ): Promise<DeviceStreamer[]>
+    ): Promise<MultipleDeviceBundle>
 }
 
 export type DeviceFactoryConstructor = new () => DeviceFactory
@@ -193,6 +167,16 @@ export interface DeviceOptionsMap {
 }
 
 export interface DeviceSpecification {
-    name: DeviceName
+    deviceName: DeviceName
     options?: DeviceOptionsMap[DeviceName]
+}
+
+export interface SingleDeviceBundle {
+    device: DeviceStreamer
+    recorder?: XdfRecorder
+}
+
+export interface MultipleDeviceBundle {
+    devices: DeviceStreamer[]
+    recorder?: XdfRecorder
 }

@@ -12,11 +12,11 @@ export default class BiosensorRuntimeOrchestrator
 
         const factory = this.BiosensorDeviceFactory()
 
-        const devices = deviceNames.map((name) => ({
-            name,
+        const deviceSpecifications = deviceNames.map((deviceName) => ({
+            deviceName,
         }))
 
-        await factory.createDevices(devices, { xdfRecordPath })
+        await factory.createDevices(deviceSpecifications, { xdfRecordPath })
 
         return new (this.Class ?? this)(options)
     }

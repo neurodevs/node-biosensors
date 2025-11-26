@@ -37,7 +37,9 @@ export default class BiosensorRuntimeOrchestratorTest extends AbstractPackageTes
         assert.isEqualDeep(
             FakeDeviceFactory.callsToCreateDevices[0],
             {
-                devices: this.deviceNames.map((name) => ({ name })),
+                deviceSpecifications: this.deviceNames.map((deviceName) => ({
+                    deviceName,
+                })),
                 options: { xdfRecordPath: this.xdfRecordPath },
             },
             'Did not create devices with expected options!'

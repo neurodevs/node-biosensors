@@ -1,6 +1,5 @@
-import { FakeXdfRecorder, XdfRecorder } from '@neurodevs/node-xdf'
+import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 
-import { DeviceStreamer } from 'impl/BiosensorDeviceFactory.js'
 import {
     DeviceFactory,
     DeviceName,
@@ -13,12 +12,12 @@ export default class FakeDeviceFactory implements DeviceFactory {
     public static numCallsToConstructor = 0
 
     public static callsToCreateDevice: {
-        name: DeviceName
+        deviceName: DeviceName
         options?: DeviceOptions
     }[] = []
 
     public static callsToCreateDevices: {
-        devices: DeviceSpecification[]
+        deviceSpecifications: DeviceSpecification[]
         options?: DeviceOptions
     }[] = []
 
@@ -29,60 +28,45 @@ export default class FakeDeviceFactory implements DeviceFactory {
         FakeDeviceFactory.numCallsToConstructor++
     }
 
-    public async createDevice(
-        name: DeviceName,
-        options: DeviceOptions & { xdfRecordPath: string }
-    ): Promise<[DeviceStreamer, XdfRecorder]>
-
-    public async createDevice(
-        name: DeviceName,
-        options?: DeviceOptions
-    ): Promise<DeviceStreamer>
-
-    public async createDevice(name: DeviceName, options?: DeviceOptions) {
-        FakeDeviceFactory.callsToCreateDevice.push({ name, options })
+    public async createDevice(deviceName: DeviceName, options?: DeviceOptions) {
+        FakeDeviceFactory.callsToCreateDevice.push({
+            deviceName,
+            options,
+        })
 
         const { xdfRecordPath } = options ?? {}
 
         if (xdfRecordPath) {
-            return [this.fakeDevice, this.fakeRecorder] as [
-                DeviceStreamer,
-                XdfRecorder,
-            ]
+            return { device: this.fakeDevice, recorder: this.fakeRecorder }
         }
 
-        return this.fakeDevice as DeviceStreamer
+        return { device: this.fakeDevice }
     }
 
     public async createDevices(
-        devices: DeviceSpecification[],
-        options: DeviceOptions & { xdfRecordPath: string }
-    ): Promise<[DeviceStreamer[], XdfRecorder]>
-
-    public async createDevices(
-        devices: DeviceSpecification[],
-        options?: DeviceOptions
-    ): Promise<DeviceStreamer[]>
-
-    public async createDevices(
-        devices: DeviceSpecification[],
+        deviceSpecifications: DeviceSpecification[],
         options?: DeviceOptions
     ) {
-        FakeDeviceFactory.callsToCreateDevices.push({ devices, options })
+        FakeDeviceFactory.callsToCreateDevices.push({
+            deviceSpecifications,
+            options,
+        })
+
         const { xdfRecordPath } = options ?? {}
 
-        const createdDevices = await Promise.all(
-            devices.map((device) => this.createDevice(device.name))
+        const createdBundles = await Promise.all(
+            deviceSpecifications.map((device) =>
+                this.createDevice(device.deviceName)
+            )
         )
 
+        const createdDevices = createdBundles.map(({ device }) => device)
+
         if (xdfRecordPath) {
-            return [createdDevices, this.fakeRecorder] as [
-                DeviceStreamer[],
-                XdfRecorder,
-            ]
+            return { devices: createdDevices, recorder: this.fakeRecorder }
         }
 
-        return createdDevices
+        return { devices: createdDevices }
     }
 
     public get fakeDevice() {

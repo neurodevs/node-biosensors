@@ -1,6 +1,6 @@
 import generateId from '@neurodevs/generate-id'
 import { test, assert } from '@neurodevs/node-tdd'
-import { FakeXdfRecorder, XdfRecorder } from '@neurodevs/node-xdf'
+import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 
 import {
     DeviceStreamer,
@@ -38,13 +38,13 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
 
     @test()
     protected static async createsDeviceForCgxDeviceStreamer() {
-        const device = await this.createCgxDeviceStreamer()
+        const { device } = await this.createCgxDeviceStreamer()
         this.assertDeviceIsTruthy(device)
     }
 
     @test()
     protected static async createsDeviceForMuseDeviceStreamer() {
-        const device = await this.createMuseDeviceStreamer()
+        const { device } = await this.createMuseDeviceStreamer()
         this.assertDeviceIsTruthy(device)
     }
 
@@ -69,7 +69,7 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
 
     @test()
     protected static async createsDeviceForZephyrDeviceStreamer() {
-        const device = await this.createZephyrDeviceStreamer()
+        const { device } = await this.createZephyrDeviceStreamer()
         this.assertDeviceIsTruthy(device)
     }
 
@@ -85,8 +85,13 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
 
     @test()
     protected static async createsMultipleDevicesAtOnce() {
-        const devices = await this.createDevices()
-        assert.isEqual(devices.length, this.specs.length, 'Incorrect length!')
+        const { devices } = await this.createDevices()
+
+        assert.isEqual(
+            devices.length,
+            this.deviceSpecifications.length,
+            'Incorrect length!'
+        )
     }
 
     @test()
@@ -116,7 +121,7 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
 
     @test()
     protected static async returnsXdfRecorder() {
-        const [, recorder] = await this.createDevices(true)
+        const { recorder } = await this.createDevices(true)
         assert.isTruthy(recorder, 'Did not return XdfRecorder!')
     }
 
@@ -139,7 +144,7 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
 
     @test()
     protected static async createDeviceReturnsXdfRecorder() {
-        const [, recorder] = await this.createCgxWithXdfRecorder()
+        const { recorder } = await this.createCgxWithXdfRecorder()
         assert.isTruthy(recorder, 'Did not return XdfRecorder!')
     }
 
@@ -166,22 +171,22 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
     }
 
     private static async createCgxWithXdfRecorder() {
-        return (await this.createCgxDeviceStreamer({
+        return await this.createCgxDeviceStreamer({
             xdfRecordPath: this.xdfRecordPath,
-        })) as unknown as [DeviceStreamer, XdfRecorder]
+        })
     }
 
     private static async createDevices(includeXdfRecorder = false) {
-        return await this.instance.createDevices(this.specs, {
+        return await this.instance.createDevices(this.deviceSpecifications, {
             xdfRecordPath: includeXdfRecorder ? this.xdfRecordPath : undefined,
         })
     }
 
     private static xdfRecordPath = generateId()
 
-    private static specs: DeviceSpecification[] = [
-        { name: 'Cognionics Quick-20r' },
-        { name: 'Muse S Gen 2' },
+    private static deviceSpecifications: DeviceSpecification[] = [
+        { deviceName: 'Cognionics Quick-20r' },
+        { deviceName: 'Muse S Gen 2' },
     ]
 
     private static createCgxDeviceStreamer(options?: DeviceStreamerOptions) {

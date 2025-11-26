@@ -3,21 +3,21 @@ import BiosensorDeviceFactory from '../impl/BiosensorDeviceFactory.js'
 async function main() {
     const factory = BiosensorDeviceFactory.Create()
 
-    const [muse, recorder] = await factory.createDevice('Muse S Gen 2', {
+    const { device, recorder } = await factory.createDevice('Muse S Gen 2', {
         xdfRecordPath: 'test.xdf',
     })
 
-    recorder.start()
+    recorder?.start()
 
-    void muse.startStreaming()
+    void device.startStreaming()
 
     await new Promise((resolve) => {
         setTimeout(resolve, 10000)
     })
 
-    await muse.disconnect()
+    await device.disconnect()
 
-    recorder.stop()
+    recorder?.stop()
 
     process.exit(0)
 }
