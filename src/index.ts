@@ -28,6 +28,14 @@ export * from './testDoubles/DeviceStreamer/MuseDeviceStreamer/SpyMuseDeviceStre
 export { default as FakeMuseDeviceStreamer } from './testDoubles/DeviceStreamer/MuseDeviceStreamer/FakeMuseDeviceStreamer.js'
 export * from './testDoubles/DeviceStreamer/MuseDeviceStreamer/FakeMuseDeviceStreamer.js'
 
+// RuntimeOrchestrator
+
+export { default as BiosensorRuntimeOrchestrator } from './impl/BiosensorRuntimeOrchestrator.js'
+export * from './impl/BiosensorRuntimeOrchestrator.js'
+
+export { default as FakeRuntimeOrchestrator } from './testDoubles/RuntimeOrchestrator/FakeRuntimeOrchestrator.js'
+export * from './testDoubles/RuntimeOrchestrator/FakeRuntimeOrchestrator.js'
+
 // Zephyr BioHarness 3
 
 export { default as ZephyrDeviceStreamer } from './impl/devices/ZephyrDeviceStreamer.js'
