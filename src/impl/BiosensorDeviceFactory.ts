@@ -79,17 +79,17 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
 
     public async createDevices(
         devices: DeviceSpecification[],
-        options?: CreateDevicesOptions & { xdfRecordPath: string }
+        options?: DeviceOptions & { xdfRecordPath: string }
     ): Promise<[DeviceStreamer[], XdfRecorder]>
 
     public async createDevices(
         devices: DeviceSpecification[],
-        options?: CreateDevicesOptions
+        options?: DeviceOptions
     ): Promise<DeviceStreamer[]>
 
     public async createDevices(
         devices: DeviceSpecification[],
-        options?: CreateDevicesOptions
+        options?: DeviceOptions
     ) {
         const { xdfRecordPath } = options ?? {}
 
@@ -156,20 +156,16 @@ export interface DeviceFactory {
 
     createDevices(
         devices: DeviceSpecification[],
-        options: CreateDevicesOptions & { xdfRecordPath: string }
+        options: DeviceOptions & { xdfRecordPath: string }
     ): Promise<[DeviceStreamer[], XdfRecorder]>
 
     createDevices(
         devices: DeviceSpecification[],
-        options?: CreateDevicesOptions
+        options?: DeviceOptions
     ): Promise<DeviceStreamer[]>
 }
 
 export type DeviceFactoryConstructor = new () => DeviceFactory
-
-export interface CreateDevicesOptions {
-    xdfRecordPath?: string
-}
 
 export interface DeviceStreamer {
     startStreaming(): Promise<void>

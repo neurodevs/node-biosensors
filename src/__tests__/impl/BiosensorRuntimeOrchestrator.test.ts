@@ -32,6 +32,20 @@ export default class BiosensorRuntimeOrchestratorTest extends AbstractPackageTes
         )
     }
 
+    @test()
+    protected static async createsDevicesWithExpectedOptions() {
+        assert.isEqualDeep(
+            FakeDeviceFactory.callsToCreateDevices[0],
+            {
+                devices: this.deviceNames.map((name) => ({ name })),
+                options: { xdfRecordPath: this.xdfRecordPath },
+            },
+            'Did not create devices with expected options!'
+        )
+    }
+
+    private static readonly xdfRecordPath = this.generateId()
+
     private static readonly deviceNames: DeviceName[] = [
         'Cognionics Quick-20r',
         'Muse S Gen 2',
@@ -41,6 +55,7 @@ export default class BiosensorRuntimeOrchestratorTest extends AbstractPackageTes
     private static async BiosensorRuntimeOrchestrator() {
         return await BiosensorRuntimeOrchestrator.Create({
             deviceNames: this.deviceNames,
+            xdfRecordPath: this.xdfRecordPath,
         })
     }
 }

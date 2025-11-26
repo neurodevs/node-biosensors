@@ -8,12 +8,21 @@ export default class BiosensorRuntimeOrchestrator
     protected constructor(_options: RuntimeOrchestratorOptions) {}
 
     public static async Create(options: RuntimeOrchestratorOptions) {
-        this.BiosensorDeviceFactory()
+        const { deviceNames, xdfRecordPath } = options
+
+        const factory = this.BiosensorDeviceFactory()
+
+        const devices = deviceNames.map((name) => ({
+            name,
+        }))
+
+        await factory.createDevices(devices, { xdfRecordPath })
+
         return new (this.Class ?? this)(options)
     }
 
     private static BiosensorDeviceFactory() {
-        BiosensorDeviceFactory.Create()
+        return BiosensorDeviceFactory.Create()
     }
 }
 
@@ -25,4 +34,5 @@ export type RuntimeOrchestratorConstructor = new (
 
 export interface RuntimeOrchestratorOptions {
     deviceNames: DeviceName[]
+    xdfRecordPath?: string
 }

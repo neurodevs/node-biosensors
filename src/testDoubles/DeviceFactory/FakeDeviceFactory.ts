@@ -2,7 +2,6 @@ import { FakeXdfRecorder, XdfRecorder } from '@neurodevs/node-xdf'
 
 import { DeviceStreamer } from 'impl/BiosensorDeviceFactory.js'
 import {
-    CreateDevicesOptions,
     DeviceFactory,
     DeviceName,
     DeviceOptions,
@@ -12,8 +11,16 @@ import FakeDeviceStreamer from '../DeviceStreamer/FakeDeviceStreamer.js'
 
 export default class FakeDeviceFactory implements DeviceFactory {
     public static numCallsToConstructor = 0
-    public static callsToCreateDevice: CallToCreateDevice[] = []
-    public static callsToCreateDevices: DeviceSpecification[][] = []
+
+    public static callsToCreateDevice: {
+        name: DeviceName
+        options?: DeviceOptions
+    }[] = []
+
+    public static callsToCreateDevices: {
+        devices: DeviceSpecification[]
+        options?: DeviceOptions
+    }[] = []
 
     public static fakeDevice = new FakeDeviceStreamer()
     public static fakeRecorder = new FakeXdfRecorder()
@@ -49,19 +56,19 @@ export default class FakeDeviceFactory implements DeviceFactory {
 
     public async createDevices(
         devices: DeviceSpecification[],
-        options: CreateDevicesOptions & { xdfRecordPath: string }
+        options: DeviceOptions & { xdfRecordPath: string }
     ): Promise<[DeviceStreamer[], XdfRecorder]>
 
     public async createDevices(
         devices: DeviceSpecification[],
-        options?: CreateDevicesOptions
+        options?: DeviceOptions
     ): Promise<DeviceStreamer[]>
 
     public async createDevices(
         devices: DeviceSpecification[],
-        options?: CreateDevicesOptions
+        options?: DeviceOptions
     ) {
-        FakeDeviceFactory.callsToCreateDevices.push(devices)
+        FakeDeviceFactory.callsToCreateDevices.push({ devices, options })
         const { xdfRecordPath } = options ?? {}
 
         const createdDevices = await Promise.all(
