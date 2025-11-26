@@ -162,7 +162,24 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async createsBiosensorWebSocketGateway() {
+    protected static async createDeviceCreatesBiosensorWebSocketGateway() {
+        await this.createDeviceWithGateway()
+
+        assert.isEqualDeep(
+            FakeWebSocketServer.callsToConstructor,
+            [{ port: this.wssPortStart }, { port: this.wssPortStart + 1 }],
+            'Did not create gateway with expected devices!'
+        )
+    }
+
+    @test()
+    protected static async createDeviceReturnsBiosensorWebSocketGateway() {
+        const { gateway } = await this.createDeviceWithGateway()
+        assert.isTruthy(gateway, 'Did not return gateway!')
+    }
+
+    @test()
+    protected static async createDevicesCreatesBiosensorWebSocketGateway() {
         await this.createDevicesWithGateway()
 
         assert.isEqualDeep(
@@ -178,7 +195,7 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async returnsBiosensorWebSocketGateway() {
+    protected static async createDevicesReturnsBiosensorWebSocketGateway() {
         const { gateway } = await this.createDevicesWithGateway()
         assert.isTruthy(gateway, 'Did not return gateway!')
     }
@@ -204,6 +221,12 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
         return await this.instance.createDevices(this.deviceSpecifications, {
             xdfRecordPath: includeXdfRecorder ? this.xdfRecordPath : undefined,
             wssPortStart: useWebSocketGateway ? this.wssPortStart : undefined,
+        })
+    }
+
+    private static async createDeviceWithGateway() {
+        return await this.instance.createDevice('Cognionics Quick-20r', {
+            wssPortStart: this.wssPortStart,
         })
     }
 

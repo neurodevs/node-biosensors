@@ -33,7 +33,7 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         this.deviceName = deviceName
         this.deviceOptions = options
 
-        const { xdfRecordPath } = options ?? {}
+        const { xdfRecordPath, wssPortStart } = options ?? {}
 
         this.createdDevice = await this.createDeviceByName()
 
@@ -43,6 +43,13 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
             bundle.recorder = this.XdfStreamRecorder(
                 xdfRecordPath,
                 this.deviceStreamQueries
+            )
+        }
+
+        if (wssPortStart) {
+            bundle.gateway = this.BiosensorWebSocketGateway(
+                [this.createdDevice],
+                wssPortStart
             )
         }
 
@@ -89,7 +96,10 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         }
 
         if (wssPortStart) {
-            bundle.gateway = this.BiosensorWebSocketGateway(wssPortStart)
+            bundle.gateway = this.BiosensorWebSocketGateway(
+                this.createdDevices,
+                wssPortStart
+            )
         }
 
         return bundle
@@ -132,8 +142,11 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         return XdfStreamRecorder.Create(xdfRecordPath, streamQueries)
     }
 
-    private BiosensorWebSocketGateway(wssPortStart: number) {
-        return BiosensorWebSocketGateway.Create(this.createdDevices, {
+    private BiosensorWebSocketGateway(
+        devices: DeviceStreamer[],
+        wssPortStart: number
+    ) {
+        return BiosensorWebSocketGateway.Create(devices, {
             wssPortStart,
         })
     }
@@ -187,6 +200,7 @@ export interface DeviceSpecification {
 export interface SingleDeviceBundle {
     device: DeviceStreamer
     recorder?: XdfRecorder
+    gateway?: WebSocketGateway
 }
 
 export interface MultipleDeviceBundle {
