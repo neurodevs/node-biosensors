@@ -52,20 +52,20 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
 
     @test()
     protected static async createsDeviceForMuseDeviceStreamerWithOptions() {
-        const options = {
+        const deviceOptions = {
             bleUuid: generateId(),
             rssiIntervalMs: Math.random(),
         }
 
-        await this.createMuseDeviceStreamer(options)
+        await this.createMuseDeviceStreamer(deviceOptions)
 
         const { bleUuid, rssiIntervalMs } =
             FakeMuseDeviceStreamer.callsToConstructor[0]!
 
         assert.isEqualDeep(
             { bleUuid, rssiIntervalMs },
-            options,
-            'Options do not match!'
+            deviceOptions,
+            'deviceOptions do not match!'
         )
     }
 
@@ -238,18 +238,22 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
         { deviceName: 'Muse S Gen 2' },
     ]
 
-    private static createCgxDeviceStreamer(options?: DeviceStreamerOptions) {
-        return this.instance.createDevice('Cognionics Quick-20r', options)
+    private static createCgxDeviceStreamer(
+        deviceOptions?: DeviceStreamerOptions
+    ) {
+        return this.instance.createDevice('Cognionics Quick-20r', deviceOptions)
     }
 
     private static createMuseDeviceStreamer(
-        options?: MuseDeviceStreamerOptions
+        deviceOptions?: MuseDeviceStreamerOptions
     ) {
-        return this.instance.createDevice('Muse S Gen 2', options)
+        return this.instance.createDevice('Muse S Gen 2', deviceOptions)
     }
 
-    private static createZephyrDeviceStreamer(options?: DeviceStreamerOptions) {
-        return this.instance.createDevice('Zephyr BioHarness 3', options)
+    private static createZephyrDeviceStreamer(
+        deviceOptions?: DeviceStreamerOptions
+    ) {
+        return this.instance.createDevice('Zephyr BioHarness 3', deviceOptions)
     }
 
     private static assertDeviceIsTruthy(device: DeviceStreamer) {

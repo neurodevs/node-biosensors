@@ -3,8 +3,9 @@ import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 import {
     DeviceFactory,
     DeviceName,
-    DeviceOptions,
+    PerDeviceOptions,
     DeviceSpecification,
+    SessionOptions,
 } from '../../impl/BiosensorDeviceFactory.js'
 import FakeDeviceStreamer from '../DeviceStreamer/FakeDeviceStreamer.js'
 
@@ -13,12 +14,12 @@ export default class FakeDeviceFactory implements DeviceFactory {
 
     public static callsToCreateDevice: {
         deviceName: DeviceName
-        options?: DeviceOptions
+        deviceOptions?: PerDeviceOptions
     }[] = []
 
     public static callsToCreateDevices: {
         deviceSpecifications: DeviceSpecification[]
-        options?: DeviceOptions
+        sessionOptions?: SessionOptions
     }[] = []
 
     public static fakeDevice = new FakeDeviceStreamer()
@@ -28,13 +29,16 @@ export default class FakeDeviceFactory implements DeviceFactory {
         FakeDeviceFactory.numCallsToConstructor++
     }
 
-    public async createDevice(deviceName: DeviceName, options?: DeviceOptions) {
+    public async createDevice(
+        deviceName: DeviceName,
+        deviceOptions?: PerDeviceOptions
+    ) {
         FakeDeviceFactory.callsToCreateDevice.push({
             deviceName,
-            options,
+            deviceOptions,
         })
 
-        const { xdfRecordPath } = options ?? {}
+        const { xdfRecordPath } = deviceOptions ?? {}
 
         if (xdfRecordPath) {
             return { device: this.fakeDevice, recorder: this.fakeRecorder }
@@ -45,14 +49,14 @@ export default class FakeDeviceFactory implements DeviceFactory {
 
     public async createDevices(
         deviceSpecifications: DeviceSpecification[],
-        options?: DeviceOptions
+        sessionOptions?: SessionOptions
     ) {
         FakeDeviceFactory.callsToCreateDevices.push({
             deviceSpecifications,
-            options,
+            sessionOptions,
         })
 
-        const { xdfRecordPath } = options ?? {}
+        const { xdfRecordPath } = sessionOptions ?? {}
 
         const createdBundles = await Promise.all(
             deviceSpecifications.map((device) =>
@@ -82,9 +86,4 @@ export default class FakeDeviceFactory implements DeviceFactory {
         FakeDeviceFactory.callsToCreateDevice = []
         FakeDeviceFactory.callsToCreateDevices = []
     }
-}
-
-export interface CallToCreateDevice {
-    name: DeviceName
-    options?: DeviceOptions
 }

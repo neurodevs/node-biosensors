@@ -14,7 +14,7 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
     public static Class?: DeviceFactoryConstructor
 
     private deviceName!: DeviceName
-    private deviceOptions?: DeviceOptionsMap[DeviceName]
+    private deviceOptions?: PerDeviceOptionsMap[DeviceName]
     private createdDevice!: DeviceStreamer
 
     private deviceSpecifications!: DeviceSpecification[]
@@ -28,12 +28,12 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
 
     public async createDevice<K extends DeviceName>(
         deviceName: K,
-        options?: DeviceOptionsMap[K]
+        deviceOptions?: PerDeviceOptionsMap[K]
     ) {
         this.deviceName = deviceName
-        this.deviceOptions = options
+        this.deviceOptions = deviceOptions
 
-        const { xdfRecordPath, wssPortStart } = options ?? {}
+        const { xdfRecordPath, wssPortStart } = deviceOptions ?? {}
 
         this.createdDevice = await this.createDeviceByName()
 
@@ -79,9 +79,9 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
 
     public async createDevices(
         deviceSpecifications: DeviceSpecification[],
-        options?: DeviceOptions
+        sessionOptions?: PerDeviceOptions
     ) {
-        const { xdfRecordPath, wssPortStart } = options ?? {}
+        const { xdfRecordPath, wssPortStart } = sessionOptions ?? {}
 
         this.deviceSpecifications = deviceSpecifications
         this.createdBundles = await this.createAllDevices()
@@ -108,8 +108,8 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
     private async createAllDevices() {
         return await Promise.all(
             this.deviceSpecifications.map((device) => {
-                const { deviceName, options } = device
-                return this.createDevice(deviceName, options)
+                const { deviceName, deviceOptions } = device
+                return this.createDevice(deviceName, deviceOptions)
             })
         )
     }
@@ -155,12 +155,12 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
 export interface DeviceFactory {
     createDevice<K extends DeviceName>(
         deviceName: K,
-        options?: DeviceOptionsMap[K]
+        deviceOptions?: PerDeviceOptionsMap[K]
     ): Promise<SingleDeviceBundle>
 
     createDevices(
         deviceSpecifications: DeviceSpecification[],
-        options?: DeviceOptions
+        sessionOptions?: SessionOptions
     ): Promise<MultipleDeviceBundle>
 }
 
@@ -179,22 +179,27 @@ export interface DeviceStreamerOptions {
     wssPortStart?: number
 }
 
-export type DeviceName =
-    | 'Cognionics Quick-20r'
-    | 'Muse S Gen 2'
-    | 'Zephyr BioHarness 3'
+export type PerDeviceOptions = PerDeviceOptionsMap[DeviceName]
 
-export type DeviceOptions = DeviceOptionsMap[DeviceName]
-
-export interface DeviceOptionsMap {
+export interface PerDeviceOptionsMap {
     'Cognionics Quick-20r': DeviceStreamerOptions
     'Muse S Gen 2': MuseDeviceStreamerOptions
     'Zephyr BioHarness 3': DeviceStreamerOptions
 }
 
+export type DeviceName =
+    | 'Cognionics Quick-20r'
+    | 'Muse S Gen 2'
+    | 'Zephyr BioHarness 3'
+
 export interface DeviceSpecification {
     deviceName: DeviceName
-    options?: DeviceOptionsMap[DeviceName]
+    deviceOptions?: PerDeviceOptionsMap[DeviceName]
+}
+
+export interface SessionOptions {
+    xdfRecordPath?: string
+    wssPortStart?: number
 }
 
 export interface SingleDeviceBundle {
