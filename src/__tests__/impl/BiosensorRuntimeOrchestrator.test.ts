@@ -1,3 +1,4 @@
+import { randomInt } from 'crypto'
 import { test, assert } from '@neurodevs/node-tdd'
 
 import { DeviceName } from '../../impl/BiosensorDeviceFactory.js'
@@ -40,13 +41,17 @@ export default class BiosensorRuntimeOrchestratorTest extends AbstractPackageTes
                 deviceSpecifications: this.deviceNames.map((deviceName) => ({
                     deviceName,
                 })),
-                options: { xdfRecordPath: this.xdfRecordPath },
+                sessionOptions: {
+                    xdfRecordPath: this.xdfRecordPath,
+                    wssPortStart: this.wssPortStart,
+                },
             },
             'Did not create devices with expected options!'
         )
     }
 
     private static readonly xdfRecordPath = this.generateId()
+    private static readonly wssPortStart = randomInt(1000, 5000)
 
     private static readonly deviceNames: DeviceName[] = [
         'Cognionics Quick-20r',
@@ -58,6 +63,7 @@ export default class BiosensorRuntimeOrchestratorTest extends AbstractPackageTes
         return await BiosensorRuntimeOrchestrator.Create({
             deviceNames: this.deviceNames,
             xdfRecordPath: this.xdfRecordPath,
+            wssPortStart: this.wssPortStart,
         })
     }
 }
