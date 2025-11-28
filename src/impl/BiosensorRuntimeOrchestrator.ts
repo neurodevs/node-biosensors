@@ -1,4 +1,5 @@
 import { XdfRecorder } from '@neurodevs/node-xdf'
+
 import BiosensorDeviceFactory, {
     DeviceFactory,
     DeviceName,

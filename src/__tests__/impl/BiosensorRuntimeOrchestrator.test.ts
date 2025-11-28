@@ -1,7 +1,7 @@
 import { randomInt } from 'crypto'
 import { test, assert } from '@neurodevs/node-tdd'
-
 import { FakeXdfRecorder } from '@neurodevs/node-xdf'
+
 import { DeviceName } from '../../impl/BiosensorDeviceFactory.js'
 import BiosensorRuntimeOrchestrator, {
     RuntimeOrchestrator,
