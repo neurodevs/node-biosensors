@@ -1,6 +1,7 @@
 import BiosensorDeviceFactory, {
     DeviceFactory,
     DeviceName,
+    MultipleDeviceBundle,
 } from './BiosensorDeviceFactory.js'
 
 export default class BiosensorRuntimeOrchestrator
@@ -13,6 +14,7 @@ export default class BiosensorRuntimeOrchestrator
     private wssPortStart?: number
 
     private factory: DeviceFactory
+    private bundle!: MultipleDeviceBundle
 
     protected constructor(options: RuntimeOrchestratorConstructorOptions) {
         const { deviceNames, xdfRecordPath, wssPortStart, factory } = options
@@ -38,7 +40,11 @@ export default class BiosensorRuntimeOrchestrator
     }
 
     public async initialize() {
-        await this.factory.createDevices(this.deviceSpecifications, {
+        this.bundle = await this.createDeviceBundle()
+    }
+
+    private async createDeviceBundle() {
+        return await this.factory.createDevices(this.deviceSpecifications, {
             xdfRecordPath: this.xdfRecordPath,
             wssPortStart: this.wssPortStart,
         })
@@ -50,6 +56,20 @@ export default class BiosensorRuntimeOrchestrator
         }))
     }
 
+    public async start() {
+        await this.startStreamingAllDevices()
+    }
+
+    private startStreamingAllDevices() {
+        return Promise.all(
+            this.devices.map((device) => device.startStreaming())
+        )
+    }
+
+    private get devices() {
+        return this.bundle.devices
+    }
+
     private static BiosensorDeviceFactory() {
         return BiosensorDeviceFactory.Create()
     }
@@ -57,6 +77,7 @@ export default class BiosensorRuntimeOrchestrator
 
 export interface RuntimeOrchestrator {
     initialize(): Promise<void>
+    start(): Promise<void>
 }
 
 export type RuntimeOrchestratorConstructor = new (

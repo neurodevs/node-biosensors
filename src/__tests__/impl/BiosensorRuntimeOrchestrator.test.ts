@@ -7,6 +7,7 @@ import BiosensorRuntimeOrchestrator, {
     RuntimeOrchestratorOptions,
 } from '../../impl/BiosensorRuntimeOrchestrator.js'
 import FakeDeviceFactory from '../../testDoubles/DeviceFactory/FakeDeviceFactory.js'
+import FakeDeviceStreamer from '../../testDoubles/DeviceStreamer/FakeDeviceStreamer.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 
 export default class BiosensorRuntimeOrchestratorTest extends AbstractPackageTest {
@@ -63,6 +64,17 @@ export default class BiosensorRuntimeOrchestratorTest extends AbstractPackageTes
             FakeDeviceFactory.callsToCreateDevices.length,
             0,
             'Should not have created devices!'
+        )
+    }
+
+    @test()
+    protected static async startCallsStartStreamingOnAllDevices() {
+        await this.instance.start()
+
+        assert.isEqual(
+            FakeDeviceStreamer.numCallsToStartStreaming,
+            this.deviceNames.length,
+            'Did not start streaming on all devices!'
         )
     }
 
