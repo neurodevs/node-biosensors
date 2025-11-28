@@ -119,6 +119,17 @@ export default class BiosensorRuntimeOrchestratorTest extends AbstractPackageTes
         )
     }
 
+    @test()
+    protected static async stopCallsDestroyOnWebSocketGatewayIfEnabled() {
+        await this.startThenStop()
+
+        assert.isEqual(
+            FakeWebSocketGateway.numCallsToDestroy,
+            1,
+            'Did not destroy WebSocket gateway!'
+        )
+    }
+
     private static async startThenStop() {
         await this.start()
         await this.stop()

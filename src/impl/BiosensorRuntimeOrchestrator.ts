@@ -84,6 +84,12 @@ export default class BiosensorRuntimeOrchestrator
 
     public async stop() {
         await this.disconnectAllDevices()
+
+        this.destroyWebSocketGatewayIfEnabled()
+    }
+
+    private destroyWebSocketGatewayIfEnabled() {
+        this.gateway?.destroy()
     }
 
     private async disconnectAllDevices() {
