@@ -57,12 +57,12 @@ export default class BiosensorRuntimeOrchestrator
     }
 
     public async start() {
-        this.startXdfRecorder()
+        this.startXdfRecorderIfEnabled()
         await this.startStreamingAllDevices()
     }
 
-    private startXdfRecorder() {
-        this.recorder!.start()
+    private startXdfRecorderIfEnabled() {
+        this.recorder?.start()
     }
 
     private startStreamingAllDevices() {

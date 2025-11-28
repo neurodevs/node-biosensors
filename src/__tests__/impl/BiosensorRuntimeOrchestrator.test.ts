@@ -91,6 +91,23 @@ export default class BiosensorRuntimeOrchestratorTest extends AbstractPackageTes
         )
     }
 
+    @test()
+    protected static async doesNotStartRecorderIfNotGivenXdfRecordPath() {
+        FakeXdfRecorder.resetTestDouble()
+
+        const instance = await this.BiosensorRuntimeOrchestrator({
+            xdfRecordPath: undefined,
+        })
+
+        await instance.start()
+
+        assert.isEqual(
+            FakeXdfRecorder.numCallsToStart,
+            0,
+            'Should not have started XDF recorder!'
+        )
+    }
+
     private static readonly xdfRecordPath = this.generateId()
     private static readonly wssPortStart = randomInt(1000, 5000)
 
