@@ -50,11 +50,14 @@ export default class BiosensorWebSocketGateway implements WebSocketGateway {
 
     public close() {
         if (this.isOpen) {
-            this.throwIfGatewayIsDestroyed(this.cannotCloseMessage)
             this.deactivateLslWebSocketBridges()
             this.isOpen = false
         } else {
-            console.warn('Cannot close gateway because it is not open.')
+            if (this.isDestroyed) {
+                this.throwIfGatewayIsDestroyed(this.cannotCloseMessage)
+            } else {
+                console.warn('Cannot close gateway because it is not open.')
+            }
         }
     }
 
@@ -66,12 +69,19 @@ export default class BiosensorWebSocketGateway implements WebSocketGateway {
 
     public destroy() {
         if (!this.isDestroyed) {
+            this.closeGatewayIfOpenBeforeDestroying()
             this.destroyLslWebSocketBridges()
             this.isDestroyed = true
         } else {
             console.warn(
                 'Cannot destroy gateway because it is already destroyed.'
             )
+        }
+    }
+
+    private closeGatewayIfOpenBeforeDestroying() {
+        if (this.isOpen) {
+            this.close()
         }
     }
 
