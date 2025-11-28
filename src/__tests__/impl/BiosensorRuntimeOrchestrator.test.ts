@@ -4,6 +4,7 @@ import { test, assert } from '@neurodevs/node-tdd'
 import { DeviceName } from '../../impl/BiosensorDeviceFactory.js'
 import BiosensorRuntimeOrchestrator, {
     RuntimeOrchestrator,
+    RuntimeOrchestratorOptions,
 } from '../../impl/BiosensorRuntimeOrchestrator.js'
 import FakeDeviceFactory from '../../testDoubles/DeviceFactory/FakeDeviceFactory.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
@@ -50,6 +51,21 @@ export default class BiosensorRuntimeOrchestratorTest extends AbstractPackageTes
         )
     }
 
+    @test()
+    protected static async doesNotCreateDevicesOnCreateIfPassedFlag() {
+        FakeDeviceFactory.resetTestDouble()
+
+        await this.BiosensorRuntimeOrchestrator({
+            initializeOnCreate: false,
+        })
+
+        assert.isEqual(
+            FakeDeviceFactory.callsToCreateDevices.length,
+            0,
+            'Should not have created devices!'
+        )
+    }
+
     private static readonly xdfRecordPath = this.generateId()
     private static readonly wssPortStart = randomInt(1000, 5000)
 
@@ -59,11 +75,14 @@ export default class BiosensorRuntimeOrchestratorTest extends AbstractPackageTes
         'Zephyr BioHarness 3',
     ]
 
-    private static async BiosensorRuntimeOrchestrator() {
+    private static async BiosensorRuntimeOrchestrator(
+        options?: Partial<RuntimeOrchestratorOptions>
+    ) {
         return await BiosensorRuntimeOrchestrator.Create({
             deviceNames: this.deviceNames,
             xdfRecordPath: this.xdfRecordPath,
             wssPortStart: this.wssPortStart,
+            ...options,
         })
     }
 }

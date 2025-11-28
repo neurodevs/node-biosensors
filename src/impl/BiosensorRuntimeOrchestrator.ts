@@ -1,27 +1,53 @@
-import BiosensorDeviceFactory, { DeviceName } from './BiosensorDeviceFactory.js'
+import BiosensorDeviceFactory, {
+    DeviceFactory,
+    DeviceName,
+} from './BiosensorDeviceFactory.js'
 
 export default class BiosensorRuntimeOrchestrator
     implements RuntimeOrchestrator
 {
     public static Class?: RuntimeOrchestratorConstructor
 
-    protected constructor(_options: RuntimeOrchestratorOptions) {}
+    private deviceNames: DeviceName[]
+    private xdfRecordPath?: string
+    private wssPortStart?: number
+
+    private factory: DeviceFactory
+
+    protected constructor(options: RuntimeOrchestratorConstructorOptions) {
+        const { deviceNames, xdfRecordPath, wssPortStart, factory } = options
+
+        this.deviceNames = deviceNames
+        this.xdfRecordPath = xdfRecordPath
+        this.wssPortStart = wssPortStart
+
+        this.factory = factory
+    }
 
     public static async Create(options: RuntimeOrchestratorOptions) {
-        const { deviceNames, xdfRecordPath, wssPortStart } = options
+        const { initializeOnCreate = true } = options
 
         const factory = this.BiosensorDeviceFactory()
+        const instance = new (this.Class ?? this)({ ...options, factory })
 
-        const deviceSpecifications = deviceNames.map((deviceName) => ({
+        if (initializeOnCreate) {
+            await instance.initialize()
+        }
+
+        return instance
+    }
+
+    public async initialize() {
+        await this.factory.createDevices(this.deviceSpecifications, {
+            xdfRecordPath: this.xdfRecordPath,
+            wssPortStart: this.wssPortStart,
+        })
+    }
+
+    private get deviceSpecifications() {
+        return this.deviceNames.map((deviceName) => ({
             deviceName,
         }))
-
-        await factory.createDevices(deviceSpecifications, {
-            xdfRecordPath,
-            wssPortStart,
-        })
-
-        return new (this.Class ?? this)(options)
     }
 
     private static BiosensorDeviceFactory() {
@@ -29,7 +55,9 @@ export default class BiosensorRuntimeOrchestrator
     }
 }
 
-export interface RuntimeOrchestrator {}
+export interface RuntimeOrchestrator {
+    initialize(): Promise<void>
+}
 
 export type RuntimeOrchestratorConstructor = new (
     options: RuntimeOrchestratorOptions
@@ -39,4 +67,10 @@ export interface RuntimeOrchestratorOptions {
     deviceNames: DeviceName[]
     xdfRecordPath?: string
     wssPortStart?: number
+    initializeOnCreate?: boolean
+}
+
+export interface RuntimeOrchestratorConstructorOptions
+    extends RuntimeOrchestratorOptions {
+    factory: DeviceFactory
 }
