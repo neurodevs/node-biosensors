@@ -1,6 +1,7 @@
 import { randomInt } from 'crypto'
 import { test, assert } from '@neurodevs/node-tdd'
 
+import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 import { DeviceName } from '../../impl/BiosensorDeviceFactory.js'
 import BiosensorRuntimeOrchestrator, {
     RuntimeOrchestrator,
@@ -16,6 +17,7 @@ export default class BiosensorRuntimeOrchestratorTest extends AbstractPackageTes
     protected static async beforeEach() {
         await super.beforeEach()
 
+        this.setFakeDevices()
         this.setFakeDeviceFactory()
 
         this.instance = await this.BiosensorRuntimeOrchestrator()
@@ -64,6 +66,17 @@ export default class BiosensorRuntimeOrchestratorTest extends AbstractPackageTes
             FakeDeviceFactory.callsToCreateDevices.length,
             0,
             'Should not have created devices!'
+        )
+    }
+
+    @test()
+    protected static async startCallsStartOnXdfStreamRecorder() {
+        await this.instance.start()
+
+        assert.isEqual(
+            FakeXdfRecorder.numCallsToStart,
+            1,
+            'Did not start XDF recorder!'
         )
     }
 

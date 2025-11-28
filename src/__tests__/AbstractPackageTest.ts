@@ -64,6 +64,8 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         this.setFakeCgxDeviceStreamer()
         this.setFakeMuseDeviceStreamer()
         this.setFakeZephyrDeviceStreamer()
+
+        FakeDeviceStreamer.resetTestDouble()
     }
 
     protected static setFakeBleController() {

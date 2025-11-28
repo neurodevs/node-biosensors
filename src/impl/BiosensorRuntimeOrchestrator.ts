@@ -57,13 +57,22 @@ export default class BiosensorRuntimeOrchestrator
     }
 
     public async start() {
+        this.startXdfRecorder()
         await this.startStreamingAllDevices()
+    }
+
+    private startXdfRecorder() {
+        this.recorder!.start()
     }
 
     private startStreamingAllDevices() {
         return Promise.all(
             this.devices.map((device) => device.startStreaming())
         )
+    }
+
+    private get recorder() {
+        return this.bundle.recorder
     }
 
     private get devices() {
