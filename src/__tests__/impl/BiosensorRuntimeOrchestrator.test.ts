@@ -40,7 +40,9 @@ export default class BiosensorRuntimeOrchestratorTest extends AbstractPackageTes
     }
 
     @test()
-    protected static async createsDevicesWithExpectedOptions() {
+    protected static async startCreatesDevicesWithExpectedOptions() {
+        await this.start()
+
         assert.isEqualDeep(
             FakeDeviceFactory.callsToCreateDevices[0],
             {
@@ -53,21 +55,6 @@ export default class BiosensorRuntimeOrchestratorTest extends AbstractPackageTes
                 },
             },
             'Did not create devices with expected options!'
-        )
-    }
-
-    @test()
-    protected static async doesNotCreateDevicesOnCreateIfPassedFlag() {
-        FakeDeviceFactory.resetTestDouble()
-
-        await this.BiosensorRuntimeOrchestrator({
-            initializeOnCreate: false,
-        })
-
-        assert.isEqual(
-            FakeDeviceFactory.callsToCreateDevices.length,
-            0,
-            'Should not have created devices!'
         )
     }
 

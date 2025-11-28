@@ -31,19 +31,22 @@ export default class BiosensorRuntimeOrchestrator
     }
 
     public static async Create(options: RuntimeOrchestratorOptions) {
-        const { initializeOnCreate = true } = options
-
         const factory = this.BiosensorDeviceFactory()
         const instance = new (this.Class ?? this)({ ...options, factory })
-
-        if (initializeOnCreate) {
-            await instance.initialize()
-        }
 
         return instance
     }
 
-    public async initialize() {
+    public async start() {
+        await this.initialize()
+
+        this.startXdfRecorderIfEnabled()
+        this.openWebSocketGatewayIfEnabled()
+
+        await this.startStreamingAllDevices()
+    }
+
+    private async initialize() {
         const { devices, recorder, gateway } = await this.createDeviceBundle()
 
         this.devices = devices
@@ -62,13 +65,6 @@ export default class BiosensorRuntimeOrchestrator
         return this.deviceNames.map((deviceName) => ({
             deviceName,
         }))
-    }
-
-    public async start() {
-        this.startXdfRecorderIfEnabled()
-        this.openWebSocketGatewayIfEnabled()
-
-        await this.startStreamingAllDevices()
     }
 
     private startXdfRecorderIfEnabled() {
@@ -91,7 +87,6 @@ export default class BiosensorRuntimeOrchestrator
 }
 
 export interface RuntimeOrchestrator {
-    initialize(): Promise<void>
     start(): Promise<void>
 }
 
@@ -103,7 +98,6 @@ export interface RuntimeOrchestratorOptions {
     deviceNames: DeviceName[]
     xdfRecordPath?: string
     wssPortStart?: number
-    initializeOnCreate?: boolean
 }
 
 export interface RuntimeOrchestratorConstructorOptions
