@@ -1,8 +1,10 @@
+import { XdfRecorder } from '@neurodevs/node-xdf'
 import BiosensorDeviceFactory, {
     DeviceFactory,
     DeviceName,
-    MultipleDeviceBundle,
+    DeviceStreamer,
 } from './BiosensorDeviceFactory.js'
+import { WebSocketGateway } from './BiosensorWebSocketGateway.js'
 
 export default class BiosensorRuntimeOrchestrator
     implements RuntimeOrchestrator
@@ -14,7 +16,9 @@ export default class BiosensorRuntimeOrchestrator
     private wssPortStart?: number
 
     private factory: DeviceFactory
-    private bundle!: MultipleDeviceBundle
+    private devices!: DeviceStreamer[]
+    private recorder?: XdfRecorder
+    private gateway?: WebSocketGateway
 
     protected constructor(options: RuntimeOrchestratorConstructorOptions) {
         const { deviceNames, xdfRecordPath, wssPortStart, factory } = options
@@ -40,7 +44,11 @@ export default class BiosensorRuntimeOrchestrator
     }
 
     public async initialize() {
-        this.bundle = await this.createDeviceBundle()
+        const { devices, recorder, gateway } = await this.createDeviceBundle()
+
+        this.devices = devices
+        this.recorder = recorder
+        this.gateway = gateway
     }
 
     private async createDeviceBundle() {
@@ -58,6 +66,8 @@ export default class BiosensorRuntimeOrchestrator
 
     public async start() {
         this.startXdfRecorderIfEnabled()
+        this.openWebSocketGatewayIfEnabled()
+
         await this.startStreamingAllDevices()
     }
 
@@ -65,18 +75,14 @@ export default class BiosensorRuntimeOrchestrator
         this.recorder?.start()
     }
 
+    private openWebSocketGatewayIfEnabled() {
+        this.gateway?.open()
+    }
+
     private startStreamingAllDevices() {
         return Promise.all(
             this.devices.map((device) => device.startStreaming())
         )
-    }
-
-    private get recorder() {
-        return this.bundle.recorder
-    }
-
-    private get devices() {
-        return this.bundle.devices
     }
 
     private static BiosensorDeviceFactory() {

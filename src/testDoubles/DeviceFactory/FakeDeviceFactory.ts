@@ -6,8 +6,11 @@ import {
     PerDeviceOptions,
     DeviceSpecification,
     SessionOptions,
+    SingleDeviceBundle,
+    MultipleDeviceBundle,
 } from '../../impl/BiosensorDeviceFactory.js'
 import FakeDeviceStreamer from '../DeviceStreamer/FakeDeviceStreamer.js'
+import FakeWebSocketGateway from '../WebSocketGateway/FakeWebSocketGateway.js'
 
 export default class FakeDeviceFactory implements DeviceFactory {
     public static numCallsToConstructor = 0
@@ -24,6 +27,7 @@ export default class FakeDeviceFactory implements DeviceFactory {
 
     public static fakeDevice = new FakeDeviceStreamer()
     public static fakeRecorder = new FakeXdfRecorder()
+    public static fakeGateway = new FakeWebSocketGateway()
 
     public constructor() {
         FakeDeviceFactory.numCallsToConstructor++
@@ -38,13 +42,19 @@ export default class FakeDeviceFactory implements DeviceFactory {
             deviceOptions,
         })
 
-        const { xdfRecordPath } = deviceOptions ?? {}
+        const { xdfRecordPath, wssPortStart } = deviceOptions ?? {}
+
+        const bundle: SingleDeviceBundle = { device: this.fakeDevice }
 
         if (xdfRecordPath) {
-            return { device: this.fakeDevice, recorder: this.fakeRecorder }
+            bundle.recorder = this.fakeRecorder
         }
 
-        return { device: this.fakeDevice }
+        if (wssPortStart) {
+            bundle.gateway = this.fakeGateway
+        }
+
+        return bundle
     }
 
     public async createDevices(
@@ -56,7 +66,7 @@ export default class FakeDeviceFactory implements DeviceFactory {
             sessionOptions,
         })
 
-        const { xdfRecordPath } = sessionOptions ?? {}
+        const { xdfRecordPath, wssPortStart } = sessionOptions ?? {}
 
         const createdBundles = await Promise.all(
             deviceSpecifications.map((device) =>
@@ -66,11 +76,17 @@ export default class FakeDeviceFactory implements DeviceFactory {
 
         const createdDevices = createdBundles.map(({ device }) => device)
 
+        const bundle: MultipleDeviceBundle = { devices: createdDevices }
+
         if (xdfRecordPath) {
-            return { devices: createdDevices, recorder: this.fakeRecorder }
+            bundle.recorder = this.fakeRecorder
         }
 
-        return { devices: createdDevices }
+        if (wssPortStart) {
+            bundle.gateway = this.fakeGateway
+        }
+
+        return bundle
     }
 
     public get fakeDevice() {
@@ -79,6 +95,10 @@ export default class FakeDeviceFactory implements DeviceFactory {
 
     public get fakeRecorder() {
         return FakeDeviceFactory.fakeRecorder
+    }
+
+    public get fakeGateway() {
+        return FakeDeviceFactory.fakeGateway
     }
 
     public static resetTestDouble() {

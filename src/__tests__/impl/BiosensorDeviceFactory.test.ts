@@ -12,13 +12,11 @@ import BiosensorDeviceFactory, {
     DeviceFactory,
     DeviceSpecification,
 } from '../../impl/BiosensorDeviceFactory.js'
-import BiosensorWebSocketGateway from '../../impl/BiosensorWebSocketGateway.js'
 import CgxDeviceStreamer from '../../impl/devices/CgxDeviceStreamer.js'
 import MuseDeviceStreamer, {
     MuseDeviceStreamerOptions,
 } from '../../impl/devices/MuseDeviceStreamer.js'
 import FakeMuseDeviceStreamer from '../../testDoubles/DeviceStreamer/MuseDeviceStreamer/FakeMuseDeviceStreamer.js'
-import FakeWebSocketGateway from '../../testDoubles/WebSocketGateway/FakeWebSocketGateway.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 
 export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
@@ -258,11 +256,6 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
 
     private static assertDeviceIsTruthy(device: DeviceStreamer) {
         assert.isTruthy(device, 'Failed to create device!')
-    }
-
-    private static setFakeWebSocketGateway() {
-        BiosensorWebSocketGateway.Class = FakeWebSocketGateway
-        FakeWebSocketGateway.resetTestDouble()
     }
 
     private static BiosensorDeviceFactory() {

@@ -9,6 +9,7 @@ import BiosensorRuntimeOrchestrator, {
 } from '../../impl/BiosensorRuntimeOrchestrator.js'
 import FakeDeviceFactory from '../../testDoubles/DeviceFactory/FakeDeviceFactory.js'
 import FakeDeviceStreamer from '../../testDoubles/DeviceStreamer/FakeDeviceStreamer.js'
+import FakeWebSocketGateway from '../../testDoubles/WebSocketGateway/FakeWebSocketGateway.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 
 export default class BiosensorRuntimeOrchestratorTest extends AbstractPackageTest {
@@ -19,6 +20,7 @@ export default class BiosensorRuntimeOrchestratorTest extends AbstractPackageTes
 
         this.setFakeDevices()
         this.setFakeDeviceFactory()
+        this.setFakeWebSocketGateway()
 
         this.instance = await this.BiosensorRuntimeOrchestrator()
     }
@@ -70,8 +72,8 @@ export default class BiosensorRuntimeOrchestratorTest extends AbstractPackageTes
     }
 
     @test()
-    protected static async startCallsStartOnXdfStreamRecorder() {
-        await this.instance.start()
+    protected static async startCallsStartOnXdfStreamRecorderIfEnabled() {
+        await this.start()
 
         assert.isEqual(
             FakeXdfRecorder.numCallsToStart,
@@ -81,8 +83,19 @@ export default class BiosensorRuntimeOrchestratorTest extends AbstractPackageTes
     }
 
     @test()
+    protected static async startCallsOpenOnWebSocketGatewayIfEnabled() {
+        await this.start()
+
+        assert.isEqual(
+            FakeWebSocketGateway.numCallsToOpen,
+            1,
+            'Did not open WebSocket gateway!'
+        )
+    }
+
+    @test()
     protected static async startCallsStartStreamingOnAllDevices() {
-        await this.instance.start()
+        await this.start()
 
         assert.isEqual(
             FakeDeviceStreamer.numCallsToStartStreaming,
@@ -106,6 +119,10 @@ export default class BiosensorRuntimeOrchestratorTest extends AbstractPackageTes
             0,
             'Should not have started XDF recorder!'
         )
+    }
+
+    private static async start() {
+        await this.instance.start()
     }
 
     private static readonly xdfRecordPath = this.generateId()

@@ -31,6 +31,7 @@ import {
 import BiosensorDeviceFactory, {
     DeviceStreamerOptions,
 } from '../impl/BiosensorDeviceFactory.js'
+import BiosensorWebSocketGateway from '../impl/BiosensorWebSocketGateway.js'
 import CgxDeviceStreamer from '../impl/devices/CgxDeviceStreamer.js'
 import MuseDeviceStreamer from '../impl/devices/MuseDeviceStreamer.js'
 import ZephyrDeviceStreamer from '../impl/devices/ZephyrDeviceStreamer.js'
@@ -43,6 +44,7 @@ import SpyMuseDeviceStreamer from '../testDoubles/DeviceStreamer/MuseDeviceStrea
 import FakeZephyrDeviceStreamer from '../testDoubles/DeviceStreamer/ZephyrDeviceStreamer/FakeZephyrDeviceStreamer.js'
 import FakeDeviceFTDI from '../testDoubles/FTDI/FakeDeviceFTDI.js'
 import FakeFTDI from '../testDoubles/FTDI/FakeFTDI.js'
+import FakeWebSocketGateway from '../testDoubles/WebSocketGateway/FakeWebSocketGateway.js'
 
 export default class AbstractPackageTest extends AbstractModuleTest {
     protected static async beforeEach() {
@@ -127,6 +129,11 @@ export default class AbstractPackageTest extends AbstractModuleTest {
 
         LslWebSocketBridge.WSS = FakeWebSocketServer
         FakeWebSocketServer.resetTestDouble()
+    }
+
+    protected static setFakeWebSocketGateway() {
+        BiosensorWebSocketGateway.Class = FakeWebSocketGateway
+        FakeWebSocketGateway.resetTestDouble()
     }
 
     protected static setFakeXdfLoader() {
