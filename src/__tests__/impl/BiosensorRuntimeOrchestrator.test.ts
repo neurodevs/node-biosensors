@@ -111,6 +111,12 @@ export default class BiosensorRuntimeOrchestratorTest extends AbstractPackageTes
     @test()
     protected static async stopCallsDisconnectOnAllDevices() {
         await this.startThenStop()
+
+        assert.isEqual(
+            FakeDeviceStreamer.numCallsToDisconnect,
+            this.deviceNames.length,
+            'Did not disconnect all devices!'
+        )
     }
 
     private static async startThenStop() {
