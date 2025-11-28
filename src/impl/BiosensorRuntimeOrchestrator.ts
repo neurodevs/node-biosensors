@@ -86,14 +86,19 @@ export default class BiosensorRuntimeOrchestrator
         await this.disconnectAllDevices()
 
         this.destroyWebSocketGatewayIfEnabled()
+        this.stopXdfRecorderIfEnabled()
+    }
+
+    private async disconnectAllDevices() {
+        return Promise.all(this.devices.map((device) => device.disconnect()))
     }
 
     private destroyWebSocketGatewayIfEnabled() {
         this.gateway?.destroy()
     }
 
-    private async disconnectAllDevices() {
-        return Promise.all(this.devices.map((device) => device.disconnect()))
+    private stopXdfRecorderIfEnabled() {
+        this.recorder?.stop()
     }
 
     private static BiosensorDeviceFactory() {

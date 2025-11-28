@@ -130,6 +130,17 @@ export default class BiosensorRuntimeOrchestratorTest extends AbstractPackageTes
         )
     }
 
+    @test()
+    protected static async stopCallsStopOnXdfRecorderIfEnabled() {
+        await this.startThenStop()
+
+        assert.isEqual(
+            FakeXdfRecorder.numCallsToStop,
+            1,
+            'Did not stop XDF recorder!'
+        )
+    }
+
     private static async startThenStop() {
         await this.start()
         await this.stop()
