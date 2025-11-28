@@ -82,6 +82,14 @@ export default class BiosensorRuntimeOrchestrator
         )
     }
 
+    public async stop() {
+        await this.disconnectAllDevices()
+    }
+
+    private async disconnectAllDevices() {
+        return Promise.all(this.devices.map((device) => device.disconnect()))
+    }
+
     private static BiosensorDeviceFactory() {
         return BiosensorDeviceFactory.Create()
     }
@@ -89,6 +97,7 @@ export default class BiosensorRuntimeOrchestrator
 
 export interface RuntimeOrchestrator {
     start(): Promise<void>
+    stop(): Promise<void>
 }
 
 export type RuntimeOrchestratorConstructor = new (

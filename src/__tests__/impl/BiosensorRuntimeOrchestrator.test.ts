@@ -108,8 +108,22 @@ export default class BiosensorRuntimeOrchestratorTest extends AbstractPackageTes
         )
     }
 
+    @test()
+    protected static async stopCallsDisconnectOnAllDevices() {
+        await this.startThenStop()
+    }
+
+    private static async startThenStop() {
+        await this.start()
+        await this.stop()
+    }
+
     private static async start() {
         await this.instance.start()
+    }
+
+    private static async stop() {
+        await this.instance.stop()
     }
 
     private static readonly xdfRecordPath = this.generateId()

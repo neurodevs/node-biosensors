@@ -10,6 +10,7 @@ export default class FakeRuntimeOrchestrator implements RuntimeOrchestrator {
     )[] = []
 
     public static numCallsToStart = 0
+    public static numCallsToStop = 0
 
     public constructor(options?: RuntimeOrchestratorOptions) {
         FakeRuntimeOrchestrator.callsToConstructor.push(options)
@@ -19,8 +20,13 @@ export default class FakeRuntimeOrchestrator implements RuntimeOrchestrator {
         FakeRuntimeOrchestrator.numCallsToStart += 1
     }
 
+    public async stop() {
+        FakeRuntimeOrchestrator.numCallsToStop += 1
+    }
+
     public static resetTestDouble() {
         FakeRuntimeOrchestrator.callsToConstructor = []
         FakeRuntimeOrchestrator.numCallsToStart = 0
+        FakeRuntimeOrchestrator.numCallsToStop = 0
     }
 }
