@@ -40,8 +40,8 @@ export default class BiosensorRuntimeOrchestrator implements RuntimeOrchestrator
     public async start() {
         await this.initialize()
 
-        this.startXdfRecorderIfEnabled()
-        this.openWebSocketGatewayIfEnabled()
+        this.startXdfRecorderIfExists()
+        this.openWebSocketGatewayIfExists()
 
         await this.startStreamingAllDevices()
     }
@@ -67,11 +67,11 @@ export default class BiosensorRuntimeOrchestrator implements RuntimeOrchestrator
         }))
     }
 
-    private startXdfRecorderIfEnabled() {
+    private startXdfRecorderIfExists() {
         this.recorder?.start()
     }
 
-    private openWebSocketGatewayIfEnabled() {
+    private openWebSocketGatewayIfExists() {
         this.gateway?.open()
     }
 
@@ -84,19 +84,19 @@ export default class BiosensorRuntimeOrchestrator implements RuntimeOrchestrator
     public async stop() {
         await this.disconnectAllDevices()
 
-        this.destroyWebSocketGatewayIfEnabled()
-        this.stopXdfRecorderIfEnabled()
+        this.destroyWebSocketGatewayIfExists()
+        this.stopXdfRecorderIfExists()
     }
 
     private async disconnectAllDevices() {
         return Promise.all(this.devices.map((device) => device.disconnect()))
     }
 
-    private destroyWebSocketGatewayIfEnabled() {
+    private destroyWebSocketGatewayIfExists() {
         this.gateway?.destroy()
     }
 
-    private stopXdfRecorderIfEnabled() {
+    private stopXdfRecorderIfExists() {
         this.recorder?.stop()
     }
 

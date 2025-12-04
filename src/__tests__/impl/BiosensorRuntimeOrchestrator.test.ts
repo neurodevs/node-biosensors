@@ -59,7 +59,7 @@ export default class BiosensorRuntimeOrchestratorTest extends AbstractPackageTes
     }
 
     @test()
-    protected static async startCallsStartOnXdfStreamRecorderIfEnabled() {
+    protected static async startCallsStartOnXdfStreamRecorderIfExists() {
         await this.start()
 
         assert.isEqual(
@@ -70,7 +70,7 @@ export default class BiosensorRuntimeOrchestratorTest extends AbstractPackageTes
     }
 
     @test()
-    protected static async startCallsOpenOnWebSocketGatewayIfEnabled() {
+    protected static async startCallsOpenOnWebSocketGatewayIfExists() {
         await this.start()
 
         assert.isEqual(
@@ -120,7 +120,7 @@ export default class BiosensorRuntimeOrchestratorTest extends AbstractPackageTes
     }
 
     @test()
-    protected static async stopCallsDestroyOnWebSocketGatewayIfEnabled() {
+    protected static async stopCallsDestroyOnWebSocketGatewayIfExists() {
         await this.startThenStop()
 
         assert.isEqual(
@@ -131,7 +131,7 @@ export default class BiosensorRuntimeOrchestratorTest extends AbstractPackageTes
     }
 
     @test()
-    protected static async stopCallsStopOnXdfRecorderIfEnabled() {
+    protected static async stopCallsStopOnXdfRecorderIfExists() {
         await this.startThenStop()
 
         assert.isEqual(
