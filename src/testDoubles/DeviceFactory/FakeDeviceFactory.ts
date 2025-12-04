@@ -42,7 +42,7 @@ export default class FakeDeviceFactory implements DeviceFactory {
             deviceOptions,
         })
 
-        const { xdfRecordPath, wssPortStart } = deviceOptions ?? {}
+        const { xdfRecordPath, webSocketPortStart } = deviceOptions ?? {}
 
         const bundle: SingleDeviceBundle = { device: this.fakeDevice }
 
@@ -50,7 +50,7 @@ export default class FakeDeviceFactory implements DeviceFactory {
             bundle.recorder = this.fakeRecorder
         }
 
-        if (wssPortStart) {
+        if (webSocketPortStart) {
             bundle.gateway = this.fakeGateway
         }
 
@@ -66,7 +66,7 @@ export default class FakeDeviceFactory implements DeviceFactory {
             sessionOptions,
         })
 
-        const { xdfRecordPath, wssPortStart } = sessionOptions ?? {}
+        const { xdfRecordPath, webSocketPortStart } = sessionOptions ?? {}
 
         const createdBundles = await Promise.all(
             deviceSpecifications.map((device) =>
@@ -82,7 +82,7 @@ export default class FakeDeviceFactory implements DeviceFactory {
             bundle.recorder = this.fakeRecorder
         }
 
-        if (wssPortStart) {
+        if (webSocketPortStart) {
             bundle.gateway = this.fakeGateway
         }
 

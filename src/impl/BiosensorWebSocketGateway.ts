@@ -93,17 +93,17 @@ export default class BiosensorWebSocketGateway implements WebSocketGateway {
         devices: DeviceStreamer[],
         options?: WebSocketGatewayOptions
     ) {
-        const { wssPortStart = 8080 } = options ?? {}
-        let currentWssPort = wssPortStart
+        const { listenPortStart = 8080 } = options ?? {}
+        let currentListenPort = listenPortStart
 
         return devices.flatMap((device) => {
             return device.outlets.map((outlet) => {
-                return this.createBridgeFrom(outlet, currentWssPort++)
+                return this.createBridgeFrom(outlet, currentListenPort++)
             })
         })
     }
 
-    private static createBridgeFrom(outlet: StreamOutlet, wssPort: number) {
+    private static createBridgeFrom(outlet: StreamOutlet, listenPort: number) {
         const { sampleRateHz, channelNames, channelFormat, chunkSize } = outlet
 
         return this.LslWebSocketBridge({
@@ -111,7 +111,7 @@ export default class BiosensorWebSocketGateway implements WebSocketGateway {
             channelNames,
             channelFormat,
             chunkSize,
-            wssPort,
+            listenPort,
         })
     }
 
@@ -127,7 +127,7 @@ export interface WebSocketGateway {
 }
 
 export interface WebSocketGatewayOptions {
-    wssPortStart?: number
+    listenPortStart?: number
 }
 
 export type WebSocketGatewayConstructor = new (

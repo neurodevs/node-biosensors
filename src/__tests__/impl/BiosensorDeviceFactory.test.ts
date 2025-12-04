@@ -165,7 +165,10 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
 
         assert.isEqualDeep(
             FakeWebSocketServer.callsToConstructor,
-            [{ port: this.wssPortStart }, { port: this.wssPortStart + 1 }],
+            [
+                { port: this.webSocketPortStart },
+                { port: this.webSocketPortStart + 1 },
+            ],
             'Did not create gateway with expected devices!'
         )
     }
@@ -183,10 +186,10 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
         assert.isEqualDeep(
             FakeWebSocketServer.callsToConstructor,
             [
-                { port: this.wssPortStart },
-                { port: this.wssPortStart + 1 },
-                { port: this.wssPortStart + 2 },
-                { port: this.wssPortStart + 3 },
+                { port: this.webSocketPortStart },
+                { port: this.webSocketPortStart + 1 },
+                { port: this.webSocketPortStart + 2 },
+                { port: this.webSocketPortStart + 3 },
             ],
             'Did not create gateway with expected devices!'
         )
@@ -218,18 +221,20 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
     } = {}) {
         return await this.instance.createDevices(this.deviceSpecifications, {
             xdfRecordPath: includeXdfRecorder ? this.xdfRecordPath : undefined,
-            wssPortStart: useWebSocketGateway ? this.wssPortStart : undefined,
+            webSocketPortStart: useWebSocketGateway
+                ? this.webSocketPortStart
+                : undefined,
         })
     }
 
     private static async createDeviceWithGateway() {
         return await this.instance.createDevice('Cognionics Quick-20r', {
-            wssPortStart: this.wssPortStart,
+            webSocketPortStart: this.webSocketPortStart,
         })
     }
 
     private static readonly xdfRecordPath = generateId()
-    private static readonly wssPortStart = randomInt(1000, 5000)
+    private static readonly webSocketPortStart = randomInt(1000, 5000)
 
     private static deviceSpecifications: DeviceSpecification[] = [
         { deviceName: 'Cognionics Quick-20r' },

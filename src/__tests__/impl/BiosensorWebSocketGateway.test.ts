@@ -1,9 +1,5 @@
 import { randomInt } from 'crypto'
-import {
-    FakeStreamInlet,
-    FakeWebSocketBridge,
-    FakeWebSocketServer,
-} from '@neurodevs/node-lsl'
+import { FakeWebSocketBridge, FakeWebSocketServer } from '@neurodevs/node-lsl'
 import { test, assert } from '@neurodevs/node-tdd'
 
 import BiosensorWebSocketGateway, {
@@ -29,29 +25,37 @@ export default class BiosensorWebSocketGatewayTest extends AbstractPackageTest {
 
     @test()
     protected static async createsLslWebSocketBridgeForEachStream() {
+        const actual = FakeWebSocketBridge.callsToConstructor.map((call) => ({
+            sampleRateHz: call?.sampleRateHz,
+            channelNames: call?.channelNames,
+            channelFormat: call?.channelFormat,
+            chunkSize: call?.chunkSize,
+            listenPort: call?.listenPort,
+        }))
+
         assert.isEqualDeep(
-            FakeStreamInlet.callsToConstructor.map((c) => c.options),
+            actual,
             this.expectedBridgeOptions,
             'Did not create expected bridges!'
         )
     }
 
     @test()
-    protected static async acceptsOptionalWssPortStart() {
+    protected static async acceptsOptionalListenPortStart() {
         FakeWebSocketServer.resetTestDouble()
 
-        const wssPortStart = randomInt(1000, 10000)
-        this.BiosensorWebSocketGateway({ wssPortStart })
+        const listenPortStart = randomInt(1000, 10000)
+        this.BiosensorWebSocketGateway({ listenPortStart })
 
         assert.isEqualDeep(
             FakeWebSocketServer.callsToConstructor.map((c) => c.port),
             [
-                wssPortStart,
-                wssPortStart + 1,
-                wssPortStart + 2,
-                wssPortStart + 3,
+                listenPortStart,
+                listenPortStart + 1,
+                listenPortStart + 2,
+                listenPortStart + 3,
             ],
-            'Did not set expected wssPortStart!'
+            'Did not set expected listenPortStart!'
         )
     }
 
@@ -201,7 +205,7 @@ export default class BiosensorWebSocketGatewayTest extends AbstractPackageTest {
         this.FakeDeviceStreamer(),
     ]
 
-    private static currentWssPort = 8080
+    private static currentListenPort = 8080
 
     private static expectedBridgeOptions = this.devices.flatMap((device) => {
         return device.outlets.map((outlet) => {
@@ -210,7 +214,7 @@ export default class BiosensorWebSocketGatewayTest extends AbstractPackageTest {
                 channelNames: outlet.channelNames,
                 channelFormat: outlet.channelFormat,
                 chunkSize: outlet.chunkSize,
-                wssPort: this.currentWssPort++,
+                listenPort: this.currentListenPort++,
             }
         })
     })

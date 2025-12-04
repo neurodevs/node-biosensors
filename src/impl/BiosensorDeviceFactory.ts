@@ -33,7 +33,7 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         this.deviceName = deviceName
         this.deviceOptions = deviceOptions
 
-        const { xdfRecordPath, wssPortStart } = deviceOptions ?? {}
+        const { xdfRecordPath, webSocketPortStart } = deviceOptions ?? {}
 
         this.createdDevice = await this.createDeviceByName()
 
@@ -46,10 +46,10 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
             )
         }
 
-        if (wssPortStart) {
+        if (webSocketPortStart) {
             bundle.gateway = this.BiosensorWebSocketGateway(
                 [this.createdDevice],
-                wssPortStart
+                webSocketPortStart
             )
         }
 
@@ -81,7 +81,7 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         deviceSpecifications: DeviceSpecification[],
         sessionOptions?: PerDeviceOptions
     ) {
-        const { xdfRecordPath, wssPortStart } = sessionOptions ?? {}
+        const { xdfRecordPath, webSocketPortStart } = sessionOptions ?? {}
 
         this.deviceSpecifications = deviceSpecifications
         this.createdBundles = await this.createAllDevices()
@@ -95,10 +95,10 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
             )
         }
 
-        if (wssPortStart) {
+        if (webSocketPortStart) {
             bundle.gateway = this.BiosensorWebSocketGateway(
                 this.createdDevices,
-                wssPortStart
+                webSocketPortStart
             )
         }
 
@@ -144,10 +144,10 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
 
     private BiosensorWebSocketGateway(
         devices: DeviceStreamer[],
-        wssPortStart: number
+        webSocketPortStart: number
     ) {
         return BiosensorWebSocketGateway.Create(devices, {
-            wssPortStart,
+            listenPortStart: webSocketPortStart,
         })
     }
 }
@@ -176,7 +176,7 @@ export interface DeviceStreamer {
 
 export interface DeviceStreamerOptions {
     xdfRecordPath?: string
-    wssPortStart?: number
+    webSocketPortStart?: number
 }
 
 export type PerDeviceOptions = PerDeviceOptionsMap[DeviceName]
@@ -199,7 +199,7 @@ export interface DeviceSpecification {
 
 export interface SessionOptions {
     xdfRecordPath?: string
-    wssPortStart?: number
+    webSocketPortStart?: number
 }
 
 export interface SingleDeviceBundle {

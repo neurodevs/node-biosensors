@@ -51,7 +51,7 @@ export default class BiosensorRuntimeOrchestratorTest extends AbstractPackageTes
                 })),
                 sessionOptions: {
                     xdfRecordPath: this.xdfRecordPath,
-                    wssPortStart: this.wssPortStart,
+                    webSocketPortStart: this.webSocketPortStart,
                 },
             },
             'Did not create devices with expected options!'
@@ -155,7 +155,7 @@ export default class BiosensorRuntimeOrchestratorTest extends AbstractPackageTes
     }
 
     private static readonly xdfRecordPath = this.generateId()
-    private static readonly wssPortStart = randomInt(1000, 5000)
+    private static readonly webSocketPortStart = randomInt(1000, 5000)
 
     private static readonly deviceNames: DeviceName[] = [
         'Cognionics Quick-20r',
@@ -169,7 +169,7 @@ export default class BiosensorRuntimeOrchestratorTest extends AbstractPackageTes
         return await BiosensorRuntimeOrchestrator.Create({
             deviceNames: this.deviceNames,
             xdfRecordPath: this.xdfRecordPath,
-            wssPortStart: this.wssPortStart,
+            webSocketPortStart: this.webSocketPortStart,
             ...options,
         })
     }

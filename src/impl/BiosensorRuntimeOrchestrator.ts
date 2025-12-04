@@ -7,14 +7,12 @@ import BiosensorDeviceFactory, {
 } from './BiosensorDeviceFactory.js'
 import { WebSocketGateway } from './BiosensorWebSocketGateway.js'
 
-export default class BiosensorRuntimeOrchestrator
-    implements RuntimeOrchestrator
-{
+export default class BiosensorRuntimeOrchestrator implements RuntimeOrchestrator {
     public static Class?: RuntimeOrchestratorConstructor
 
     private deviceNames: DeviceName[]
     private xdfRecordPath?: string
-    private wssPortStart?: number
+    private webSocketPortStart?: number
 
     private factory: DeviceFactory
     private devices!: DeviceStreamer[]
@@ -22,11 +20,12 @@ export default class BiosensorRuntimeOrchestrator
     private gateway?: WebSocketGateway
 
     protected constructor(options: RuntimeOrchestratorConstructorOptions) {
-        const { deviceNames, xdfRecordPath, wssPortStart, factory } = options
+        const { deviceNames, xdfRecordPath, webSocketPortStart, factory } =
+            options
 
         this.deviceNames = deviceNames
         this.xdfRecordPath = xdfRecordPath
-        this.wssPortStart = wssPortStart
+        this.webSocketPortStart = webSocketPortStart
 
         this.factory = factory
     }
@@ -58,7 +57,7 @@ export default class BiosensorRuntimeOrchestrator
     private async createDeviceBundle() {
         return await this.factory.createDevices(this.deviceSpecifications, {
             xdfRecordPath: this.xdfRecordPath,
-            wssPortStart: this.wssPortStart,
+            webSocketPortStart: this.webSocketPortStart,
         })
     }
 
@@ -118,10 +117,9 @@ export type RuntimeOrchestratorConstructor = new (
 export interface RuntimeOrchestratorOptions {
     deviceNames: DeviceName[]
     xdfRecordPath?: string
-    wssPortStart?: number
+    webSocketPortStart?: number
 }
 
-export interface RuntimeOrchestratorConstructorOptions
-    extends RuntimeOrchestratorOptions {
+export interface RuntimeOrchestratorConstructorOptions extends RuntimeOrchestratorOptions {
     factory: DeviceFactory
 }
