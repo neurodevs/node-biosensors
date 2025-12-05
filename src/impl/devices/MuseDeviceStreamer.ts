@@ -45,10 +45,13 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
     }
 
     public static async Create(options?: MuseDeviceStreamerOptions) {
+        const eegOutlet = await this.LslStreamOutlet(this.eegOutletOptions)
+        const ppgOutlet = await this.LslStreamOutlet(this.ppgOutletOptions)
+
         return new (this.Class ?? this)({
             ...options,
-            eegOutlet: await this.LslStreamOutlet(this.eegOutletOptions),
-            ppgOutlet: await this.LslStreamOutlet(this.ppgOutletOptions),
+            eegOutlet,
+            ppgOutlet,
         })
     }
 
