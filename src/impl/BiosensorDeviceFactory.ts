@@ -45,7 +45,6 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
                 this.deviceStreamQueries
             )
         }
-        await new Promise((resolve) => setTimeout(resolve, 1000))
 
         if (webSocketPortStart) {
             bundle.gateway = this.BiosensorWebSocketGateway(
@@ -88,8 +87,6 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         this.createdBundles = await this.createAllDevices()
 
         const bundle: MultipleDeviceBundle = { devices: this.createdDevices }
-
-        await new Promise((resolve) => setTimeout(resolve, 5000))
 
         if (xdfRecordPath) {
             bundle.recorder = this.XdfStreamRecorder(
