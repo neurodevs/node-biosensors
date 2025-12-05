@@ -32,9 +32,7 @@ export default class BiosensorRuntimeOrchestrator implements RuntimeOrchestrator
 
     public static async Create(options: RuntimeOrchestratorOptions) {
         const factory = this.BiosensorDeviceFactory()
-        const instance = new (this.Class ?? this)({ ...options, factory })
-
-        return instance
+        return new (this.Class ?? this)({ ...options, factory })
     }
 
     public async start() {
