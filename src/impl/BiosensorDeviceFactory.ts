@@ -47,7 +47,7 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         }
 
         if (webSocketPortStart) {
-            bundle.gateway = this.BiosensorWebSocketGateway(
+            bundle.gateway = await this.BiosensorWebSocketGateway(
                 [this.createdDevice],
                 webSocketPortStart
             )
@@ -96,7 +96,7 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         }
 
         if (webSocketPortStart) {
-            bundle.gateway = this.BiosensorWebSocketGateway(
+            bundle.gateway = await this.BiosensorWebSocketGateway(
                 this.createdDevices,
                 webSocketPortStart
             )

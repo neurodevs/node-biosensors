@@ -15,7 +15,7 @@ export default class BiosensorWebSocketGatewayTest extends AbstractPackageTest {
     protected static async beforeEach() {
         await super.beforeEach()
 
-        this.instance = this.BiosensorWebSocketGateway()
+        this.instance = await this.BiosensorWebSocketGateway()
     }
 
     @test()
@@ -26,9 +26,7 @@ export default class BiosensorWebSocketGatewayTest extends AbstractPackageTest {
     @test()
     protected static async createsLslWebSocketBridgeForEachStream() {
         const actual = FakeWebSocketBridge.callsToConstructor.map((call) => ({
-            sampleRateHz: call?.sampleRateHz,
-            channelNames: call?.channelNames,
-            channelFormat: call?.channelFormat,
+            sourceId: call?.sourceId,
             chunkSize: call?.chunkSize,
             listenPort: call?.listenPort,
         }))
@@ -45,7 +43,7 @@ export default class BiosensorWebSocketGatewayTest extends AbstractPackageTest {
         FakeWebSocketServer.resetTestDouble()
 
         const listenPortStart = randomInt(1000, 10000)
-        this.BiosensorWebSocketGateway({ listenPortStart })
+        await this.BiosensorWebSocketGateway({ listenPortStart })
 
         assert.isEqualDeep(
             FakeWebSocketServer.callsToConstructor.map((c) => c.port),
@@ -209,17 +207,17 @@ export default class BiosensorWebSocketGatewayTest extends AbstractPackageTest {
 
     private static expectedBridgeOptions = this.devices.flatMap((device) => {
         return device.outlets.map((outlet) => {
+            const { sourceId, chunkSize } = outlet
+
             return {
-                sampleRateHz: outlet.sampleRateHz,
-                channelNames: outlet.channelNames,
-                channelFormat: outlet.channelFormat,
-                chunkSize: outlet.chunkSize,
+                sourceId,
+                chunkSize,
                 listenPort: this.currentListenPort++,
             }
         })
     })
 
-    private static BiosensorWebSocketGateway(
+    private static async BiosensorWebSocketGateway(
         options?: WebSocketGatewayOptions
     ) {
         return BiosensorWebSocketGateway.Create(this.devices, options)

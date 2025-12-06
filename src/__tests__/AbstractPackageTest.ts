@@ -19,6 +19,8 @@ import {
     LslWebSocketBridge,
     FakeWebSocketBridge,
     FakeWebSocketServer,
+    FakeLiblsl,
+    LiblslAdapter,
 } from '@neurodevs/node-lsl'
 import AbstractModuleTest from '@neurodevs/node-tdd'
 import {
@@ -47,6 +49,8 @@ import FakeFTDI from '../testDoubles/FTDI/FakeFTDI.js'
 import FakeWebSocketGateway from '../testDoubles/WebSocketGateway/FakeWebSocketGateway.js'
 
 export default class AbstractPackageTest extends AbstractModuleTest {
+    protected static fakeLiblsl: FakeLiblsl
+
     protected static async beforeEach() {
         await super.beforeEach()
 
@@ -54,6 +58,7 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         this.setFakeBleConnector()
         this.setFakeBleScanner()
         this.setFakeFTDI()
+        this.setFakeLiblsl()
         this.setFakeStreamInlet()
         this.setFakeStreamOutlet()
         this.setFakeStreamInfo()
@@ -101,6 +106,11 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         FakeDeviceFTDI.resetTestDouble()
 
         FakeFTDI.setFakeDeviceInfos()
+    }
+
+    protected static setFakeLiblsl() {
+        this.fakeLiblsl = new FakeLiblsl()
+        LiblslAdapter.setInstance(this.fakeLiblsl)
     }
 
     protected static setFakeStreamInlet() {

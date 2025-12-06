@@ -18,11 +18,11 @@ export default class BiosensorWebSocketGateway implements WebSocketGateway {
         this.bridges = bridges
     }
 
-    public static Create(
+    public static async Create(
         devices: DeviceStreamer[],
         options?: WebSocketGatewayOptions
     ) {
-        const bridges = this.createBridgesFrom(devices, options)
+        const bridges = await this.createBridgesFrom(devices, options)
         return new (this.Class ?? this)(bridges)
     }
 
@@ -89,33 +89,42 @@ export default class BiosensorWebSocketGateway implements WebSocketGateway {
         this.bridges.forEach((bridge) => bridge.destroy())
     }
 
-    private static createBridgesFrom(
+    private static async createBridgesFrom(
         devices: DeviceStreamer[],
         options?: WebSocketGatewayOptions
     ) {
         const { listenPortStart = 8080 } = options ?? {}
         let currentListenPort = listenPortStart
 
-        return devices.flatMap((device) => {
-            return device.outlets.map((outlet) => {
-                return this.createBridgeFrom(outlet, currentListenPort++)
-            })
-        })
+        const bridges: WebSocketBridge[] = []
+
+        for (const device of devices) {
+            for (const outlet of device.outlets) {
+                const bridge = await this.createBridgeFrom(
+                    outlet,
+                    currentListenPort++
+                )
+                bridges.push(bridge)
+            }
+        }
+
+        return bridges
     }
 
-    private static createBridgeFrom(outlet: StreamOutlet, listenPort: number) {
-        const { sampleRateHz, channelNames, channelFormat, chunkSize } = outlet
+    private static async createBridgeFrom(
+        outlet: StreamOutlet,
+        listenPort: number
+    ) {
+        const { sourceId, chunkSize } = outlet
 
         return this.LslWebSocketBridge({
-            sampleRateHz,
-            channelNames,
-            channelFormat,
+            sourceId,
             chunkSize,
             listenPort,
         })
     }
 
-    private static LslWebSocketBridge(options: WebSocketBridgeOptions) {
+    private static async LslWebSocketBridge(options: WebSocketBridgeOptions) {
         return LslWebSocketBridge.Create(options)
     }
 }
