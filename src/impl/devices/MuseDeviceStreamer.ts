@@ -320,7 +320,7 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
         sourceId: 'muse-eeg',
         manufacturer: 'Interaxon Inc.',
         units: 'microvolt',
-        chunkSize: this.eegChunkSize,
+        chunkSize: 1,
         maxBufferedMs: 360,
     }
 
@@ -333,7 +333,7 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
         sourceId: 'muse-s-ppg',
         manufacturer: 'Interaxon Inc.',
         units: 'N/A',
-        chunkSize: this.ppgChunkSize,
+        chunkSize: 1,
         maxBufferedMs: 360,
     }
 

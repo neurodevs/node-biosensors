@@ -29,6 +29,7 @@ import {
     XdfFileLoader,
     FakeXdfLoader,
 } from '@neurodevs/node-xdf'
+import { Server } from 'ws'
 
 import BiosensorDeviceFactory, {
     DeviceStreamerOptions,
@@ -137,7 +138,7 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         LslWebSocketBridge.Class = FakeWebSocketBridge
         FakeWebSocketBridge.resetTestDouble()
 
-        LslWebSocketBridge.WSS = FakeWebSocketServer
+        LslWebSocketBridge.WSS = FakeWebSocketServer as unknown as typeof Server
         FakeWebSocketServer.resetTestDouble()
     }
 

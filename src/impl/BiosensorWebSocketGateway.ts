@@ -115,10 +115,10 @@ export default class BiosensorWebSocketGateway implements WebSocketGateway {
         outlet: StreamOutlet,
         listenPort: number
     ) {
-        const { sourceId, chunkSize } = outlet
+        const { info, chunkSize } = outlet
 
         return this.LslWebSocketBridge({
-            sourceId,
+            info,
             chunkSize,
             listenPort,
         })
