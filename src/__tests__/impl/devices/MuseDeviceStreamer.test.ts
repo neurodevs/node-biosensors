@@ -77,7 +77,7 @@ export default class MuseDeviceStreamerTest extends AbstractPackageTest {
             sourceId: 'muse-eeg',
             manufacturer: 'Interaxon Inc.',
             units: 'microvolt',
-            chunkSize: this.eegChunkSize,
+            chunkSize: 1,
             maxBufferedMs: 360,
         })
     }
@@ -129,7 +129,7 @@ export default class MuseDeviceStreamerTest extends AbstractPackageTest {
             sourceId: 'muse-s-ppg',
             manufacturer: 'Interaxon Inc.',
             units: 'N/A',
-            chunkSize: this.ppgChunkSize,
+            chunkSize: 1,
             maxBufferedMs: 360,
         })
     }

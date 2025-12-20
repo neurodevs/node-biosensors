@@ -207,10 +207,10 @@ export default class BiosensorWebSocketGatewayTest extends AbstractPackageTest {
 
     private static expectedBridgeOptions = this.devices.flatMap((device) => {
         return device.outlets.map((outlet) => {
-            const { sourceId, chunkSize } = outlet
+            const { info, chunkSize } = outlet
 
             return {
-                sourceId,
+                info,
                 chunkSize,
                 listenPort: this.currentListenPort++,
             }
