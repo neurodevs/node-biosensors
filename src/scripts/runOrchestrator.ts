@@ -11,7 +11,7 @@ await orchestrator.start()
 console.log('Biosensor runtime orchestrator started successfully.')
 
 await new Promise((resolve) => {
-    setTimeout(resolve, 60 * 1000)
+    setTimeout(resolve, 5 * 1000)
 })
 
 await orchestrator.stop()
