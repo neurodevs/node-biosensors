@@ -7,8 +7,8 @@ import BiosensorDeviceFactory, {
 } from './BiosensorDeviceFactory.js'
 import { WebSocketGateway } from './BiosensorWebSocketGateway.js'
 
-export default class BiosensorRuntimeOrchestrator implements RuntimeOrchestrator {
-    public static Class?: RuntimeOrchestratorConstructor
+export default class BiosensorStreamingServer implements StreamingServer {
+    public static Class?: StreamingServerConstructor
 
     private deviceNames: DeviceName[]
     private xdfRecordPath?: string
@@ -19,7 +19,7 @@ export default class BiosensorRuntimeOrchestrator implements RuntimeOrchestrator
     private recorder?: XdfRecorder
     private gateway?: WebSocketGateway
 
-    protected constructor(options: RuntimeOrchestratorConstructorOptions) {
+    protected constructor(options: StreamingServerConstructorOptions) {
         const { deviceNames, xdfRecordPath, webSocketPortStart, factory } =
             options
 
@@ -30,7 +30,7 @@ export default class BiosensorRuntimeOrchestrator implements RuntimeOrchestrator
         this.factory = factory
     }
 
-    public static async Create(options: RuntimeOrchestratorOptions) {
+    public static async Create(options: StreamingServerOptions) {
         const factory = this.BiosensorDeviceFactory()
         return new (this.Class ?? this)({ ...options, factory })
     }
@@ -103,21 +103,21 @@ export default class BiosensorRuntimeOrchestrator implements RuntimeOrchestrator
     }
 }
 
-export interface RuntimeOrchestrator {
+export interface StreamingServer {
     start(): Promise<void>
     stop(): Promise<void>
 }
 
-export type RuntimeOrchestratorConstructor = new (
-    options: RuntimeOrchestratorOptions
-) => RuntimeOrchestrator
+export type StreamingServerConstructor = new (
+    options: StreamingServerOptions
+) => StreamingServer
 
-export interface RuntimeOrchestratorOptions {
+export interface StreamingServerOptions {
     deviceNames: DeviceName[]
     xdfRecordPath?: string
     webSocketPortStart?: number
 }
 
-export interface RuntimeOrchestratorConstructorOptions extends RuntimeOrchestratorOptions {
+export interface StreamingServerConstructorOptions extends StreamingServerOptions {
     factory: DeviceFactory
 }
