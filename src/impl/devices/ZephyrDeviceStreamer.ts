@@ -6,7 +6,7 @@ export default class ZephyrDeviceStreamer implements DeviceStreamer {
 
     protected constructor() {}
 
-    public static Create() {
+    public static async Create() {
         return new (this.Class ?? this)()
     }
 

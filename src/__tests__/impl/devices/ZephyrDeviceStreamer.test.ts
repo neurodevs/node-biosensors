@@ -10,7 +10,7 @@ export default class ZephyrDeviceStreamerTest extends AbstractPackageTest {
     protected static async beforeEach() {
         await super.beforeEach()
 
-        this.instance = this.ZephyrDeviceStreamer()
+        this.instance = await this.ZephyrDeviceStreamer()
     }
 
     @test()
@@ -27,7 +27,7 @@ export default class ZephyrDeviceStreamerTest extends AbstractPackageTest {
         )
     }
 
-    private static ZephyrDeviceStreamer() {
+    private static async ZephyrDeviceStreamer() {
         return ZephyrDeviceStreamer.Create()
     }
 }
