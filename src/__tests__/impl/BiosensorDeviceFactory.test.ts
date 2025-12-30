@@ -216,15 +216,13 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
 
     @test()
     protected static async createDeviceReturnsEventMarkerOutletIfRequested() {
-        const { markerOutlet } = await this.createWithMarkerOutlet()
+        const { markerOutlet } = await this.createDeviceWithMarkerOutlet()
         assert.isTruthy(markerOutlet, 'Did not return marker outlet!')
     }
 
     @test()
     protected static async createDevicesCreatesEventMarkerOutletIfRequested() {
-        await this.instance.createDevices(this.deviceSpecifications, {
-            createEventMarkerOutlet: true,
-        })
+        await this.createDevicesWithMarkerOutlet()
 
         assert.isEqualDeep(
             FakeEventMarkerOutlet.numCallsToConstructor,
@@ -233,8 +231,20 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
         )
     }
 
-    private static async createWithMarkerOutlet() {
+    @test()
+    protected static async createDevicesReturnsEventMarkerOutletIfRequested() {
+        const { markerOutlet } = await this.createDevicesWithMarkerOutlet()
+        assert.isTruthy(markerOutlet, 'Did not return marker outlet!')
+    }
+
+    private static async createDeviceWithMarkerOutlet() {
         return await this.instance.createDevice('Cognionics Quick-20r', {
+            createEventMarkerOutlet: true,
+        })
+    }
+
+    private static async createDevicesWithMarkerOutlet() {
+        return await this.instance.createDevices(this.deviceSpecifications, {
             createEventMarkerOutlet: true,
         })
     }

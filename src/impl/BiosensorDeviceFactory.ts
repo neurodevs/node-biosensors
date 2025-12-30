@@ -113,7 +113,7 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         }
 
         if (createEventMarkerOutlet) {
-            await this.LslEventMarkerOutlet()
+            bundle.markerOutlet = await this.LslEventMarkerOutlet()
         }
 
         return bundle
@@ -232,4 +232,5 @@ export interface MultipleDeviceBundle {
     devices: DeviceStreamer[]
     recorder?: XdfRecorder
     gateway?: WebSocketGateway
+    markerOutlet?: EventMarkerOutlet
 }
