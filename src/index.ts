@@ -28,13 +28,13 @@ export * from './testDoubles/DeviceStreamer/MuseDeviceStreamer/SpyMuseDeviceStre
 export { default as FakeMuseDeviceStreamer } from './testDoubles/DeviceStreamer/MuseDeviceStreamer/FakeMuseDeviceStreamer.js'
 export * from './testDoubles/DeviceStreamer/MuseDeviceStreamer/FakeMuseDeviceStreamer.js'
 
-// StreamingServer
+// StreamingOrchestrator
 
-export { default as BiosensorStreamingServer } from './impl/BiosensorStreamingServer.js'
-export * from './impl/BiosensorStreamingServer.js'
+export { default as BiosensorStreamingOrchestrator } from './impl/BiosensorStreamingOrchestrator.js'
+export * from './impl/BiosensorStreamingOrchestrator.js'
 
-export { default as FakeStreamingServer } from './testDoubles/StreamingServer/FakeStreamingServer.js'
-export * from './testDoubles/StreamingServer/FakeStreamingServer.js'
+export { default as FakeStreamingOrchestrator } from './testDoubles/StreamingOrchestrator/FakeStreamingOrchestrator.js'
+export * from './testDoubles/StreamingOrchestrator/FakeStreamingOrchestrator.js'
 
 // Zephyr BioHarness 3
 

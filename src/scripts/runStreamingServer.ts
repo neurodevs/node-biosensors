@@ -1,6 +1,6 @@
-import BiosensorStreamingServer from '../impl/BiosensorStreamingServer.js'
+import BiosensorStreamingOrchestrator from '../impl/BiosensorStreamingOrchestrator.js'
 
-const server = await BiosensorStreamingServer.Create({
+const server = await BiosensorStreamingOrchestrator.Create({
     deviceNames: ['Muse S Gen 2'],
     // xdfRecordPath: './src/__tests__/test.xdf',
     webSocketPortStart: 8080,

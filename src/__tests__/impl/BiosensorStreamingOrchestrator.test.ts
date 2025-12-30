@@ -3,17 +3,17 @@ import { test, assert } from '@neurodevs/node-tdd'
 import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 
 import { DeviceName } from '../../impl/BiosensorDeviceFactory.js'
-import BiosensorStreamingServer, {
-    StreamingServer,
-    StreamingServerOptions,
-} from '../../impl/BiosensorStreamingServer.js'
+import BiosensorStreamingOrchestrator, {
+    StreamingOrchestrator,
+    StreamingOrchestratorConstructorOptions,
+} from '../../impl/BiosensorStreamingOrchestrator.js'
 import FakeDeviceFactory from '../../testDoubles/DeviceFactory/FakeDeviceFactory.js'
 import FakeDeviceStreamer from '../../testDoubles/DeviceStreamer/FakeDeviceStreamer.js'
 import FakeWebSocketGateway from '../../testDoubles/WebSocketGateway/FakeWebSocketGateway.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 
-export default class BiosensorStreamingServerTest extends AbstractPackageTest {
-    private static instance: StreamingServer
+export default class BiosensorStreamingOrchestratorTest extends AbstractPackageTest {
+    private static instance: StreamingOrchestrator
 
     protected static async beforeEach() {
         await super.beforeEach()
@@ -22,7 +22,7 @@ export default class BiosensorStreamingServerTest extends AbstractPackageTest {
         this.setFakeDeviceFactory()
         this.setFakeWebSocketGateway()
 
-        this.instance = await this.BiosensorStreamingServer()
+        this.instance = await this.BiosensorStreamingOrchestrator()
     }
 
     @test()
@@ -95,7 +95,7 @@ export default class BiosensorStreamingServerTest extends AbstractPackageTest {
     protected static async doesNotStartRecorderIfNotGivenXdfRecordPath() {
         FakeXdfRecorder.resetTestDouble()
 
-        const instance = await this.BiosensorStreamingServer({
+        const instance = await this.BiosensorStreamingOrchestrator({
             xdfRecordPath: undefined,
         })
 
@@ -163,10 +163,10 @@ export default class BiosensorStreamingServerTest extends AbstractPackageTest {
         'Zephyr BioHarness 3',
     ]
 
-    private static async BiosensorStreamingServer(
-        options?: Partial<StreamingServerOptions>
+    private static async BiosensorStreamingOrchestrator(
+        options?: Partial<StreamingOrchestratorConstructorOptions>
     ) {
-        return await BiosensorStreamingServer.Create({
+        return await BiosensorStreamingOrchestrator.Create({
             deviceNames: this.deviceNames,
             xdfRecordPath: this.xdfRecordPath,
             webSocketPortStart: this.webSocketPortStart,
