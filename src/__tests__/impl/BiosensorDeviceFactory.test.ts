@@ -214,6 +214,18 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
         )
     }
 
+    @test()
+    protected static async createDeviceReturnsEventMarkerOutletIfRequested() {
+        const { markerOutlet } = await this.createWithMarkerOutlet()
+        assert.isTruthy(markerOutlet, 'Did not return marker outlet!')
+    }
+
+    private static async createWithMarkerOutlet() {
+        return await this.instance.createDevice('Cognionics Quick-20r', {
+            createEventMarkerOutlet: true,
+        })
+    }
+
     private static async createCgxWithXdfRecorder() {
         return await this.createCgxDeviceStreamer({
             xdfRecordPath: this.xdfRecordPath,

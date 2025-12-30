@@ -59,7 +59,7 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         }
 
         if (createEventMarkerOutlet) {
-            await this.LslEventMarkerOutlet()
+            bundle.markerOutlet = await this.LslEventMarkerOutlet()
         }
 
         return bundle
