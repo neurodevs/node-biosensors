@@ -88,9 +88,10 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
 
     public async createDevices(
         deviceSpecifications: DeviceSpecification[],
-        options?: PerDeviceOptions
+        options?: SessionOptions
     ) {
-        const { xdfRecordPath, webSocketPortStart } = options ?? {}
+        const { xdfRecordPath, webSocketPortStart, createEventMarkerOutlet } =
+            options ?? {}
 
         this.deviceSpecifications = deviceSpecifications
         this.createdBundles = await this.createAllDevices()
@@ -109,6 +110,10 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
                 this.createdDevices,
                 webSocketPortStart
             )
+        }
+
+        if (createEventMarkerOutlet) {
+            await this.LslEventMarkerOutlet()
         }
 
         return bundle

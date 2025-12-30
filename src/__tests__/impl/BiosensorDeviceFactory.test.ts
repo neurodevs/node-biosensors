@@ -220,6 +220,19 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
         assert.isTruthy(markerOutlet, 'Did not return marker outlet!')
     }
 
+    @test()
+    protected static async createDevicesCreatesEventMarkerOutletIfRequested() {
+        await this.instance.createDevices(this.deviceSpecifications, {
+            createEventMarkerOutlet: true,
+        })
+
+        assert.isEqualDeep(
+            FakeEventMarkerOutlet.numCallsToConstructor,
+            1,
+            'Did not create marker outlet!'
+        )
+    }
+
     private static async createWithMarkerOutlet() {
         return await this.instance.createDevice('Cognionics Quick-20r', {
             createEventMarkerOutlet: true,
