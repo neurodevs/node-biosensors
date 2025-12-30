@@ -1,6 +1,6 @@
 import { randomInt } from 'crypto'
 import generateId from '@neurodevs/generate-id'
-import { FakeWebSocketServer } from '@neurodevs/node-lsl'
+import { FakeEventMarkerOutlet, FakeWebSocketServer } from '@neurodevs/node-lsl'
 import { test, assert } from '@neurodevs/node-tdd'
 import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 
@@ -50,20 +50,20 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
 
     @test()
     protected static async createsDeviceForMuseDeviceStreamerWithOptions() {
-        const deviceOptions = {
+        const options = {
             bleUuid: generateId(),
             rssiIntervalMs: Math.random(),
         }
 
-        await this.createMuseDeviceStreamer(deviceOptions)
+        await this.createMuseDeviceStreamer(options)
 
         const { bleUuid, rssiIntervalMs } =
             FakeMuseDeviceStreamer.callsToConstructor[0]!
 
         assert.isEqualDeep(
             { bleUuid, rssiIntervalMs },
-            deviceOptions,
-            'deviceOptions do not match!'
+            options,
+            'options do not match!'
         )
     }
 
@@ -201,6 +201,19 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
         assert.isTruthy(gateway, 'Did not return gateway!')
     }
 
+    @test()
+    protected static async createDeviceCreatesEventMarkerOutletIfRequested() {
+        await this.instance.createDevice('Cognionics Quick-20r', {
+            createEventMarkerOutlet: true,
+        })
+
+        assert.isEqualDeep(
+            FakeEventMarkerOutlet.numCallsToConstructor,
+            1,
+            'Did not create marker outlet!'
+        )
+    }
+
     private static async createCgxWithXdfRecorder() {
         return await this.createCgxDeviceStreamer({
             xdfRecordPath: this.xdfRecordPath,
@@ -241,22 +254,18 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
         { deviceName: 'Muse S Gen 2' },
     ]
 
-    private static createCgxDeviceStreamer(
-        deviceOptions?: DeviceStreamerOptions
-    ) {
-        return this.instance.createDevice('Cognionics Quick-20r', deviceOptions)
+    private static createCgxDeviceStreamer(options?: DeviceStreamerOptions) {
+        return this.instance.createDevice('Cognionics Quick-20r', options)
     }
 
     private static createMuseDeviceStreamer(
-        deviceOptions?: MuseDeviceStreamerOptions
+        options?: MuseDeviceStreamerOptions
     ) {
-        return this.instance.createDevice('Muse S Gen 2', deviceOptions)
+        return this.instance.createDevice('Muse S Gen 2', options)
     }
 
-    private static createZephyrDeviceStreamer(
-        deviceOptions?: DeviceStreamerOptions
-    ) {
-        return this.instance.createDevice('Zephyr BioHarness 3', deviceOptions)
+    private static createZephyrDeviceStreamer(options?: DeviceStreamerOptions) {
+        return this.instance.createDevice('Zephyr BioHarness 3', options)
     }
 
     private static assertDeviceIsTruthy(device: DeviceStreamer) {

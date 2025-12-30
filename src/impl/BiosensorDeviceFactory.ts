@@ -1,4 +1,8 @@
-import { StreamOutlet } from '@neurodevs/node-lsl'
+import {
+    EventMarkerOutlet,
+    LslEventMarkerOutlet,
+    StreamOutlet,
+} from '@neurodevs/node-lsl'
 import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 
 import BiosensorWebSocketGateway, {
@@ -14,7 +18,7 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
     public static Class?: DeviceFactoryConstructor
 
     private deviceName!: DeviceName
-    private deviceOptions?: PerDeviceOptionsMap[DeviceName]
+    private options?: PerDeviceOptionsMap[DeviceName]
     private createdDevice!: DeviceStreamer
 
     private deviceSpecifications!: DeviceSpecification[]
@@ -28,12 +32,13 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
 
     public async createDevice<K extends DeviceName>(
         deviceName: K,
-        deviceOptions?: PerDeviceOptionsMap[K]
+        options?: PerDeviceOptionsMap[K] & SessionOptions
     ) {
         this.deviceName = deviceName
-        this.deviceOptions = deviceOptions
+        this.options = options
 
-        const { xdfRecordPath, webSocketPortStart } = deviceOptions ?? {}
+        const { xdfRecordPath, webSocketPortStart, createEventMarkerOutlet } =
+            options ?? {}
 
         this.createdDevice = await this.createDeviceByName()
 
@@ -51,6 +56,10 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
                 [this.createdDevice],
                 webSocketPortStart
             )
+        }
+
+        if (createEventMarkerOutlet) {
+            await this.LslEventMarkerOutlet()
         }
 
         return bundle
@@ -79,9 +88,9 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
 
     public async createDevices(
         deviceSpecifications: DeviceSpecification[],
-        sessionOptions?: PerDeviceOptions
+        options?: PerDeviceOptions
     ) {
-        const { xdfRecordPath, webSocketPortStart } = sessionOptions ?? {}
+        const { xdfRecordPath, webSocketPortStart } = options ?? {}
 
         this.deviceSpecifications = deviceSpecifications
         this.createdBundles = await this.createAllDevices()
@@ -108,8 +117,8 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
     private async createAllDevices() {
         return await Promise.all(
             this.deviceSpecifications.map((device) => {
-                const { deviceName, deviceOptions } = device
-                return this.createDevice(deviceName, deviceOptions)
+                const { deviceName, options } = device
+                return this.createDevice(deviceName, options)
             })
         )
     }
@@ -126,12 +135,12 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         return this.createdBundles.flatMap(({ device }) => device.streamQueries)
     }
 
-    private CgxDeviceStreamer() {
+    private async CgxDeviceStreamer() {
         return CgxDeviceStreamer.Create()
     }
 
-    private MuseDeviceStreamer() {
-        return MuseDeviceStreamer.Create(this.deviceOptions)
+    private async MuseDeviceStreamer() {
+        return MuseDeviceStreamer.Create(this.options)
     }
 
     private ZephyrDeviceStreamer() {
@@ -142,7 +151,7 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         return XdfStreamRecorder.Create(xdfRecordPath, streamQueries)
     }
 
-    private BiosensorWebSocketGateway(
+    private async BiosensorWebSocketGateway(
         devices: DeviceStreamer[],
         webSocketPortStart: number
     ) {
@@ -150,17 +159,21 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
             listenPortStart: webSocketPortStart,
         })
     }
+
+    private async LslEventMarkerOutlet() {
+        return LslEventMarkerOutlet.Create()
+    }
 }
 
 export interface DeviceFactory {
     createDevice<K extends DeviceName>(
         deviceName: K,
-        deviceOptions?: PerDeviceOptionsMap[K]
+        options?: PerDeviceOptionsMap[K] & SessionOptions
     ): Promise<SingleDeviceBundle>
 
     createDevices(
         deviceSpecifications: DeviceSpecification[],
-        sessionOptions?: SessionOptions
+        options?: SessionOptions
     ): Promise<MultipleDeviceBundle>
 }
 
@@ -194,18 +207,20 @@ export type DeviceName =
 
 export interface DeviceSpecification {
     deviceName: DeviceName
-    deviceOptions?: PerDeviceOptionsMap[DeviceName]
+    options?: PerDeviceOptionsMap[DeviceName]
 }
 
 export interface SessionOptions {
     xdfRecordPath?: string
     webSocketPortStart?: number
+    createEventMarkerOutlet?: boolean
 }
 
 export interface SingleDeviceBundle {
     device: DeviceStreamer
     recorder?: XdfRecorder
     gateway?: WebSocketGateway
+    markerOutlet?: EventMarkerOutlet
 }
 
 export interface MultipleDeviceBundle {

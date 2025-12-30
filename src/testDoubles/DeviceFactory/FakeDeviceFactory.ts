@@ -17,7 +17,7 @@ export default class FakeDeviceFactory implements DeviceFactory {
 
     public static callsToCreateDevice: {
         deviceName: DeviceName
-        deviceOptions?: PerDeviceOptions
+        options?: PerDeviceOptions & SessionOptions
     }[] = []
 
     public static callsToCreateDevices: {
@@ -35,14 +35,14 @@ export default class FakeDeviceFactory implements DeviceFactory {
 
     public async createDevice(
         deviceName: DeviceName,
-        deviceOptions?: PerDeviceOptions
+        options?: PerDeviceOptions & SessionOptions
     ) {
         FakeDeviceFactory.callsToCreateDevice.push({
             deviceName,
-            deviceOptions,
+            options,
         })
 
-        const { xdfRecordPath, webSocketPortStart } = deviceOptions ?? {}
+        const { xdfRecordPath, webSocketPortStart } = options ?? {}
 
         const bundle: SingleDeviceBundle = { device: this.fakeDevice }
 
