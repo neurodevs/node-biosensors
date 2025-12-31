@@ -1,3 +1,4 @@
+import { TimedEventMarker } from '@neurodevs/node-lsl'
 import { XdfRecorder } from '@neurodevs/node-xdf'
 
 import BiosensorDeviceFactory, {
@@ -13,6 +14,7 @@ export default class BiosensorStreamingOrchestrator implements StreamingOrchestr
     private deviceNames: DeviceName[]
     private xdfRecordPath?: string
     private webSocketPortStart?: number
+    private eventMarkers?: TimedEventMarker[]
 
     private factory: DeviceFactory
     private devices!: DeviceStreamer[]
@@ -20,12 +22,18 @@ export default class BiosensorStreamingOrchestrator implements StreamingOrchestr
     private gateway?: WebSocketGateway
 
     protected constructor(options: StreamingOrchestratorConstructorOptions) {
-        const { deviceNames, xdfRecordPath, webSocketPortStart, factory } =
-            options
+        const {
+            deviceNames,
+            xdfRecordPath,
+            webSocketPortStart,
+            eventMarkers,
+            factory,
+        } = options
 
         this.deviceNames = deviceNames
         this.xdfRecordPath = xdfRecordPath
         this.webSocketPortStart = webSocketPortStart
+        this.eventMarkers = eventMarkers
 
         this.factory = factory
     }
@@ -56,6 +64,7 @@ export default class BiosensorStreamingOrchestrator implements StreamingOrchestr
         return await this.factory.createDevices(this.deviceSpecifications, {
             xdfRecordPath: this.xdfRecordPath,
             webSocketPortStart: this.webSocketPortStart,
+            createEventMarkerEmitter: this.eventMarkers !== undefined,
         })
     }
 
@@ -116,6 +125,7 @@ export interface StreamingOrchestratorOptions {
     deviceNames: DeviceName[]
     xdfRecordPath?: string
     webSocketPortStart?: number
+    eventMarkers?: TimedEventMarker[]
 }
 
 export interface StreamingOrchestratorConstructorOptions extends StreamingOrchestratorOptions {

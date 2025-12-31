@@ -1,6 +1,9 @@
 import { randomInt } from 'crypto'
 import generateId from '@neurodevs/generate-id'
-import { FakeEventMarkerOutlet, FakeWebSocketServer } from '@neurodevs/node-lsl'
+import {
+    FakeEventMarkerEmitter,
+    FakeWebSocketServer,
+} from '@neurodevs/node-lsl'
 import { test, assert } from '@neurodevs/node-tdd'
 import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 
@@ -202,50 +205,50 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async createDeviceCreatesEventMarkerOutletIfRequested() {
+    protected static async createDeviceCreatesEventMarkerEmitterIfRequested() {
         await this.instance.createDevice('Cognionics Quick-20r', {
-            createEventMarkerOutlet: true,
+            createEventMarkerEmitter: true,
         })
 
         assert.isEqualDeep(
-            FakeEventMarkerOutlet.numCallsToConstructor,
+            FakeEventMarkerEmitter.numCallsToConstructor,
             1,
             'Did not create marker outlet!'
         )
     }
 
     @test()
-    protected static async createDeviceReturnsEventMarkerOutletIfRequested() {
-        const { markerOutlet } = await this.createDeviceWithMarkerOutlet()
-        assert.isTruthy(markerOutlet, 'Did not return marker outlet!')
+    protected static async createDeviceReturnsEventMarkerEmitterIfRequested() {
+        const { emitter } = await this.createDeviceWithEmitter()
+        assert.isTruthy(emitter, 'Did not return event marker emitter!')
     }
 
     @test()
-    protected static async createDevicesCreatesEventMarkerOutletIfRequested() {
-        await this.createDevicesWithMarkerOutlet()
+    protected static async createDevicesCreatesEventMarkerEmitterIfRequested() {
+        await this.createDevicesWithEmitter()
 
         assert.isEqualDeep(
-            FakeEventMarkerOutlet.numCallsToConstructor,
+            FakeEventMarkerEmitter.numCallsToConstructor,
             1,
-            'Did not create marker outlet!'
+            'Did not create marker emitter!'
         )
     }
 
     @test()
-    protected static async createDevicesReturnsEventMarkerOutletIfRequested() {
-        const { markerOutlet } = await this.createDevicesWithMarkerOutlet()
-        assert.isTruthy(markerOutlet, 'Did not return marker outlet!')
+    protected static async createDevicesReturnsEventMarkerEmitterIfRequested() {
+        const { emitter } = await this.createDevicesWithEmitter()
+        assert.isTruthy(emitter, 'Did not return event marker emitter!')
     }
 
-    private static async createDeviceWithMarkerOutlet() {
+    private static async createDeviceWithEmitter() {
         return await this.instance.createDevice('Cognionics Quick-20r', {
-            createEventMarkerOutlet: true,
+            createEventMarkerEmitter: true,
         })
     }
 
-    private static async createDevicesWithMarkerOutlet() {
+    private static async createDevicesWithEmitter() {
         return await this.instance.createDevices(this.deviceSpecifications, {
-            createEventMarkerOutlet: true,
+            createEventMarkerEmitter: true,
         })
     }
 

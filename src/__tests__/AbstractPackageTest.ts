@@ -21,8 +21,8 @@ import {
     FakeWebSocketServer,
     FakeLiblsl,
     LiblslAdapter,
-    LslEventMarkerOutlet,
-    FakeEventMarkerOutlet,
+    LslEventMarkerEmitter,
+    FakeEventMarkerEmitter,
 } from '@neurodevs/node-lsl'
 import AbstractModuleTest from '@neurodevs/node-tdd'
 import {
@@ -62,7 +62,7 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         this.setFakeBleScanner()
         this.setFakeFTDI()
         this.setFakeLiblsl()
-        this.setFakeMarkerOutlet()
+        this.setFakeMarkerEmitter()
         this.setFakeStreamInlet()
         this.setFakeStreamOutlet()
         this.setFakeStreamInfo()
@@ -117,9 +117,9 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         LiblslAdapter.setInstance(this.fakeLiblsl)
     }
 
-    protected static setFakeMarkerOutlet() {
-        LslEventMarkerOutlet.Class = FakeEventMarkerOutlet
-        FakeEventMarkerOutlet.resetTestDouble()
+    protected static setFakeMarkerEmitter() {
+        LslEventMarkerEmitter.Class = FakeEventMarkerEmitter
+        FakeEventMarkerEmitter.resetTestDouble()
     }
 
     protected static setFakeStreamInlet() {

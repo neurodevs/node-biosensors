@@ -1,6 +1,6 @@
 import {
-    EventMarkerOutlet,
-    LslEventMarkerOutlet,
+    EventMarkerEmitter,
+    LslEventMarkerEmitter,
     StreamOutlet,
 } from '@neurodevs/node-lsl'
 import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
@@ -37,7 +37,7 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         this.deviceName = deviceName
         this.options = options
 
-        const { xdfRecordPath, webSocketPortStart, createEventMarkerOutlet } =
+        const { xdfRecordPath, webSocketPortStart, createEventMarkerEmitter } =
             options ?? {}
 
         this.createdDevice = await this.createDeviceByName()
@@ -58,8 +58,8 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
             )
         }
 
-        if (createEventMarkerOutlet) {
-            bundle.markerOutlet = await this.LslEventMarkerOutlet()
+        if (createEventMarkerEmitter) {
+            bundle.emitter = await this.LslEventMarkerEmitter()
         }
 
         return bundle
@@ -90,7 +90,7 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         deviceSpecifications: DeviceSpecification[],
         options?: SessionOptions
     ) {
-        const { xdfRecordPath, webSocketPortStart, createEventMarkerOutlet } =
+        const { xdfRecordPath, webSocketPortStart, createEventMarkerEmitter } =
             options ?? {}
 
         this.deviceSpecifications = deviceSpecifications
@@ -112,8 +112,8 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
             )
         }
 
-        if (createEventMarkerOutlet) {
-            bundle.markerOutlet = await this.LslEventMarkerOutlet()
+        if (createEventMarkerEmitter) {
+            bundle.emitter = await this.LslEventMarkerEmitter()
         }
 
         return bundle
@@ -165,8 +165,8 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         })
     }
 
-    private async LslEventMarkerOutlet() {
-        return LslEventMarkerOutlet.Create()
+    private async LslEventMarkerEmitter() {
+        return LslEventMarkerEmitter.Create()
     }
 }
 
@@ -218,19 +218,19 @@ export interface DeviceSpecification {
 export interface SessionOptions {
     xdfRecordPath?: string
     webSocketPortStart?: number
-    createEventMarkerOutlet?: boolean
+    createEventMarkerEmitter?: boolean
 }
 
 export interface SingleDeviceBundle {
     device: DeviceStreamer
     recorder?: XdfRecorder
     gateway?: WebSocketGateway
-    markerOutlet?: EventMarkerOutlet
+    emitter?: EventMarkerEmitter
 }
 
 export interface MultipleDeviceBundle {
     devices: DeviceStreamer[]
     recorder?: XdfRecorder
     gateway?: WebSocketGateway
-    markerOutlet?: EventMarkerOutlet
+    emitter?: EventMarkerEmitter
 }

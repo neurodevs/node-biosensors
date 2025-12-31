@@ -52,6 +52,7 @@ export default class BiosensorStreamingOrchestratorTest extends AbstractPackageT
                 sessionOptions: {
                     xdfRecordPath: this.xdfRecordPath,
                     webSocketPortStart: this.webSocketPortStart,
+                    createEventMarkerEmitter: false,
                 },
             },
             'Did not create devices with expected options!'
@@ -138,6 +139,22 @@ export default class BiosensorStreamingOrchestratorTest extends AbstractPackageT
             FakeXdfRecorder.numCallsToStop,
             1,
             'Did not stop XDF recorder!'
+        )
+    }
+
+    @test()
+    protected static async createsEventMarkerEmitterIfRequested() {
+        const instance = await this.BiosensorStreamingOrchestrator({
+            eventMarkers: [],
+        })
+
+        await instance.start()
+
+        const call = FakeDeviceFactory.callsToCreateDevices[0]
+
+        assert.isTrue(
+            call.sessionOptions?.createEventMarkerEmitter,
+            'Did not create event marker outlet!'
         )
     }
 
