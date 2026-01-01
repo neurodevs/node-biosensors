@@ -19,7 +19,7 @@ export default class BiosensorStreamingOrchestrator implements StreamingOrchestr
     private factory: DeviceFactory
     private devices!: DeviceStreamer[]
     private recorder?: XdfRecorder
-    private gateway?: WebSocketGateway
+    private gateway!: WebSocketGateway
 
     protected constructor(options: StreamingOrchestratorConstructorOptions) {
         const {
@@ -47,7 +47,7 @@ export default class BiosensorStreamingOrchestrator implements StreamingOrchestr
         await this.initialize()
 
         this.startXdfRecorderIfExists()
-        this.openWebSocketGatewayIfExists()
+        this.openWebSocketGateway()
 
         await this.startStreamingAllDevices()
     }
@@ -57,7 +57,7 @@ export default class BiosensorStreamingOrchestrator implements StreamingOrchestr
 
         this.devices = devices
         this.recorder = recorder
-        this.gateway = gateway
+        this.gateway = gateway!
     }
 
     private async createDeviceBundle() {
@@ -78,8 +78,8 @@ export default class BiosensorStreamingOrchestrator implements StreamingOrchestr
         this.recorder?.start()
     }
 
-    private openWebSocketGatewayIfExists() {
-        this.gateway?.open()
+    private openWebSocketGateway() {
+        this.gateway.open()
     }
 
     private startStreamingAllDevices() {
@@ -100,7 +100,7 @@ export default class BiosensorStreamingOrchestrator implements StreamingOrchestr
     }
 
     private destroyWebSocketGatewayIfExists() {
-        this.gateway?.destroy()
+        this.gateway.destroy()
     }
 
     private stopXdfRecorderIfExists() {
