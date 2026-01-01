@@ -939,6 +939,11 @@
     "@emnapi/runtime" "^1.4.3"
     "@tybys/wasm-util" "^0.10.0"
 
+"@neurodevs/generate-id@1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@neurodevs/generate-id/-/generate-id-1.1.1.tgz#98e5348a04b4db9f5cb04ec9d9133590fce01ffc"
+  integrity sha512-iaNXPTQS7zgfCJ+ExH0AX0YJ8LNugchVFVizljjKxbQex1M5tlNds6EFYix7Ox+qXNcLSozUls/v0g1YdciNeA==
+
 "@neurodevs/generate-id@^1.0.9":
   version "1.0.9"
   resolved "https://registry.yarnpkg.com/@neurodevs/generate-id/-/generate-id-1.0.9.tgz#e73eb0fced505a327dd986596ba017486056cba7"
