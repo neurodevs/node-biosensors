@@ -25,7 +25,7 @@ export default class BiosensorStreamingOrchestrator implements StreamingOrchestr
         const {
             deviceNames,
             xdfRecordPath,
-            webSocketPortStart,
+            webSocketPortStart = 8080,
             eventMarkers,
             factory,
         } = options

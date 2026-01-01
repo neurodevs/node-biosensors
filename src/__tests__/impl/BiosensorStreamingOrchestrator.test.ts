@@ -60,6 +60,23 @@ export default class BiosensorStreamingOrchestratorTest extends AbstractPackageT
     }
 
     @test()
+    protected static async usesDefaultPortIfWssPortStartNotPassed() {
+        const instance = await this.BiosensorStreamingOrchestrator({
+            webSocketPortStart: undefined,
+        })
+
+        await instance.start()
+
+        const call = FakeDeviceFactory.callsToCreateDevices[0]
+
+        assert.isEqual(
+            call.sessionOptions?.webSocketPortStart,
+            8080,
+            'Did not use default WebSocket port start!'
+        )
+    }
+
+    @test()
     protected static async startCallsStartOnXdfStreamRecorderIfExists() {
         await this.start()
 
@@ -71,7 +88,7 @@ export default class BiosensorStreamingOrchestratorTest extends AbstractPackageT
     }
 
     @test()
-    protected static async startCallsOpenOnWebSocketGatewayIfExists() {
+    protected static async startCallsOpenOnWebSocketGateway() {
         await this.start()
 
         assert.isEqual(
