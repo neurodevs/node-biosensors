@@ -1,6 +1,7 @@
 import { LslStreamOutlet, LslStreamInlet } from '@neurodevs/node-lsl'
 
 console.log('Creating outlet...')
+
 const outlet = await LslStreamOutlet.Create({
     name: 'TestOutlet',
     type: 'TEST',
@@ -28,12 +29,15 @@ const inlet = await LslStreamInlet.Create(
 )
 
 console.log('Start pulling...')
-inlet.startPulling()
+
+await inlet.startPulling()
 
 console.log('Waiting for 100 ms...')
+
 await new Promise((resolve) => setTimeout(resolve, 100))
 
 console.log('Pushing samples...')
+
 for (let i = 0; i < 300; i++) {
     const sample = [i, i, i]
     outlet.pushSample(sample)
@@ -43,6 +47,7 @@ for (let i = 0; i < 300; i++) {
 await new Promise((resolve) => setTimeout(resolve, 1000))
 
 console.log('Pushing more samples...')
+
 for (let i = 0; i < 30; i++) {
     const sample = [i, i, i]
     outlet.pushSample(sample)
