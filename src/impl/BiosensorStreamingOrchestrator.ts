@@ -91,7 +91,7 @@ export default class BiosensorStreamingOrchestrator implements StreamingOrchestr
     public async stop() {
         await this.disconnectAllDevices()
 
-        this.destroyWebSocketGatewayIfExists()
+        this.destroyWebSocketGateway()
         this.stopXdfRecorderIfExists()
     }
 
@@ -99,7 +99,7 @@ export default class BiosensorStreamingOrchestrator implements StreamingOrchestr
         return Promise.all(this.devices.map((device) => device.disconnect()))
     }
 
-    private destroyWebSocketGatewayIfExists() {
+    private destroyWebSocketGateway() {
         this.gateway.destroy()
     }
 
