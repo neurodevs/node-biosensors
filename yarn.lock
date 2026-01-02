@@ -984,12 +984,12 @@
   resolved "https://registry.yarnpkg.com/@neurodevs/node-mangled-names/-/node-mangled-names-1.0.1.tgz#165a4ee32879b7ab2019fd7f48c7ca1459332966"
   integrity sha512-tVx8EeO1NWCgo+R5fCuw+CO8r2+HrqFOWuRwJETtianrWFclDNUre4vb5sIryp0o+lyNi96tZ68EigfbftYbYw==
 
-"@neurodevs/node-tdd@0.2.3":
-  version "0.2.3"
-  resolved "https://registry.yarnpkg.com/@neurodevs/node-tdd/-/node-tdd-0.2.3.tgz#c290c10e1bf658bb21f7e540cd232fc4e40d435a"
-  integrity sha512-d/rROaTn+s1aMOMvM7CmA4sITfTTvUYpnNea5xgdeUdwfRye+UR5e0SA+8uq7LI2V2W6o6cZu14tNXV7R0UlEA==
+"@neurodevs/node-tdd@0.2.5":
+  version "0.2.5"
+  resolved "https://registry.yarnpkg.com/@neurodevs/node-tdd/-/node-tdd-0.2.5.tgz#cb9187194cc1b4c7fd2935b450eb591ba76dfc59"
+  integrity sha512-Tfzh/sbY9T1MnA00fU3saDX/Y1ejGDGiQcQ0LnjTt9QfBIorosfz94qSjqC9I2yq5q6jwIyD7pjaxXXJG85RIw==
   dependencies:
-    "@neurodevs/generate-id" "^1.0.9"
+    "@neurodevs/generate-id" "1.1.2"
     "@sprucelabs/jest-json-reporter" "^9.0.71"
     "@sprucelabs/resolve-path-aliases" "^3.0.29"
     "@sprucelabs/test" "^10.0.25"

@@ -60,7 +60,7 @@
   },
   "devDependencies": {
     "@neurodevs/generate-id": "1.1.2",
-    "@neurodevs/node-tdd": "0.2.3",
+    "@neurodevs/node-tdd": "0.2.5",
     "@types/node": "^22.7.7",
     "@types/ws": "^8.18.1",
     "chokidar-cli": "^3.0.0",
