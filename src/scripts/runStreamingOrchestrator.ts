@@ -5,11 +5,11 @@ const orchestrator = await BiosensorStreamingOrchestrator.Create({
     xdfRecordPath: './src/__tests__/test.xdf',
     webSocketPortStart: 8080,
     eventMarkers: [
-        { name: 'test-event-marker-1', waitForMs: 1000 },
-        { name: 'test-event-marker-1', waitForMs: 2000 },
-        { name: 'test-event-marker-1', waitForMs: 3000 },
-        { name: 'test-event-marker-1', waitForMs: 4000 },
-        { name: 'test-event-marker-1', waitForMs: 5000 },
+        { name: 'test-event-marker-1', waitAfterMs: 1000 },
+        { name: 'test-event-marker-1', waitAfterMs: 2000 },
+        { name: 'test-event-marker-1', waitAfterMs: 3000 },
+        { name: 'test-event-marker-1', waitAfterMs: 4000 },
+        { name: 'test-event-marker-1', waitAfterMs: 5000 },
     ],
 })
 
