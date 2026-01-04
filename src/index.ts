@@ -36,6 +36,14 @@ export * from './impl/BiosensorStreamingOrchestrator.js'
 export { default as FakeStreamingOrchestrator } from './testDoubles/StreamingOrchestrator/FakeStreamingOrchestrator.js'
 export * from './testDoubles/StreamingOrchestrator/FakeStreamingOrchestrator.js'
 
+// StreamVisualizer
+
+export { default as BiosensorStreamVisualizer } from './impl/BiosensorStreamVisualizer.js'
+export * from './impl/BiosensorStreamVisualizer.js'
+
+export { default as FakeStreamVisualizer } from './testDoubles/StreamVisualizer/FakeStreamVisualizer.js'
+export * from './testDoubles/StreamVisualizer/FakeStreamVisualizer.js'
+
 // Zephyr BioHarness 3
 
 export { default as ZephyrDeviceStreamer } from './impl/devices/ZephyrDeviceStreamer.js'
