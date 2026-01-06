@@ -1,3 +1,4 @@
+import { FakeEventMarkerEmitter } from '@neurodevs/node-lsl'
 import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 
 import {
@@ -28,6 +29,7 @@ export default class FakeDeviceFactory implements DeviceFactory {
     public static fakeDevice = new FakeDeviceStreamer()
     public static fakeRecorder = new FakeXdfRecorder()
     public static fakeGateway = new FakeWebSocketGateway()
+    public static fakeEmitter = new FakeEventMarkerEmitter()
 
     public constructor() {
         FakeDeviceFactory.numCallsToConstructor++
@@ -42,7 +44,8 @@ export default class FakeDeviceFactory implements DeviceFactory {
             options,
         })
 
-        const { xdfRecordPath, webSocketPortStart } = options ?? {}
+        const { xdfRecordPath, webSocketPortStart, createEventMarkerEmitter } =
+            options ?? {}
 
         const bundle: SingleDeviceBundle = { device: this.fakeDevice }
 
@@ -52,6 +55,10 @@ export default class FakeDeviceFactory implements DeviceFactory {
 
         if (webSocketPortStart) {
             bundle.gateway = this.fakeGateway
+        }
+
+        if (createEventMarkerEmitter) {
+            bundle.emitter = this.fakeEmitter
         }
 
         return bundle
@@ -66,7 +73,8 @@ export default class FakeDeviceFactory implements DeviceFactory {
             sessionOptions,
         })
 
-        const { xdfRecordPath, webSocketPortStart } = sessionOptions ?? {}
+        const { xdfRecordPath, webSocketPortStart, createEventMarkerEmitter } =
+            sessionOptions ?? {}
 
         const createdBundles = await Promise.all(
             deviceSpecifications.map((device) =>
@@ -86,6 +94,10 @@ export default class FakeDeviceFactory implements DeviceFactory {
             bundle.gateway = this.fakeGateway
         }
 
+        if (createEventMarkerEmitter) {
+            bundle.emitter = this.fakeEmitter
+        }
+
         return bundle
     }
 
@@ -99,6 +111,10 @@ export default class FakeDeviceFactory implements DeviceFactory {
 
     public get fakeGateway() {
         return FakeDeviceFactory.fakeGateway
+    }
+
+    public get fakeEmitter() {
+        return FakeDeviceFactory.fakeEmitter
     }
 
     public static resetTestDouble() {

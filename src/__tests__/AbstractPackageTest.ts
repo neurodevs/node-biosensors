@@ -62,7 +62,7 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         this.setFakeBleScanner()
         this.setFakeFTDI()
         this.setFakeLiblsl()
-        this.setFakeMarkerEmitter()
+        this.setFakeEventMarkerEmitter()
         this.setFakeStreamInlet()
         this.setFakeStreamOutlet()
         this.setFakeStreamInfo()
@@ -117,7 +117,7 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         LiblslAdapter.setInstance(this.fakeLiblsl)
     }
 
-    protected static setFakeMarkerEmitter() {
+    protected static setFakeEventMarkerEmitter() {
         LslEventMarkerEmitter.Class = FakeEventMarkerEmitter
         FakeEventMarkerEmitter.resetTestDouble()
     }

@@ -1,4 +1,4 @@
-import { TimedEventMarker } from '@neurodevs/node-lsl'
+import { EventMarkerEmitter, TimedEventMarker } from '@neurodevs/node-lsl'
 import { XdfRecorder } from '@neurodevs/node-xdf'
 
 import BiosensorDeviceFactory, {
@@ -20,6 +20,7 @@ export default class BiosensorStreamingOrchestrator implements StreamingOrchestr
     private devices!: DeviceStreamer[]
     private recorder?: XdfRecorder
     private gateway!: WebSocketGateway
+    private emitter?: EventMarkerEmitter
 
     protected constructor(options: StreamingOrchestratorConstructorOptions) {
         const {
@@ -53,11 +54,13 @@ export default class BiosensorStreamingOrchestrator implements StreamingOrchestr
     }
 
     private async initialize() {
-        const { devices, recorder, gateway } = await this.createDeviceBundle()
+        const { devices, recorder, gateway, emitter } =
+            await this.createDeviceBundle()
 
         this.devices = devices
         this.recorder = recorder
         this.gateway = gateway!
+        this.emitter = emitter
     }
 
     private async createDeviceBundle() {
@@ -91,6 +94,7 @@ export default class BiosensorStreamingOrchestrator implements StreamingOrchestr
     public async stop() {
         await this.disconnectAllDevices()
 
+        this.destroyEventMarkerEmitter()
         this.destroyWebSocketGateway()
         this.stopXdfRecorderIfExists()
     }
@@ -99,8 +103,12 @@ export default class BiosensorStreamingOrchestrator implements StreamingOrchestr
         return Promise.all(this.devices.map((device) => device.disconnect()))
     }
 
+    private destroyEventMarkerEmitter() {
+        this.emitter?.destroy()
+    }
+
     private destroyWebSocketGateway() {
-        this.gateway.destroy()
+        this.gateway?.destroy()
     }
 
     private stopXdfRecorderIfExists() {

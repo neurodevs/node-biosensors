@@ -1,4 +1,5 @@
 import { randomInt } from 'crypto'
+import { FakeEventMarkerEmitter } from '@neurodevs/node-lsl'
 import { test, assert } from '@neurodevs/node-tdd'
 import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 
@@ -21,6 +22,7 @@ export default class BiosensorStreamingOrchestratorTest extends AbstractPackageT
         this.setFakeDevices()
         this.setFakeDeviceFactory()
         this.setFakeWebSocketGateway()
+        this.setFakeEventMarkerEmitter()
 
         this.instance = await this.BiosensorStreamingOrchestrator()
     }
@@ -161,9 +163,7 @@ export default class BiosensorStreamingOrchestratorTest extends AbstractPackageT
 
     @test()
     protected static async createsEventMarkerEmitterIfRequested() {
-        const instance = await this.BiosensorStreamingOrchestrator({
-            eventMarkers: [],
-        })
+        const instance = await this.createWithEventMarkerEmitter()
 
         await instance.start()
 
@@ -172,6 +172,20 @@ export default class BiosensorStreamingOrchestratorTest extends AbstractPackageT
         assert.isTrue(
             call.sessionOptions?.createEventMarkerEmitter,
             'Did not create event marker outlet!'
+        )
+    }
+
+    @test()
+    protected static async stopCallsDestroyOnEventMarkerEmitter() {
+        const instance = await this.createWithEventMarkerEmitter()
+
+        await instance.start()
+        await instance.stop()
+
+        assert.isEqual(
+            FakeEventMarkerEmitter.numCallsToDestroy,
+            1,
+            'Did not destroy event marker emitter!'
         )
     }
 
@@ -196,6 +210,12 @@ export default class BiosensorStreamingOrchestratorTest extends AbstractPackageT
         'Muse S Gen 2',
         'Zephyr BioHarness 3',
     ]
+
+    private static async createWithEventMarkerEmitter() {
+        return await this.BiosensorStreamingOrchestrator({
+            eventMarkers: [],
+        })
+    }
 
     private static async BiosensorStreamingOrchestrator(
         options?: Partial<StreamingOrchestratorConstructorOptions>
