@@ -32,9 +32,6 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
     private ppgChannelChunks = this.generateEmptyPpgMatrix()
     private encoder: TextEncoder
 
-    private totalEeg = 0
-    private totalPpg = 0
-
     protected constructor(options: MuseDeviceStreamerConstructorOptions) {
         const { eegOutlet, ppgOutlet, bleUuid, rssiIntervalMs } = options
 
@@ -184,10 +181,7 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
             sample.push(channelValue)
         }
 
-        if (this.totalEeg % 100 === 0) {
-            this.eegOutlet.pushSample(sample)
-        }
-        this.totalEeg += 1
+        this.eegOutlet.pushSample(sample)
     }
 
     protected resetEegChannelChunks() {
@@ -259,10 +253,7 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
             sample.push(channelValue)
         }
 
-        if (this.totalPpg % 100 === 0) {
-            this.ppgOutlet.pushSample(sample)
-        }
-        this.totalPpg += 1
+        this.ppgOutlet.pushSample(sample)
     }
 
     protected resetPpgChannelChunks() {
