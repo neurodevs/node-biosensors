@@ -187,7 +187,7 @@ export default class CgxDeviceStreamerTest extends AbstractPackageTest {
     @test()
     protected static async createConstructsLslOutletforEEG() {
         assert.isEqualDeep(
-            FakeStreamOutlet.callsToConstructor[0]?.options,
+            FakeStreamOutlet.callsToConstructor[0],
             {
                 sourceId: 'cgx-eeg',
                 name: 'CGX Quick-20r (Cognionics) - EEG',
@@ -248,7 +248,7 @@ export default class CgxDeviceStreamerTest extends AbstractPackageTest {
     @test()
     protected static async createConstructsLslOutletforAccelerometer() {
         assert.isEqualDeep(
-            FakeStreamOutlet.callsToConstructor[1]?.options,
+            FakeStreamOutlet.callsToConstructor[1],
             {
                 sourceId: 'cgx-accel',
                 name: 'CGX Quick-20r (Cognionics) - Accelerometer',

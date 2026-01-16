@@ -68,7 +68,7 @@ export default class MuseDeviceStreamerTest extends AbstractPackageTest {
     protected static async createsLslOutletForEegChannels() {
         const firstCall = FakeStreamOutlet.callsToConstructor[0]
 
-        assert.isEqualDeep(firstCall.options, {
+        assert.isEqualDeep(firstCall, {
             name: 'Muse S Gen 2 EEG',
             type: 'EEG',
             channelNames: this.eegCharNames,
@@ -120,7 +120,7 @@ export default class MuseDeviceStreamerTest extends AbstractPackageTest {
     protected static async createsLslOutletForPpgChannels() {
         const secondCall = FakeStreamOutlet.callsToConstructor[1]
 
-        assert.isEqualDeep(secondCall.options, {
+        assert.isEqualDeep(secondCall, {
             name: 'Muse S Gen 2 PPG',
             type: 'PPG',
             channelNames: this.ppgCharNames,

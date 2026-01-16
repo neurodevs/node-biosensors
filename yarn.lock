@@ -984,6 +984,15 @@
   resolved "https://registry.yarnpkg.com/@neurodevs/node-mangled-names/-/node-mangled-names-1.0.1.tgz#165a4ee32879b7ab2019fd7f48c7ca1459332966"
   integrity sha512-tVx8EeO1NWCgo+R5fCuw+CO8r2+HrqFOWuRwJETtianrWFclDNUre4vb5sIryp0o+lyNi96tZ68EigfbftYbYw==
 
+"@neurodevs/node-runtime-monitors@^0.0.1":
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@neurodevs/node-runtime-monitors/-/node-runtime-monitors-0.0.1.tgz#751c1161a29bd9c453fb5d10d687917c5a0696af"
+  integrity sha512-sW9HfqFqfG0j7ds4wjTlW9GjyrYuxQwHP4RBY92pvHYxVb8peb62U+WTwbAO2PaLQn71WzdrscEP9HGTaupjdA==
+  dependencies:
+    "@quickstat/core" "^0.0.4"
+    "@quickstat/nodejs" "^0.0.4"
+    "@quickstat/prometheus" "^0.0.4"
+
 "@neurodevs/node-tdd@0.2.5":
   version "0.2.5"
   resolved "https://registry.yarnpkg.com/@neurodevs/node-tdd/-/node-tdd-0.2.5.tgz#cb9187194cc1b4c7fd2935b450eb591ba76dfc59"
@@ -1070,6 +1079,25 @@
   version "0.2.9"
   resolved "https://registry.yarnpkg.com/@pkgr/core/-/core-0.2.9.tgz#d229a7b7f9dac167a156992ef23c7f023653f53b"
   integrity sha512-QNqXyfVS2wm9hweSYD2O7F0G06uurj9kZ96TRQE5Y9hU7+tgdZwIkbAKc5Ocy1HxEY2kuDQa6cQ1WRs/O5LFKA==
+
+"@quickstat/core@0.0.4", "@quickstat/core@^0.0.4":
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/@quickstat/core/-/core-0.0.4.tgz#a356d205abaa2847305d35269f00a1e0c65117bf"
+  integrity sha512-irybCMqcy/9GJn9xKAVbPt97bIlbW4XKI1sX50E4jXtS171xhzi5ruTo2QAlMwD5LsPJfe7Owa0iOjKKu06lkw==
+
+"@quickstat/nodejs@^0.0.4":
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/@quickstat/nodejs/-/nodejs-0.0.4.tgz#c945855130212528419c71445315f1490acbef28"
+  integrity sha512-I92h648sPCMzzFEnOAa9p5O+RNxOgVHYy+z2WzV3L72OhAW9d/ute7K58CkpDa2rKN5Wpk/Fg4mGyDf4klpFRQ==
+  dependencies:
+    "@quickstat/core" "0.0.4"
+
+"@quickstat/prometheus@^0.0.4":
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/@quickstat/prometheus/-/prometheus-0.0.4.tgz#c9b15064ad3e8f871d03717752ff206d4e3b72cd"
+  integrity sha512-KSVUrLzUXcZmcN4u/c6f8cWD310o342p+tF2DYEDaxDB4FH4wK9FAkQwRwzlcDGSWvEF+naLe1TmrGuAqZ6+PQ==
+  dependencies:
+    "@quickstat/core" "0.0.4"
 
 "@rtsao/scc@^1.1.0":
   version "1.1.0"

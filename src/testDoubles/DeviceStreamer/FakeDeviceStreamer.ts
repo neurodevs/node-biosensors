@@ -45,7 +45,7 @@ export default class FakeDeviceStreamer implements DeviceStreamer {
 
     public outlets = this.streamQueries.map(
         () =>
-            new FakeStreamOutlet(undefined, {
+            new FakeStreamOutlet({
                 sourceId: FakeDeviceStreamer.fakeSourceId,
                 type: FakeDeviceStreamer.fakeType,
                 name: FakeDeviceStreamer.fakeName,

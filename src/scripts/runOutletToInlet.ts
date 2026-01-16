@@ -17,7 +17,7 @@ const outlet = await LslStreamOutlet.Create({
 console.log('Creating inlet...')
 
 const inletOptions = {
-    info: outlet.info,
+    sourceId: outlet.sourceId,
     chunkSize: 1,
 }
 

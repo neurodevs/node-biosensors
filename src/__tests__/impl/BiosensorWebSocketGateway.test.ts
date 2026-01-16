@@ -26,7 +26,7 @@ export default class BiosensorWebSocketGatewayTest extends AbstractPackageTest {
     @test()
     protected static async createsLslWebSocketBridgeForEachStream() {
         const actual = FakeWebSocketBridge.callsToConstructor.map((call) => ({
-            info: call?.info,
+            sourceId: call?.sourceId,
             chunkSize: call?.chunkSize,
             listenPort: call?.listenPort,
         }))
@@ -207,10 +207,10 @@ export default class BiosensorWebSocketGatewayTest extends AbstractPackageTest {
 
     private static expectedBridgeOptions = this.devices.flatMap((device) => {
         return device.outlets.map((outlet) => {
-            const { info, chunkSize } = outlet
+            const { sourceId, chunkSize } = outlet
 
             return {
-                info,
+                sourceId,
                 chunkSize,
                 listenPort: this.currentListenPort++,
             }
