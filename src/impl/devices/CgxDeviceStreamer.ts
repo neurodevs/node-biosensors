@@ -339,7 +339,6 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
         manufacturer: 'CGX Systems',
         units: 'microvolt',
         chunkSize: 1,
-        maxBufferedMs: 360,
     }
 
     private static readonly accelCharacteristicNames = [
@@ -358,7 +357,6 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
         manufacturer: 'CGX Systems',
         units: 'Unknown',
         chunkSize: 1,
-        maxBufferedMs: 360,
     }
 
     private static createXdfRecorderIfPath(xdfRecordPath?: string) {

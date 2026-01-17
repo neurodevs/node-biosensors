@@ -321,7 +321,6 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
         manufacturer: 'Interaxon Inc.',
         units: 'microvolt',
         chunkSize: 1,
-        maxBufferedMs: 360,
     }
 
     private static readonly ppgOutletOptions = {
@@ -334,7 +333,6 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
         manufacturer: 'Interaxon Inc.',
         units: 'N/A',
         chunkSize: 1,
-        maxBufferedMs: 360,
     }
 
     private readonly bleLocalName = 'MuseS'

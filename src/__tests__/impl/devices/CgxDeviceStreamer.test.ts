@@ -198,7 +198,6 @@ export default class CgxDeviceStreamerTest extends AbstractPackageTest {
                 manufacturer: 'CGX Systems',
                 units: 'microvolt',
                 chunkSize: 1,
-                maxBufferedMs: 360,
             },
             'Should create an LslOutlet!'
         )
@@ -259,7 +258,6 @@ export default class CgxDeviceStreamerTest extends AbstractPackageTest {
                 manufacturer: 'CGX Systems',
                 units: 'Unknown',
                 chunkSize: 1,
-                maxBufferedMs: 360,
             },
             'Should create an LslOutlet for accelerometer!'
         )
