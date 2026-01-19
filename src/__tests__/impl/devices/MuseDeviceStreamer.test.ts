@@ -69,7 +69,7 @@ export default class MuseDeviceStreamerTest extends AbstractPackageTest {
         const firstCall = FakeStreamOutlet.callsToConstructor[0]
 
         assert.isEqualDeep(firstCall, {
-            name: 'Muse S Gen 2 EEG',
+            name: 'Muse EEG',
             type: 'EEG',
             channelNames: this.eegCharNames,
             sampleRateHz: this.eegsampleRateHz,
@@ -120,7 +120,7 @@ export default class MuseDeviceStreamerTest extends AbstractPackageTest {
         const secondCall = FakeStreamOutlet.callsToConstructor[1]
 
         assert.isEqualDeep(secondCall, {
-            name: 'Muse S Gen 2 PPG',
+            name: 'Muse PPG',
             type: 'PPG',
             channelNames: this.ppgCharNames,
             sampleRateHz: this.ppgsampleRateHz,

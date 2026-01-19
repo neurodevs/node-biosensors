@@ -312,7 +312,7 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
     ]
 
     private static readonly eegOutletOptions = {
-        name: 'Muse S Gen 2 EEG',
+        name: 'Muse EEG',
         type: 'EEG',
         channelNames: this.eegCharacteristicNames,
         sampleRateHz: this.eegsampleRateHz,
@@ -324,7 +324,7 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
     }
 
     private static readonly ppgOutletOptions = {
-        name: 'Muse S Gen 2 PPG',
+        name: 'Muse PPG',
         type: 'PPG',
         channelNames: this.ppgCharacteristicNames,
         sampleRateHz: this.ppgsampleRateHz,
