@@ -984,10 +984,10 @@
   resolved "https://registry.yarnpkg.com/@neurodevs/node-mangled-names/-/node-mangled-names-1.0.1.tgz#165a4ee32879b7ab2019fd7f48c7ca1459332966"
   integrity sha512-tVx8EeO1NWCgo+R5fCuw+CO8r2+HrqFOWuRwJETtianrWFclDNUre4vb5sIryp0o+lyNi96tZ68EigfbftYbYw==
 
-"@neurodevs/node-runtime-monitors@^0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@neurodevs/node-runtime-monitors/-/node-runtime-monitors-0.0.1.tgz#751c1161a29bd9c453fb5d10d687917c5a0696af"
-  integrity sha512-sW9HfqFqfG0j7ds4wjTlW9GjyrYuxQwHP4RBY92pvHYxVb8peb62U+WTwbAO2PaLQn71WzdrscEP9HGTaupjdA==
+"@neurodevs/node-runtime-monitors@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@neurodevs/node-runtime-monitors/-/node-runtime-monitors-0.0.2.tgz#ee0ae8044b78054572238149b0b6826c066b3981"
+  integrity sha512-0KRRdRhGfJKZXDX8xxnj6KEo696LfSm2q4ZnOYhmDiOZDI/o9vsOSH3lrqkiZrNA/FPfKfbhgly1q4JPUbDNIQ==
   dependencies:
     "@quickstat/core" "^0.0.4"
     "@quickstat/nodejs" "^0.0.4"
