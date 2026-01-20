@@ -364,7 +364,7 @@ export default class CgxDeviceStreamerTest extends AbstractPackageTest {
         await instance.stopStreaming()
 
         assert.isEqual(
-            FakeXdfRecorder.numCallsToStop,
+            FakeXdfRecorder.numCallsToFinish,
             1,
             'Should call stop on XdfRecorder!'
         )

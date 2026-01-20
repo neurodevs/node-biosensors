@@ -45,7 +45,7 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         const bundle: SingleDeviceBundle = { device: this.createdDevice }
 
         if (xdfRecordPath) {
-            bundle.recorder = this.XdfStreamRecorder(
+            bundle.recorder = await this.XdfStreamRecorder(
                 xdfRecordPath,
                 this.deviceStreamQueries
             )
@@ -99,7 +99,7 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         const bundle: MultipleDeviceBundle = { devices: this.createdDevices }
 
         if (xdfRecordPath) {
-            bundle.recorder = this.XdfStreamRecorder(
+            bundle.recorder = await this.XdfStreamRecorder(
                 xdfRecordPath,
                 this.allStreamQueries
             )

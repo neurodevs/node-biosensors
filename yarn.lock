@@ -939,6 +939,13 @@
     "@emnapi/runtime" "^1.4.3"
     "@tybys/wasm-util" "^0.10.0"
 
+"@neurodevs/fake-node-core@^0.11.1":
+  version "0.11.1"
+  resolved "https://registry.yarnpkg.com/@neurodevs/fake-node-core/-/fake-node-core-0.11.1.tgz#455a1821fee0b9f28545d721a5433206f25d4318"
+  integrity sha512-PgtEaTeKpFi+oFZrigha4XcSVFOJvM2bEszy37x9iLrsjchRBQauawDjfv6HoRmaPGgDzhI6/DVY8ItJh/ZiUw==
+  dependencies:
+    "@neurodevs/generate-id" "1.1.2"
+
 "@neurodevs/generate-id@1.1.2", "@neurodevs/generate-id@^1.0.9":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@neurodevs/generate-id/-/generate-id-1.1.2.tgz#d9c725e8141ef247a40478da3c2d3c784815fad4"
@@ -951,18 +958,7 @@
   dependencies:
     "@abandonware/noble" "^1.9.2-22"
 
-"@neurodevs/node-lsl@^12.0.4":
-  version "12.0.6"
-  resolved "https://registry.yarnpkg.com/@neurodevs/node-lsl/-/node-lsl-12.0.6.tgz#c9a05555853b79ce85a8559c8dcc89905a0e105f"
-  integrity sha512-BC51bZiTcZweSdNt5KvMSH0NIXvavkVve5B5aOGHbgjTAqpDXZ33z0oVsBLg/TMbBLJsiqrqrtM7Q1f6BNYNOg==
-  dependencies:
-    "@neurodevs/generate-id" "^1.0.9"
-    ffi-rs "^1.0.98"
-    node-gyp "^10.2.0"
-    ref-array-napi "^1.2.2"
-    ref-napi "^3.0.3"
-
-"@neurodevs/node-lsl@^17.1.1":
+"@neurodevs/node-lsl@^17.1.0", "@neurodevs/node-lsl@^17.1.1":
   version "17.1.1"
   resolved "https://registry.yarnpkg.com/@neurodevs/node-lsl/-/node-lsl-17.1.1.tgz#60c2bae046a11a3e02b997813bc5eb043138a0d4"
   integrity sha512-rVpXSc9Bll+EgYhD4pswVkzds8Zu+cxsWO5juIQBRZ/Qy7IEOKeIFMYISrx/Tv9heq5mbLlm5WaHU5NizYsfRQ==
@@ -999,12 +995,13 @@
     "@sprucelabs/test" "^10.0.25"
     "@sprucelabs/test-utils" "^6.0.117"
 
-"@neurodevs/node-xdf@^1.4.6":
-  version "1.4.6"
-  resolved "https://registry.yarnpkg.com/@neurodevs/node-xdf/-/node-xdf-1.4.6.tgz#5fa520e9eef33aa9e8bc75e909627a5d7717593a"
-  integrity sha512-EgL7zput9s/WPSq4jl/Im6gwAWDpq18mm/6RrwMAjB5EslV0xLLGqmUvt8SVYLaLGthB4yyWcBzGTo8CVVE0zg==
+"@neurodevs/node-xdf@^3.0.2":
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/@neurodevs/node-xdf/-/node-xdf-3.0.2.tgz#4f6b528379debfaa928d5e49b1701c324a1e52e9"
+  integrity sha512-YxeHR3w6b8bEkEvr6yvukA51qEl9PHDnLL+lkKZX3LFF1ajKjIZbg4cycrsWkDC30+EtjfvsQSavQsn4xA52mw==
   dependencies:
-    "@neurodevs/node-lsl" "^12.0.4"
+    "@neurodevs/fake-node-core" "^0.11.1"
+    "@neurodevs/node-lsl" "^17.1.0"
     "@neurodevs/node-mangled-names" "^1.0.1"
     ffi-rs "^1.0.98"
 
@@ -4859,7 +4856,7 @@ node-gyp-build@^4.2.1, node-gyp-build@^4.5.0, node-gyp-build@^4.8.4:
   resolved "https://registry.yarnpkg.com/node-gyp-build/-/node-gyp-build-4.8.4.tgz#8a70ee85464ae52327772a90d66c6077a900cfc8"
   integrity sha512-LA4ZjwlnUblHVgq0oBF3Jl/6h/Nvs5fzBLwdEF4nuxnFdsfajde4WfxtJr3CaiH+F6ewcIB/q4jQ4UzPyid+CQ==
 
-node-gyp@^10.0.1, node-gyp@^10.2.0:
+node-gyp@^10.0.1:
   version "10.3.1"
   resolved "https://registry.yarnpkg.com/node-gyp/-/node-gyp-10.3.1.tgz#1dd1a1a1c6c5c59da1a76aea06a062786b2c8a1a"
   integrity sha512-Pp3nFHBThHzVtNY7U6JfPjvT/DTE8+o/4xKsLQtBoU+j2HLsGlhcfzflAoUreaJbNmYnX+LlLi0qjV8kpyO6xQ==
@@ -5844,9 +5841,9 @@ tar@^6.1.11, tar@^6.2.1:
     yallist "^4.0.0"
 
 tar@^7.5.2:
-  version "7.5.3"
-  resolved "https://registry.yarnpkg.com/tar/-/tar-7.5.3.tgz#e1a41236e32446f75e63b720222112c4ffe5b3a1"
-  integrity sha512-ENg5JUHUm2rDD7IvKNFGzyElLXNjachNLp6RaGf4+JOgxXHkqA+gq81ZAMCUmtMtqBsoU62lcp6S27g1LCYGGQ==
+  version "7.5.4"
+  resolved "https://registry.yarnpkg.com/tar/-/tar-7.5.4.tgz#18b53b44f939a7e03ed874f1fafe17d29e306c81"
+  integrity sha512-AN04xbWGrSTDmVwlI4/GTlIIwMFk/XEv7uL8aa57zuvRy6s4hdBed+lVq2fAZ89XDa7Us3ANXcE3Tvqvja1kTA==
   dependencies:
     "@isaacs/fs-minipass" "^4.0.0"
     chownr "^3.0.0"

@@ -16,4 +16,4 @@ await new Promise((resolve) => {
 
 await device.disconnect()
 
-recorder?.stop()
+recorder?.finish()

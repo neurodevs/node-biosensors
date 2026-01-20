@@ -112,7 +112,7 @@ export default class BiosensorStreamingOrchestrator implements StreamingOrchestr
     }
 
     private stopXdfRecorderIfExists() {
-        this.recorder?.stop()
+        this.recorder?.finish()
     }
 
     private static BiosensorDeviceFactory() {

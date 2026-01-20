@@ -155,7 +155,7 @@ export default class BiosensorStreamingOrchestratorTest extends AbstractPackageT
         await this.startThenStop()
 
         assert.isEqual(
-            FakeXdfRecorder.numCallsToStop,
+            FakeXdfRecorder.numCallsToFinish,
             1,
             'Did not stop XDF recorder!'
         )

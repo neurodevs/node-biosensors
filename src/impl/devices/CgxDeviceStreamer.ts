@@ -48,7 +48,7 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
         const eegOutlet = await this.EegOutlet()
         const accelOutlet = await this.AccelOutlet()
 
-        const xdfRecorder = this.createXdfRecorderIfPath(xdfRecordPath)
+        const xdfRecorder = await this.createXdfRecorderIfPath(xdfRecordPath)
 
         return new (this.Class ?? this)({
             eegOutlet,
@@ -260,7 +260,7 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
 
     private stopXdfRecorderIfDefined() {
         if (this.xdfRecorder) {
-            this.xdfRecorder.stop()
+            this.xdfRecorder.finish()
         }
     }
 
