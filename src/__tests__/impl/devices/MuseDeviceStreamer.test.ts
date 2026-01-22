@@ -96,7 +96,7 @@ export default class MuseDeviceStreamerTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async ignoresFirstTwoEegSamplesThatAreTimestamps() {
+    protected static async ignoresFirstTwoEegSamplesThatAreCounters() {
         const increasingData = this.createIncreasingData(this.eegChunkSize)
 
         const increasingBuffer = Buffer.from(increasingData)
@@ -105,7 +105,7 @@ export default class MuseDeviceStreamerTest extends AbstractPackageTest {
         assert.isEqualDeep(
             this.firstCallToPushSample,
             [2, 2, 2, 2, 2],
-            'Should ignore the first two EEG samples that are timestamps!'
+            'Did not ignore the first two EEG samples!'
         )
     }
 
@@ -148,7 +148,7 @@ export default class MuseDeviceStreamerTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async ignoresFirstTwoPpgSamplesThatAreTimestamps() {
+    protected static async ignoresFirstTwoPpgSamplesThatAreCounters() {
         const increasingData = Array(this.ppgChunkSize)
             .fill(0)
             .map((_, i) => i)
@@ -159,7 +159,7 @@ export default class MuseDeviceStreamerTest extends AbstractPackageTest {
         assert.isEqualDeep(
             this.firstCallToPushSample,
             [131844, 131844, 131844],
-            'Should ignore the first two EEG samples that are timestamps!'
+            'Did not ignore the first two PPG samples!'
         )
     }
 
