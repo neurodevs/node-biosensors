@@ -172,20 +172,19 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
     }
 
     private createAndPushEegSample(chunkIdx: number) {
-        let sample: number[] = []
-
-        for (let i = 0; i < this.eegNumChannels; i++) {
-            const channelIdx = i
-            const channelValue = this.eegChannelChunks[channelIdx][chunkIdx]
-
-            sample.push(channelValue)
-        }
+        const sample = this.eegChannelChunks.map(
+            (channelChunk) => channelChunk[chunkIdx]
+        )
 
         this.eegOutlet.pushSample(sample)
     }
 
     protected resetEegChannelChunks() {
         this.eegChannelChunks = this.generateEmptyEegMatrix()
+    }
+
+    private generateEmptyEegMatrix() {
+        return this.generateEmptyMatrix(this.eegNumChannels, this.eegChunkSize)
     }
 
     private generatePpgCallbacks() {
@@ -260,6 +259,10 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
         this.ppgChannelChunks = this.generateEmptyPpgMatrix()
     }
 
+    private generateEmptyPpgMatrix() {
+        return this.generateEmptyMatrix(this.ppgNumChannels, this.ppgChunkSize)
+    }
+
     public get outlets() {
         return [this.eegOutlet, this.ppgOutlet]
     }
@@ -276,14 +279,6 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
 
     private get bleController() {
         return this.bleConnector!.getBleController()
-    }
-
-    private generateEmptyEegMatrix() {
-        return this.generateEmptyMatrix(this.eegNumChannels, this.eegChunkSize)
-    }
-
-    private generateEmptyPpgMatrix() {
-        return this.generateEmptyMatrix(this.ppgNumChannels, this.ppgChunkSize)
     }
 
     private generateEmptyMatrix(rows: number, columns: number) {
