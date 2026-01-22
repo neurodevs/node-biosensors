@@ -11,6 +11,7 @@ import {
     StreamOutlet,
     StreamOutletOptions,
     LslStreamOutlet,
+    LiblslAdapter,
 } from '@neurodevs/node-lsl'
 
 import {
@@ -31,6 +32,11 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
     private eegChannelChunks = this.generateEmptyEegMatrix()
     private ppgChannelChunks = this.generateEmptyPpgMatrix()
     private encoder: TextEncoder
+
+    private currentEegTimestamp!: number
+    private currentPpgTimestamp!: number
+
+    private lsl = LiblslAdapter.getInstance()
 
     protected constructor(options: MuseDeviceStreamerConstructorOptions) {
         const { eegOutlet, ppgOutlet, bleUuid, rssiIntervalMs } = options
@@ -145,14 +151,22 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
     }
 
     protected handleEegChannelChunk(data: Buffer, char: Characteristic) {
+        if (this.isFirstEegChannel(char.uuid)) {
+            this.currentEegTimestamp = this.lsl.localClock()
+        }
+
+        const charIdx = this.getEegChannelIdx(char.uuid)
         const channelValuesForChunk = Array.from(data).slice(2)
-        const channelIdx = this.getEegChannelIdx(char.uuid)
 
-        this.eegChannelChunks[channelIdx] = channelValuesForChunk
+        this.eegChannelChunks[charIdx] = channelValuesForChunk
 
-        if (this.isLastEegChannel(channelIdx)) {
+        if (this.isLastEegChannel(charIdx)) {
             this.pushEegSamples()
         }
+    }
+
+    private isFirstEegChannel(charUuid: string) {
+        return charUuid === '273e00034c4d454d96bef03bac821358'
     }
 
     private getEegChannelIdx(charUuid: string) {
@@ -176,7 +190,10 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
             (channelChunk) => channelChunk[chunkIdx]
         )
 
-        this.eegOutlet.pushSample(sample)
+        this.eegOutlet.pushSample(
+            sample,
+            this.currentEegTimestamp + chunkIdx / this.eegSampleRateHz
+        )
     }
 
     protected resetEegChannelChunks() {
@@ -198,19 +215,27 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
     }
 
     protected handlePpgChannelChunk(data: Buffer, char: SimpleCharacteristic) {
+        if (this.isFirstPpgChannel(char.uuid)) {
+            this.currentPpgTimestamp = this.lsl.localClock()
+        }
+
+        const charIdx = this.getPpgCharIdx(char.uuid)
         const channelValuesForChunk = Array.from(data).slice(2)
-        const channelIdx = this.getPpgChannelIdx(char.uuid)
 
-        const decoded = this.decodeUnsigned24BitData(channelValuesForChunk)
+        this.ppgChannelChunks[charIdx] = this.decodeUnsigned24BitData(
+            channelValuesForChunk
+        )
 
-        this.ppgChannelChunks[channelIdx] = decoded
-
-        if (this.isLastPpgChannel(channelIdx)) {
+        if (this.isLastPpgChannel(charIdx)) {
             this.pushPpgSamples()
         }
     }
 
-    private getPpgChannelIdx(charUuid: string) {
+    private isFirstPpgChannel(charUuid: string) {
+        return charUuid === '273e000f4c4d454d96bef03bac821358'
+    }
+
+    private getPpgCharIdx(charUuid: string) {
         return this.ppgCharUuids.indexOf(charUuid)
     }
 
@@ -252,7 +277,10 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
             sample.push(channelValue)
         }
 
-        this.ppgOutlet.pushSample(sample)
+        this.ppgOutlet.pushSample(
+            sample,
+            this.currentPpgTimestamp + chunkIdx / this.ppgSampleRateHz
+        )
     }
 
     protected resetPpgChannelChunks() {
@@ -287,10 +315,18 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
         ) as number[][]
     }
 
+    private get eegSampleRateHz() {
+        return MuseDeviceStreamer.eegSampleRateHz
+    }
+
+    private get ppgSampleRateHz() {
+        return MuseDeviceStreamer.ppgSampleRateHz
+    }
+
     private static readonly eegChunkSize = 12
-    private static readonly eegsampleRateHz = 256
+    private static readonly eegSampleRateHz = 256
     private static readonly ppgChunkSize = 6
-    private static readonly ppgsampleRateHz = 64
+    private static readonly ppgSampleRateHz = 64
 
     private static readonly eegCharacteristicNames = [
         'EEG_TP9',
@@ -310,7 +346,7 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
         name: 'Muse EEG',
         type: 'EEG',
         channelNames: this.eegCharacteristicNames,
-        sampleRateHz: this.eegsampleRateHz,
+        sampleRateHz: this.eegSampleRateHz,
         channelFormat: 'float32' as ChannelFormat,
         sourceId: 'muse-eeg',
         manufacturer: 'Interaxon Inc.',
@@ -322,7 +358,7 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
         name: 'Muse PPG',
         type: 'PPG',
         channelNames: this.ppgCharacteristicNames,
-        sampleRateHz: this.ppgsampleRateHz,
+        sampleRateHz: this.ppgSampleRateHz,
         channelFormat: 'float32' as ChannelFormat,
         sourceId: 'muse-s-ppg',
         manufacturer: 'Interaxon Inc.',

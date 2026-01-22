@@ -236,8 +236,8 @@ export default class CgxDeviceStreamerTest extends AbstractPackageTest {
 
         assert.isEqualDeep(
             [
-                FakeStreamOutlet.callsToPushSample[0],
-                FakeStreamOutlet.callsToPushSample[2],
+                FakeStreamOutlet.callsToPushSample[0].sample,
+                FakeStreamOutlet.callsToPushSample[2].sample,
             ],
             [eegData, eegData],
             'Should push EEG data to LSL outlet!'
@@ -297,8 +297,8 @@ export default class CgxDeviceStreamerTest extends AbstractPackageTest {
 
         assert.isEqualDeep(
             [
-                FakeStreamOutlet.callsToPushSample[1],
-                FakeStreamOutlet.callsToPushSample[3],
+                FakeStreamOutlet.callsToPushSample[1].sample,
+                FakeStreamOutlet.callsToPushSample[3].sample,
             ],
             [accelData, accelData],
             'Should push EEG data to LSL outlet!'

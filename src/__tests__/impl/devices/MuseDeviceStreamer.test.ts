@@ -72,7 +72,7 @@ export default class MuseDeviceStreamerTest extends AbstractPackageTest {
             name: 'Muse EEG',
             type: 'EEG',
             channelNames: this.eegCharNames,
-            sampleRateHz: this.eegsampleRateHz,
+            sampleRateHz: this.eegSampleRateHz,
             channelFormat: 'float32',
             sourceId: 'muse-eeg',
             manufacturer: 'Interaxon Inc.',
@@ -89,9 +89,28 @@ export default class MuseDeviceStreamerTest extends AbstractPackageTest {
         const expected = Array(this.eegChunkSize).fill(emptySample)
 
         assert.isEqualDeep(
-            this.callsToPushSample,
+            this.callsToPushSample.map((call) => call.sample),
             expected,
             'Should push an EEG sample for each chunk!'
+        )
+    }
+
+    @test()
+    protected static async outletPushesTimestampsForEachEegChunk() {
+        const sample = Array(this.eegSize).fill(0) as number[]
+        this.simulateEegForChars(Buffer.from(sample))
+
+        const firstTimestamp = this.callsToPushSample[0].timestamp!
+
+        const expectedTimestamps = Array.from(
+            { length: this.eegChunkSize },
+            (_, i) => firstTimestamp + i / this.eegSampleRateHz
+        )
+
+        assert.isEqualDeep(
+            this.callsToPushSample.map((call) => call.timestamp),
+            expectedTimestamps,
+            'Should push a timestamp for each EEG chunk!'
         )
     }
 
@@ -103,7 +122,7 @@ export default class MuseDeviceStreamerTest extends AbstractPackageTest {
         this.simulateEegForChars(increasingBuffer)
 
         assert.isEqualDeep(
-            this.firstCallToPushSample,
+            this.firstCallToPushSample.sample,
             [2, 2, 2, 2, 2],
             'Did not ignore the first two EEG samples!'
         )
@@ -123,7 +142,7 @@ export default class MuseDeviceStreamerTest extends AbstractPackageTest {
             name: 'Muse PPG',
             type: 'PPG',
             channelNames: this.ppgCharNames,
-            sampleRateHz: this.ppgsampleRateHz,
+            sampleRateHz: this.ppgSampleRateHz,
             channelFormat: 'float32',
             sourceId: 'muse-s-ppg',
             manufacturer: 'Interaxon Inc.',
@@ -141,9 +160,28 @@ export default class MuseDeviceStreamerTest extends AbstractPackageTest {
         const ppgSamples = this.generatePpgSamples(decoded)
 
         assert.isEqualDeep(
-            this.callsToPushSample,
+            this.callsToPushSample.map((call) => call.sample),
             ppgSamples,
             'Should push a PPG sample for each chunk!'
+        )
+    }
+
+    @test()
+    protected static async outletPushesTimestampsForEachPpgChunk() {
+        const sample = Array(this.ppgSize).fill(0) as number[]
+        this.simulatePpgForChars(Buffer.from(sample))
+
+        const firstTimestamp = this.callsToPushSample[0].timestamp!
+
+        const expectedTimestamps = Array.from(
+            { length: this.ppgChunkSize },
+            (_, i) => firstTimestamp + i / this.ppgSampleRateHz
+        )
+
+        assert.isEqualDeep(
+            this.callsToPushSample.map((call) => call.timestamp),
+            expectedTimestamps,
+            'Should push a timestamp for each PPG chunk!'
         )
     }
 
@@ -157,7 +195,7 @@ export default class MuseDeviceStreamerTest extends AbstractPackageTest {
         this.simulatePpgForChars(increasingBuffer)
 
         assert.isEqualDeep(
-            this.firstCallToPushSample,
+            this.firstCallToPushSample.sample,
             [131844, 131844, 131844],
             'Did not ignore the first two PPG samples!'
         )
@@ -192,7 +230,7 @@ export default class MuseDeviceStreamerTest extends AbstractPackageTest {
         const ppgSamples = this.generatePpgSamples(decoded)
 
         assert.isEqualDeep(
-            this.callsToPushSample,
+            this.callsToPushSample.map((call) => call.sample),
             ppgSamples,
             'Should push a PPG sample for each chunk!'
         )
@@ -493,14 +531,14 @@ export default class MuseDeviceStreamerTest extends AbstractPackageTest {
     private static readonly controlUuid: string = CHAR_UUIDS.CONTROL
     private static readonly numTimestamps = 2
 
-    private static readonly eegsampleRateHz = 256
+    private static readonly eegSampleRateHz = 256
     private static readonly eegChunkSize = 12
     private static readonly eegSize = this.numTimestamps + this.eegChunkSize
     private static readonly emptyEegChunk = Array(this.eegSize).fill(0)
     private static readonly emptyEegBuffer = Buffer.from(this.emptyEegChunk)
     private static readonly eegNumChannels = this.eegCharNames.length
 
-    private static readonly ppgsampleRateHz = 64
+    private static readonly ppgSampleRateHz = 64
     private static readonly ppgChunkSize = 6
     private static readonly bytesPerSample = 3
     private static readonly ppgBytes = this.bytesPerSample * this.ppgChunkSize
