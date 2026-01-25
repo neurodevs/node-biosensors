@@ -34,6 +34,19 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
     private packet!: Uint8Array<ArrayBufferLike>
     private packetCounter!: number
 
+    private readonly readTimeoutMs = 1000
+    private readonly writeTimeoutMs = 1000
+    private readonly latencyTimerMs = 4
+    private readonly bytesPerSample = 78
+    private readonly baudRate = 1000000
+    private readonly seventeenInHex = 0x11
+    private readonly nineteenInHex = 0x13
+    private readonly ftdiFlowControlMode = FTDI.FT_FLOW_RTS_CTS
+    private readonly ftdiReadBuffer = FTDI.FT_PURGE_RX
+    private readonly eightDataBits = FTDI.FT_BITS_8
+    private readonly oneStopBit = FTDI.FT_STOP_BITS_1
+    private readonly noParityBit = FTDI.FT_PARITY_NONE
+
     protected constructor(options: CgxDeviceStreamerConstructorOptions) {
         const { eegOutlet, accelOutlet, xdfRecorder } = options
 
@@ -59,16 +72,14 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
     }
 
     public async startStreaming() {
-        this.startXdfRecorderIfDefined()
+        this.startXdfRecorderIfExists()
 
         await this.connectFtdi()
         await this.startReadingPackets()
     }
 
-    private startXdfRecorderIfDefined() {
-        if (this.xdfRecorder) {
-            this.xdfRecorder.start()
-        }
+    private startXdfRecorderIfExists() {
+        this.xdfRecorder?.start()
     }
 
     private async connectFtdi() {
@@ -255,13 +266,11 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
     }
 
     public async stopStreaming() {
-        this.stopXdfRecorderIfDefined()
+        this.finishXdfRecorderIfExists()
     }
 
-    private stopXdfRecorderIfDefined() {
-        if (this.xdfRecorder) {
-            this.xdfRecorder.finish()
-        }
+    private finishXdfRecorderIfExists() {
+        this.xdfRecorder?.finish()
     }
 
     public async disconnect() {}
@@ -270,7 +279,9 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
         return [this.eegOutlet, this.accelOutlet]
     }
 
-    public readonly streamQueries = CgxDeviceStreamer.streamQueries
+    public get streamQueries() {
+        return CgxDeviceStreamer.streamQueries
+    }
 
     private get headerByte() {
         return this.packet[0]
@@ -291,19 +302,6 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
     private get FTDI() {
         return CgxDeviceStreamer.FTDI
     }
-
-    private readonly readTimeoutMs = 1000
-    private readonly writeTimeoutMs = 1000
-    private readonly latencyTimerMs = 4
-    private readonly bytesPerSample = 78
-    private readonly baudRate = 1000000
-    private readonly seventeenInHex = 0x11
-    private readonly nineteenInHex = 0x13
-    private readonly ftdiFlowControlMode = FTDI.FT_FLOW_RTS_CTS
-    private readonly ftdiReadBuffer = FTDI.FT_PURGE_RX
-    private readonly eightDataBits = FTDI.FT_BITS_8
-    private readonly oneStopBit = FTDI.FT_STOP_BITS_1
-    private readonly noParityBit = FTDI.FT_PARITY_NONE
 
     private static readonly eegCharacteristicNames = [
         'F7',
