@@ -373,12 +373,27 @@ export default class CgxDeviceStreamerTest extends AbstractPackageTest {
     @test()
     protected static async disconnectCallsFinishOnXdfRecorder() {
         const instance = await this.createStreamerWithRecorder()
+        await instance.startStreaming()
         await instance.disconnect()
 
         assert.isEqual(
             FakeXdfRecorder.numCallsToFinish,
             1,
             'Should call finish on XdfRecorder!'
+        )
+    }
+
+    @test()
+    protected static async disconnectReturnsEarlyIfNotRunning() {
+        const instance = await this.createStreamerWithRecorder()
+        await instance.startStreaming()
+        await instance.disconnect()
+        await instance.disconnect()
+
+        assert.isEqual(
+            FakeXdfRecorder.numCallsToFinish,
+            1,
+            'Should not call finish on XdfRecorder!'
         )
     }
 

@@ -72,6 +72,7 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
     }
 
     public async startStreaming() {
+        this.isRunning = true
         this.startXdfRecorderIfExists()
 
         await this.connectFtdi()
@@ -157,8 +158,6 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
     }
 
     private async startReadingPackets() {
-        this.isRunning = true
-
         while (this.isRunning) {
             try {
                 await this.readPacket()
@@ -274,7 +273,10 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
     }
 
     public async disconnect() {
-        await this.stopStreaming()
+        if (this.isRunning) {
+            await this.stopStreaming()
+            this.isRunning = false
+        }
     }
 
     public get outlets() {
