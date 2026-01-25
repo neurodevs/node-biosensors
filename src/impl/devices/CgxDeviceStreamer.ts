@@ -273,7 +273,9 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
         this.xdfRecorder?.finish()
     }
 
-    public async disconnect() {}
+    public async disconnect() {
+        await this.stopStreaming()
+    }
 
     public get outlets() {
         return [this.eegOutlet, this.accelOutlet]
