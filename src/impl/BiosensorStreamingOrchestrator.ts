@@ -19,7 +19,7 @@ export default class BiosensorStreamingOrchestrator implements StreamingOrchestr
     private factory: DeviceFactory
     private devices!: DeviceStreamer[]
     private recorder?: XdfRecorder
-    private gateway!: WebSocketGateway
+    private gateway?: WebSocketGateway
     private emitter?: EventMarkerEmitter
 
     protected constructor(options: StreamingOrchestratorConstructorOptions) {
@@ -50,7 +50,7 @@ export default class BiosensorStreamingOrchestrator implements StreamingOrchestr
         this.startXdfRecorderIfExists()
         this.openWebSocketGatewayIfExists()
 
-        await this.startStreamingAllDevices()
+        await this.startStreamingDevices()
     }
 
     private async initialize() {
@@ -59,7 +59,7 @@ export default class BiosensorStreamingOrchestrator implements StreamingOrchestr
 
         this.devices = devices
         this.recorder = recorder
-        this.gateway = gateway!
+        this.gateway = gateway
         this.emitter = emitter
     }
 
@@ -85,32 +85,33 @@ export default class BiosensorStreamingOrchestrator implements StreamingOrchestr
         this.gateway?.open()
     }
 
-    private startStreamingAllDevices() {
+    private startStreamingDevices() {
         return Promise.all(
             this.devices.map((device) => device.startStreaming())
         )
     }
 
     public async stop() {
-        await this.disconnectAllDevices()
-        this.destroyEventMarkerEmitter()
-        this.destroyWebSocketGateway()
-        this.stopXdfRecorderIfExists()
+        await this.disconnectDevices()
+
+        this.destroyEmitterIfExists()
+        this.destroyGatewayIfExists()
+        this.finishRecorderIfExists()
     }
 
-    private async disconnectAllDevices() {
+    private async disconnectDevices() {
         return Promise.all(this.devices.map((device) => device.disconnect()))
     }
 
-    private destroyEventMarkerEmitter() {
+    private destroyEmitterIfExists() {
         this.emitter?.destroy()
     }
 
-    private destroyWebSocketGateway() {
+    private destroyGatewayIfExists() {
         this.gateway?.destroy()
     }
 
-    private stopXdfRecorderIfExists() {
+    private finishRecorderIfExists() {
         this.recorder?.finish()
     }
 
