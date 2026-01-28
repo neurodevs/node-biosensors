@@ -63,6 +63,8 @@
     "@neurodevs/generate-id": "1.1.2",
     "@neurodevs/ndx-native": "^0.1.0",
     "@neurodevs/node-tdd": "0.2.5",
+    "@regressionproof/cli": "^0.8.0",
+    "@regressionproof/jest-reporter": "^0.8.0",
     "@types/node": "^22.7.7",
     "@types/ws": "^8.18.1",
     "chokidar-cli": "^3.0.0",
@@ -91,7 +93,11 @@
     ],
     "moduleNameMapper": {
       "^#spruce/(.*)$": "<rootDir>/build/.spruce/$1"
-    }
+    },
+    "reporters": [
+      "default",
+      "@regressionproof/jest-reporter"
+    ]
   },
   "skill": {
     "namespace": "node-biosensors"
