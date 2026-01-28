@@ -1,3 +1,4 @@
+import { FakeLiblsl, LiblslAdapter } from '@neurodevs/ndx-native'
 import {
     BleDeviceController,
     FakeBleController,
@@ -19,8 +20,6 @@ import {
     LslWebSocketBridge,
     FakeWebSocketBridge,
     FakeWebSocketServer,
-    FakeLiblsl,
-    LiblslAdapter,
     LslEventMarkerEmitter,
     FakeEventMarkerEmitter,
 } from '@neurodevs/node-lsl'

@@ -4,13 +4,6 @@ const orchestrator = await BiosensorStreamingOrchestrator.Create({
     deviceNames: ['Muse S Gen 2'],
     xdfRecordPath: './src/__tests__/test.xdf',
     webSocketPortStart: 8080,
-    eventMarkers: [
-        { name: 'test-event-marker-1', waitAfterMs: 1000 },
-        { name: 'test-event-marker-1', waitAfterMs: 2000 },
-        { name: 'test-event-marker-1', waitAfterMs: 3000 },
-        { name: 'test-event-marker-1', waitAfterMs: 4000 },
-        { name: 'test-event-marker-1', waitAfterMs: 5000 },
-    ],
 })
 
 await orchestrator.start()
@@ -18,8 +11,10 @@ await orchestrator.start()
 console.log('Biosensor streaming orchestrator started successfully.')
 
 await new Promise((resolve) => {
-    setTimeout(resolve, 30 * 1000)
+    setTimeout(resolve, 5 * 1000)
 })
+
+console.log('Stopping biosensor streaming orchestrator...')
 
 await orchestrator.stop()
 

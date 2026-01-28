@@ -7,11 +7,8 @@
 // 75: Battery voltage (value: 0–255)
 // 76-77: Trigger (value: 0–255)
 
-import {
-    ChannelFormat,
-    StreamOutlet,
-    LslStreamOutlet,
-} from '@neurodevs/node-lsl'
+import { ChannelFormat } from '@neurodevs/ndx-native'
+import { StreamOutlet, LslStreamOutlet } from '@neurodevs/node-lsl'
 import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 import FTDI from 'ftdi-d2xx'
 

@@ -1,5 +1,6 @@
 import generateId from '@neurodevs/generate-id'
-import { ChannelFormat, FakeStreamOutlet } from '@neurodevs/node-lsl'
+import { ChannelFormat } from '@neurodevs/ndx-native'
+import { FakeStreamOutlet } from '@neurodevs/node-lsl'
 
 import {
     DeviceStreamer,

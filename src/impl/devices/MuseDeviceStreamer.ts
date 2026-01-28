@@ -1,4 +1,6 @@
-import { TextEncoder } from 'util'
+import { TextEncoder } from 'node:util'
+
+import { LiblslAdapter, ChannelFormat } from '@neurodevs/ndx-native'
 import {
     SimpleCharacteristic,
     Characteristic,
@@ -7,11 +9,9 @@ import {
     BleDeviceConnector,
 } from '@neurodevs/node-ble'
 import {
-    ChannelFormat,
     StreamOutlet,
     StreamOutletOptions,
     LslStreamOutlet,
-    LiblslAdapter,
 } from '@neurodevs/node-lsl'
 
 import {
