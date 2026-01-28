@@ -26,7 +26,7 @@ export default class BiosensorStreamingOrchestrator implements StreamingOrchestr
         const {
             deviceNames,
             xdfRecordPath,
-            webSocketPortStart = 8080,
+            webSocketPortStart,
             eventMarkers,
             factory,
         } = options
@@ -48,7 +48,7 @@ export default class BiosensorStreamingOrchestrator implements StreamingOrchestr
         await this.initialize()
 
         this.startXdfRecorderIfExists()
-        this.openWebSocketGateway()
+        this.openWebSocketGatewayIfExists()
 
         await this.startStreamingAllDevices()
     }
@@ -81,8 +81,8 @@ export default class BiosensorStreamingOrchestrator implements StreamingOrchestr
         this.recorder?.start()
     }
 
-    private openWebSocketGateway() {
-        this.gateway.open()
+    private openWebSocketGatewayIfExists() {
+        this.gateway?.open()
     }
 
     private startStreamingAllDevices() {
@@ -93,7 +93,6 @@ export default class BiosensorStreamingOrchestrator implements StreamingOrchestr
 
     public async stop() {
         await this.disconnectAllDevices()
-
         this.destroyEventMarkerEmitter()
         this.destroyWebSocketGateway()
         this.stopXdfRecorderIfExists()
