@@ -6,6 +6,7 @@ export default class FakeDeviceFTDI {
     public static callsToSetDataCharacteristics: CallToSetDataChars[] = []
     public static callsToSetLatencyTimer: number[] = []
     public static callsToRead: number[] = []
+    public static callsToWrite: Uint8Array[] = []
 
     public static fakeReadPackets?: Uint8Array[]
 
@@ -61,6 +62,10 @@ export default class FakeDeviceFTDI {
         }
     }
 
+    public async write(data: Uint8Array) {
+        FakeDeviceFTDI.callsToWrite.push(data)
+    }
+
     public static resetTestDouble() {
         FakeDeviceFTDI.callsToSetTimeouts = []
         FakeDeviceFTDI.callsToPurge = []
@@ -69,6 +74,7 @@ export default class FakeDeviceFTDI {
         FakeDeviceFTDI.callsToSetDataCharacteristics = []
         FakeDeviceFTDI.callsToSetLatencyTimer = []
         FakeDeviceFTDI.callsToRead = []
+        FakeDeviceFTDI.callsToWrite = []
     }
 }
 

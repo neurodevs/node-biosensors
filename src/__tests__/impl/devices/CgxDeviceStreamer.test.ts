@@ -106,6 +106,13 @@ export default class CgxDeviceStreamerTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async writesSeventeenToDeviceToTurnOnImpedance() {
+        await this.startStreaming()
+
+        assert.isEqualDeep(FakeDeviceFTDI.callsToWrite[0], Buffer.from([0x11]))
+    }
+
+    @test()
     protected static async startStreamingSetsIsRunningTrue() {
         await this.startStreaming()
         assert.isTrue(this.instance.isRunning)

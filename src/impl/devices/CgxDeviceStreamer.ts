@@ -84,6 +84,12 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
         await this.openDeviceBySerialNumber()
 
         this.configureDevice()
+
+        await this.turnOnImpedanceCheck()
+    }
+
+    private async turnOnImpedanceCheck() {
+        await this.device.write(Buffer.from([0x11]))
     }
 
     private async loadFtdiDeviceInfos() {
