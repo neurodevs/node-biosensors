@@ -190,7 +190,7 @@ export default class CgxDeviceStreamerTest extends AbstractPackageTest {
             FakeStreamOutlet.callsToConstructor[0],
             {
                 sourceId: 'cgx-eeg',
-                name: 'CGX Quick-20r (Cognionics) - EEG',
+                name: 'CGX Quick-20r (Cognionics) EEG',
                 type: 'EEG',
                 channelNames: this.eegCharacteristicNames,
                 sampleRateHz: 500,
@@ -250,7 +250,7 @@ export default class CgxDeviceStreamerTest extends AbstractPackageTest {
             FakeStreamOutlet.callsToConstructor[1],
             {
                 sourceId: 'cgx-accel',
-                name: 'CGX Quick-20r (Cognionics) - Accelerometer',
+                name: 'CGX Quick-20r (Cognionics) Accelerometer',
                 type: 'ACCEL',
                 channelNames: this.accelCharacteristicNames,
                 sampleRateHz: 500,

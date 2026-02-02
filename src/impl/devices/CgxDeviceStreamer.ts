@@ -321,7 +321,7 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
 
     private static readonly eegOptions = {
         sourceId: 'cgx-eeg',
-        name: 'CGX Quick-20r (Cognionics) - EEG',
+        name: 'CGX Quick-20r (Cognionics) EEG',
         type: 'EEG',
         channelNames: this.eegCharacteristicNames,
         sampleRateHz: 500,
@@ -339,7 +339,7 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
 
     private static readonly accelOptions = {
         sourceId: 'cgx-accel',
-        name: 'CGX Quick-20r (Cognionics) - Accelerometer',
+        name: 'CGX Quick-20r (Cognionics) Accelerometer',
         type: 'ACCEL',
         channelNames: this.accelCharacteristicNames,
         sampleRateHz: 500,
