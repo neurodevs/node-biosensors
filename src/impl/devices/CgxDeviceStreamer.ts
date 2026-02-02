@@ -28,7 +28,6 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
 
     private infos!: FTDI.FTDI_DeviceInfo[]
     private device!: FTDI.FTDI_Device
-    private packet!: Uint8Array<ArrayBufferLike>
     private packetCounter!: number
 
     private readonly readTimeoutMs = 1000
@@ -165,22 +164,21 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
     }
 
     private async readPacket() {
-        this.packet = await this.readPacketFromDevice()
-        await this.offsetIfHeaderNotFirst()
-        this.handlePacketCounter()
+        const packet = await this.readPacketAndEnsureAlignment()
+        this.handlePacketCounter(packet)
 
-        this.decode24BitEeg()
-        this.decode24BitAccerlerometer()
+        this.decode24BitEeg(packet)
+        this.decode24BitAccerlerometer(packet)
     }
 
-    private decode24BitEeg() {
+    private decode24BitEeg(packet: Uint8Array<ArrayBufferLike>) {
         const eegData = []
 
         for (let i = 0; i < this.numEegChannels; i++) {
             const startIdx = 2 + i * 3
-            const firstByte = this.packet[startIdx]
-            const secondByte = this.packet[startIdx + 1]
-            const thirdByte = this.packet[startIdx + 2]
+            const firstByte = packet[startIdx]
+            const secondByte = packet[startIdx + 1]
+            const thirdByte = packet[startIdx + 2]
 
             const rawValue =
                 ((firstByte << 24) >>> 0) +
@@ -196,14 +194,14 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
         console.log('EEG data:', eegData)
     }
 
-    private decode24BitAccerlerometer() {
+    private decode24BitAccerlerometer(packet: Uint8Array<ArrayBufferLike>) {
         const accelData = []
 
         for (let i = 0; i < this.numAccelChannels; i++) {
             const startIdx = 65 + i * 3
-            const firstByte = this.packet[startIdx]
-            const secondByte = this.packet[startIdx + 1]
-            const thirdByte = this.packet[startIdx + 2]
+            const firstByte = packet[startIdx]
+            const secondByte = packet[startIdx + 1]
+            const thirdByte = packet[startIdx + 2]
 
             const rawValue =
                 ((firstByte << 24) >>> 0) +
@@ -219,37 +217,38 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
         console.log('Accelerometer data:', accelData)
     }
 
-    private async readPacketFromDevice() {
-        return await this.device.read(this.bytesPerSample)
-    }
+    private async readPacketAndEnsureAlignment() {
+        const packet = await this.device.read(this.bytesPerSample)
 
-    private async offsetIfHeaderNotFirst() {
-        if (this.headerByte !== 0xff) {
-            const idx = this.packet.indexOf(0xff)
-            const partial = this.packet.slice(idx)
+        if (packet[0] !== 0xff) {
+            const idx = packet.indexOf(0xff)
+            const partial = packet.slice(idx)
+
+            if (idx === -1) {
+                console.log('Malformed packet')
+                return packet
+            }
+
             const rest = await this.device.read(idx)
-
-            this.packet.set(rest, partial.length)
+            packet.set(rest, partial.length)
         }
+
+        return packet
     }
 
-    private handlePacketCounter() {
+    private handlePacketCounter(packet: Uint8Array<ArrayBufferLike>) {
         if (typeof this.packetCounter == 'undefined') {
-            this.setPacketCounterToCurrent()
+            this.packetCounter = packet[1]
         } else {
-            if (this.counterByte !== this.packetCounter + 1) {
-                if (this.counterByte == 0) {
+            if (packet[1] !== this.packetCounter + 1) {
+                if (packet[1] == 0) {
                     this.resetPacketCounter()
                 } else {
                     this.incrementNumPacketsDropped()
                 }
             }
-            this.setPacketCounterToCurrent()
+            this.packetCounter = packet[1]
         }
-    }
-
-    private setPacketCounterToCurrent() {
-        this.packetCounter = this.counterByte
     }
 
     private resetPacketCounter() {
@@ -282,14 +281,6 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
 
     public get streamQueries() {
         return CgxDeviceStreamer.streamQueries
-    }
-
-    private get headerByte() {
-        return this.packet[0]
-    }
-
-    private get counterByte() {
-        return this.packet[1]
     }
 
     private get numEegChannels() {
