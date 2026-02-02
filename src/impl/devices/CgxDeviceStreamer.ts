@@ -168,7 +168,7 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
         this.handlePacketCounter(packet)
 
         this.decode24BitEeg(packet)
-        this.decode24BitAccerlerometer(packet)
+        this.decode24BitAccelerometer(packet)
     }
 
     private decode24BitEeg(packet: Uint8Array<ArrayBufferLike>) {
@@ -194,7 +194,7 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
         console.log('EEG data:', eegData)
     }
 
-    private decode24BitAccerlerometer(packet: Uint8Array<ArrayBufferLike>) {
+    private decode24BitAccelerometer(packet: Uint8Array<ArrayBufferLike>) {
         const accelData = []
 
         for (let i = 0; i < this.numAccelChannels; i++) {
