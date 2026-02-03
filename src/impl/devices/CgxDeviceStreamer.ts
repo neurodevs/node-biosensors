@@ -242,28 +242,24 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
         return packet
     }
 
-    private handlePacketCounter(packet: Uint8Array<ArrayBufferLike>) {
-        if (typeof this.packetCounter == 'undefined') {
-            this.packetCounter = packet[1]
-        } else {
-            if (packet[1] !== this.packetCounter + 1) {
-                if (packet[1] == 0) {
-                    this.resetPacketCounter()
-                } else {
-                    this.incrementNumPacketsDropped()
-                }
-            }
-            this.packetCounter = packet[1]
+    private handlePacketCounter(packet: Uint8Array) {
+        const current = packet[1]
+
+        if (this.packetCounter == null) {
+            this.packetCounter = current
+            return
         }
-    }
 
-    private resetPacketCounter() {
-        this.packetCounter = 0
-    }
+        const expected = (this.packetCounter + 1) % 255
 
-    private incrementNumPacketsDropped() {
-        this.numPacketsDropped++
-        console.log('Dropped packet')
+        if (current !== expected) {
+            if (current !== 0) {
+                this.numPacketsDropped++
+                console.log(`Dropped packet ${current} / ${expected}`)
+            }
+        }
+
+        this.packetCounter = current
     }
 
     public async stopStreaming() {
