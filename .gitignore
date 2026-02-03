@@ -133,3 +133,5 @@ build/
 sandbox/
 *.xdf
 .DS_Store
+
+artifacts/
