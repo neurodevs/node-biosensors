@@ -58,7 +58,7 @@
     "@neurodevs/generate-id": "^1.1.2",
     "@neurodevs/ndx-native": "^0.2.0",
     "@neurodevs/node-tdd": "^0.2.5",
-    "@neurodevs/prettier-config-ndx": "^1.0.1",
+    "@neurodevs/prettier-config-ndx": "^1.0.2",
     "@regressionproof/cli": "^0.8.0",
     "@regressionproof/jest-reporter": "^0.8.0",
     "@types/ws": "^8.18.1",
