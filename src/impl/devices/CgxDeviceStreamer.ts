@@ -71,7 +71,7 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
         this.isRunning = true
         this.startXdfRecorderIfExists()
 
-        await this.connectFtdi()
+        await this.setupFtdi()
         await this.startReadingPackets()
     }
 
@@ -79,17 +79,13 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
         this.xdfRecorder?.start()
     }
 
-    private async connectFtdi() {
+    private async setupFtdi() {
         await this.loadFtdiDeviceInfos()
         await this.openDeviceBySerialNumber()
 
-        this.configureDevice()
+        this.configureFtdiDevice()
 
         await this.turnOnImpedanceCheck()
-    }
-
-    private async turnOnImpedanceCheck() {
-        await this.device.write(Buffer.from([0x11]))
     }
 
     private async loadFtdiDeviceInfos() {
@@ -118,7 +114,7 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
         return this.infos[0].serial_number
     }
 
-    private configureDevice() {
+    private configureFtdiDevice() {
         this.setReadAndWriteTimeouts()
         this.purgeReadBuffer()
         this.setFlowControl()
@@ -159,6 +155,10 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
         this.device.setLatencyTimer(this.latencyTimerMs)
     }
 
+    private async turnOnImpedanceCheck() {
+        await this.device.write(Buffer.from([0x11]))
+    }
+
     private async startReadingPackets() {
         while (this.isRunning) {
             try {
@@ -175,52 +175,6 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
 
         this.decode24BitEeg(packet)
         this.decode24BitAccelerometer(packet)
-    }
-
-    private decode24BitEeg(packet: Uint8Array<ArrayBufferLike>) {
-        const eegData = []
-
-        for (let i = 0; i < this.numEegChannels; i++) {
-            const startIdx = 2 + i * 3
-            const firstByte = packet[startIdx]
-            const secondByte = packet[startIdx + 1]
-            const thirdByte = packet[startIdx + 2]
-
-            const rawValue =
-                ((firstByte << 24) >>> 0) +
-                ((secondByte << 17) >>> 0) +
-                ((thirdByte << 10) >>> 0)
-
-            const volts = rawValue * (5.0 / 3.0) * (1.0 / Math.pow(2, 32))
-            eegData.push(volts)
-        }
-
-        this.eegOutlet.pushSample(eegData)
-
-        console.log('EEG data:', eegData)
-    }
-
-    private decode24BitAccelerometer(packet: Uint8Array<ArrayBufferLike>) {
-        const accelData = []
-
-        for (let i = 0; i < this.numAccelChannels; i++) {
-            const startIdx = 65 + i * 3
-            const firstByte = packet[startIdx]
-            const secondByte = packet[startIdx + 1]
-            const thirdByte = packet[startIdx + 2]
-
-            const rawValue =
-                ((firstByte << 24) >>> 0) +
-                ((secondByte << 17) >>> 0) +
-                ((thirdByte << 10) >>> 0)
-
-            const volts = rawValue * 2.5 * (1.0 / Math.pow(2, 32))
-            accelData.push(volts)
-        }
-
-        this.accelOutlet.pushSample(accelData)
-
-        console.log('Accelerometer data:', accelData)
     }
 
     private async readPacketAndEnsureAlignment() {
@@ -262,6 +216,60 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
         this.packetCounter = current
     }
 
+    private decode24BitEeg(packet: Uint8Array<ArrayBufferLike>) {
+        const eegData = []
+
+        for (let i = 0; i < this.numEegChannels; i++) {
+            const startIdx = 2 + i * 3
+            const firstByte = packet[startIdx]
+            const secondByte = packet[startIdx + 1]
+            const thirdByte = packet[startIdx + 2]
+
+            const rawValue =
+                ((firstByte << 24) >>> 0) +
+                ((secondByte << 17) >>> 0) +
+                ((thirdByte << 10) >>> 0)
+
+            const volts = rawValue * (5.0 / 3.0) * (1.0 / Math.pow(2, 32))
+            eegData.push(volts)
+        }
+
+        this.eegOutlet.pushSample(eegData)
+
+        console.log('EEG data:', eegData)
+    }
+
+    private get numEegChannels() {
+        return CgxDeviceStreamer.eegCharacteristicNames.length
+    }
+
+    private decode24BitAccelerometer(packet: Uint8Array<ArrayBufferLike>) {
+        const accelData = []
+
+        for (let i = 0; i < this.numAccelChannels; i++) {
+            const startIdx = 65 + i * 3
+            const firstByte = packet[startIdx]
+            const secondByte = packet[startIdx + 1]
+            const thirdByte = packet[startIdx + 2]
+
+            const rawValue =
+                ((firstByte << 24) >>> 0) +
+                ((secondByte << 17) >>> 0) +
+                ((thirdByte << 10) >>> 0)
+
+            const volts = rawValue * 2.5 * (1.0 / Math.pow(2, 32))
+            accelData.push(volts)
+        }
+
+        this.accelOutlet.pushSample(accelData)
+
+        console.log('Accelerometer data:', accelData)
+    }
+
+    private get numAccelChannels() {
+        return CgxDeviceStreamer.accelCharacteristicNames.length
+    }
+
     public async stopStreaming() {
         this.finishXdfRecorderIfExists()
     }
@@ -283,14 +291,6 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
 
     public get streamQueries() {
         return CgxDeviceStreamer.streamQueries
-    }
-
-    private get numEegChannels() {
-        return CgxDeviceStreamer.eegCharacteristicNames.length
-    }
-
-    private get numAccelChannels() {
-        return CgxDeviceStreamer.accelCharacteristicNames.length
     }
 
     private get FTDI() {
