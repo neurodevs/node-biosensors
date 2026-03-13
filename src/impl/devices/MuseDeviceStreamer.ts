@@ -29,9 +29,10 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
     private ppgOutlet: StreamOutlet
     private _bleUuid?: string
     private rssiIntervalMs?: number
-    private eegChannelChunks = this.generateEmptyEegMatrix()
-    private ppgChannelChunks = this.generateEmptyPpgMatrix()
     private encoder: TextEncoder
+
+    private eegChannelChunks: number[][] = []
+    private ppgChannelChunks: number[][] = []
 
     private currentEegTimestamp!: number
     private currentPpgTimestamp!: number
@@ -61,82 +62,13 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
         })
     }
 
-    public async startStreaming() {
-        await this.createBleConnectorIfNotExists()
-        await this.writeStartCommandsToControl()
-    }
-
-    private async createBleConnectorIfNotExists() {
-        if (!this.bleConnector) {
-            this.bleConnector = await this.BleDeviceConnector()
-        }
-    }
-
-    private async writeStartCommandsToControl() {
-        for (const command of ['h', 'p50', 's', 'd']) {
-            const buffer = this.createBufferFrom(command)
-            await this.control.writeAsync(buffer, true)
-        }
-    }
-
-    private createBufferFrom(cmd: string) {
-        const encoded = this.encoder.encode(`X${cmd}\n`)
-        encoded[0] = encoded.length - 1
-        return Buffer.from(encoded)
-    }
-
-    private get control() {
-        return this.bleController.getCharacteristic(this.controlUuid)!
-    }
-
-    private get controlUuid() {
-        return CHAR_UUIDS.CONTROL
-    }
-
-    public async stopStreaming() {
-        if (this.bleConnector) {
-            await this.writeHaltCommandToControl()
-        }
-    }
-
-    private async writeHaltCommandToControl() {
-        await this.control.writeAsync(this.haltCmdBuffer, true)
-    }
-
-    private get haltCmdBuffer() {
-        return this.createBufferFrom('h')
-    }
-
-    public async disconnect() {
-        await this.stopStreaming()
-        await this.disconnectBle()
-
-        this.destroyStreamOutlets()
-    }
-
-    private destroyStreamOutlets() {
-        this.eegOutlet.destroy()
-        this.ppgOutlet.destroy()
-    }
-
-    private async disconnectBle() {
-        if (this.bleConnector) {
-            await this.bleConnector!.disconnectBle()
-            delete this.bleConnector
-        }
-    }
-
     private generateScanOptions() {
         return {
-            characteristicCallbacks: this.generateCharCallbacks(),
+            characteristicCallbacks: {
+                ...this.generateEegCallbacks(),
+                ...this.generatePpgCallbacks(),
+            },
             rssiIntervalMs: this.rssiIntervalMs,
-        }
-    }
-
-    private generateCharCallbacks() {
-        return {
-            ...this.generateEegCallbacks(),
-            ...this.generatePpgCallbacks(),
         }
     }
 
@@ -155,7 +87,7 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
             this.currentEegTimestamp = this.lsl.localClock()
         }
 
-        const charIdx = this.getEegChannelIdx(char.uuid)
+        const charIdx = this.eegCharUuids.indexOf(char.uuid)
         const channelValuesForChunk = Array.from(data).slice(2)
 
         this.eegChannelChunks[charIdx] = channelValuesForChunk
@@ -169,10 +101,6 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
         return charUuid === '273e00034c4d454d96bef03bac821358'
     }
 
-    private getEegChannelIdx(charUuid: string) {
-        return this.eegCharUuids.indexOf(charUuid)
-    }
-
     private isLastEegChannel(charIdx: number) {
         return charIdx === 4
     }
@@ -180,28 +108,26 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
     private pushEegSamples() {
         for (let j = 0; j < this.eegChunkSize; j++) {
             const chunkIdx = j
-            this.createAndPushEegSample(chunkIdx)
+            const sample = this.eegChannelChunks.map(
+                (channelChunk) => channelChunk[chunkIdx]
+            )
+
+            this.eegOutlet.pushSample(
+                sample,
+                this.currentEegTimestamp + chunkIdx / this.eegSampleRateHz
+            )
         }
-        this.resetEegChannelChunks()
-    }
-
-    private createAndPushEegSample(chunkIdx: number) {
-        const sample = this.eegChannelChunks.map(
-            (channelChunk) => channelChunk[chunkIdx]
-        )
-
-        this.eegOutlet.pushSample(
-            sample,
-            this.currentEegTimestamp + chunkIdx / this.eegSampleRateHz
-        )
-    }
-
-    protected resetEegChannelChunks() {
         this.eegChannelChunks = this.generateEmptyEegMatrix()
     }
 
     private generateEmptyEegMatrix() {
         return this.generateEmptyMatrix(this.eegNumChannels, this.eegChunkSize)
+    }
+
+    private generateEmptyMatrix(rows: number, columns: number) {
+        return Array.from({ length: rows }, () =>
+            new Array(columns).fill(0)
+        ) as number[][]
     }
 
     private generatePpgCallbacks() {
@@ -219,7 +145,7 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
             this.currentPpgTimestamp = this.lsl.localClock()
         }
 
-        const charIdx = this.getPpgCharIdx(char.uuid)
+        const charIdx = this.ppgCharUuids.indexOf(char.uuid)
         const channelValuesForChunk = Array.from(data).slice(2)
 
         this.ppgChannelChunks[charIdx] = this.decodeUnsigned24BitData(
@@ -233,10 +159,6 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
 
     private isFirstPpgChannel(charUuid: string) {
         return charUuid === '273e000f4c4d454d96bef03bac821358'
-    }
-
-    private getPpgCharIdx(charUuid: string) {
-        return this.ppgCharUuids.indexOf(charUuid)
     }
 
     private decodeUnsigned24BitData(samples: number[]) {
@@ -262,33 +184,79 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
     private pushPpgSamples() {
         for (let j = 0; j < this.ppgChunkSize; j++) {
             const chunkIdx = j
-            this.createAndPushPpgSample(chunkIdx)
+            const sample: number[] = []
+
+            for (let i = 0; i < this.ppgNumChannels; i++) {
+                const channelIdx = i
+                const channelValue = this.ppgChannelChunks[channelIdx][chunkIdx]
+
+                sample.push(channelValue)
+            }
+
+            this.ppgOutlet.pushSample(
+                sample,
+                this.currentPpgTimestamp + chunkIdx / this.ppgSampleRateHz
+            )
         }
-        this.resetPpgChannelChunks()
-    }
-
-    private createAndPushPpgSample(chunkIdx: number) {
-        let sample: number[] = []
-
-        for (let i = 0; i < this.ppgNumChannels; i++) {
-            const channelIdx = i
-            const channelValue = this.ppgChannelChunks[channelIdx][chunkIdx]
-
-            sample.push(channelValue)
-        }
-
-        this.ppgOutlet.pushSample(
-            sample,
-            this.currentPpgTimestamp + chunkIdx / this.ppgSampleRateHz
-        )
-    }
-
-    protected resetPpgChannelChunks() {
         this.ppgChannelChunks = this.generateEmptyPpgMatrix()
     }
 
     private generateEmptyPpgMatrix() {
         return this.generateEmptyMatrix(this.ppgNumChannels, this.ppgChunkSize)
+    }
+
+    public async startStreaming() {
+        if (!this.bleConnector) {
+            this.bleConnector = await this.BleDeviceConnector()
+        }
+        await this.writeStartCommandsToControl()
+    }
+
+    private async writeStartCommandsToControl() {
+        for (const command of ['h', 'p50', 's', 'd']) {
+            const buffer = this.createBufferFrom(command)
+            await this.control.writeAsync(buffer, true)
+        }
+    }
+
+    private createBufferFrom(cmd: string) {
+        const encoded = this.encoder.encode(`X${cmd}\n`)
+        encoded[0] = encoded.length - 1
+        return Buffer.from(encoded)
+    }
+
+    private get control() {
+        return this.bleController.getCharacteristic(CHAR_UUIDS.CONTROL)!
+    }
+
+    public async stopStreaming() {
+        if (this.bleConnector) {
+            await this.writeHaltCommandToControl()
+        }
+    }
+
+    private async writeHaltCommandToControl() {
+        const haltCommandBuffer = this.createBufferFrom('h')
+        await this.control.writeAsync(haltCommandBuffer, true)
+    }
+
+    public async disconnect() {
+        await this.stopStreaming()
+        await this.disconnectBle()
+
+        this.destroyStreamOutlets()
+    }
+
+    private async disconnectBle() {
+        if (this.bleConnector) {
+            await this.bleConnector.disconnectBle()
+            delete this.bleConnector
+        }
+    }
+
+    private destroyStreamOutlets() {
+        this.eegOutlet.destroy()
+        this.ppgOutlet.destroy()
     }
 
     public get outlets() {
@@ -307,12 +275,6 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
 
     private get bleController() {
         return this.bleConnector!.getBleController()
-    }
-
-    private generateEmptyMatrix(rows: number, columns: number) {
-        return Array.from({ length: rows }, () =>
-            new Array(columns).fill(0)
-        ) as number[][]
     }
 
     private get eegSampleRateHz() {
