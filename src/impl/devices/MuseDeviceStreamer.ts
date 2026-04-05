@@ -39,6 +39,67 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
 
     private lsl = LiblslAdapter.getInstance()
 
+    private static readonly eegChunkSize = 12
+    private static readonly eegSampleRateHz = 256
+    private static readonly ppgChunkSize = 6
+    private static readonly ppgSampleRateHz = 64
+
+    private static readonly eegCharacteristicNames = [
+        'EEG_TP9',
+        'EEG_AF7',
+        'EEG_AF8',
+        'EEG_TP10',
+        'EEG_AUX',
+    ]
+
+    private static readonly ppgCharacteristicNames = [
+        'PPG_AMBIENT',
+        'PPG_INFRARED',
+        'PPG_RED',
+    ]
+
+    private static readonly eegOutletOptions = {
+        name: 'Muse EEG',
+        type: 'EEG',
+        channelNames: this.eegCharacteristicNames,
+        sampleRateHz: this.eegSampleRateHz,
+        channelFormat: 'float32' as ChannelFormat,
+        sourceId: 'muse-eeg',
+        manufacturer: 'Interaxon Inc.',
+        units: 'microvolt',
+        chunkSize: 1,
+    }
+
+    private static readonly ppgOutletOptions = {
+        name: 'Muse PPG',
+        type: 'PPG',
+        channelNames: this.ppgCharacteristicNames,
+        sampleRateHz: this.ppgSampleRateHz,
+        channelFormat: 'float32' as ChannelFormat,
+        sourceId: 'muse-s-ppg',
+        manufacturer: 'Interaxon Inc.',
+        units: 'N/A',
+        chunkSize: 1,
+    }
+
+    private readonly bleLocalName = 'MuseS'
+
+    private readonly eegCharNames = MuseDeviceStreamer.eegCharacteristicNames
+    private readonly eegChunkSize = MuseDeviceStreamer.eegChunkSize
+    private readonly eegNumChannels = this.eegCharNames.length
+
+    private readonly ppgCharNames = MuseDeviceStreamer.ppgCharacteristicNames
+    private readonly ppgChunkSize = MuseDeviceStreamer.ppgChunkSize
+    private readonly ppgNumChannels = this.ppgCharNames.length
+
+    private readonly eegCharUuids = this.eegCharNames.map(
+        (name) => CHAR_UUIDS[name]
+    )
+
+    private readonly ppgCharUuids = this.ppgCharNames.map(
+        (name) => CHAR_UUIDS[name]
+    )
+
     protected constructor(options: MuseDeviceStreamerConstructorOptions) {
         const { eegOutlet, ppgOutlet, bleUuid, rssiIntervalMs } = options
 
@@ -263,8 +324,6 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
         return [this.eegOutlet, this.ppgOutlet]
     }
 
-    public readonly streamQueries = MuseDeviceStreamer.streamQueries
-
     public get bleUuid() {
         return this.bleController.uuid
     }
@@ -277,6 +336,10 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
         return this.bleConnector!.getBleController()
     }
 
+    public get streamQueries() {
+        return MuseDeviceStreamer.streamQueries
+    }
+
     private get eegSampleRateHz() {
         return MuseDeviceStreamer.eegSampleRateHz
     }
@@ -284,67 +347,6 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
     private get ppgSampleRateHz() {
         return MuseDeviceStreamer.ppgSampleRateHz
     }
-
-    private static readonly eegChunkSize = 12
-    private static readonly eegSampleRateHz = 256
-    private static readonly ppgChunkSize = 6
-    private static readonly ppgSampleRateHz = 64
-
-    private static readonly eegCharacteristicNames = [
-        'EEG_TP9',
-        'EEG_AF7',
-        'EEG_AF8',
-        'EEG_TP10',
-        'EEG_AUX',
-    ]
-
-    private static readonly ppgCharacteristicNames = [
-        'PPG_AMBIENT',
-        'PPG_INFRARED',
-        'PPG_RED',
-    ]
-
-    private static readonly eegOutletOptions = {
-        name: 'Muse EEG',
-        type: 'EEG',
-        channelNames: this.eegCharacteristicNames,
-        sampleRateHz: this.eegSampleRateHz,
-        channelFormat: 'float32' as ChannelFormat,
-        sourceId: 'muse-eeg',
-        manufacturer: 'Interaxon Inc.',
-        units: 'microvolt',
-        chunkSize: 1,
-    }
-
-    private static readonly ppgOutletOptions = {
-        name: 'Muse PPG',
-        type: 'PPG',
-        channelNames: this.ppgCharacteristicNames,
-        sampleRateHz: this.ppgSampleRateHz,
-        channelFormat: 'float32' as ChannelFormat,
-        sourceId: 'muse-s-ppg',
-        manufacturer: 'Interaxon Inc.',
-        units: 'N/A',
-        chunkSize: 1,
-    }
-
-    private readonly bleLocalName = 'MuseS'
-
-    private readonly eegCharNames = MuseDeviceStreamer.eegCharacteristicNames
-    private readonly eegChunkSize = MuseDeviceStreamer.eegChunkSize
-    private readonly eegNumChannels = this.eegCharNames.length
-
-    private readonly ppgCharNames = MuseDeviceStreamer.ppgCharacteristicNames
-    private readonly ppgChunkSize = MuseDeviceStreamer.ppgChunkSize
-    private readonly ppgNumChannels = this.ppgCharNames.length
-
-    private readonly eegCharUuids = this.eegCharNames.map(
-        (name) => CHAR_UUIDS[name]
-    )
-
-    private readonly ppgCharUuids = this.ppgCharNames.map(
-        (name) => CHAR_UUIDS[name]
-    )
 
     private TextEncoder() {
         return new TextEncoder()
