@@ -10,7 +10,7 @@ import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 import {
     DeviceStreamer,
     DeviceStreamerOptions,
-} from 'impl/BiosensorDeviceFactory.js'
+} from '../../impl/BiosensorDeviceFactory.js'
 import BiosensorDeviceFactory, {
     DeviceFactory,
     DeviceSpecification,

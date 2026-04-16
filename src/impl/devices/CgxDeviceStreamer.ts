@@ -12,7 +12,7 @@ import { StreamOutlet, LslStreamOutlet } from '@neurodevs/node-lsl'
 import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 import FTDI from 'ftdi-d2xx'
 
-import { DeviceStreamer } from 'impl/BiosensorDeviceFactory.js'
+import { DeviceStreamer } from '../../impl/BiosensorDeviceFactory.js'
 
 export default class CgxDeviceStreamer implements DeviceStreamer {
     public static Class?: CgxDeviceStreamerConstructor

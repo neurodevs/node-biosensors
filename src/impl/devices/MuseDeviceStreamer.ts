@@ -17,7 +17,7 @@ import {
 import {
     DeviceStreamer,
     DeviceStreamerOptions,
-} from 'impl/BiosensorDeviceFactory.js'
+} from '../../impl/BiosensorDeviceFactory.js'
 
 export default class MuseDeviceStreamer implements BleDeviceStreamer {
     public static Class?: MuseDeviceStreamerConstructor

@@ -5,7 +5,7 @@ import { FakeStreamOutlet } from '@neurodevs/node-lsl'
 import {
     DeviceStreamer,
     DeviceStreamerOptions,
-} from 'impl/BiosensorDeviceFactory.js'
+} from '../../impl/BiosensorDeviceFactory.js'
 
 export default class FakeDeviceStreamer implements DeviceStreamer {
     public static callsToConstructor: (DeviceStreamerOptions | undefined)[] = []

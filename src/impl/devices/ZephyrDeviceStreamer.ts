@@ -1,4 +1,4 @@
-import { DeviceStreamer } from 'impl/BiosensorDeviceFactory.js'
+import { DeviceStreamer } from '../../impl/BiosensorDeviceFactory.js'
 
 export default class ZephyrDeviceStreamer implements DeviceStreamer {
     public static Class?: DeviceStreamerConstructor

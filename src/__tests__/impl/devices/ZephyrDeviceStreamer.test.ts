@@ -1,6 +1,6 @@
 import { test, assert } from '@neurodevs/node-tdd'
 
-import { DeviceStreamer } from 'impl/BiosensorDeviceFactory.js'
+import { DeviceStreamer } from '../../../impl/BiosensorDeviceFactory.js'
 import ZephyrDeviceStreamer from '../../../impl/devices/ZephyrDeviceStreamer.js'
 import AbstractPackageTest from '../../AbstractPackageTest.js'
 
