@@ -1,11 +1,10 @@
 {
   "compilerOptions": {
     "module": "nodenext",
-    "moduleResolution": "nodenext",
-    "target": "ES2022",
-    "lib": ["ES2022"],
+    "target": "esnext",
+    "lib": ["esnext"],
     "types": ["node"],
-    "baseUrl": "src",
+    "rootDir": "src",
     "outDir": "build",
     "sourceMap": false,
     "strict": true,
