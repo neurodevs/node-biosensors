@@ -764,10 +764,10 @@
     "@quickstat/nodejs" "^0.0.4"
     "@quickstat/prometheus" "^0.0.4"
 
-"@neurodevs/node-tdd@^1.0.3":
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/@neurodevs/node-tdd/-/node-tdd-1.0.3.tgz#8334557b66d19a731e998189db18f839356d50e2"
-  integrity sha512-TCOr+DPPnGOVhTi/RQ40cvrDvAd1pPXPe75KNwrDLj/jvatHYgVKoxat7iWyS7vfZNmKYL2pa87aXqTpMopO2g==
+"@neurodevs/node-tdd@^1.0.9":
+  version "1.0.9"
+  resolved "https://registry.yarnpkg.com/@neurodevs/node-tdd/-/node-tdd-1.0.9.tgz#295f91393f900d79bfb3ad2dff00f3cd84141ca3"
+  integrity sha512-bORwMj8DqXL6P72ll4Q4MH/Bt+pEHYPNL3+1cyHWce/1f6h9EU3a7aWTRxa5s5K/NCZqhmhQ0XuyG7/wFH5Ujg==
   dependencies:
     "@neurodevs/generate-id" "^1.1.2"
     "@sprucelabs/jest-json-reporter" "^10.0.33"
