@@ -57,13 +57,9 @@
     "@neurodevs/eslint-config-ndx": "^1.0.1",
     "@neurodevs/generate-id": "^1.1.2",
     "@neurodevs/ndx-native": "^0.2.0",
-    "@neurodevs/node-tdd": "^1.0.9",
+    "@neurodevs/node-tdd": "^1.1.2",
     "@neurodevs/prettier-config-ndx": "^1.0.2",
     "@types/ws": "^8.18.1",
-    "jest": "^29.7.0",
-    "jest-circus": "^29.7.0",
-    "prettier": "^3.8.1",
-    "tsc-watch": "^6.2.0",
     "typescript": "^5.6.3"
   },
   "jest": {
