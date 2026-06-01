@@ -17,6 +17,14 @@ export * from './testDoubles/DeviceStreamer/CgxDeviceStreamer/SpyCgxDeviceStream
 export { default as FakeCgxDeviceStreamer } from './testDoubles/DeviceStreamer/CgxDeviceStreamer/FakeCgxDeviceStreamer.js'
 export * from './testDoubles/DeviceStreamer/CgxDeviceStreamer/FakeCgxDeviceStreamer.js'
 
+// DeviceController
+
+export { default as MuseDeviceController } from './impl/MuseDeviceController.js'
+export * from './impl/MuseDeviceController.js'
+
+export { default as FakeDeviceController } from './testDoubles/DeviceController/FakeDeviceController.js'
+export * from './testDoubles/DeviceController/FakeDeviceController.js'
+
 // Muse S Gen 2
 
 export { default as MuseDeviceStreamer } from './impl/devices/MuseDeviceStreamer.js'
