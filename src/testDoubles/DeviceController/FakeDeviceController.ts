@@ -1,6 +1,6 @@
-import { DeviceController } from '../../impl/MuseDeviceController.js'
+import { MuseController } from '../../impl/MuseDeviceController.js'
 
-export default class FakeDeviceController implements DeviceController {
+export default class FakeDeviceController implements MuseController {
     public static numCallsToConstructor = 0
 
     public constructor() {

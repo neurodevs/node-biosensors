@@ -1,15 +1,40 @@
 import { test, assert } from '@neurodevs/node-tdd'
 
 import MuseDeviceController, {
-    DeviceController,
+    MuseController,
+    MUSE_CHAR_UUIDS,
 } from '../../impl/MuseDeviceController.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
+import { BleDeviceController, FakeBleController } from '@neurodevs/node-lsl'
+import koffi from 'koffi'
 
 export default class MuseDeviceControllerTest extends AbstractPackageTest {
-    private static instance: DeviceController
+    private static instance: MuseController
+
+    private static readonly deviceUuid = this.generateId()
+
+    private static readonly charCallbacks = Object.entries(MUSE_CHAR_UUIDS).map(
+        ([name, uuid]) => {
+            return {
+                charUuid: uuid,
+                charName: name,
+                onData: (data: Buffer, length: number, timestamp: number) => {
+                    const bytes = koffi.decode(
+                        data,
+                        'uint8',
+                        length
+                    ) as number[]
+                    console.info(`[${timestamp}] length=${length}`, bytes)
+                },
+            }
+        }
+    )
 
     protected static async beforeEach() {
         await super.beforeEach()
+
+        BleDeviceController.Class = FakeBleController
+        FakeBleController.resetTestDouble()
 
         this.instance = this.MuseDeviceController()
     }
@@ -19,7 +44,33 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
         assert.isTruthy(this.instance, 'Failed to create instance!')
     }
 
+    @test()
+    protected static async createsBleDeviceController() {
+        const call = FakeBleController.callsToConstructor[0]
+
+        assert.isEqualDeep(
+            {
+                deviceUuid: call?.deviceUuid,
+                charCallbacks: call?.charCallbacks?.map(
+                    ({ charUuid, charName }) => ({ charUuid, charName })
+                ),
+            },
+            {
+                deviceUuid: this.deviceUuid,
+                charCallbacks: this.charCallbacks.map(
+                    ({ charUuid, charName }) => ({ charUuid, charName })
+                ),
+            }
+        )
+
+        call?.charCallbacks?.forEach(({ onData }) => {
+            assert.isFunction(onData, 'onData should be a function')
+        })
+    }
+
     private static MuseDeviceController() {
-        return MuseDeviceController.Create()
+        return MuseDeviceController.Create({
+            deviceUuid: this.deviceUuid,
+        })
     }
 }
