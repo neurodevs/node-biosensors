@@ -1,5 +1,17 @@
-import MuseDeviceStreamer from '../impl/devices/MuseDeviceStreamer.js'
+import MuseDeviceController from '../impl/MuseDeviceController.js'
 
-const muse = await MuseDeviceStreamer.Create()
+const muse = await MuseDeviceController.Create({
+    deviceUuid: 'CA6A61B7-B7A8-AF24-3C9E-04A6A5012554',
+})
+
 await muse.startStreaming()
-console.log(muse.bleUuid)
+
+await new Promise((resolve) => setTimeout(resolve, 5000))
+
+await muse.stopStreaming()
+
+await new Promise((resolve) => setTimeout(resolve, 2000))
+
+await muse.disconnect()
+
+console.log('Done!')
