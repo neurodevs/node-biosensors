@@ -3,6 +3,7 @@ import { test, assert } from '@neurodevs/node-tdd'
 import MuseDeviceController, {
     MuseController,
     MUSE_CHAR_UUIDS,
+    CONTROL_UUID,
 } from '../../impl/MuseDeviceController.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 import { BleDeviceController, FakeBleController } from '@neurodevs/node-lsl'
@@ -70,12 +71,24 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
 
     @test()
     protected static async startStreamingCallsConnectBle() {
-        await this.instance.startStreaming()
+        await this.startStreaming()
 
         assert.isEqual(
             FakeBleController.numCallsToConnect,
             1,
             'Did not connect to BLE device!'
+        )
+    }
+
+    @test()
+    protected static async stopStreamingWritesHaltCommandToControlChar() {
+        await this.startStreaming()
+        await this.stopStreaming()
+
+        assert.isEqualDeep(
+            FakeBleController.callsToWriteCharacteristic[0],
+            { characteristicUuid: CONTROL_UUID, value: 'h' },
+            'Did not write halt command to control char!'
         )
     }
 
@@ -88,6 +101,14 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
             1,
             'Did not disconnect from BLE device!'
         )
+    }
+
+    private static async startStreaming() {
+        await this.instance.startStreaming()
+    }
+
+    private static async stopStreaming() {
+        await this.instance.stopStreaming()
     }
 
     private static MuseDeviceController() {

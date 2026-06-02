@@ -41,6 +41,10 @@ export default class MuseDeviceController implements MuseController {
         await this.ble.connect()
     }
 
+    public async stopStreaming() {
+        await this.ble.writeCharacteristic(CONTROL_UUID, 'h')
+    }
+
     public async disconnect() {
         await this.ble.disconnect()
     }
@@ -62,6 +66,7 @@ export default class MuseDeviceController implements MuseController {
 
 export interface MuseController {
     startStreaming(): Promise<void>
+    stopStreaming(): Promise<void>
     disconnect(): Promise<void>
 }
 
