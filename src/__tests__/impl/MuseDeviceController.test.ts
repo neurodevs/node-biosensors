@@ -81,13 +81,36 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async startStreamingWritesCommandsToControlChar() {
+        await this.startStreaming()
+
+        assert.isEqualDeep(
+            FakeBleController.callsToWriteCharacteristic,
+            [
+                this.generateCmd('h'),
+                this.generateCmd('p50'),
+                this.generateCmd('s'),
+                this.generateCmd('d'),
+            ],
+            'Should not write any commands to control char when starting streaming!'
+        )
+    }
+
+    private static generateCmd(value: string) {
+        return {
+            characteristicUuid: CONTROL_UUID,
+            value,
+        }
+    }
+
+    @test()
     protected static async stopStreamingWritesHaltCommandToControlChar() {
         await this.startStreaming()
         await this.stopStreaming()
 
         assert.isEqualDeep(
             FakeBleController.callsToWriteCharacteristic[0],
-            { characteristicUuid: CONTROL_UUID, value: 'h' },
+            this.generateCmd('h'),
             'Did not write halt command to control char!'
         )
     }
