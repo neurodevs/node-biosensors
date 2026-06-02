@@ -1,13 +1,20 @@
+import { BleController } from '@neurodevs/node-lsl'
 import { MuseController } from '../../impl/MuseDeviceController.js'
 
 export default class FakeDeviceController implements MuseController {
-    public static numCallsToConstructor = 0
+    public static callsToConstructor: { ble: BleController }[] = []
+    public static numCallsToStartStreaming = 0
 
-    public constructor() {
-        FakeDeviceController.numCallsToConstructor++
+    public constructor(ble: BleController) {
+        FakeDeviceController.callsToConstructor.push({ ble })
+    }
+
+    public async startStreaming() {
+        FakeDeviceController.numCallsToStartStreaming++
     }
 
     public static resetTestDouble() {
-        FakeDeviceController.numCallsToConstructor = 0
+        FakeDeviceController.callsToConstructor = []
+        FakeDeviceController.numCallsToStartStreaming = 0
     }
 }

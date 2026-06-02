@@ -1,4 +1,4 @@
-import { BleDeviceController } from '@neurodevs/node-lsl'
+import { BleController, BleDeviceController } from '@neurodevs/node-lsl'
 
 export const MUSE_CHAR_UUIDS: Record<string, string> = {
     CONTROL: '273E0001-4C4D-454D-96BE-F03BAC821358',
@@ -18,19 +18,27 @@ export const MUSE_CHAR_UUIDS: Record<string, string> = {
 export const CONTROL_UUID = MUSE_CHAR_UUIDS['CONTROL']
 
 export default class MuseDeviceController implements MuseController {
-    public static Class?: DeviceControllerConstructor
+    public static Class?: MuseControllerConstructor
 
-    protected constructor() {}
+    private readonly ble: BleController
 
-    public static Create(options: MuseControllerOptions) {
+    protected constructor(ble: BleController) {
+        this.ble = ble
+    }
+
+    public static async Create(options: MuseControllerOptions) {
         const { deviceUuid } = options
 
-        BleDeviceController.Create({
+        const ble = await BleDeviceController.Create({
             deviceUuid,
             charCallbacks: this.generateCharCallbacks(),
         })
 
-        return new (this.Class ?? this)()
+        return new (this.Class ?? this)(ble)
+    }
+
+    public async startStreaming() {
+        await this.ble.connect()
     }
 
     private static generateCharCallbacks() {
@@ -48,10 +56,14 @@ export default class MuseDeviceController implements MuseController {
     }
 }
 
-export interface MuseController {}
+export interface MuseController {
+    startStreaming(): Promise<void>
+}
 
 export interface MuseControllerOptions {
     deviceUuid: string
 }
 
-export type DeviceControllerConstructor = new () => MuseController
+export type MuseControllerConstructor = new (
+    ble: BleController
+) => MuseController

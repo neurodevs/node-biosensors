@@ -36,7 +36,7 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
         BleDeviceController.Class = FakeBleController
         FakeBleController.resetTestDouble()
 
-        this.instance = this.MuseDeviceController()
+        this.instance = await this.MuseDeviceController()
     }
 
     @test()
@@ -66,6 +66,17 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
         call?.charCallbacks?.forEach(({ onData }) => {
             assert.isFunction(onData, 'onData should be a function')
         })
+    }
+
+    @test()
+    protected static async startStreamingCallsConnectBle() {
+        await this.instance.startStreaming()
+
+        assert.isEqual(
+            FakeBleController.numCallsToConnect,
+            1,
+            'Did not connect to BLE device!'
+        )
     }
 
     private static MuseDeviceController() {
