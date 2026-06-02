@@ -41,6 +41,10 @@ export default class MuseDeviceController implements MuseController {
         await this.ble.connect()
     }
 
+    public async disconnect() {
+        await this.ble.disconnect()
+    }
+
     private static generateCharCallbacks() {
         return Object.entries(MUSE_CHAR_UUIDS).map(([name, uuid]) => {
             return {
@@ -58,6 +62,7 @@ export default class MuseDeviceController implements MuseController {
 
 export interface MuseController {
     startStreaming(): Promise<void>
+    disconnect(): Promise<void>
 }
 
 export interface MuseControllerOptions {

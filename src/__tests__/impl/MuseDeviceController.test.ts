@@ -79,6 +79,17 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
         )
     }
 
+    @test()
+    protected static async disconnectCallsDisconnectBle() {
+        await this.instance.disconnect()
+
+        assert.isEqual(
+            FakeBleController.numCallsToDisconnect,
+            1,
+            'Did not disconnect from BLE device!'
+        )
+    }
+
     private static MuseDeviceController() {
         return MuseDeviceController.Create({
             deviceUuid: this.deviceUuid,
