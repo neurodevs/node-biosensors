@@ -96,13 +96,6 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
         )
     }
 
-    private static generateCmd(value: string) {
-        return {
-            characteristicUuid: CONTROL_UUID,
-            value,
-        }
-    }
-
     @test()
     protected static async stopStreamingWritesHaltCommandToControlChar() {
         await this.startStreaming()
@@ -132,6 +125,13 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
 
     private static async stopStreaming() {
         await this.instance.stopStreaming()
+    }
+
+    private static generateCmd(value: string) {
+        return {
+            characteristicUuid: CONTROL_UUID,
+            value,
+        }
     }
 
     private static MuseDeviceController() {
