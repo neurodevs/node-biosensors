@@ -1,7 +1,7 @@
 import MuseDeviceController from '../impl/MuseDeviceController.js'
 
 const muse = await MuseDeviceController.Create({
-    deviceUuid: 'CA6A61B7-B7A8-AF24-3C9E-04A6A5012554',
+    bleUuid: 'CA6A61B7-B7A8-AF24-3C9E-04A6A5012554',
 })
 
 await muse.startStreaming()

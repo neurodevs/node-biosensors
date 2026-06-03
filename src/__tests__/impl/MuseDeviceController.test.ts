@@ -122,6 +122,17 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async exposesUuidFromBleController() {
+        await this.startStreaming()
+
+        assert.isEqual(
+            this.instance.bleUuid,
+            this.deviceUuid,
+            'Did not expose uuid from BLE controller!'
+        )
+    }
+
+    @test()
     protected static async exposesNameFromBleController() {
         await this.startStreaming()
 
@@ -149,7 +160,7 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
 
     private static async MuseDeviceController() {
         return (await MuseDeviceController.Create({
-            deviceUuid: this.deviceUuid,
+            bleUuid: this.deviceUuid,
         })) as SpyMuseController
     }
 }

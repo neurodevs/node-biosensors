@@ -26,6 +26,10 @@ export default class FakeMuseController implements MuseController {
         FakeMuseController.numCallsToDisconnect++
     }
 
+    public get bleUuid() {
+        return this.ble.uuid
+    }
+
     public get bleName() {
         return this.ble.name
     }

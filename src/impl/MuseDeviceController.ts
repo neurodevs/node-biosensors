@@ -27,7 +27,7 @@ export default class MuseDeviceController implements MuseController {
     }
 
     public static async Create(options: MuseControllerOptions) {
-        const { deviceUuid } = options
+        const { bleUuid: deviceUuid } = options
 
         const ble = await BleDeviceController.Create({
             deviceUuid,
@@ -53,6 +53,10 @@ export default class MuseDeviceController implements MuseController {
         await this.ble.disconnect()
     }
 
+    public get bleUuid() {
+        return this.ble.uuid
+    }
+
     public get bleName() {
         return this.ble.name
     }
@@ -76,11 +80,12 @@ export interface MuseController {
     startStreaming(): Promise<void>
     stopStreaming(): Promise<void>
     disconnect(): Promise<void>
+    readonly bleUuid: string
     readonly bleName: string
 }
 
 export interface MuseControllerOptions {
-    deviceUuid: string
+    bleUuid: string
 }
 
 export type MuseControllerConstructor = new (
