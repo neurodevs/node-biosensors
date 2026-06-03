@@ -20,7 +20,7 @@ export const CONTROL_UUID = MUSE_CHAR_UUIDS['CONTROL']
 export default class MuseDeviceController implements MuseController {
     public static Class?: MuseControllerConstructor
 
-    private readonly ble: BleController
+    protected readonly ble: BleController
 
     protected constructor(ble: BleController) {
         this.ble = ble
@@ -53,6 +53,10 @@ export default class MuseDeviceController implements MuseController {
         await this.ble.disconnect()
     }
 
+    public get bleName() {
+        return this.ble.name
+    }
+
     private static generateCharCallbacks() {
         return Object.entries(MUSE_CHAR_UUIDS).map(([name, uuid]) => {
             return {
@@ -72,6 +76,7 @@ export interface MuseController {
     startStreaming(): Promise<void>
     stopStreaming(): Promise<void>
     disconnect(): Promise<void>
+    readonly bleName: string
 }
 
 export interface MuseControllerOptions {

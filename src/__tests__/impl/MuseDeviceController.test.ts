@@ -1,16 +1,16 @@
 import { test, assert } from '@neurodevs/node-tdd'
 
 import MuseDeviceController, {
-    MuseController,
     MUSE_CHAR_UUIDS,
     CONTROL_UUID,
 } from '../../impl/MuseDeviceController.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 import { BleDeviceController, FakeBleController } from '@neurodevs/node-lsl'
 import koffi from 'koffi'
+import SpyMuseController from '../../testDoubles/MuseController/SpyMuseController.js'
 
 export default class MuseDeviceControllerTest extends AbstractPackageTest {
-    private static instance: MuseController
+    private static instance: SpyMuseController
 
     private static readonly deviceUuid = this.generateId()
 
@@ -36,6 +36,8 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
 
         BleDeviceController.Class = FakeBleController
         FakeBleController.resetTestDouble()
+
+        MuseDeviceController.Class = SpyMuseController
 
         this.instance = await this.MuseDeviceController()
     }
@@ -119,6 +121,17 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
         )
     }
 
+    @test()
+    protected static async exposesNameFromBleController() {
+        await this.startStreaming()
+
+        assert.isEqual(
+            this.instance.bleName,
+            this.instance.getName(),
+            'Did not expose name from BLE controller!'
+        )
+    }
+
     private static async startStreaming() {
         await this.instance.startStreaming()
     }
@@ -134,9 +147,9 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
         }
     }
 
-    private static MuseDeviceController() {
-        return MuseDeviceController.Create({
+    private static async MuseDeviceController() {
+        return (await MuseDeviceController.Create({
             deviceUuid: this.deviceUuid,
-        })
+        })) as SpyMuseController
     }
 }

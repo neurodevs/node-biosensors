@@ -22,8 +22,8 @@ export * from './testDoubles/DeviceStreamer/CgxDeviceStreamer/FakeCgxDeviceStrea
 export { default as MuseDeviceController } from './impl/MuseDeviceController.js'
 export * from './impl/MuseDeviceController.js'
 
-export { default as FakeDeviceController } from './testDoubles/DeviceController/FakeDeviceController.js'
-export * from './testDoubles/DeviceController/FakeDeviceController.js'
+export { default as FakeDeviceController } from './testDoubles/MuseController/FakeMuseController.js'
+export * from './testDoubles/MuseController/FakeMuseController.js'
 
 // Muse S Gen 2
 
