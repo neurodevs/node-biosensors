@@ -40,9 +40,11 @@ export default class MuseDeviceController implements MuseController {
         return new (this.Class ?? this)(ble)
     }
 
-    public async startStreaming() {
+    public async connect() {
         await this.ble.connect()
+    }
 
+    public async startStreaming() {
         for (const cmd of ['h', 'p50', 's', 'd']) {
             await this.ble.writeCharacteristic(CONTROL_UUID, cmd)
         }
@@ -83,6 +85,7 @@ export default class MuseDeviceController implements MuseController {
 }
 
 export interface MuseController {
+    connect(): Promise<void>
     startStreaming(): Promise<void>
     stopStreaming(): Promise<void>
     disconnect(): Promise<void>

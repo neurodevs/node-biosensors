@@ -6,11 +6,16 @@ const muse = await MuseDeviceController.Create({
     enableLogs: true,
 })
 
+await muse.connect()
 await muse.startStreaming()
 
 await new Promise((resolve) => setTimeout(resolve, 5000))
 
 await muse.stopStreaming()
+
+await new Promise((resolve) => setTimeout(resolve, 2000))
+
+await muse.startStreaming()
 
 await new Promise((resolve) => setTimeout(resolve, 2000))
 

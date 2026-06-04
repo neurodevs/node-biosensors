@@ -79,8 +79,8 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async startStreamingCallsConnectBle() {
-        await this.startStreaming()
+    protected static async connectCallsBleControllerConnect() {
+        await this.connect()
 
         assert.isEqual(
             FakeBleController.numCallsToConnect,
@@ -200,6 +200,10 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
             rssiIntervalMs,
             'Did not pass rssiIntervalMs to BLE controller!'
         )
+    }
+
+    private static async connect() {
+        await this.instance.connect()
     }
 
     private static async startStreaming() {

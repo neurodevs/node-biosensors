@@ -3,6 +3,7 @@ import { MuseController } from '../../impl/MuseDeviceController.js'
 
 export default class FakeMuseController implements MuseController {
     public static callsToConstructor: { ble: BleController }[] = []
+    public static numCallsToConnect = 0
     public static numCallsToStartStreaming = 0
     public static numCallsToStopStreaming = 0
     public static numCallsToDisconnect = 0
@@ -12,6 +13,10 @@ export default class FakeMuseController implements MuseController {
     public constructor(ble: BleController) {
         FakeMuseController.callsToConstructor.push({ ble })
         this.ble = ble
+    }
+
+    public async connect() {
+        FakeMuseController.numCallsToConnect++
     }
 
     public async startStreaming() {
@@ -36,6 +41,7 @@ export default class FakeMuseController implements MuseController {
 
     public static resetTestDouble() {
         FakeMuseController.callsToConstructor = []
+        FakeMuseController.numCallsToConnect = 0
         FakeMuseController.numCallsToStartStreaming = 0
         FakeMuseController.numCallsToStopStreaming = 0
         FakeMuseController.numCallsToDisconnect = 0
