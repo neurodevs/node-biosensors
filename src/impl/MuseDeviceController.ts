@@ -68,8 +68,12 @@ export default class MuseDeviceController implements MuseController {
                 charUuid: uuid,
                 charName: name,
                 onData: (data: Buffer, length: number, timestamp: number) => {
-                    const bytes = Array.from(koffi.decode(data, 'uint8', length) as ArrayLike<number>)
-                    if (enableLogs) { console.info(`[${timestamp}]`, bytes) }
+                    const bytes = Array.from(
+                        koffi.decode(data, 'uint8', length)
+                    )
+                    if (enableLogs) {
+                        console.info(`[${timestamp}]`, bytes)
+                    }
                 },
             }
         })

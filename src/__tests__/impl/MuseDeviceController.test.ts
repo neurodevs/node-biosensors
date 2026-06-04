@@ -154,6 +154,19 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async doesNotLogByDefault() {
+        await MuseDeviceController.Create({ bleUuid: this.deviceUuid })
+
+        const { loggedArgs } = this.simulateOnData()
+
+        assert.isEqualDeep(
+            loggedArgs,
+            [],
+            'Should not log any data to console by default!'
+        )
+    }
+
+    @test()
     protected static async exposesNameFromBleController() {
         await this.startStreaming()
 
