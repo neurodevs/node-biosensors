@@ -3,10 +3,10 @@ import { test, assert } from '@neurodevs/node-tdd'
 import MuseDeviceController, {
     MUSE_CHAR_UUIDS,
     CONTROL_UUID,
+    MuseControllerOptions,
 } from '../../impl/MuseDeviceController.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 import { BleDeviceController, FakeBleController } from '@neurodevs/node-lsl'
-import koffi from 'koffi'
 import SpyMuseController from '../../testDoubles/MuseController/SpyMuseController.js'
 
 export default class MuseDeviceControllerTest extends AbstractPackageTest {
@@ -19,14 +19,11 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
             return {
                 charUuid: uuid,
                 charName: name,
-                onData: (data: Buffer, length: number, timestamp: number) => {
-                    const bytes = koffi.decode(
-                        data,
-                        'uint8',
-                        length
-                    ) as number[]
-                    console.info(`[${timestamp}] length=${length}`, bytes)
-                },
+                onData: (
+                    _data: Buffer,
+                    _length: number,
+                    _timestamp: number
+                ) => {},
             }
         }
     )
@@ -134,28 +131,25 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
 
     @test()
     protected static async onDataDecodesAndLogsBytesToConsole() {
-        const { charCallbacks } = FakeBleController.callsToConstructor[0]!
-        const { onData } = charCallbacks![0]!
-
-        const fakeBytes = [10, 20, 30]
-        const fakeBuffer = Buffer.from(fakeBytes)
-        const timestamp = 12345
-
-        const loggedArgs: unknown[][] = []
-        const original = console.info
-
-        console.info = (...args: unknown[]) => {
-            loggedArgs.push(args)
-        }
-
-        onData(fakeBuffer, fakeBytes.length, timestamp)
-
-        console.info = original
+        const { loggedArgs, timestamp, fakeBytes } = this.simulateOnData()
 
         assert.isEqualDeep(
             loggedArgs,
             [[`[${timestamp}]`, fakeBytes]],
             'Did not log expected data to console!'
+        )
+    }
+
+    @test()
+    protected static async doesNotLogIfPassedOption() {
+        await this.MuseDeviceController({ enableLogs: false })
+
+        const { loggedArgs } = this.simulateOnData()
+
+        assert.isEqualDeep(
+            loggedArgs,
+            [],
+            'Should not log any data to console!'
         )
     }
 
@@ -185,9 +179,36 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
         }
     }
 
-    private static async MuseDeviceController() {
+    private static simulateOnData() {
+        const calls = FakeBleController.callsToConstructor
+        const { charCallbacks } = calls[calls.length - 1]!
+        const { onData } = charCallbacks![0]!
+
+        const fakeBytes = [10, 20, 30]
+        const fakeBuffer = Buffer.from(fakeBytes)
+        const timestamp = 12345
+
+        const loggedArgs: unknown[][] = []
+        const original = console.info
+
+        console.info = (...args: unknown[]) => {
+            loggedArgs.push(args)
+        }
+
+        onData(fakeBuffer, fakeBytes.length, timestamp)
+
+        console.info = original
+
+        return { loggedArgs, timestamp, fakeBytes }
+    }
+
+    private static async MuseDeviceController(
+        options?: Partial<MuseControllerOptions>
+    ) {
         return (await MuseDeviceController.Create({
             bleUuid: this.deviceUuid,
+            enableLogs: true,
+            ...options,
         })) as SpyMuseController
     }
 }

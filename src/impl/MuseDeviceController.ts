@@ -28,11 +28,11 @@ export default class MuseDeviceController implements MuseController {
     }
 
     public static async Create(options: MuseControllerOptions) {
-        const { bleUuid } = options
+        const { bleUuid, enableLogs } = options
 
         const ble = await BleDeviceController.Create({
             deviceUuid: bleUuid,
-            charCallbacks: this.generateCharCallbacks(),
+            charCallbacks: this.generateCharCallbacks(enableLogs),
         })
 
         return new (this.Class ?? this)(ble)
@@ -62,14 +62,14 @@ export default class MuseDeviceController implements MuseController {
         return this.ble.name
     }
 
-    private static generateCharCallbacks() {
+    private static generateCharCallbacks(enableLogs?: boolean) {
         return Object.entries(MUSE_CHAR_UUIDS).map(([name, uuid]) => {
             return {
                 charUuid: uuid,
                 charName: name,
                 onData: (data: Buffer, length: number, timestamp: number) => {
-                    const bytes = koffi.decode(data, 'uint8', length)
-                    console.info(`[${timestamp}]`, bytes)
+                    const bytes = Array.from(koffi.decode(data, 'uint8', length) as ArrayLike<number>)
+                    if (enableLogs) { console.info(`[${timestamp}]`, bytes) }
                 },
             }
         })
@@ -86,6 +86,7 @@ export interface MuseController {
 
 export interface MuseControllerOptions {
     bleUuid: string
+    enableLogs?: boolean
 }
 
 export type MuseControllerConstructor = new (
