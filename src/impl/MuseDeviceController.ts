@@ -20,6 +20,7 @@ export const CONTROL_UUID = MUSE_CHAR_UUIDS['CONTROL']
 
 export default class MuseDeviceController implements MuseController {
     public static Class?: MuseControllerConstructor
+    public static log? = console.info
 
     protected readonly ble: BleController
 
@@ -63,6 +64,8 @@ export default class MuseDeviceController implements MuseController {
     }
 
     private static generateCharCallbacks(enableLogs?: boolean) {
+        const log = enableLogs ? this.log : undefined
+
         return Object.entries(MUSE_CHAR_UUIDS).map(([name, uuid]) => {
             return {
                 charUuid: uuid,
@@ -71,9 +74,7 @@ export default class MuseDeviceController implements MuseController {
                     const bytes = Array.from(
                         koffi.decode(data, 'uint8', length)
                     )
-                    if (enableLogs) {
-                        console.info(`[${timestamp}]`, bytes)
-                    }
+                    log?.(`[${timestamp}]`, bytes)
                 },
             }
         })

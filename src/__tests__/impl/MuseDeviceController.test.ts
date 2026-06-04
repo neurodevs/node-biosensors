@@ -28,6 +28,8 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
         }
     )
 
+    private static readonly logCalls: unknown[][] = []
+
     protected static async beforeEach() {
         await super.beforeEach()
 
@@ -35,6 +37,12 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
         FakeBleController.resetTestDouble()
 
         MuseDeviceController.Class = SpyMuseController
+
+        MuseDeviceController.log = (...args: unknown[]) => {
+            this.logCalls.push(args)
+        }
+
+        this.logCalls.length = 0
 
         this.instance = await this.MuseDeviceController()
     }
@@ -131,10 +139,10 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
 
     @test()
     protected static async onDataDecodesAndLogsBytesToConsole() {
-        const { loggedArgs, timestamp, fakeBytes } = this.simulateOnData()
+        const { timestamp, fakeBytes } = this.simulateOnData()
 
         assert.isEqualDeep(
-            loggedArgs,
+            this.logCalls,
             [[`[${timestamp}]`, fakeBytes]],
             'Did not log expected data to console!'
         )
@@ -144,10 +152,10 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
     protected static async doesNotLogIfPassedOption() {
         await this.MuseDeviceController({ enableLogs: false })
 
-        const { loggedArgs } = this.simulateOnData()
+        this.simulateOnData()
 
         assert.isEqualDeep(
-            loggedArgs,
+            this.logCalls,
             [],
             'Should not log any data to console!'
         )
@@ -157,10 +165,10 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
     protected static async doesNotLogByDefault() {
         await MuseDeviceController.Create({ bleUuid: this.deviceUuid })
 
-        const { loggedArgs } = this.simulateOnData()
+        this.simulateOnData()
 
         assert.isEqualDeep(
-            loggedArgs,
+            this.logCalls,
             [],
             'Should not log any data to console by default!'
         )
@@ -201,18 +209,9 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
         const fakeBuffer = Buffer.from(fakeBytes)
         const timestamp = 12345
 
-        const loggedArgs: unknown[][] = []
-        const original = console.info
-
-        console.info = (...args: unknown[]) => {
-            loggedArgs.push(args)
-        }
-
         onData(fakeBuffer, fakeBytes.length, timestamp)
 
-        console.info = original
-
-        return { loggedArgs, timestamp, fakeBytes }
+        return { timestamp, fakeBytes }
     }
 
     private static async MuseDeviceController(
