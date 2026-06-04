@@ -1,3 +1,5 @@
+import { randomInt } from 'node:crypto'
+
 import { test, assert } from '@neurodevs/node-tdd'
 
 import MuseDeviceController, {
@@ -182,6 +184,21 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
             this.instance.bleName,
             this.instance.getName(),
             'Did not expose name from BLE controller!'
+        )
+    }
+
+    @test()
+    protected static async passesRssiIntervalMsToBleController() {
+        const rssiIntervalMs = randomInt(1, 5)
+
+        await this.MuseDeviceController({ rssiIntervalMs })
+
+        const call = FakeBleController.callsToConstructor[1]
+
+        assert.isEqual(
+            call?.rssiIntervalMs,
+            rssiIntervalMs,
+            'Did not pass rssiIntervalMs to BLE controller!'
         )
     }
 

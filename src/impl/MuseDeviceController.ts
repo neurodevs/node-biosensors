@@ -29,10 +29,11 @@ export default class MuseDeviceController implements MuseController {
     }
 
     public static async Create(options: MuseControllerOptions) {
-        const { bleUuid, enableLogs } = options
+        const { bleUuid, rssiIntervalMs, enableLogs } = options
 
         const ble = await BleDeviceController.Create({
             deviceUuid: bleUuid,
+            rssiIntervalMs,
             charCallbacks: this.generateCharCallbacks(enableLogs),
         })
 
@@ -92,6 +93,7 @@ export interface MuseController {
 export interface MuseControllerOptions {
     bleUuid: string
     enableLogs?: boolean
+    rssiIntervalMs?: number
 }
 
 export type MuseControllerConstructor = new (
