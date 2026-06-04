@@ -133,6 +133,42 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async onDataDecodesAndLogsBytesToConsole() {
+        const { charCallbacks } = FakeBleController.callsToConstructor[0]!
+        const { onData } = charCallbacks![0]!
+
+        const fakeBytes = [10, 20, 30]
+        const fakeBuffer = Buffer.from(fakeBytes)
+        const timestamp = 12345
+
+        const loggedArgs: unknown[][] = []
+        const original = console.info
+        console.info = (...args: unknown[]) => {
+            loggedArgs.push(args)
+        }
+
+        debugger
+
+        onData(fakeBuffer, fakeBytes.length, timestamp)
+
+        console.info = original
+
+        assert.isEqual(
+            loggedArgs.length,
+            1,
+            'Expected console.info to be called once!'
+        )
+
+        const [label, decoded] = loggedArgs[0]!
+        assert.isEqual(label, `[${timestamp}]`, 'Unexpected timestamp label!')
+        assert.isEqualDeep(
+            Array.from(decoded as Uint8Array),
+            fakeBytes,
+            'Decoded bytes do not match!'
+        )
+    }
+
+    @test()
     protected static async exposesNameFromBleController() {
         await this.startStreaming()
 

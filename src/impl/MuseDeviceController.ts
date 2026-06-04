@@ -1,4 +1,5 @@
 import { BleController, BleDeviceController } from '@neurodevs/node-lsl'
+import koffi from 'koffi'
 
 export const MUSE_CHAR_UUIDS: Record<string, string> = {
     CONTROL: '273E0001-4C4D-454D-96BE-F03BAC821358',
@@ -27,10 +28,10 @@ export default class MuseDeviceController implements MuseController {
     }
 
     public static async Create(options: MuseControllerOptions) {
-        const { bleUuid: deviceUuid } = options
+        const { bleUuid } = options
 
         const ble = await BleDeviceController.Create({
-            deviceUuid,
+            deviceUuid: bleUuid,
             charCallbacks: this.generateCharCallbacks(),
         })
 
@@ -66,11 +67,10 @@ export default class MuseDeviceController implements MuseController {
             return {
                 charUuid: uuid,
                 charName: name,
-                onData: (
-                    _data: Buffer,
-                    _length: number,
-                    _timestamp: number
-                ) => {},
+                onData: (data: Buffer, length: number, timestamp: number) => {
+                    const bytes = koffi.decode(data, 'uint8', length)
+                    console.info(`[${timestamp}]`, bytes)
+                },
             }
         })
     }
