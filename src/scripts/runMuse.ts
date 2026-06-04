@@ -9,7 +9,7 @@ const muse = await MuseDeviceController.Create({
 await muse.connect()
 await muse.startStreaming()
 
-await new Promise((resolve) => setTimeout(resolve, 5000))
+await new Promise((resolve) => setTimeout(resolve, 2000))
 
 await muse.stopStreaming()
 
@@ -19,6 +19,15 @@ await muse.startStreaming()
 
 await new Promise((resolve) => setTimeout(resolve, 2000))
 
+await muse.stopStreaming()
+await muse.disconnect()
+
+await muse.connect()
+await muse.startStreaming()
+
+await new Promise((resolve) => setTimeout(resolve, 2000))
+
+await muse.stopStreaming()
 await muse.disconnect()
 
 console.log('Done!')
