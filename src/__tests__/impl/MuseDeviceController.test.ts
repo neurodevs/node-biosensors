@@ -74,7 +74,12 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
 
     @test()
     protected static async startsWithIsRunningFalse() {
-        assert.isFalse(this.isRunning, 'Did not set isRunning false!')
+        assert.isFalse(this.isStreaming, 'Did not set isRunning false!')
+    }
+
+    @test()
+    protected static async startsWithIsConnectedFalse() {
+        assert.isFalse(this.isConnected, 'Did not set isConnected false!')
     }
 
     @test()
@@ -116,7 +121,7 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
     protected static async startStreamingSetsIsRunningTrue() {
         await this.startStreaming()
 
-        assert.isTrue(this.isRunning, 'Did not set isRunning true!')
+        assert.isTrue(this.isStreaming, 'Did not set isRunning true!')
     }
 
     @test()
@@ -140,7 +145,7 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
         await this.startStreaming()
         await this.stopStreaming()
 
-        assert.isFalse(this.isRunning, 'Did not set isRunning false!')
+        assert.isFalse(this.isStreaming, 'Did not set isRunning false!')
     }
 
     @test()
@@ -334,8 +339,12 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
         )
     }
 
-    private static get isRunning() {
-        return this.instance.getIsRunning()
+    private static get isConnected() {
+        return this.instance.getIsConnected()
+    }
+
+    private static get isStreaming() {
+        return this.instance.getIsStreaming()
     }
 
     private static async connect() {

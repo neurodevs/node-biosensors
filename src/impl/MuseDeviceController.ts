@@ -28,6 +28,7 @@ export default class MuseDeviceController implements MuseController {
 
     protected readonly ble: BleController
 
+    protected isConnected = false
     protected isStreaming = false
 
     protected constructor(ble: BleController) {

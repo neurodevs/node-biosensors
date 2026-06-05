@@ -10,7 +10,11 @@ export default class SpyMuseController extends MuseDeviceController {
         return this.ble.name
     }
 
-    public getIsRunning() {
+    public getIsConnected() {
+        return this.isConnected
+    }
+
+    public getIsStreaming() {
         return this.isStreaming
     }
 }
