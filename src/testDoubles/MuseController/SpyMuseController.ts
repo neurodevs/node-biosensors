@@ -11,6 +11,6 @@ export default class SpyMuseController extends MuseDeviceController {
     }
 
     public getIsRunning() {
-        return this.isRunning
+        return this.isStreaming
     }
 }
