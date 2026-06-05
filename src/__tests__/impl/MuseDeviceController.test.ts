@@ -125,6 +125,18 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async connectDoesNotCallBleControllerIfConnected() {
+        await this.connect()
+        await this.connect()
+
+        assert.isEqual(
+            FakeBleController.numCallsToConnect,
+            1,
+            'Did not connect to BLE device!'
+        )
+    }
+
+    @test()
     protected static async startStreamingSetsIsStreamingTrue() {
         await this.startStreaming()
 
