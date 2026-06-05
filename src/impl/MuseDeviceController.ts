@@ -26,16 +26,6 @@ export default class MuseDeviceController implements MuseController {
     public static Class?: MuseControllerConstructor
     public static log? = console.info
 
-    private static readonly eegSampleRateHz = 256
-
-    private static readonly eegCharNames = [
-        'EEG_TP9',
-        'EEG_AF7',
-        'EEG_AF8',
-        'EEG_TP10',
-        'EEG_AUX',
-    ]
-
     protected readonly ble: BleController
 
     protected constructor(ble: BleController) {
@@ -48,8 +38,10 @@ export default class MuseDeviceController implements MuseController {
         const ble = await this.BleDeviceController(options)
 
         if (!disableEeg) {
-            await this.LslStreamOutlet()
+            await this.EegLslOutlet()
         }
+
+        await this.PpgLslOutlet()
 
         return new (this.Class ?? this)(ble)
     }
@@ -107,16 +99,36 @@ export default class MuseDeviceController implements MuseController {
         })
     }
 
-    private static async LslStreamOutlet() {
+    private static async EegLslOutlet() {
         await LslStreamOutlet.Create({
             name: 'Muse EEG',
             type: 'EEG',
-            channelNames: this.eegCharNames,
-            sampleRateHz: this.eegSampleRateHz,
+            channelNames: [
+                'EEG_TP9',
+                'EEG_AF7',
+                'EEG_AF8',
+                'EEG_TP10',
+                'EEG_AUX',
+            ],
+            sampleRateHz: 256,
             channelFormat: 'float32',
             sourceId: 'muse-eeg',
             manufacturer: 'Interaxon Inc.',
             units: 'microvolt',
+            chunkSize: 1,
+        })
+    }
+
+    private static async PpgLslOutlet() {
+        await LslStreamOutlet.Create({
+            name: 'Muse PPG',
+            type: 'PPG',
+            channelNames: ['PPG_AMBIENT', 'PPG_INFRARED', 'PPG_RED'],
+            sampleRateHz: 64,
+            channelFormat: 'float32',
+            sourceId: 'muse-s-ppg',
+            manufacturer: 'Interaxon Inc.',
+            units: 'N/A',
             chunkSize: 1,
         })
     }
