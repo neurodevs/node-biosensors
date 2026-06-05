@@ -269,6 +269,21 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
         })
     }
 
+    @test()
+    protected static async doesNotCreatePpgLslOutletWithFlag() {
+        FakeStreamOutlet.callsToConstructor.length = 0
+
+        await this.MuseDeviceController({ disablePpg: true })
+
+        assert.isEqual(
+            FakeStreamOutlet.callsToConstructor.filter(
+                (call) => call?.name === 'Muse PPG'
+            ).length,
+            0,
+            'Should not create any PPG outlets!'
+        )
+    }
+
     private static async connect() {
         await this.instance.connect()
     }
