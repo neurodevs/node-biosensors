@@ -73,6 +73,11 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async startsWithIsRunningFalse() {
+        assert.isFalse(this.isRunning)
+    }
+
+    @test()
     protected static async createsBleDeviceController() {
         const call = FakeBleController.callsToConstructor[0]
 
@@ -296,6 +301,10 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
             0,
             'Should not create any PPG outlets!'
         )
+    }
+
+    private static get isRunning() {
+        return this.instance.getIsRunning()
     }
 
     private static async connect() {

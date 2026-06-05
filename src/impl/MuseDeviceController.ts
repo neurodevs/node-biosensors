@@ -28,6 +28,8 @@ export default class MuseDeviceController implements MuseController {
 
     protected readonly ble: BleController
 
+    protected isRunning = false
+
     protected constructor(ble: BleController) {
         this.ble = ble
     }
