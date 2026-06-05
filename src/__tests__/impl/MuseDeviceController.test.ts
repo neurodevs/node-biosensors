@@ -8,13 +8,28 @@ import MuseDeviceController, {
     MuseControllerOptions,
 } from '../../impl/MuseDeviceController.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
-import { BleDeviceController, FakeBleController } from '@neurodevs/node-lsl'
+import {
+    BleDeviceController,
+    FakeBleController,
+    FakeStreamOutlet,
+    LslStreamOutlet,
+} from '@neurodevs/node-lsl'
 import SpyMuseController from '../../testDoubles/MuseController/SpyMuseController.js'
 
 export default class MuseDeviceControllerTest extends AbstractPackageTest {
     private static instance: SpyMuseController
 
     private static readonly deviceUuid = this.generateId()
+
+    private static readonly eegSampleRateHz = 256
+
+    private static readonly eegCharNames = [
+        'EEG_TP9',
+        'EEG_AF7',
+        'EEG_AF8',
+        'EEG_TP10',
+        'EEG_AUX',
+    ]
 
     private static readonly charCallbacks = Object.entries(MUSE_CHAR_UUIDS).map(
         ([name, uuid]) => {
@@ -37,6 +52,9 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
 
         BleDeviceController.Class = FakeBleController
         FakeBleController.resetTestDouble()
+
+        LslStreamOutlet.Class = FakeStreamOutlet
+        FakeStreamOutlet.resetTestDouble()
 
         MuseDeviceController.Class = SpyMuseController
 
@@ -200,6 +218,23 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
             rssiIntervalMs,
             'Did not pass rssiIntervalMs to BLE controller!'
         )
+    }
+
+    @test()
+    protected static async createsLslOutletForEegChannels() {
+        const firstCall = FakeStreamOutlet.callsToConstructor[0]
+
+        assert.isEqualDeep(firstCall, {
+            name: 'Muse EEG',
+            type: 'EEG',
+            channelNames: this.eegCharNames,
+            sampleRateHz: this.eegSampleRateHz,
+            channelFormat: 'float32',
+            sourceId: 'muse-eeg',
+            manufacturer: 'Interaxon Inc.',
+            units: 'microvolt',
+            chunkSize: 1,
+        })
     }
 
     private static async connect() {

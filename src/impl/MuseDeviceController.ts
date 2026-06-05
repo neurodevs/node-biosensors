@@ -1,4 +1,8 @@
-import { BleController, BleDeviceController } from '@neurodevs/node-lsl'
+import {
+    BleController,
+    BleDeviceController,
+    LslStreamOutlet,
+} from '@neurodevs/node-lsl'
 import koffi from 'koffi'
 
 export const MUSE_CHAR_UUIDS: Record<string, string> = {
@@ -22,6 +26,16 @@ export default class MuseDeviceController implements MuseController {
     public static Class?: MuseControllerConstructor
     public static log? = console.info
 
+    private static readonly eegSampleRateHz = 256
+
+    private static readonly eegCharNames = [
+        'EEG_TP9',
+        'EEG_AF7',
+        'EEG_AF8',
+        'EEG_TP10',
+        'EEG_AUX',
+    ]
+
     protected readonly ble: BleController
 
     protected constructor(ble: BleController) {
@@ -29,13 +43,8 @@ export default class MuseDeviceController implements MuseController {
     }
 
     public static async Create(options: MuseControllerOptions) {
-        const { bleUuid, rssiIntervalMs, enableLogs } = options
-
-        const ble = await BleDeviceController.Create({
-            deviceUuid: bleUuid,
-            rssiIntervalMs,
-            charCallbacks: this.generateCharCallbacks(enableLogs),
-        })
+        const ble = await this.BleDeviceController(options)
+        await this.LslStreamOutlet()
 
         return new (this.Class ?? this)(ble)
     }
@@ -80,6 +89,30 @@ export default class MuseDeviceController implements MuseController {
                     log?.(`[${timestamp}]`, name, bytes)
                 },
             }
+        })
+    }
+
+    private static async BleDeviceController(options: MuseControllerOptions) {
+        const { bleUuid, rssiIntervalMs, enableLogs } = options
+
+        return await BleDeviceController.Create({
+            deviceUuid: bleUuid,
+            rssiIntervalMs,
+            charCallbacks: this.generateCharCallbacks(enableLogs),
+        })
+    }
+
+    private static async LslStreamOutlet() {
+        await LslStreamOutlet.Create({
+            name: 'Muse EEG',
+            type: 'EEG',
+            channelNames: this.eegCharNames,
+            sampleRateHz: this.eegSampleRateHz,
+            channelFormat: 'float32',
+            sourceId: 'muse-eeg',
+            manufacturer: 'Interaxon Inc.',
+            units: 'microvolt',
+            chunkSize: 1,
         })
     }
 }

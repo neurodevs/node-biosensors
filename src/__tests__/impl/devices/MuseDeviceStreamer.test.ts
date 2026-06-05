@@ -128,12 +128,6 @@ export default class MuseDeviceStreamerTest extends AbstractPackageTest {
         )
     }
 
-    private static createIncreasingData(size = 0) {
-        return Array(size)
-            .fill(0)
-            .map((_, i) => i)
-    }
-
     @test()
     protected static async createsLslOutletForPpgChannels() {
         const secondCall = FakeStreamOutlet.callsToConstructor[1]
@@ -353,6 +347,12 @@ export default class MuseDeviceStreamerTest extends AbstractPackageTest {
 
     private static async disconnect() {
         await this.instance.disconnect()
+    }
+
+    private static createIncreasingData(size = 0) {
+        return Array(size)
+            .fill(0)
+            .map((_, i) => i)
     }
 
     private static generatePpgSamples(decoded: number[]) {
