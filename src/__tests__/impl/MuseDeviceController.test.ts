@@ -141,11 +141,11 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
 
     @test()
     protected static async onDataDecodesAndLogsBytesToConsole() {
-        const { timestamp, fakeBytes } = this.simulateOnData()
+        const { timestamp, fakeBytes, name } = this.simulateOnData()
 
         assert.isEqualDeep(
             this.logCalls,
-            [[`[${timestamp}]`, fakeBytes]],
+            [[`[${timestamp}]`, name, fakeBytes]],
             'Did not log expected data to console!'
         )
     }
@@ -224,7 +224,7 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
     private static simulateOnData() {
         const calls = FakeBleController.callsToConstructor
         const { charCallbacks } = calls[calls.length - 1]!
-        const { onData } = charCallbacks![0]!
+        const { onData, charName } = charCallbacks![0]!
 
         const fakeBytes = [10, 20, 30]
         const fakeBuffer = Buffer.from(fakeBytes)
@@ -232,7 +232,7 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
 
         onData(fakeBuffer, fakeBytes.length, timestamp)
 
-        return { timestamp, fakeBytes }
+        return { timestamp, fakeBytes, name: charName }
     }
 
     private static async MuseDeviceController(

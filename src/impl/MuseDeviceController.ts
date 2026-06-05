@@ -77,7 +77,7 @@ export default class MuseDeviceController implements MuseController {
                     const bytes = Array.from(
                         koffi.decode(data, 'uint8', length)
                     )
-                    log?.(`[${timestamp}]`, bytes)
+                    log?.(`[${timestamp}]`, name, bytes)
                 },
             }
         })
