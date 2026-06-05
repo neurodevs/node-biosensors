@@ -147,6 +147,20 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async disconnectCallsStopStreaming() {
+        let wasHit = false
+
+        this.instance.stopStreaming = async () => {
+            wasHit = true
+        }
+
+        await this.startStreaming()
+        await this.disconnect()
+
+        assert.isTrue(wasHit, 'Should call stopStreaming on disconnect!')
+    }
+
+    @test()
     protected static async exposesUuidFromBleController() {
         await this.startStreaming()
 
@@ -294,6 +308,10 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
 
     private static async stopStreaming() {
         await this.instance.stopStreaming()
+    }
+
+    private static async disconnect() {
+        await this.instance.disconnect()
     }
 
     private static generateCmd(value: string) {
