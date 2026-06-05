@@ -237,6 +237,19 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
         })
     }
 
+    @test()
+    protected static async doesNotCreateEegOutletWhenPassedFlag() {
+        FakeStreamOutlet.callsToConstructor.length = 0
+
+        await this.MuseDeviceController({ disableEeg: true })
+
+        assert.isEqual(
+            FakeStreamOutlet.callsToConstructor.length,
+            0,
+            'Should not create any stream outlets!'
+        )
+    }
+
     private static async connect() {
         await this.instance.connect()
     }

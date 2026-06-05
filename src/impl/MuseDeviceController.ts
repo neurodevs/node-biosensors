@@ -43,8 +43,13 @@ export default class MuseDeviceController implements MuseController {
     }
 
     public static async Create(options: MuseControllerOptions) {
+        const { disableEeg } = options
+
         const ble = await this.BleDeviceController(options)
-        await this.LslStreamOutlet()
+
+        if (!disableEeg) {
+            await this.LslStreamOutlet()
+        }
 
         return new (this.Class ?? this)(ble)
     }
@@ -130,6 +135,7 @@ export interface MuseControllerOptions {
     bleUuid: string
     enableLogs?: boolean
     rssiIntervalMs?: number
+    disableEeg?: boolean
 }
 
 export type MuseControllerConstructor = new (
