@@ -73,13 +73,13 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async startsWithIsRunningFalse() {
-        assert.isFalse(this.isStreaming, 'Did not set isRunning false!')
+    protected static async startsWithIsConnectedFalse() {
+        assert.isFalse(this.isConnected, 'Did not set isConnected false!')
     }
 
     @test()
-    protected static async startsWithIsConnectedFalse() {
-        assert.isFalse(this.isConnected, 'Did not set isConnected false!')
+    protected static async startsWithIsStreamingFalse() {
+        assert.isFalse(this.isStreaming, 'Did not set isStreaming false!')
     }
 
     @test()
@@ -107,6 +107,13 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async connectSetsIsConnectedTrue() {
+        await this.connect()
+
+        assert.isTrue(this.isConnected, 'Did not set isConnected true!')
+    }
+
+    @test()
     protected static async connectCallsBleControllerConnect() {
         await this.connect()
 
@@ -118,10 +125,10 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async startStreamingSetsIsRunningTrue() {
+    protected static async startStreamingSetsIsStreamingTrue() {
         await this.startStreaming()
 
-        assert.isTrue(this.isStreaming, 'Did not set isRunning true!')
+        assert.isTrue(this.isStreaming, 'Did not set isStreaming true!')
     }
 
     @test()
@@ -141,11 +148,11 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async stopStreamingSetsIsRunningFalse() {
+    protected static async stopStreamingSetsIsStreamingFalse() {
         await this.startStreaming()
         await this.stopStreaming()
 
-        assert.isFalse(this.isStreaming, 'Did not set isRunning false!')
+        assert.isFalse(this.isStreaming, 'Did not set isStreaming false!')
     }
 
     @test()

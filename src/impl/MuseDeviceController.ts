@@ -53,6 +53,7 @@ export default class MuseDeviceController implements MuseController {
 
     public async connect() {
         await this.ble.connect()
+        this.isConnected = true
     }
 
     public async startStreaming() {
