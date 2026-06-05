@@ -63,6 +63,7 @@ export default class MuseDeviceController implements MuseController {
 
     public async stopStreaming() {
         await this.ble.writeCharacteristic(CONTROL_UUID, 'h')
+        this.isStreaming = false
     }
 
     public async disconnect() {

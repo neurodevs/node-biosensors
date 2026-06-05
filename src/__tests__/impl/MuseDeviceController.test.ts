@@ -136,6 +136,14 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async stopStreamingSetsIsRunningFalse() {
+        await this.startStreaming()
+        await this.stopStreaming()
+
+        assert.isFalse(this.isRunning, 'Did not set isRunning false!')
+    }
+
+    @test()
     protected static async stopStreamingWritesHaltCommandToControlChar() {
         await this.startStreaming()
         await this.stopStreaming()
