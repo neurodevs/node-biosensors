@@ -206,6 +206,15 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
             'Should not have written to control char!'
         )
     }
+
+    @test()
+    protected static async disconnectSetsIsConnectedFalse() {
+        await this.connect()
+        await this.disconnect()
+
+        assert.isFalse(this.isConnected, 'Did not set isConnected false!')
+    }
+
     @test()
     protected static async disconnectCallsDisconnectBle() {
         await this.connect()

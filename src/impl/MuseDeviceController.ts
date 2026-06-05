@@ -100,6 +100,11 @@ export default class MuseDeviceController implements MuseController {
         if (this.isStreaming) {
             await this.stopStreaming()
         }
+        await this.idempotentDisconnect()
+        this.isConnected = false
+    }
+
+    private async idempotentDisconnect() {
         if (this.isConnected) {
             await this.ble.disconnect()
         } else {
