@@ -100,7 +100,11 @@ export default class MuseDeviceController implements MuseController {
         if (this.isStreaming) {
             await this.stopStreaming()
         }
-        await this.ble.disconnect()
+        if (this.isConnected) {
+            await this.ble.disconnect()
+        } else {
+            console.warn(`Already disconnected from ${this.bleUuid}.`)
+        }
     }
 
     public get bleUuid() {

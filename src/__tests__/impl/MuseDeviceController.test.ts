@@ -208,7 +208,8 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
     }
     @test()
     protected static async disconnectCallsDisconnectBle() {
-        await this.instance.disconnect()
+        await this.connect()
+        await this.disconnect()
 
         assert.isEqual(
             FakeBleController.numCallsToDisconnect,
@@ -244,6 +245,17 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
         assert.isFalse(
             wasHit,
             'Should not call stopStreaming if not streaming!'
+        )
+    }
+
+    @test()
+    protected static async disconnectDoesNotCallBleControllerIfNotConnected() {
+        await this.disconnect()
+
+        assert.isEqual(
+            FakeBleController.numCallsToDisconnect,
+            0,
+            'Should not disconnect from BLE device if not connected!'
         )
     }
 
