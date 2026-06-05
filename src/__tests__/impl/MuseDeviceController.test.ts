@@ -160,6 +160,23 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async startStreamingDoesNotWriteCharsIfStreaming() {
+        await this.startStreaming()
+        await this.startStreaming()
+
+        assert.isEqualDeep(
+            FakeBleController.callsToWriteCharacteristic,
+            [
+                this.generateCmd('h'),
+                this.generateCmd('p50'),
+                this.generateCmd('s'),
+                this.generateCmd('d'),
+            ],
+            'Should not write any commands to control char when starting streaming!'
+        )
+    }
+
+    @test()
     protected static async stopStreamingSetsIsStreamingFalse() {
         await this.startStreaming()
         await this.stopStreaming()
