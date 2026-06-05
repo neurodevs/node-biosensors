@@ -58,6 +58,7 @@ export default class MuseDeviceController implements MuseController {
         for (const cmd of ['h', 'p50', 's', 'd']) {
             await this.ble.writeCharacteristic(CONTROL_UUID, cmd)
         }
+        this.isStreaming = true
     }
 
     public async stopStreaming() {

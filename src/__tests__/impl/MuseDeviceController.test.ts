@@ -74,7 +74,7 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
 
     @test()
     protected static async startsWithIsRunningFalse() {
-        assert.isFalse(this.isRunning)
+        assert.isFalse(this.isRunning, 'Did not set isRunning false!')
     }
 
     @test()
@@ -110,6 +110,13 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
             1,
             'Did not connect to BLE device!'
         )
+    }
+
+    @test()
+    protected static async startStreamingSetsIsRunningTrue() {
+        await this.startStreaming()
+
+        assert.isTrue(this.isRunning, 'Did not set isRunning true!')
     }
 
     @test()
