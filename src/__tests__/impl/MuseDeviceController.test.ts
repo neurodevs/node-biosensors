@@ -197,6 +197,16 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async stopStreamingDoesNotWriteControlCharIfNotStreaming() {
+        await this.stopStreaming()
+
+        assert.isEqualDeep(
+            FakeBleController.callsToWriteCharacteristic,
+            [],
+            'Should not have written to control char!'
+        )
+    }
+    @test()
     protected static async disconnectCallsDisconnectBle() {
         await this.instance.disconnect()
 

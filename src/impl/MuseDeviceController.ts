@@ -52,17 +52,29 @@ export default class MuseDeviceController implements MuseController {
     }
 
     public async connect() {
-        if (!this.isConnected) {
-            await this.ble.connect()
-        }
+        await this.idempotentConnect()
         this.isConnected = true
     }
 
+    private async idempotentConnect() {
+        if (!this.isConnected) {
+            await this.ble.connect()
+        } else {
+            console.warn(`Already connected to ${this.bleUuid}.`)
+        }
+    }
+
     public async startStreaming() {
+        await this.idempotentStartStreaming()
+        this.isStreaming = true
+    }
+
+    private async idempotentStartStreaming() {
         if (!this.isStreaming) {
             await this.writeStartStreamingCommands()
+        } else {
+            console.warn(`Already streaming from ${this.bleUuid}.`)
         }
-        this.isStreaming = true
     }
 
     private async writeStartStreamingCommands() {
@@ -72,8 +84,16 @@ export default class MuseDeviceController implements MuseController {
     }
 
     public async stopStreaming() {
-        await this.ble.writeCharacteristic(CONTROL_UUID, 'h')
+        await this.idempotentStopStreaming()
         this.isStreaming = false
+    }
+
+    private async idempotentStopStreaming() {
+        if (this.isStreaming) {
+            await this.ble.writeCharacteristic(CONTROL_UUID, 'h')
+        } else {
+            console.warn(`Not streaming from ${this.bleUuid}.`)
+        }
     }
 
     public async disconnect() {
