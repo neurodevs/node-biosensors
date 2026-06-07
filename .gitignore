@@ -129,9 +129,9 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
+artifacts/
 build/
 sandbox/
-*.xdf
 .DS_Store
-
-artifacts/
+*.txt
+*.xdf
