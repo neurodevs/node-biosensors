@@ -1,3 +1,4 @@
+import fs from 'fs'
 import {
     BleController,
     BleDeviceController,
@@ -24,6 +25,7 @@ export const CONTROL_UUID = MUSE_CHAR_UUIDS['CONTROL']
 
 export default class MuseDeviceController implements MuseController {
     public static Class?: MuseControllerConstructor
+    public static createWriteStream = fs.createWriteStream
     public static log? = console.info
 
     protected readonly ble: BleController
@@ -120,30 +122,39 @@ export default class MuseDeviceController implements MuseController {
         return this.ble.name
     }
 
-    private static generateCharCallbacks(enableLogs?: boolean) {
+    private static async BleDeviceController(options: MuseControllerOptions) {
+        const { bleUuid, rssiIntervalMs, enableLogs, txtRecordPath } = options
+
         const log = enableLogs ? this.log : undefined
 
-        return Object.entries(MUSE_CHAR_UUIDS).map(([name, uuid]) => {
-            return {
-                charUuid: uuid,
-                charName: name,
-                onData: (data: Buffer, length: number, timestamp: number) => {
-                    const bytes = Array.from(
-                        koffi.decode(data, 'uint8', length)
-                    )
-                    log?.(`[${timestamp}]`, name, bytes)
-                },
-            }
-        })
-    }
-
-    private static async BleDeviceController(options: MuseControllerOptions) {
-        const { bleUuid, rssiIntervalMs, enableLogs } = options
+        const stream = txtRecordPath
+            ? this.createWriteStream(txtRecordPath, { flags: 'a' })
+            : undefined
 
         return await BleDeviceController.Create({
             deviceUuid: bleUuid,
             rssiIntervalMs,
-            charCallbacks: this.generateCharCallbacks(enableLogs),
+            charCallbacks: Object.entries(MUSE_CHAR_UUIDS).map(
+                ([name, uuid]) => {
+                    return {
+                        charUuid: uuid,
+                        charName: name,
+                        onData: (
+                            data: Buffer,
+                            length: number,
+                            timestamp: number
+                        ) => {
+                            const bytes = Array.from(
+                                koffi.decode(data, 'uint8', length)
+                            )
+                            log?.(`[${timestamp}]`, name, bytes)
+                            stream?.write(
+                                `[${timestamp}] ${name} ${JSON.stringify(bytes)}\n`
+                            )
+                        },
+                    }
+                }
+            ),
         })
     }
 
@@ -195,6 +206,7 @@ export interface MuseControllerOptions {
     bleUuid: string
     enableLogs?: boolean
     rssiIntervalMs?: number
+    txtRecordPath?: string
     disableEeg?: boolean
     disablePpg?: boolean
 }

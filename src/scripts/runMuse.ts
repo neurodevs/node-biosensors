@@ -3,13 +3,14 @@ import MuseDeviceController from '../impl/MuseDeviceController.js'
 const muse = await MuseDeviceController.Create({
     bleUuid: 'CA6A61B7-B7A8-AF24-3C9E-04A6A5012554',
     rssiIntervalMs: 1000,
+    txtRecordPath: 'muse_data.txt',
     enableLogs: true,
 })
 
 await muse.connect()
 await muse.startStreaming()
 
-await new Promise((resolve) => setTimeout(resolve, 2000))
+await new Promise((resolve) => setTimeout(resolve, 200000))
 
 await muse.stopStreaming()
 

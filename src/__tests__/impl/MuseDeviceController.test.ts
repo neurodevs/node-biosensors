@@ -45,6 +45,10 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
         }
     )
 
+    private static readonly txtRecordPath = this.generateId()
+
+    private static readonly callsToCreateWriteStream: unknown[] = []
+    private static readonly callsToWriteStream: unknown[] = []
     private static readonly logCalls: unknown[][] = []
 
     protected static async beforeEach() {
@@ -52,6 +56,18 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
 
         BleDeviceController.Class = FakeBleController
         FakeBleController.resetTestDouble()
+
+        MuseDeviceController.createWriteStream = (path: any, options?: any) => {
+            this.callsToCreateWriteStream.push({ path, options })
+            return {
+                write: (chunk: any) => {
+                    this.callsToWriteStream.push(chunk)
+                },
+            } as any
+        }
+
+        this.callsToCreateWriteStream.length = 0
+        this.callsToWriteStream.length = 0
 
         LslStreamOutlet.Class = FakeStreamOutlet
         FakeStreamOutlet.resetTestDouble()
@@ -269,17 +285,6 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async exposesUuidFromBleController() {
-        await this.startStreaming()
-
-        assert.isEqual(
-            this.instance.bleUuid,
-            this.deviceUuid,
-            'Did not expose uuid from BLE controller!'
-        )
-    }
-
-    @test()
     protected static async onDataDecodesAndLogsBytesToConsole() {
         const { timestamp, fakeBytes, name } = this.simulateOnData()
 
@@ -313,6 +318,47 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
             this.logCalls,
             [],
             'Should not log any data to console by default!'
+        )
+    }
+
+    @test()
+    protected static async onDataCreatesWriteStreamWithOption() {
+        await this.MuseDeviceController({
+            txtRecordPath: this.txtRecordPath,
+        })
+
+        this.simulateOnData()
+
+        assert.isEqualDeep(
+            this.callsToCreateWriteStream[0],
+            { path: this.txtRecordPath, options: { flags: 'a' } },
+            'Did not create write stream with expected options!'
+        )
+    }
+
+    @test()
+    protected static async onDataWritesToWriteStreamWithExpectedContent() {
+        await this.MuseDeviceController({
+            txtRecordPath: this.txtRecordPath,
+        })
+
+        this.simulateOnData()
+
+        assert.isEqualDeep(
+            this.callsToWriteStream[0],
+            `[12345] ${this.charCallbacks[0].charName} ${JSON.stringify([10, 20, 30])}\n`,
+            'Did not write expected content to write stream!'
+        )
+    }
+
+    @test()
+    protected static async exposesUuidFromBleController() {
+        await this.startStreaming()
+
+        assert.isEqual(
+            this.instance.bleUuid,
+            this.deviceUuid,
+            'Did not expose uuid from BLE controller!'
         )
     }
 
