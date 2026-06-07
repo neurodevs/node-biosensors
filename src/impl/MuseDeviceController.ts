@@ -26,7 +26,7 @@ export const CONTROL_UUID = MUSE_CHAR_UUIDS['CONTROL']
 export default class MuseDeviceController implements MuseController {
     public static Class?: MuseControllerConstructor
     public static createWriteStream = fs.createWriteStream
-    public static log? = console.info
+    public static log = console.info
 
     protected readonly ble: BleController
 
