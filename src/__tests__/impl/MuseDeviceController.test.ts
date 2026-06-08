@@ -20,8 +20,8 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
     private static instance: SpyMuseController
 
     private static readonly deviceUuid = this.generateId()
-
     private static readonly eegSampleRateHz = 256
+    private static readonly eegChunkSize = 12
 
     private static readonly eegCharNames = [
         'EEG_TP9',
@@ -290,7 +290,7 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
 
         assert.isEqualDeep(
             this.logCalls,
-            [[`[${timestamp}]`, name, fakeBytes]],
+            [[`[${timestamp}] ${name} ${fakeBytes}`]],
             'Did not log expected data to console!'
         )
     }
@@ -346,8 +346,61 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
 
         assert.isEqualDeep(
             this.callsToWriteStream[0],
-            `[12345] ${this.charCallbacks[0].charName} ${JSON.stringify([10, 20, 30])}\n`,
+            `[12345] ${this.charCallbacks[0].charName} ${[10, 20, 30]}\n`,
             'Did not write expected content to write stream!'
+        )
+    }
+
+    @test()
+    protected static async onDataPushesEegSamplesToOutlet() {
+        const { timestamp, charValues } = this.simulateEegOnData()
+
+        const expected = Array.from(
+            { length: this.eegChunkSize },
+            (_, sampleIdx) => ({
+                sample: charValues.map((values) => values[sampleIdx]),
+                timestamp: timestamp + sampleIdx / this.eegSampleRateHz,
+            })
+        )
+
+        assert.isEqualDeep(
+            FakeStreamOutlet.callsToPushSample,
+            expected,
+            'Should push each EEG sample of chunk!'
+        )
+    }
+
+    @test()
+    protected static async onDataLogsEegSamplesOnceChunkIsFormed() {
+        const { timestamp, charValues } = this.simulateEegOnData()
+
+        const expected = this.generateExpectedEegMessages(
+            timestamp,
+            charValues
+        ).map((msg) => [msg])
+
+        assert.isEqualDeep(
+            this.eegLogCalls,
+            expected,
+            'Should log each EEG sample once the chunk is formed!'
+        )
+    }
+
+    @test()
+    protected static async onDataWritesEegSamplesToWriteStreamOnceChunkIsFormed() {
+        await this.MuseDeviceController({ txtRecordPath: this.txtRecordPath })
+
+        const { timestamp, charValues } = this.simulateEegOnData()
+
+        const expected = this.generateExpectedEegMessages(
+            timestamp,
+            charValues
+        ).map((msg) => `${msg}\n`)
+
+        assert.isEqualDeep(
+            this.eegWriteStreamCalls,
+            expected,
+            'Should write each EEG sample to the write stream once the chunk is formed!'
         )
     }
 
@@ -495,6 +548,83 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
         onData(fakeBuffer, fakeBytes.length, timestamp)
 
         return { timestamp, fakeBytes, name: charName }
+    }
+
+    private static generateExpectedEegMessages(
+        timestamp: number,
+        charValues: number[][]
+    ) {
+        return Array.from({ length: this.eegChunkSize }, (_, sampleIdx) => {
+            const sample = charValues.map((values) => values[sampleIdx])
+            const ts = timestamp + sampleIdx / this.eegSampleRateHz
+
+            return `EEG, ${JSON.stringify(sample)}, ${ts}`
+        })
+    }
+
+    private static get eegLogCalls() {
+        return this.logCalls.filter(([msg]) =>
+            (msg as string).startsWith('EEG,')
+        )
+    }
+
+    private static get eegWriteStreamCalls() {
+        return this.callsToWriteStream.filter((chunk) =>
+            (chunk as string).startsWith('EEG,')
+        )
+    }
+
+    private static simulateEegOnData() {
+        const calls = FakeBleController.callsToConstructor
+        const { charCallbacks } = calls[calls.length - 1]!
+
+        const timestamp = randomInt(1, 100)
+
+        const charValues = this.eegCharNames.map(() =>
+            this.generateEegCharValues()
+        )
+
+        this.eegCharNames.forEach((charName, charIdx) => {
+            const { onData } = charCallbacks!.find(
+                (callback) => callback.charName === charName
+            )!
+
+            const fakeBytes = this.generateEegBytes(charValues[charIdx])
+            const fakeBuffer = Buffer.from(fakeBytes)
+
+            onData(fakeBuffer, fakeBytes.length, timestamp)
+        })
+
+        return { timestamp, charValues }
+    }
+
+    private static generateEegCharValues() {
+        return Array.from(
+            { length: this.eegChunkSize },
+            (_, sampleIdx) => sampleIdx
+        )
+    }
+
+    private static generateEegBytes(values: number[]) {
+        const bytes = [this.generateRandomByte(), this.generateRandomByte()]
+
+        for (let i = 0; i < values.length; i += 2) {
+            bytes.push(...this.encode12BitPair(values[i]!, values[i + 1]!))
+        }
+
+        return bytes
+    }
+
+    private static generateRandomByte() {
+        return randomInt(0, 255)
+    }
+
+    private static encode12BitPair(first: number, second: number) {
+        return [
+            (first >> 4) & 0xff,
+            ((first & 0x0f) << 4) | ((second >> 8) & 0x0f),
+            second & 0xff,
+        ]
     }
 
     private static async MuseDeviceController(

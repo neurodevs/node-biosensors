@@ -2,7 +2,9 @@ import fs from 'fs'
 import {
     BleController,
     BleDeviceController,
+    CharacteristicCallbacks,
     LslStreamOutlet,
+    StreamOutlet,
 } from '@neurodevs/node-lsl'
 import koffi from 'koffi'
 
@@ -28,6 +30,17 @@ export default class MuseDeviceController implements MuseController {
     public static createWriteStream = fs.createWriteStream
     public static log = console.info
 
+    private static readonly eegSampleRateHz = 256
+    private static readonly eegChunkSize = 12
+
+    private static readonly eegCharNames = [
+        'EEG_TP9',
+        'EEG_AF7',
+        'EEG_AF8',
+        'EEG_TP10',
+        'EEG_AUX',
+    ]
+
     protected readonly ble: BleController
 
     protected isConnected = false
@@ -40,15 +53,14 @@ export default class MuseDeviceController implements MuseController {
     public static async Create(options: MuseControllerOptions) {
         const { disableEeg, disablePpg } = options
 
-        const ble = await this.BleDeviceController(options)
-
-        if (!disableEeg) {
-            await this.EegLslOutlet()
-        }
+        const eegOutlet = !disableEeg ? await this.EegLslOutlet() : undefined
 
         if (!disablePpg) {
             await this.PpgLslOutlet()
         }
+
+        const charCallbacks = this.generateCharCallbacks(options, eegOutlet)
+        const ble = await this.BleDeviceController(options, charCallbacks)
 
         return new (this.Class ?? this)(ble)
     }
@@ -122,54 +134,100 @@ export default class MuseDeviceController implements MuseController {
         return this.ble.name
     }
 
-    private static async BleDeviceController(options: MuseControllerOptions) {
-        const { bleUuid, rssiIntervalMs, enableLogs, txtRecordPath } = options
-
+    private static generateCharCallbacks(
+        options: MuseControllerOptions,
+        eegOutlet?: StreamOutlet
+    ) {
+        const { enableLogs, txtRecordPath } = options
         const log = enableLogs ? this.log : undefined
 
         const stream = txtRecordPath
             ? this.createWriteStream(txtRecordPath, { flags: 'a' })
             : undefined
 
+        const eegCharChunks: number[][] = []
+        let t0 = 0
+
+        return Object.entries(MUSE_CHAR_UUIDS).map(([name, uuid]) => {
+            return {
+                charUuid: uuid,
+                charName: name,
+                onData: (data: Buffer, length: number, timestamp: number) => {
+                    const bytes = Array.from(
+                        koffi.decode(data, 'uint8', length)
+                    ) as number[]
+
+                    const msg = `[${timestamp}] ${name} ${bytes}`
+                    stream?.write(`${msg}\n`)
+                    log?.(msg)
+
+                    const eegIdx = this.eegCharNames.indexOf(name)
+
+                    if (eegOutlet && eegIdx !== -1) {
+                        if (eegIdx === 0) {
+                            t0 = timestamp
+                        }
+
+                        eegCharChunks[eegIdx] = this.decodeEegChunk(
+                            bytes.slice(2)
+                        )
+
+                        if (eegIdx === this.eegCharNames.length - 1) {
+                            for (
+                                let sampleIdx = 0;
+                                sampleIdx < this.eegChunkSize;
+                                sampleIdx++
+                            ) {
+                                const sample = eegCharChunks.map(
+                                    (charChunk) => charChunk[sampleIdx]
+                                )
+
+                                const ts = t0 + sampleIdx / this.eegSampleRateHz
+                                eegOutlet.pushSample(sample, ts)
+
+                                const msg = `EEG, ${JSON.stringify(sample)}, ${ts}`
+                                stream?.write(`${msg}\n`)
+                                log?.(msg)
+                            }
+                        }
+                    }
+                },
+            }
+        })
+    }
+
+    private static decodeEegChunk(bytes: number[]) {
+        const values: number[] = []
+
+        for (let i = 0; i < bytes.length; i += 3) {
+            const first = (bytes[i]! << 4) | (bytes[i + 1]! >> 4)
+            const second = ((bytes[i + 1]! & 0x0f) << 8) | bytes[i + 2]!
+
+            values.push(first, second)
+        }
+
+        return values
+    }
+
+    private static async BleDeviceController(
+        options: MuseControllerOptions,
+        charCallbacks: CharacteristicCallbacks
+    ) {
+        const { bleUuid, rssiIntervalMs } = options
+
         return await BleDeviceController.Create({
             deviceUuid: bleUuid,
+            charCallbacks,
             rssiIntervalMs,
-            charCallbacks: Object.entries(MUSE_CHAR_UUIDS).map(
-                ([name, uuid]) => {
-                    return {
-                        charUuid: uuid,
-                        charName: name,
-                        onData: (
-                            data: Buffer,
-                            length: number,
-                            timestamp: number
-                        ) => {
-                            const bytes = Array.from(
-                                koffi.decode(data, 'uint8', length)
-                            )
-                            log?.(`[${timestamp}]`, name, bytes)
-                            stream?.write(
-                                `[${timestamp}] ${name} ${JSON.stringify(bytes)}\n`
-                            )
-                        },
-                    }
-                }
-            ),
         })
     }
 
     private static async EegLslOutlet() {
-        await LslStreamOutlet.Create({
+        return await LslStreamOutlet.Create({
             name: 'Muse EEG',
             type: 'EEG',
-            channelNames: [
-                'EEG_TP9',
-                'EEG_AF7',
-                'EEG_AF8',
-                'EEG_TP10',
-                'EEG_AUX',
-            ],
-            sampleRateHz: 256,
+            channelNames: this.eegCharNames,
+            sampleRateHz: this.eegSampleRateHz,
             channelFormat: 'float32',
             sourceId: 'muse-eeg',
             manufacturer: 'Interaxon Inc.',
