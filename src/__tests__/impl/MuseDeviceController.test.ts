@@ -850,6 +850,122 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
         )
     }
 
+    @test()
+    protected static async disableEegIgnoresAllEegData() {
+        await this.MuseDeviceController({
+            enableLogs: true,
+            txtRecordPath: this.txtRecordPath,
+            disableEeg: true,
+        })
+
+        this.simulateEegOnData()
+
+        const eegLogCalls = this.logCalls.filter(([msg]) =>
+            (msg as string).startsWith('EEG')
+        )
+        const eegWriteCalls = this.callsToWriteStream.filter((chunk) =>
+            (chunk as string).startsWith('EEG')
+        )
+
+        assert.isEqualDeep(eegLogCalls, [], 'Should not log any EEG data!')
+        assert.isEqualDeep(
+            eegWriteCalls,
+            [],
+            'Should not write any EEG data to stream!'
+        )
+        assert.isEqualDeep(
+            FakeStreamOutlet.callsToPushSample,
+            [],
+            'Should not push any EEG samples to outlet!'
+        )
+    }
+
+    @test()
+    protected static async disablePpgIgnoresAllPpgData() {
+        await this.MuseDeviceController({
+            enableLogs: true,
+            txtRecordPath: this.txtRecordPath,
+            disablePpg: true,
+        })
+
+        this.simulatePpgOnData()
+
+        const ppgLogCalls = this.logCalls.filter(([msg]) =>
+            (msg as string).startsWith('PPG')
+        )
+        const ppgWriteCalls = this.callsToWriteStream.filter((chunk) =>
+            (chunk as string).startsWith('PPG')
+        )
+
+        assert.isEqualDeep(ppgLogCalls, [], 'Should not log any PPG data!')
+        assert.isEqualDeep(
+            ppgWriteCalls,
+            [],
+            'Should not write any PPG data to stream!'
+        )
+        assert.isEqualDeep(
+            FakeStreamOutlet.callsToPushSample,
+            [],
+            'Should not push any PPG samples to outlet!'
+        )
+    }
+
+    @test()
+    protected static async disableGyroIgnoresAllGyroData() {
+        await this.MuseDeviceController({
+            enableLogs: true,
+            txtRecordPath: this.txtRecordPath,
+            disableGyro: true,
+        })
+
+        const samples = this.generateImuSamples()
+        this.simulateImuOnDataWithSamples('GYROSCOPE', samples)
+
+        assert.isEqualDeep(
+            this.gyroLogCalls,
+            [],
+            'Should not log any gyro data!'
+        )
+        assert.isEqualDeep(
+            this.gyroWriteStreamCalls,
+            [],
+            'Should not write any gyro data to stream!'
+        )
+        assert.isEqualDeep(
+            FakeStreamOutlet.callsToPushSample,
+            [],
+            'Should not push any gyro samples to outlet!'
+        )
+    }
+
+    @test()
+    protected static async disableAccelIgnoresAllAccelData() {
+        await this.MuseDeviceController({
+            enableLogs: true,
+            txtRecordPath: this.txtRecordPath,
+            disableAccel: true,
+        })
+
+        const samples = this.generateImuSamples()
+        this.simulateImuOnDataWithSamples('ACCELEROMETER', samples)
+
+        assert.isEqualDeep(
+            this.accelLogCalls,
+            [],
+            'Should not log any accel data!'
+        )
+        assert.isEqualDeep(
+            this.accelWriteStreamCalls,
+            [],
+            'Should not write any accel data to stream!'
+        )
+        assert.isEqualDeep(
+            FakeStreamOutlet.callsToPushSample,
+            [],
+            'Should not push any accel samples to outlet!'
+        )
+    }
+
     private static get isConnected() {
         return this.instance.getIsConnected()
     }

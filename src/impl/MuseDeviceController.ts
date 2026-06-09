@@ -158,12 +158,27 @@ export default class MuseDeviceController implements MuseController {
         gyroOutlet?: StreamOutlet,
         accelOutlet?: StreamOutlet
     ) {
-        const { enableLogs, txtRecordPath } = options
+        const {
+            enableLogs,
+            txtRecordPath,
+            disableEeg,
+            disablePpg,
+            disableGyro,
+            disableAccel,
+        } = options
+
         const log = enableLogs ? this.log : undefined
 
         const stream = txtRecordPath
             ? this.createWriteStream(txtRecordPath, { flags: 'a' })
             : undefined
+
+        const disabledChars = new Set<string>([
+            ...(disableEeg ? this.eegCharNames : []),
+            ...(disablePpg ? this.ppgCharNames : []),
+            ...(disableGyro ? ['GYROSCOPE'] : []),
+            ...(disableAccel ? ['ACCELEROMETER'] : []),
+        ])
 
         const handleEeg = this.createEegHandler(log, stream, eegOutlet)
         const handlePpg = this.createPpgHandler(log, stream, ppgOutlet)
@@ -188,6 +203,10 @@ export default class MuseDeviceController implements MuseController {
             charUuid: uuid,
             charName: name,
             onData: (data: Buffer, length: number, timestamp: number) => {
+                if (disabledChars.has(name)) {
+                    return
+                }
+
                 const bytes = Array.from<number>(
                     koffi.decode(data, 'uint8', length)
                 )
