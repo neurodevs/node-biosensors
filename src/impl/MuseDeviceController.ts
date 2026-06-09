@@ -1,4 +1,4 @@
-import fs from 'fs'
+import fs, { WriteStream } from 'fs'
 import {
     BleController,
     BleDeviceController,
@@ -145,55 +145,63 @@ export default class MuseDeviceController implements MuseController {
             ? this.createWriteStream(txtRecordPath, { flags: 'a' })
             : undefined
 
+        const handleIfEeg = this.createEegHandler(log, stream, eegOutlet)
+
+        return Object.entries(MUSE_CHAR_UUIDS).map(([name, uuid]) => ({
+            charUuid: uuid,
+            charName: name,
+            onData: (data: Buffer, length: number, timestamp: number) => {
+                const bytes = Array.from(
+                    koffi.decode(data, 'uint8', length)
+                ) as number[]
+
+                const msg = `[${timestamp}] ${name} ${bytes}`
+                stream?.write(`${msg}\n`)
+                log?.(msg)
+
+                handleIfEeg(name, bytes, timestamp)
+            },
+        }))
+    }
+
+    private static createEegHandler(
+        log?: typeof MuseDeviceController.log,
+        stream?: WriteStream,
+        eegOutlet?: StreamOutlet
+    ) {
         const eegCharChunks: number[][] = []
         let t0 = 0
 
-        return Object.entries(MUSE_CHAR_UUIDS).map(([name, uuid]) => {
-            return {
-                charUuid: uuid,
-                charName: name,
-                onData: (data: Buffer, length: number, timestamp: number) => {
-                    const bytes = Array.from(
-                        koffi.decode(data, 'uint8', length)
-                    ) as number[]
+        return (name: string, bytes: number[], timestamp: number) => {
+            const eegIdx = this.eegCharNames.indexOf(name)
 
-                    const msg = `[${timestamp}] ${name} ${bytes}`
-                    stream?.write(`${msg}\n`)
-                    log?.(msg)
+            if (eegOutlet && eegIdx !== -1) {
+                if (eegIdx === 0) {
+                    t0 = timestamp
+                }
 
-                    const eegIdx = this.eegCharNames.indexOf(name)
+                eegCharChunks[eegIdx] = this.decodeEegChunk(bytes.slice(2))
 
-                    if (eegOutlet && eegIdx !== -1) {
-                        if (eegIdx === 0) {
-                            t0 = timestamp
-                        }
-
-                        eegCharChunks[eegIdx] = this.decodeEegChunk(
-                            bytes.slice(2)
+                if (eegIdx === this.eegCharNames.length - 1) {
+                    for (
+                        let sampleIdx = 0;
+                        sampleIdx < this.eegChunkSize;
+                        sampleIdx++
+                    ) {
+                        const sample = eegCharChunks.map(
+                            (charChunk) => charChunk[sampleIdx]
                         )
 
-                        if (eegIdx === this.eegCharNames.length - 1) {
-                            for (
-                                let sampleIdx = 0;
-                                sampleIdx < this.eegChunkSize;
-                                sampleIdx++
-                            ) {
-                                const sample = eegCharChunks.map(
-                                    (charChunk) => charChunk[sampleIdx]
-                                )
+                        const ts = t0 + sampleIdx / this.eegSampleRateHz
+                        eegOutlet.pushSample(sample, ts)
 
-                                const ts = t0 + sampleIdx / this.eegSampleRateHz
-                                eegOutlet.pushSample(sample, ts)
-
-                                const msg = `EEG, ${JSON.stringify(sample)}, ${ts}`
-                                stream?.write(`${msg}\n`)
-                                log?.(msg)
-                            }
-                        }
+                        const msg = `EEG, ${JSON.stringify(sample)}, ${ts}`
+                        stream?.write(`${msg}\n`)
+                        log?.(msg)
                     }
-                },
+                }
             }
-        })
+        }
     }
 
     private static decodeEegChunk(bytes: number[]) {
