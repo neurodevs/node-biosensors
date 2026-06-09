@@ -4,7 +4,11 @@ const muse = await MuseDeviceController.Create({
     bleUuid: 'CA6A61B7-B7A8-AF24-3C9E-04A6A5012554',
     rssiIntervalMs: 1000,
     txtRecordPath: 'muse_data.txt',
-    enableLogs: true,
+    enableLogs: false,
+    disableEeg: false,
+    disablePpg: false,
+    disableAccel: false,
+    disableGyro: false,
 })
 
 await muse.connect()
