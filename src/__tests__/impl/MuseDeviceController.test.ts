@@ -368,7 +368,9 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
         const expected = Array.from(
             { length: this.eegChunkSize },
             (_, sampleIdx) => ({
-                sample: charValues.map((values) => values[sampleIdx]),
+                sample: charValues.map(
+                    (values) => 0.48828125 * (values[sampleIdx] - 2048)
+                ),
                 timestamp: ts + (1000 * sampleIdx) / this.eegSampleRateHz,
             })
         )
@@ -377,6 +379,28 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
             FakeStreamOutlet.callsToPushSample,
             expected,
             'Should push each EEG sample of chunk!'
+        )
+    }
+
+    @test()
+    protected static async onDataScalesEegSamplesToMicrovolts() {
+        const rawValue = 3048
+        const expectedMicrovolts = 0.48828125 * (rawValue - 2048)
+
+        const charValues = this.eegCharNames.map(() =>
+            Array.from({ length: this.eegChunkSize }, () => rawValue)
+        )
+
+        this.simulateEegOnDataWithValues(charValues)
+
+        const pushedValues = FakeStreamOutlet.callsToPushSample.map(
+            ({ sample }) => sample[0]
+        )
+
+        assert.isEqualDeep(
+            pushedValues,
+            Array.from({ length: this.eegChunkSize }, () => expectedMicrovolts),
+            'Should scale EEG samples to microvolts!'
         )
     }
 
@@ -622,7 +646,9 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
         charValues: number[][]
     ) {
         return Array.from({ length: this.eegChunkSize }, (_, sampleIdx) => {
-            const sample = charValues.map((values) => values[sampleIdx])
+            const sample = charValues.map(
+                (values) => 0.48828125 * (values[sampleIdx] - 2048)
+            )
             const ts = timestamp + (1000 * sampleIdx) / this.eegSampleRateHz
 
             return `${'EEG'.padEnd(13)} | ${ts.toFixed(5).padEnd(15)} | ${JSON.stringify(sample)}`
@@ -642,14 +668,20 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
     }
 
     private static simulateEegOnData() {
+        const charValues = this.eegCharNames.map(() =>
+            this.generateEegCharValues()
+        )
+
+        const ts = this.simulateEegOnDataWithValues(charValues)
+
+        return { ts, charValues }
+    }
+
+    private static simulateEegOnDataWithValues(charValues: number[][]) {
         const calls = FakeBleController.callsToConstructor
         const { charCallbacks } = calls[calls.length - 1]!
 
         const ts = randomInt(1, 100)
-
-        const charValues = this.eegCharNames.map(() =>
-            this.generateEegCharValues()
-        )
 
         this.eegCharNames.forEach((charName, charIdx) => {
             const { onData } = charCallbacks!.find(
@@ -662,7 +694,7 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
             onData(fakeBuffer, fakeBytes.length, ts)
         })
 
-        return { ts, charValues }
+        return ts
     }
 
     private static generateEegCharValues() {

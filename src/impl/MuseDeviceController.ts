@@ -221,7 +221,11 @@ export default class MuseDeviceController implements MuseController {
             charSamples.push(first, second)
         }
 
-        return charSamples
+        const charSamplesInMicrovolts = charSamples.map((c) => {
+            return 0.48828125 * (c - 2048)
+        })
+
+        return charSamplesInMicrovolts
     }
 
     private static createPpgHandler(
