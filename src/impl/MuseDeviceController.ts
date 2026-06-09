@@ -212,20 +212,20 @@ export default class MuseDeviceController implements MuseController {
     }
 
     private static decodeEegCharChunk(bytes: number[]) {
-        const charSamples: number[] = []
+        const decoded: number[] = []
 
         for (let i = 0; i < bytes.length; i += 3) {
             const first = (bytes[i]! << 4) | (bytes[i + 1]! >> 4)
             const second = ((bytes[i + 1]! & 0x0f) << 8) | bytes[i + 2]!
 
-            charSamples.push(first, second)
+            decoded.push(first, second)
         }
 
-        const charSamplesInMicrovolts = charSamples.map((c) => {
+        const decodedInMicrovolts = decoded.map((c) => {
             return 0.48828125 * (c - 2048)
         })
 
-        return charSamplesInMicrovolts
+        return decodedInMicrovolts
     }
 
     private static createPpgHandler(
