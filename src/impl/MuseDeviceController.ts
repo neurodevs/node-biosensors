@@ -167,7 +167,7 @@ export default class MuseDeviceController implements MuseController {
                     koffi.decode(data, 'uint8', length)
                 )
 
-                const msg = `[${timestamp}] ${name} ${bytes}`
+                const msg = `${name.padEnd(13)} | ${timestamp.toFixed(5).padEnd(15)} | ${JSON.stringify(bytes)}`
                 stream?.write(`${msg}\n`)
                 log?.(msg)
 
@@ -202,7 +202,7 @@ export default class MuseDeviceController implements MuseController {
                         const ts = t0 + (1000 * i) / this.eegSampleRateHz
                         eegOutlet.pushSample(sample, ts)
 
-                        const msg = `EEG, ${JSON.stringify(sample)}, ${ts}`
+                        const msg = `${'EEG'.padEnd(13)} | ${ts.toFixed(5).padEnd(15)} | ${JSON.stringify(sample)}`
                         stream?.write(`${msg}\n`)
                         log?.(msg)
                     }
@@ -249,7 +249,7 @@ export default class MuseDeviceController implements MuseController {
                         const ts = t0 + (1000 * i) / this.ppgSampleRateHz
                         ppgOutlet.pushSample(sample, ts)
 
-                        const msg = `PPG, ${JSON.stringify(sample)}, ${ts}`
+                        const msg = `${'PPG'.padEnd(13)} | ${ts.toFixed(5).padEnd(15)} | ${JSON.stringify(sample)}`
                         stream?.write(`${msg}\n`)
                         log?.(msg)
                     }

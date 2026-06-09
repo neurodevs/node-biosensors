@@ -298,7 +298,7 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
 
         assert.isEqualDeep(
             this.logCalls,
-            [[`[${timestamp}] ${name} ${fakeBytes}`]],
+            [[this.generateExpectedOnDataMessage(name, timestamp, fakeBytes)]],
             'Did not log expected data to console!'
         )
     }
@@ -338,23 +338,25 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
         this.simulateOnData()
 
         assert.isEqualDeep(
-            this.callsToCreateWriteStream[0],
-            { path: this.txtRecordPath, options: { flags: 'a' } },
+            this.callsToCreateWriteStream,
+            [{ path: this.txtRecordPath, options: { flags: 'a' } }],
             'Did not create write stream with expected options!'
         )
     }
 
     @test()
-    protected static async onDataWritesToWriteStreamWithExpectedContent() {
+    protected static async onDataWritesStreamWithExpectedContent() {
         await this.MuseDeviceController({
             txtRecordPath: this.txtRecordPath,
         })
 
-        this.simulateOnData()
+        const { name, timestamp, fakeBytes } = this.simulateOnData()
 
         assert.isEqualDeep(
-            this.callsToWriteStream[0],
-            `[12345] ${this.charCallbacks[0].charName} ${[10, 20, 30]}\n`,
+            this.callsToWriteStream,
+            [
+                `${this.generateExpectedOnDataMessage(name, timestamp, fakeBytes)}\n`,
+            ],
             'Did not write expected content to write stream!'
         )
     }
@@ -607,6 +609,14 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
         return { timestamp, fakeBytes, name: charName }
     }
 
+    private static generateExpectedOnDataMessage(
+        name: string | undefined,
+        timestamp: number,
+        fakeBytes: number[]
+    ): unknown {
+        return `${name?.padEnd(13)} | ${timestamp.toFixed(5).padEnd(15)} | ${JSON.stringify(fakeBytes)}`
+    }
+
     private static generateExpectedEegMessages(
         timestamp: number,
         charValues: number[][]
@@ -615,19 +625,19 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
             const sample = charValues.map((values) => values[sampleIdx])
             const ts = timestamp + (1000 * sampleIdx) / this.eegSampleRateHz
 
-            return `EEG, ${JSON.stringify(sample)}, ${ts}`
+            return `${'EEG'.padEnd(13)} | ${ts.toFixed(5).padEnd(15)} | ${JSON.stringify(sample)}`
         })
     }
 
     private static get eegLogCalls() {
         return this.logCalls.filter(([msg]) =>
-            (msg as string).startsWith('EEG,')
+            (msg as string).startsWith('EEG ')
         )
     }
 
     private static get eegWriteStreamCalls() {
         return this.callsToWriteStream.filter((chunk) =>
-            (chunk as string).startsWith('EEG,')
+            (chunk as string).startsWith('EEG ')
         )
     }
 
@@ -725,19 +735,19 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
             const sample = charValues.map((values) => values[sampleIdx])
             const ts = timestamp + (1000 * sampleIdx) / this.ppgSampleRateHz
 
-            return `PPG, ${JSON.stringify(sample)}, ${ts}`
+            return `${'PPG'.padEnd(13)} | ${ts.toFixed(5).padEnd(15)} | ${JSON.stringify(sample)}`
         })
     }
 
     private static get ppgLogCalls() {
         return this.logCalls.filter(([msg]) =>
-            (msg as string).startsWith('PPG,')
+            (msg as string).startsWith('PPG ')
         )
     }
 
     private static get ppgWriteStreamCalls() {
         return this.callsToWriteStream.filter((chunk) =>
-            (chunk as string).startsWith('PPG,')
+            (chunk as string).startsWith('PPG ')
         )
     }
 
