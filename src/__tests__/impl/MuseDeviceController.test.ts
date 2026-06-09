@@ -599,9 +599,8 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
     }
 
     private static generateEegCharValues() {
-        return Array.from(
-            { length: this.eegChunkSize },
-            (_, sampleIdx) => sampleIdx
+        return Array.from({ length: this.eegChunkSize }, (_, sampleIdx) =>
+            1000 + sampleIdx * 100
         )
     }
 
