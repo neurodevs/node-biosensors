@@ -145,54 +145,48 @@ export default class MuseDeviceController implements MuseController {
             ? this.createWriteStream(txtRecordPath, { flags: 'a' })
             : undefined
 
-        const handleIfEeg = this.createEegHandler(log, stream, eegOutlet)
+        const handleEeg = this.createEegHandler(log, stream, eegOutlet)
 
         return Object.entries(MUSE_CHAR_UUIDS).map(([name, uuid]) => ({
             charUuid: uuid,
             charName: name,
             onData: (data: Buffer, length: number, timestamp: number) => {
-                const bytes = Array.from(
+                const bytes = Array.from<number>(
                     koffi.decode(data, 'uint8', length)
-                ) as number[]
+                )
 
                 const msg = `[${timestamp}] ${name} ${bytes}`
                 stream?.write(`${msg}\n`)
                 log?.(msg)
 
-                handleIfEeg(name, bytes, timestamp)
+                handleEeg(name, bytes, timestamp)
             },
         }))
     }
 
     private static createEegHandler(
-        log?: typeof MuseDeviceController.log,
+        log?: (...data: any[]) => void,
         stream?: WriteStream,
         eegOutlet?: StreamOutlet
     ) {
-        const eegCharChunks: number[][] = []
+        const charChunks: number[][] = []
         let t0 = 0
 
-        return (name: string, bytes: number[], timestamp: number) => {
-            const eegIdx = this.eegCharNames.indexOf(name)
+        return (charName: string, bytes: number[], timestamp: number) => {
+            const charIdx = this.eegCharNames.indexOf(charName)
 
-            if (eegOutlet && eegIdx !== -1) {
-                if (eegIdx === 0) {
+            if (eegOutlet && charIdx !== -1) {
+                if (charIdx === 0) {
                     t0 = timestamp
                 }
 
-                eegCharChunks[eegIdx] = this.decodeEegChunk(bytes.slice(2))
+                charChunks[charIdx] = this.decodeEegCharChunk(bytes.slice(2))
 
-                if (eegIdx === this.eegCharNames.length - 1) {
-                    for (
-                        let sampleIdx = 0;
-                        sampleIdx < this.eegChunkSize;
-                        sampleIdx++
-                    ) {
-                        const sample = eegCharChunks.map(
-                            (charChunk) => charChunk[sampleIdx]
-                        )
+                if (charIdx === this.eegCharNames.length - 1) {
+                    for (let i = 0; i < this.eegChunkSize; i++) {
+                        const sample = charChunks.map((c) => c[i])
 
-                        const ts = t0 + sampleIdx / this.eegSampleRateHz
+                        const ts = t0 + i / this.eegSampleRateHz
                         eegOutlet.pushSample(sample, ts)
 
                         const msg = `EEG, ${JSON.stringify(sample)}, ${ts}`
@@ -204,17 +198,17 @@ export default class MuseDeviceController implements MuseController {
         }
     }
 
-    private static decodeEegChunk(bytes: number[]) {
-        const values: number[] = []
+    private static decodeEegCharChunk(bytes: number[]) {
+        const charSamples: number[] = []
 
         for (let i = 0; i < bytes.length; i += 3) {
             const first = (bytes[i]! << 4) | (bytes[i + 1]! >> 4)
             const second = ((bytes[i + 1]! & 0x0f) << 8) | bytes[i + 2]!
 
-            values.push(first, second)
+            charSamples.push(first, second)
         }
 
-        return values
+        return charSamples
     }
 
     private static async BleDeviceController(
