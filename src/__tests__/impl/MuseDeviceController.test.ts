@@ -361,13 +361,13 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
 
     @test()
     protected static async onDataPushesEegSamplesToOutlet() {
-        const { timestamp, charValues } = this.simulateEegOnData()
+        const { ts, charValues } = this.simulateEegOnData()
 
         const expected = Array.from(
             { length: this.eegChunkSize },
             (_, sampleIdx) => ({
                 sample: charValues.map((values) => values[sampleIdx]),
-                timestamp: timestamp + sampleIdx / this.eegSampleRateHz,
+                timestamp: ts + (1000 * sampleIdx) / this.eegSampleRateHz,
             })
         )
 
@@ -380,12 +380,11 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
 
     @test()
     protected static async onDataLogsEegSamplesOnceChunkIsFormed() {
-        const { timestamp, charValues } = this.simulateEegOnData()
+        const { ts, charValues } = this.simulateEegOnData()
 
-        const expected = this.generateExpectedEegMessages(
-            timestamp,
-            charValues
-        ).map((msg) => [msg])
+        const expected = this.generateExpectedEegMessages(ts, charValues).map(
+            (msg) => [msg]
+        )
 
         assert.isEqualDeep(
             this.eegLogCalls,
@@ -398,12 +397,11 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
     protected static async onDataWritesEegSamplesToWriteStreamOnceChunkIsFormed() {
         await this.MuseDeviceController({ txtRecordPath: this.txtRecordPath })
 
-        const { timestamp, charValues } = this.simulateEegOnData()
+        const { ts, charValues } = this.simulateEegOnData()
 
-        const expected = this.generateExpectedEegMessages(
-            timestamp,
-            charValues
-        ).map((msg) => `${msg}\n`)
+        const expected = this.generateExpectedEegMessages(ts, charValues).map(
+            (msg) => `${msg}\n`
+        )
 
         assert.isEqualDeep(
             this.eegWriteStreamCalls,
@@ -414,13 +412,13 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
 
     @test()
     protected static async onDataPushesPpgSamplesToOutlet() {
-        const { timestamp, charValues } = this.simulatePpgOnData()
+        const { ts, charValues } = this.simulatePpgOnData()
 
         const expected = Array.from(
             { length: this.ppgChunkSize },
             (_, sampleIdx) => ({
                 sample: charValues.map((values) => values[sampleIdx]),
-                timestamp: timestamp + sampleIdx / this.ppgSampleRateHz,
+                timestamp: ts + (1000 * sampleIdx) / this.ppgSampleRateHz,
             })
         )
 
@@ -433,12 +431,11 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
 
     @test()
     protected static async onDataLogsPpgSamplesOnceChunkIsFormed() {
-        const { timestamp, charValues } = this.simulatePpgOnData()
+        const { ts, charValues } = this.simulatePpgOnData()
 
-        const expected = this.generateExpectedPpgMessages(
-            timestamp,
-            charValues
-        ).map((msg) => [msg])
+        const expected = this.generateExpectedPpgMessages(ts, charValues).map(
+            (msg) => [msg]
+        )
 
         assert.isEqualDeep(
             this.ppgLogCalls,
@@ -451,12 +448,11 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
     protected static async onDataWritesPpgSamplesToWriteStreamOnceChunkIsFormed() {
         await this.MuseDeviceController({ txtRecordPath: this.txtRecordPath })
 
-        const { timestamp, charValues } = this.simulatePpgOnData()
+        const { ts, charValues } = this.simulatePpgOnData()
 
-        const expected = this.generateExpectedPpgMessages(
-            timestamp,
-            charValues
-        ).map((msg) => `${msg}\n`)
+        const expected = this.generateExpectedPpgMessages(ts, charValues).map(
+            (msg) => `${msg}\n`
+        )
 
         assert.isEqualDeep(
             this.ppgWriteStreamCalls,
@@ -617,7 +613,7 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
     ) {
         return Array.from({ length: this.eegChunkSize }, (_, sampleIdx) => {
             const sample = charValues.map((values) => values[sampleIdx])
-            const ts = timestamp + sampleIdx / this.eegSampleRateHz
+            const ts = timestamp + (1000 * sampleIdx) / this.eegSampleRateHz
 
             return `EEG, ${JSON.stringify(sample)}, ${ts}`
         })
@@ -639,7 +635,7 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
         const calls = FakeBleController.callsToConstructor
         const { charCallbacks } = calls[calls.length - 1]!
 
-        const timestamp = randomInt(1, 100)
+        const ts = randomInt(1, 100)
 
         const charValues = this.eegCharNames.map(() =>
             this.generateEegCharValues()
@@ -653,10 +649,10 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
             const fakeBytes = this.generateEegBytes(charValues[charIdx])
             const fakeBuffer = Buffer.from(fakeBytes)
 
-            onData(fakeBuffer, fakeBytes.length, timestamp)
+            onData(fakeBuffer, fakeBytes.length, ts)
         })
 
-        return { timestamp, charValues }
+        return { ts, charValues }
     }
 
     private static generateEegCharValues() {
@@ -684,7 +680,7 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
         const calls = FakeBleController.callsToConstructor
         const { charCallbacks } = calls[calls.length - 1]!
 
-        const timestamp = randomInt(1, 100)
+        const ts = randomInt(1, 100)
 
         const charValues = this.ppgCharNames.map(() =>
             this.generatePpgCharValues()
@@ -698,10 +694,10 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
             const fakeBytes = this.generatePpgBytes(charValues[charIdx]!)
             const fakeBuffer = Buffer.from(fakeBytes)
 
-            onData(fakeBuffer, fakeBytes.length, timestamp)
+            onData(fakeBuffer, fakeBytes.length, ts)
         })
 
-        return { timestamp, charValues }
+        return { ts, charValues }
     }
 
     private static generatePpgCharValues() {
@@ -727,7 +723,7 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
     ) {
         return Array.from({ length: this.ppgChunkSize }, (_, sampleIdx) => {
             const sample = charValues.map((values) => values[sampleIdx])
-            const ts = timestamp + sampleIdx / this.ppgSampleRateHz
+            const ts = timestamp + (1000 * sampleIdx) / this.ppgSampleRateHz
 
             return `PPG, ${JSON.stringify(sample)}, ${ts}`
         })

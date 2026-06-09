@@ -199,7 +199,7 @@ export default class MuseDeviceController implements MuseController {
                     for (let i = 0; i < this.eegChunkSize; i++) {
                         const sample = charChunks.map((c) => c[i])
 
-                        const ts = t0 + i / this.eegSampleRateHz
+                        const ts = t0 + (1000 * i) / this.eegSampleRateHz
                         eegOutlet.pushSample(sample, ts)
 
                         const msg = `EEG, ${JSON.stringify(sample)}, ${ts}`
@@ -246,7 +246,7 @@ export default class MuseDeviceController implements MuseController {
                     for (let i = 0; i < this.ppgChunkSize; i++) {
                         const sample = charChunks.map((c) => c[i])
 
-                        const ts = t0 + i / this.ppgSampleRateHz
+                        const ts = t0 + (1000 * i) / this.ppgSampleRateHz
                         ppgOutlet.pushSample(sample, ts)
 
                         const msg = `PPG, ${JSON.stringify(sample)}, ${ts}`
