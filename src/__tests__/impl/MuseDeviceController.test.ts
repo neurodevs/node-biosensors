@@ -39,6 +39,9 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
         'PPG_RED',
     ]
 
+    private static readonly imuSampleRateHz = 52
+    private static readonly imuChunkSize = 3
+
     private static readonly charCallbacks = Object.entries(MUSE_CHAR_UUIDS).map(
         ([name, uuid]) => {
             return {
@@ -488,6 +491,201 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async onDataPushesGyroSamplesToOutlet() {
+        const samples = this.generateImuSamples()
+        const { ts } = this.simulateImuOnDataWithSamples('GYROSCOPE', samples)
+
+        const expected = samples.map((sample, i) => ({
+            sample: sample.map((v) => 0.0074768 * v),
+            timestamp: ts + (1000 * i) / this.imuSampleRateHz,
+        }))
+
+        assert.isEqualDeep(
+            FakeStreamOutlet.callsToPushSample,
+            expected,
+            'Should push each gyro sample from packet!'
+        )
+    }
+
+    @test()
+    protected static async onDataScalesGyroSamples() {
+        const rawValue = 1000
+        const expectedScaled = 0.0074768 * rawValue
+
+        const samples = Array.from(
+            { length: this.imuChunkSize },
+            () => [rawValue, rawValue, rawValue] as [number, number, number]
+        )
+
+        this.simulateImuOnDataWithSamples('GYROSCOPE', samples)
+
+        const pushedValues = FakeStreamOutlet.callsToPushSample.map(
+            ({ sample }) => sample[0]
+        )
+
+        assert.isEqualDeep(
+            pushedValues,
+            Array.from({ length: this.imuChunkSize }, () => expectedScaled),
+            'Should scale gyro samples by 0.0074768!'
+        )
+    }
+
+    @test()
+    protected static async onDataLogsGyroSamplesOncePacketIsReceived() {
+        const samples = this.generateImuSamples()
+
+        const { ts, fakeBytes } = this.simulateImuOnDataWithSamples(
+            'GYROSCOPE',
+            samples
+        )
+
+        const expected = [
+            [this.generateExpectedOnDataMessage('GYROSCOPE', ts, fakeBytes)],
+            ...this.generateExpectedImuMessages(
+                'GYROSCOPE',
+                ts,
+                samples,
+                0.0074768
+            ).map((msg) => [msg]),
+        ]
+
+        assert.isEqualDeep(
+            this.gyroLogCalls,
+            expected,
+            'Should log each gyro sample once packet is received!'
+        )
+    }
+
+    @test()
+    protected static async onDataWritesGyroSamplesToWriteStream() {
+        await this.MuseDeviceController({ txtRecordPath: this.txtRecordPath })
+
+        const samples = this.generateImuSamples()
+
+        const { ts, fakeBytes } = this.simulateImuOnDataWithSamples(
+            'GYROSCOPE',
+            samples
+        )
+
+        const expected = [
+            `${this.generateExpectedOnDataMessage('GYROSCOPE', ts, fakeBytes)}\n`,
+            ...this.generateExpectedImuMessages(
+                'GYROSCOPE',
+                ts,
+                samples,
+                0.0074768
+            ).map((msg) => `${msg}\n`),
+        ]
+
+        assert.isEqualDeep(
+            this.gyroWriteStreamCalls,
+            expected,
+            'Should write each gyro sample to write stream!'
+        )
+    }
+
+    @test()
+    protected static async onDataPushesAccelSamplesToOutlet() {
+        const samples = this.generateImuSamples()
+        const { ts } = this.simulateImuOnDataWithSamples(
+            'ACCELEROMETER',
+            samples
+        )
+
+        const expected = samples.map((sample, i) => ({
+            sample: sample.map((v) => 0.0000610352 * v),
+            timestamp: ts + (1000 * i) / this.imuSampleRateHz,
+        }))
+
+        assert.isEqualDeep(
+            FakeStreamOutlet.callsToPushSample,
+            expected,
+            'Should push each accel sample from packet!'
+        )
+    }
+
+    @test()
+    protected static async onDataScalesAccelSamples() {
+        const rawValue = 1000
+        const expectedScaled = 0.0000610352 * rawValue
+
+        const samples = Array.from(
+            { length: this.imuChunkSize },
+            () => [rawValue, rawValue, rawValue] as [number, number, number]
+        )
+
+        this.simulateImuOnDataWithSamples('ACCELEROMETER', samples)
+
+        const pushedValues = FakeStreamOutlet.callsToPushSample.map(
+            ({ sample }) => sample[0]
+        )
+
+        assert.isEqualDeep(
+            pushedValues,
+            Array.from({ length: this.imuChunkSize }, () => expectedScaled),
+            'Should scale accel samples by 0.0000610352!'
+        )
+    }
+
+    @test()
+    protected static async onDataLogsAccelSamplesOncePacketIsReceived() {
+        const samples = this.generateImuSamples()
+        const { ts, fakeBytes } = this.simulateImuOnDataWithSamples(
+            'ACCELEROMETER',
+            samples
+        )
+
+        const expected = [
+            [
+                this.generateExpectedOnDataMessage(
+                    'ACCELEROMETER',
+                    ts,
+                    fakeBytes
+                ),
+            ],
+            ...this.generateExpectedImuMessages(
+                'ACCELEROMETER',
+                ts,
+                samples,
+                0.0000610352
+            ).map((msg) => [msg]),
+        ]
+
+        assert.isEqualDeep(
+            this.accelLogCalls,
+            expected,
+            'Should log each accel sample once packet is received!'
+        )
+    }
+
+    @test()
+    protected static async onDataWritesAccelSamplesToWriteStream() {
+        await this.MuseDeviceController({ txtRecordPath: this.txtRecordPath })
+
+        const samples = this.generateImuSamples()
+        const { ts, fakeBytes } = this.simulateImuOnDataWithSamples(
+            'ACCELEROMETER',
+            samples
+        )
+
+        const expected = [
+            `${this.generateExpectedOnDataMessage('ACCELEROMETER', ts, fakeBytes)}\n`,
+            ...this.generateExpectedImuMessages(
+                'ACCELEROMETER',
+                ts,
+                samples,
+                0.0000610352
+            ).map((msg) => `${msg}\n`),
+        ]
+
+        assert.isEqualDeep(
+            this.accelWriteStreamCalls,
+            expected,
+            'Should write each accel sample to write stream!'
+        )
+    }
+
+    @test()
     protected static async exposesUuidFromBleController() {
         await this.startStreaming()
 
@@ -585,6 +783,70 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
             ).length,
             0,
             'Should not create any PPG outlets!'
+        )
+    }
+
+    @test()
+    protected static async createsGyroscopeLslOutlet() {
+        const call = FakeStreamOutlet.callsToConstructor[2]
+
+        assert.isEqualDeep(call, {
+            name: 'Muse Gyroscope',
+            type: 'Gyroscope',
+            channelNames: ['X', 'Y', 'Z'],
+            sampleRateHz: this.imuSampleRateHz,
+            channelFormat: 'float32',
+            sourceId: 'muse-gyroscope',
+            manufacturer: 'Interaxon Inc.',
+            units: 'degrees/s',
+            chunkSize: 1,
+        })
+    }
+
+    @test()
+    protected static async doesNotCreateGyroscopeLslOutletWithFlag() {
+        FakeStreamOutlet.callsToConstructor.length = 0
+
+        await this.MuseDeviceController({ disableGyro: true })
+
+        assert.isEqual(
+            FakeStreamOutlet.callsToConstructor.filter(
+                (call) => call?.name === 'Muse Gyroscope'
+            ).length,
+            0,
+            'Should not create any Gyroscope outlets!'
+        )
+    }
+
+    @test()
+    protected static async createsAccelerometerLslOutlet() {
+        const call = FakeStreamOutlet.callsToConstructor[3]
+
+        assert.isEqualDeep(call, {
+            name: 'Muse Accelerometer',
+            type: 'Accelerometer',
+            channelNames: ['X', 'Y', 'Z'],
+            sampleRateHz: this.imuSampleRateHz,
+            channelFormat: 'float32',
+            sourceId: 'muse-accelerometer',
+            manufacturer: 'Interaxon Inc.',
+            units: 'g',
+            chunkSize: 1,
+        })
+    }
+
+    @test()
+    protected static async doesNotCreateAccelerometerLslOutletWithFlag() {
+        FakeStreamOutlet.callsToConstructor.length = 0
+
+        await this.MuseDeviceController({ disableAccel: true })
+
+        assert.isEqual(
+            FakeStreamOutlet.callsToConstructor.filter(
+                (call) => call?.name === 'Muse Accelerometer'
+            ).length,
+            0,
+            'Should not create any Accelerometer outlets!'
         )
     }
 
@@ -780,6 +1042,93 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
     private static get ppgWriteStreamCalls() {
         return this.callsToWriteStream.filter((chunk) =>
             (chunk as string).startsWith('PPG ')
+        )
+    }
+
+    private static simulateImuOnDataWithSamples(
+        charName: 'GYROSCOPE' | 'ACCELEROMETER',
+        samples: [number, number, number][]
+    ) {
+        const calls = FakeBleController.callsToConstructor
+        const { charCallbacks } = calls[calls.length - 1]!
+        const { onData } = charCallbacks!.find(
+            (cb) => cb.charName === charName
+        )!
+
+        const ts = randomInt(1, 100)
+        const fakeBytes = this.generateImuBytes(samples)
+        const fakeBuffer = Buffer.from(fakeBytes)
+
+        onData(fakeBuffer, fakeBytes.length, ts)
+
+        return { ts, fakeBytes }
+    }
+
+    private static generateImuSamples(): [number, number, number][] {
+        return Array.from(
+            { length: this.imuChunkSize },
+            (_, i) =>
+                [100 + i * 10, 200 + i * 10, 300 + i * 10] as [
+                    number,
+                    number,
+                    number,
+                ]
+        )
+    }
+
+    private static generateImuBytes(samples: [number, number, number][]) {
+        const bytes = [this.generateRandomByte(), this.generateRandomByte()]
+
+        // Fortran order: all x, then all y, then all z
+        for (let axis = 0; axis < 3; axis++) {
+            for (const sample of samples) {
+                bytes.push(...this.encodeInt16(sample[axis]!))
+            }
+        }
+
+        return bytes
+    }
+
+    private static encodeInt16(value: number): [number, number] {
+        const buf = Buffer.alloc(2)
+        buf.writeInt16BE(value)
+        return [buf[0]!, buf[1]!]
+    }
+
+    private static generateExpectedImuMessages(
+        label: string,
+        timestamp: number,
+        samples: [number, number, number][],
+        scale: number
+    ) {
+        return samples.map((sample, i) => {
+            const scaled = sample.map((v) => scale * v)
+            const ts = timestamp + (1000 * i) / this.imuSampleRateHz
+            return `${label.padEnd(13)} | ${ts.toFixed(5).padEnd(15)} | ${JSON.stringify(scaled)}`
+        })
+    }
+
+    private static get gyroLogCalls() {
+        return this.logCalls.filter(([msg]) =>
+            (msg as string).startsWith('GYROSCOPE ')
+        )
+    }
+
+    private static get accelLogCalls() {
+        return this.logCalls.filter(([msg]) =>
+            (msg as string).startsWith('ACCELEROMETER ')
+        )
+    }
+
+    private static get gyroWriteStreamCalls() {
+        return this.callsToWriteStream.filter((chunk) =>
+            (chunk as string).startsWith('GYROSCOPE ')
+        )
+    }
+
+    private static get accelWriteStreamCalls() {
+        return this.callsToWriteStream.filter((chunk) =>
+            (chunk as string).startsWith('ACCELEROMETER ')
         )
     }
 

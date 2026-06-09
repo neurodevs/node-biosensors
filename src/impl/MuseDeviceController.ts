@@ -50,6 +50,9 @@ export default class MuseDeviceController implements MuseController {
         'PPG_RED',
     ]
 
+    private static readonly imuSampleRateHz = 52
+    private static readonly imuChunkSize = 3
+
     protected readonly ble: BleController
 
     protected isConnected = false
@@ -60,15 +63,19 @@ export default class MuseDeviceController implements MuseController {
     }
 
     public static async Create(options: MuseControllerOptions) {
-        const { disableEeg, disablePpg } = options
+        const { disableEeg, disablePpg, disableGyro, disableAccel } = options
 
-        const eegOutlet = !disableEeg ? await this.EegLslOutlet() : undefined
-        const ppgOutlet = !disablePpg ? await this.PpgLslOutlet() : undefined
+        const eegOutlet = !disableEeg ? await this.EegOutlet() : undefined
+        const ppgOutlet = !disablePpg ? await this.PpgOutlet() : undefined
+        const gyroOutlet = !disableGyro ? await this.GyroOutlet() : undefined
+        const accelOutlet = !disableAccel ? await this.AccelOutlet() : undefined
 
         const charCallbacks = this.generateCharCallbacks(
             options,
             eegOutlet,
-            ppgOutlet
+            ppgOutlet,
+            gyroOutlet,
+            accelOutlet
         )
         const ble = await this.BleDeviceController(options, charCallbacks)
 
@@ -147,7 +154,9 @@ export default class MuseDeviceController implements MuseController {
     private static generateCharCallbacks(
         options: MuseControllerOptions,
         eegOutlet?: StreamOutlet,
-        ppgOutlet?: StreamOutlet
+        ppgOutlet?: StreamOutlet,
+        gyroOutlet?: StreamOutlet,
+        accelOutlet?: StreamOutlet
     ) {
         const { enableLogs, txtRecordPath } = options
         const log = enableLogs ? this.log : undefined
@@ -158,6 +167,22 @@ export default class MuseDeviceController implements MuseController {
 
         const handleEeg = this.createEegHandler(log, stream, eegOutlet)
         const handlePpg = this.createPpgHandler(log, stream, ppgOutlet)
+
+        const handleGyro = this.createImuHandler(
+            'GYROSCOPE',
+            0.0074768,
+            log,
+            stream,
+            gyroOutlet
+        )
+
+        const handleAccel = this.createImuHandler(
+            'ACCELEROMETER',
+            0.0000610352,
+            log,
+            stream,
+            accelOutlet
+        )
 
         return Object.entries(MUSE_CHAR_UUIDS).map(([name, uuid]) => ({
             charUuid: uuid,
@@ -173,6 +198,8 @@ export default class MuseDeviceController implements MuseController {
 
                 handleEeg(name, bytes, timestamp)
                 handlePpg(name, bytes, timestamp)
+                handleGyro(name, bytes, timestamp)
+                handleAccel(name, bytes, timestamp)
             },
         }))
     }
@@ -262,6 +289,47 @@ export default class MuseDeviceController implements MuseController {
         }
     }
 
+    private static createImuHandler(
+        name: string,
+        scale: number,
+        log?: (...data: any[]) => void,
+        stream?: WriteStream,
+        outlet?: StreamOutlet
+    ) {
+        return (charName: string, bytes: number[], timestamp: number) => {
+            if (outlet && charName === name) {
+                const samples = this.decodeImuPacket(bytes, scale)
+
+                samples.forEach((sample, i) => {
+                    const ts = timestamp + (1000 * i) / this.imuSampleRateHz
+                    outlet.pushSample(sample, ts)
+
+                    const msg = `${name.padEnd(13)} | ${ts.toFixed(5).padEnd(15)} | ${JSON.stringify(sample)}`
+                    stream?.write(`${msg}\n`)
+                    log?.(msg)
+                })
+            }
+        }
+    }
+
+    private static decodeImuPacket(bytes: number[], scale: number) {
+        const samples: number[][] = []
+
+        for (let i = 0; i < this.imuChunkSize; i++) {
+            const x = this.readInt16BE(bytes, 2 + i * 2)
+            const y = this.readInt16BE(bytes, 2 + (i + 3) * 2)
+            const z = this.readInt16BE(bytes, 2 + (i + 6) * 2)
+            samples.push([x * scale, y * scale, z * scale])
+        }
+
+        return samples
+    }
+
+    private static readInt16BE(bytes: number[], offset: number) {
+        const value = (bytes[offset]! << 8) | bytes[offset + 1]!
+        return value >= 0x8000 ? value - 0x10000 : value
+    }
+
     private static decodePpgCharChunk(bytes: number[]) {
         const charSamples: number[] = []
 
@@ -287,7 +355,7 @@ export default class MuseDeviceController implements MuseController {
         })
     }
 
-    private static async EegLslOutlet() {
+    private static async EegOutlet() {
         return await LslStreamOutlet.Create({
             name: 'Muse EEG',
             type: 'EEG',
@@ -301,7 +369,7 @@ export default class MuseDeviceController implements MuseController {
         })
     }
 
-    private static async PpgLslOutlet() {
+    private static async PpgOutlet() {
         return await LslStreamOutlet.Create({
             name: 'Muse PPG',
             type: 'PPG',
@@ -311,6 +379,34 @@ export default class MuseDeviceController implements MuseController {
             sourceId: 'muse-s-ppg',
             manufacturer: 'Interaxon Inc.',
             units: 'N/A',
+            chunkSize: 1,
+        })
+    }
+
+    private static async GyroOutlet() {
+        return await LslStreamOutlet.Create({
+            name: 'Muse Gyroscope',
+            type: 'Gyroscope',
+            channelNames: ['X', 'Y', 'Z'],
+            sampleRateHz: this.imuSampleRateHz,
+            channelFormat: 'float32',
+            sourceId: 'muse-gyroscope',
+            manufacturer: 'Interaxon Inc.',
+            units: 'degrees/s',
+            chunkSize: 1,
+        })
+    }
+
+    private static async AccelOutlet() {
+        return await LslStreamOutlet.Create({
+            name: 'Muse Accelerometer',
+            type: 'Accelerometer',
+            channelNames: ['X', 'Y', 'Z'],
+            sampleRateHz: this.imuSampleRateHz,
+            channelFormat: 'float32',
+            sourceId: 'muse-accelerometer',
+            manufacturer: 'Interaxon Inc.',
+            units: 'g',
             chunkSize: 1,
         })
     }
@@ -332,6 +428,8 @@ export interface MuseControllerOptions {
     txtRecordPath?: string
     disableEeg?: boolean
     disablePpg?: boolean
+    disableGyro?: boolean
+    disableAccel?: boolean
 }
 
 export type MuseControllerConstructor = new (
