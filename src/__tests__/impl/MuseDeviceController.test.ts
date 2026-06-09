@@ -31,6 +31,14 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
         'EEG_AUX',
     ]
 
+    private static readonly ppgSampleRateHz = 64
+    private static readonly ppgChunkSize = 6
+    private static readonly ppgCharNames = [
+        'PPG_AMBIENT',
+        'PPG_INFRARED',
+        'PPG_RED',
+    ]
+
     private static readonly charCallbacks = Object.entries(MUSE_CHAR_UUIDS).map(
         ([name, uuid]) => {
             return {
@@ -405,6 +413,59 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async onDataPushesPpgSamplesToOutlet() {
+        const { timestamp, charValues } = this.simulatePpgOnData()
+
+        const expected = Array.from(
+            { length: this.ppgChunkSize },
+            (_, sampleIdx) => ({
+                sample: charValues.map((values) => values[sampleIdx]),
+                timestamp: timestamp + sampleIdx / this.ppgSampleRateHz,
+            })
+        )
+
+        assert.isEqualDeep(
+            FakeStreamOutlet.callsToPushSample,
+            expected,
+            'Should push each PPG sample of chunk!'
+        )
+    }
+
+    @test()
+    protected static async onDataLogsPpgSamplesOnceChunkIsFormed() {
+        const { timestamp, charValues } = this.simulatePpgOnData()
+
+        const expected = this.generateExpectedPpgMessages(
+            timestamp,
+            charValues
+        ).map((msg) => [msg])
+
+        assert.isEqualDeep(
+            this.ppgLogCalls,
+            expected,
+            'Should log each PPG sample once the chunk is formed!'
+        )
+    }
+
+    @test()
+    protected static async onDataWritesPpgSamplesToWriteStreamOnceChunkIsFormed() {
+        await this.MuseDeviceController({ txtRecordPath: this.txtRecordPath })
+
+        const { timestamp, charValues } = this.simulatePpgOnData()
+
+        const expected = this.generateExpectedPpgMessages(
+            timestamp,
+            charValues
+        ).map((msg) => `${msg}\n`)
+
+        assert.isEqualDeep(
+            this.ppgWriteStreamCalls,
+            expected,
+            'Should write each PPG sample to the write stream once the chunk is formed!'
+        )
+    }
+
+    @test()
     protected static async exposesUuidFromBleController() {
         await this.startStreaming()
 
@@ -599,8 +660,9 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
     }
 
     private static generateEegCharValues() {
-        return Array.from({ length: this.eegChunkSize }, (_, sampleIdx) =>
-            1000 + sampleIdx * 100
+        return Array.from(
+            { length: this.eegChunkSize },
+            (_, sampleIdx) => 1000 + sampleIdx * 100
         )
     }
 
@@ -616,6 +678,71 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
 
     private static generateRandomByte() {
         return randomInt(0, 255)
+    }
+
+    private static simulatePpgOnData() {
+        const calls = FakeBleController.callsToConstructor
+        const { charCallbacks } = calls[calls.length - 1]!
+
+        const timestamp = randomInt(1, 100)
+
+        const charValues = this.ppgCharNames.map(() =>
+            this.generatePpgCharValues()
+        )
+
+        this.ppgCharNames.forEach((charName, charIdx) => {
+            const { onData } = charCallbacks!.find(
+                (callback) => callback.charName === charName
+            )!
+
+            const fakeBytes = this.generatePpgBytes(charValues[charIdx]!)
+            const fakeBuffer = Buffer.from(fakeBytes)
+
+            onData(fakeBuffer, fakeBytes.length, timestamp)
+        })
+
+        return { timestamp, charValues }
+    }
+
+    private static generatePpgCharValues() {
+        return Array.from(
+            { length: this.ppgChunkSize },
+            (_, sampleIdx) => 1000000 + sampleIdx * 100000
+        )
+    }
+
+    private static generatePpgBytes(values: number[]) {
+        const bytes = [this.generateRandomByte(), this.generateRandomByte()]
+
+        for (const value of values) {
+            bytes.push((value >> 16) & 0xff, (value >> 8) & 0xff, value & 0xff)
+        }
+
+        return bytes
+    }
+
+    private static generateExpectedPpgMessages(
+        timestamp: number,
+        charValues: number[][]
+    ) {
+        return Array.from({ length: this.ppgChunkSize }, (_, sampleIdx) => {
+            const sample = charValues.map((values) => values[sampleIdx])
+            const ts = timestamp + sampleIdx / this.ppgSampleRateHz
+
+            return `PPG, ${JSON.stringify(sample)}, ${ts}`
+        })
+    }
+
+    private static get ppgLogCalls() {
+        return this.logCalls.filter(([msg]) =>
+            (msg as string).startsWith('PPG,')
+        )
+    }
+
+    private static get ppgWriteStreamCalls() {
+        return this.callsToWriteStream.filter((chunk) =>
+            (chunk as string).startsWith('PPG,')
+        )
     }
 
     private static encode12BitPair(first: number, second: number) {

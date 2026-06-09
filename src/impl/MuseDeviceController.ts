@@ -41,6 +41,15 @@ export default class MuseDeviceController implements MuseController {
         'EEG_AUX',
     ]
 
+    private static readonly ppgSampleRateHz = 64
+    private static readonly ppgChunkSize = 6
+
+    private static readonly ppgCharNames = [
+        'PPG_AMBIENT',
+        'PPG_INFRARED',
+        'PPG_RED',
+    ]
+
     protected readonly ble: BleController
 
     protected isConnected = false
@@ -54,12 +63,13 @@ export default class MuseDeviceController implements MuseController {
         const { disableEeg, disablePpg } = options
 
         const eegOutlet = !disableEeg ? await this.EegLslOutlet() : undefined
+        const ppgOutlet = !disablePpg ? await this.PpgLslOutlet() : undefined
 
-        if (!disablePpg) {
-            await this.PpgLslOutlet()
-        }
-
-        const charCallbacks = this.generateCharCallbacks(options, eegOutlet)
+        const charCallbacks = this.generateCharCallbacks(
+            options,
+            eegOutlet,
+            ppgOutlet
+        )
         const ble = await this.BleDeviceController(options, charCallbacks)
 
         return new (this.Class ?? this)(ble)
@@ -136,7 +146,8 @@ export default class MuseDeviceController implements MuseController {
 
     private static generateCharCallbacks(
         options: MuseControllerOptions,
-        eegOutlet?: StreamOutlet
+        eegOutlet?: StreamOutlet,
+        ppgOutlet?: StreamOutlet
     ) {
         const { enableLogs, txtRecordPath } = options
         const log = enableLogs ? this.log : undefined
@@ -146,6 +157,7 @@ export default class MuseDeviceController implements MuseController {
             : undefined
 
         const handleEeg = this.createEegHandler(log, stream, eegOutlet)
+        const handlePpg = this.createPpgHandler(log, stream, ppgOutlet)
 
         return Object.entries(MUSE_CHAR_UUIDS).map(([name, uuid]) => ({
             charUuid: uuid,
@@ -160,6 +172,7 @@ export default class MuseDeviceController implements MuseController {
                 log?.(msg)
 
                 handleEeg(name, bytes, timestamp)
+                handlePpg(name, bytes, timestamp)
             },
         }))
     }
@@ -211,6 +224,52 @@ export default class MuseDeviceController implements MuseController {
         return charSamples
     }
 
+    private static createPpgHandler(
+        log?: (...data: any[]) => void,
+        stream?: WriteStream,
+        ppgOutlet?: StreamOutlet
+    ) {
+        const charChunks: number[][] = []
+        let t0 = 0
+
+        return (charName: string, bytes: number[], timestamp: number) => {
+            const charIdx = this.ppgCharNames.indexOf(charName)
+
+            if (ppgOutlet && charIdx !== -1) {
+                if (charIdx === 0) {
+                    t0 = timestamp
+                }
+
+                charChunks[charIdx] = this.decodePpgCharChunk(bytes.slice(2))
+
+                if (charIdx === this.ppgCharNames.length - 1) {
+                    for (let i = 0; i < this.ppgChunkSize; i++) {
+                        const sample = charChunks.map((c) => c[i])
+
+                        const ts = t0 + i / this.ppgSampleRateHz
+                        ppgOutlet.pushSample(sample, ts)
+
+                        const msg = `PPG, ${JSON.stringify(sample)}, ${ts}`
+                        stream?.write(`${msg}\n`)
+                        log?.(msg)
+                    }
+                }
+            }
+        }
+    }
+
+    private static decodePpgCharChunk(bytes: number[]) {
+        const charSamples: number[] = []
+
+        for (let i = 0; i < bytes.length; i += 3) {
+            charSamples.push(
+                (bytes[i]! << 16) | (bytes[i + 1]! << 8) | bytes[i + 2]!
+            )
+        }
+
+        return charSamples
+    }
+
     private static async BleDeviceController(
         options: MuseControllerOptions,
         charCallbacks: CharacteristicCallbacks
@@ -239,7 +298,7 @@ export default class MuseDeviceController implements MuseController {
     }
 
     private static async PpgLslOutlet() {
-        await LslStreamOutlet.Create({
+        return await LslStreamOutlet.Create({
             name: 'Muse PPG',
             type: 'PPG',
             channelNames: ['PPG_AMBIENT', 'PPG_INFRARED', 'PPG_RED'],
