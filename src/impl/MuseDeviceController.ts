@@ -34,10 +34,10 @@ export default class MuseDeviceController implements MuseController {
     private static readonly eegChunkSize = 12
 
     private static readonly eegCharNames = [
+        'EEG_TP10',
+        'EEG_AF8',
         'EEG_TP9',
         'EEG_AF7',
-        'EEG_AF8',
-        'EEG_TP10',
         'EEG_AUX',
     ]
 
