@@ -182,22 +182,8 @@ export default class MuseDeviceController implements MuseController {
 
         const handleEeg = this.createEegHandler(log, stream, eegOutlet)
         const handlePpg = this.createPpgHandler(log, stream, ppgOutlet)
-
-        const handleGyro = this.createImuHandler(
-            'GYROSCOPE',
-            0.0074768,
-            log,
-            stream,
-            gyroOutlet
-        )
-
-        const handleAccel = this.createImuHandler(
-            'ACCELEROMETER',
-            0.0000610352,
-            log,
-            stream,
-            accelOutlet
-        )
+        const handleGyro = this.createGyroHandler(log, stream, gyroOutlet)
+        const handleAccel = this.createAccelHandler(log, stream, accelOutlet)
 
         return Object.entries(MUSE_CHAR_UUIDS).map(([name, uuid]) => ({
             charUuid: uuid,
@@ -308,6 +294,46 @@ export default class MuseDeviceController implements MuseController {
         }
     }
 
+    private static decodePpgCharChunk(bytes: number[]) {
+        const charSamples: number[] = []
+
+        for (let i = 0; i < bytes.length; i += 3) {
+            charSamples.push(
+                (bytes[i]! << 16) | (bytes[i + 1]! << 8) | bytes[i + 2]!
+            )
+        }
+
+        return charSamples
+    }
+
+    private static createAccelHandler(
+        log?: (...data: any[]) => void,
+        stream?: fs.WriteStream,
+        accelOutlet?: StreamOutlet
+    ) {
+        return this.createImuHandler(
+            'ACCELEROMETER',
+            0.0000610352,
+            log,
+            stream,
+            accelOutlet
+        )
+    }
+
+    private static createGyroHandler(
+        log?: (...data: any[]) => void,
+        stream?: fs.WriteStream,
+        gyroOutlet?: StreamOutlet
+    ) {
+        return this.createImuHandler(
+            'GYROSCOPE',
+            0.0074768,
+            log,
+            stream,
+            gyroOutlet
+        )
+    }
+
     private static createImuHandler(
         name: string,
         scale: number,
@@ -347,18 +373,6 @@ export default class MuseDeviceController implements MuseController {
     private static readInt16BE(bytes: number[], offset: number) {
         const value = (bytes[offset]! << 8) | bytes[offset + 1]!
         return value >= 0x8000 ? value - 0x10000 : value
-    }
-
-    private static decodePpgCharChunk(bytes: number[]) {
-        const charSamples: number[] = []
-
-        for (let i = 0; i < bytes.length; i += 3) {
-            charSamples.push(
-                (bytes[i]! << 16) | (bytes[i + 1]! << 8) | bytes[i + 2]!
-            )
-        }
-
-        return charSamples
     }
 
     private static async BleDeviceController(
