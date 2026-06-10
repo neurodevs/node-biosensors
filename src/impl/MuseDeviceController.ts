@@ -185,6 +185,27 @@ export default class MuseDeviceController implements MuseController {
         const handleGyro = this.createGyroHandler(log, stream, gyroOutlet)
         const handleAccel = this.createAccelHandler(log, stream, accelOutlet)
 
+        const handleData = (
+            charName: string,
+            bytes: number[],
+            timestamp: number
+        ) => {
+            switch (true) {
+                case this.eegCharNames.includes(charName):
+                    handleEeg(charName, bytes, timestamp)
+                    break
+                case this.ppgCharNames.includes(charName):
+                    handlePpg(charName, bytes, timestamp)
+                    break
+                case charName === 'GYROSCOPE':
+                    handleGyro(bytes, timestamp)
+                    break
+                case charName === 'ACCELEROMETER':
+                    handleAccel(bytes, timestamp)
+                    break
+            }
+        }
+
         return Object.entries(MUSE_CHAR_UUIDS).map(([name, uuid]) => ({
             charUuid: uuid,
             charName: name,
@@ -201,10 +222,7 @@ export default class MuseDeviceController implements MuseController {
                 stream?.write(`${msg}\n`)
                 log?.(msg)
 
-                handleEeg(name, bytes, timestamp)
-                handlePpg(name, bytes, timestamp)
-                handleGyro(name, bytes, timestamp)
-                handleAccel(name, bytes, timestamp)
+                handleData(name, bytes, timestamp)
             },
         }))
     }
@@ -220,24 +238,22 @@ export default class MuseDeviceController implements MuseController {
         return (charName: string, bytes: number[], timestamp: number) => {
             const charIdx = this.eegCharNames.indexOf(charName)
 
-            if (eegOutlet && charIdx !== -1) {
-                if (charIdx === 0) {
-                    t0 = timestamp
-                }
+            if (charIdx === 0) {
+                t0 = timestamp
+            }
 
-                charChunks[charIdx] = this.decodeEegCharChunk(bytes.slice(2))
+            charChunks[charIdx] = this.decodeEegCharChunk(bytes.slice(2))
 
-                if (charIdx === this.eegCharNames.length - 1) {
-                    for (let i = 0; i < this.eegChunkSize; i++) {
-                        const sample = charChunks.map((c) => c[i])
+            if (charIdx === this.eegCharNames.length - 1) {
+                for (let i = 0; i < this.eegChunkSize; i++) {
+                    const sample = charChunks.map((c) => c[i])
 
-                        const ts = t0 + (1000 * i) / this.eegSampleRateHz
-                        eegOutlet.pushSample(sample, ts)
+                    const ts = t0 + (1000 * i) / this.eegSampleRateHz
+                    eegOutlet?.pushSample(sample, ts)
 
-                        const msg = `${'EEG'.padEnd(13)} | ${ts.toFixed(5).padEnd(15)} | ${JSON.stringify(sample)}`
-                        stream?.write(`${msg}\n`)
-                        log?.(msg)
-                    }
+                    const msg = `${'EEG'.padEnd(13)} | ${ts.toFixed(5).padEnd(15)} | ${JSON.stringify(sample)}`
+                    stream?.write(`${msg}\n`)
+                    log?.(msg)
                 }
             }
         }
@@ -271,24 +287,22 @@ export default class MuseDeviceController implements MuseController {
         return (charName: string, bytes: number[], timestamp: number) => {
             const charIdx = this.ppgCharNames.indexOf(charName)
 
-            if (ppgOutlet && charIdx !== -1) {
-                if (charIdx === 0) {
-                    t0 = timestamp
-                }
+            if (charIdx === 0) {
+                t0 = timestamp
+            }
 
-                charChunks[charIdx] = this.decodePpgCharChunk(bytes.slice(2))
+            charChunks[charIdx] = this.decodePpgCharChunk(bytes.slice(2))
 
-                if (charIdx === this.ppgCharNames.length - 1) {
-                    for (let i = 0; i < this.ppgChunkSize; i++) {
-                        const sample = charChunks.map((c) => c[i])
+            if (charIdx === this.ppgCharNames.length - 1) {
+                for (let i = 0; i < this.ppgChunkSize; i++) {
+                    const sample = charChunks.map((c) => c[i])
 
-                        const ts = t0 + (1000 * i) / this.ppgSampleRateHz
-                        ppgOutlet.pushSample(sample, ts)
+                    const ts = t0 + (1000 * i) / this.ppgSampleRateHz
+                    ppgOutlet?.pushSample(sample, ts)
 
-                        const msg = `${'PPG'.padEnd(13)} | ${ts.toFixed(5).padEnd(15)} | ${JSON.stringify(sample)}`
-                        stream?.write(`${msg}\n`)
-                        log?.(msg)
-                    }
+                    const msg = `${'PPG'.padEnd(13)} | ${ts.toFixed(5).padEnd(15)} | ${JSON.stringify(sample)}`
+                    stream?.write(`${msg}\n`)
+                    log?.(msg)
                 }
             }
         }
@@ -341,19 +355,17 @@ export default class MuseDeviceController implements MuseController {
         stream?: WriteStream,
         outlet?: StreamOutlet
     ) {
-        return (charName: string, bytes: number[], timestamp: number) => {
-            if (outlet && charName === name) {
-                const samples = this.decodeImuPacket(bytes, scale)
+        return (bytes: number[], timestamp: number) => {
+            const samples = this.decodeImuPacket(bytes, scale)
 
-                samples.forEach((sample, i) => {
-                    const ts = timestamp + (1000 * i) / this.imuSampleRateHz
-                    outlet.pushSample(sample, ts)
+            samples.forEach((sample, i) => {
+                const ts = timestamp + (1000 * i) / this.imuSampleRateHz
+                outlet?.pushSample(sample, ts)
 
-                    const msg = `${name.padEnd(13)} | ${ts.toFixed(5).padEnd(15)} | ${JSON.stringify(sample)}`
-                    stream?.write(`${msg}\n`)
-                    log?.(msg)
-                })
-            }
+                const msg = `${name.padEnd(13)} | ${ts.toFixed(5).padEnd(15)} | ${JSON.stringify(sample)}`
+                stream?.write(`${msg}\n`)
+                log?.(msg)
+            })
         }
     }
 
