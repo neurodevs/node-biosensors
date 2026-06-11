@@ -7,7 +7,7 @@ import {
     StreamOutlet,
 } from '@neurodevs/node-lsl'
 import koffi from 'koffi'
-import { XdfStreamRecorder } from '@neurodevs/node-xdf'
+import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 
 export const MUSE_CHAR_UUIDS: Record<string, string> = {
     CONTROL: '273E0001-4C4D-454D-96BE-F03BAC821358',
@@ -55,12 +55,14 @@ export default class MuseDeviceController implements MuseController {
     private static readonly imuChunkSize = 3
 
     protected readonly ble: BleController
+    private readonly recorder?: XdfRecorder
 
     protected isConnected = false
     protected isStreaming = false
 
-    protected constructor(ble: BleController) {
+    protected constructor(ble: BleController, recorder?: XdfRecorder) {
         this.ble = ble
+        this.recorder = recorder
     }
 
     public static async Create(options: MuseControllerOptions) {
@@ -86,9 +88,11 @@ export default class MuseDeviceController implements MuseController {
         )
         const ble = await this.BleDeviceController(options, charCallbacks)
 
-        xdfRecordPath ? this.XdfStreamRecorder(xdfRecordPath) : undefined
+        const recorder = xdfRecordPath
+            ? await this.XdfStreamRecorder(xdfRecordPath)
+            : undefined
 
-        return new (this.Class ?? this)(ble)
+        return new (this.Class ?? this)(ble, recorder)
     }
 
     public async connect() {
@@ -99,6 +103,7 @@ export default class MuseDeviceController implements MuseController {
     private async idempotentConnect() {
         if (!this.isConnected) {
             await this.ble.connect()
+            this.recorder?.start()
         } else {
             console.warn(`Already connected to ${this.bleUuid}.`)
         }

@@ -994,6 +994,21 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
         )
     }
 
+    @test()
+    protected static async connectStartsXdfRecorder() {
+        const instance = await this.MuseDeviceController({
+            xdfRecordPath: this.xdfRecordPath,
+        })
+
+        await instance.connect()
+
+        assert.isEqualDeep(
+            FakeXdfRecorder.numCallsToStart,
+            1,
+            'Did not start XDF recorder!'
+        )
+    }
+
     private static get isConnected() {
         return this.instance.getIsConnected()
     }
