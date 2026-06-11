@@ -15,6 +15,7 @@ import {
     LslStreamOutlet,
 } from '@neurodevs/node-lsl'
 import SpyMuseController from '../../testDoubles/MuseController/SpyMuseController.js'
+import { FakeXdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 
 export default class MuseDeviceControllerTest extends AbstractPackageTest {
     private static instance: SpyMuseController
@@ -56,6 +57,7 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
         }
     )
 
+    private static readonly xdfRecordPath = this.generateId()
     private static readonly txtRecordPath = this.generateId()
 
     private static readonly callsToCreateWriteStream: unknown[] = []
@@ -82,6 +84,9 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
 
         LslStreamOutlet.Class = FakeStreamOutlet
         FakeStreamOutlet.resetTestDouble()
+
+        XdfStreamRecorder.Class = FakeXdfRecorder
+        FakeXdfRecorder.resetTestDouble()
 
         MuseDeviceController.Class = SpyMuseController
 
@@ -792,7 +797,7 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
 
         assert.isEqualDeep(call, {
             name: 'Muse Gyroscope',
-            type: 'Gyroscope',
+            type: 'GYRO',
             channelNames: ['X', 'Y', 'Z'],
             sampleRateHz: this.imuSampleRateHz,
             channelFormat: 'float32',
@@ -824,7 +829,7 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
 
         assert.isEqualDeep(call, {
             name: 'Muse Accelerometer',
-            type: 'Accelerometer',
+            type: 'ACCEL',
             channelNames: ['X', 'Y', 'Z'],
             sampleRateHz: this.imuSampleRateHz,
             channelFormat: 'float32',
@@ -963,6 +968,29 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
             FakeStreamOutlet.callsToPushSample,
             [],
             'Should not push any accel samples to outlet!'
+        )
+    }
+
+    @test()
+    protected static async createsXdfRecorderIfPassedPath() {
+        await this.MuseDeviceController({
+            xdfRecordPath: this.xdfRecordPath,
+        })
+
+        const { xdfRecordPath, streamQueries } =
+            FakeXdfRecorder.callsToConstructor[0] ?? {}
+
+        assert.isEqualDeep(
+            { xdfRecordPath, streamQueries },
+            {
+                xdfRecordPath: this.xdfRecordPath,
+                streamQueries: [
+                    'type="EEG"',
+                    'type="PPG"',
+                    'type="GYRO"',
+                    'type="ACCEL"',
+                ],
+            }
         )
     }
 

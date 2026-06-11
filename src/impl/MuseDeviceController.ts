@@ -7,6 +7,7 @@ import {
     StreamOutlet,
 } from '@neurodevs/node-lsl'
 import koffi from 'koffi'
+import { XdfStreamRecorder } from '@neurodevs/node-xdf'
 
 export const MUSE_CHAR_UUIDS: Record<string, string> = {
     CONTROL: '273E0001-4C4D-454D-96BE-F03BAC821358',
@@ -63,7 +64,13 @@ export default class MuseDeviceController implements MuseController {
     }
 
     public static async Create(options: MuseControllerOptions) {
-        const { disableEeg, disablePpg, disableGyro, disableAccel } = options
+        const {
+            xdfRecordPath,
+            disableEeg,
+            disablePpg,
+            disableGyro,
+            disableAccel,
+        } = options
 
         const eegOutlet = !disableEeg ? await this.EegOutlet() : undefined
         const ppgOutlet = !disablePpg ? await this.PpgOutlet() : undefined
@@ -78,6 +85,8 @@ export default class MuseDeviceController implements MuseController {
             accelOutlet
         )
         const ble = await this.BleDeviceController(options, charCallbacks)
+
+        xdfRecordPath ? this.XdfStreamRecorder(xdfRecordPath) : undefined
 
         return new (this.Class ?? this)(ble)
     }
@@ -431,7 +440,7 @@ export default class MuseDeviceController implements MuseController {
     private static async GyroOutlet() {
         return await LslStreamOutlet.Create({
             name: 'Muse Gyroscope',
-            type: 'Gyroscope',
+            type: 'GYRO',
             channelNames: ['X', 'Y', 'Z'],
             sampleRateHz: this.imuSampleRateHz,
             channelFormat: 'float32',
@@ -445,7 +454,7 @@ export default class MuseDeviceController implements MuseController {
     private static async AccelOutlet() {
         return await LslStreamOutlet.Create({
             name: 'Muse Accelerometer',
-            type: 'Accelerometer',
+            type: 'ACCEL',
             channelNames: ['X', 'Y', 'Z'],
             sampleRateHz: this.imuSampleRateHz,
             channelFormat: 'float32',
@@ -454,6 +463,15 @@ export default class MuseDeviceController implements MuseController {
             units: 'g',
             chunkSize: 1,
         })
+    }
+
+    private static XdfStreamRecorder(xdfRecordPath: string) {
+        return XdfStreamRecorder.Create(xdfRecordPath, [
+            'type="EEG"',
+            'type="PPG"',
+            'type="GYRO"',
+            'type="ACCEL"',
+        ])
     }
 }
 
@@ -470,6 +488,7 @@ export interface MuseControllerOptions {
     bleUuid: string
     enableLogs?: boolean
     rssiIntervalMs?: number
+    xdfRecordPath?: string
     txtRecordPath?: string
     disableEeg?: boolean
     disablePpg?: boolean
