@@ -152,6 +152,7 @@ export default class MuseDeviceController implements MuseController {
     private async idempotentDisconnect() {
         if (this.isConnected) {
             await this.ble.disconnect()
+            this.recorder?.finish()
         } else {
             console.warn(`Already disconnected from ${this.bleUuid}.`)
         }
