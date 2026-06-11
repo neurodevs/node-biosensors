@@ -1,4 +1,5 @@
-import { randomInt } from 'crypto'
+import { randomInt } from 'node:crypto'
+
 import { FakeWebSocketBridge, FakeWebSocketServer } from '@neurodevs/node-lsl'
 import { test, assert } from '@neurodevs/node-tdd'
 

@@ -1,4 +1,6 @@
-import fs, { WriteStream } from 'fs'
+import fs, { WriteStream } from 'node:fs'
+
+import koffi from 'koffi'
 import {
     BleController,
     BleDeviceController,
@@ -6,7 +8,6 @@ import {
     LslStreamOutlet,
     StreamOutlet,
 } from '@neurodevs/node-lsl'
-import koffi from 'koffi'
 import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 
 export const MUSE_CHAR_UUIDS: Record<string, string> = {
