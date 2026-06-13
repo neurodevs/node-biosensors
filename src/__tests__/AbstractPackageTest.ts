@@ -37,18 +37,17 @@ import BiosensorDeviceFactory, {
 } from '../impl/BiosensorDeviceFactory.js'
 import BiosensorWebSocketGateway from '../impl/BiosensorWebSocketGateway.js'
 import CgxDeviceController from '../impl/devices/CgxDeviceController.js'
-import MuseDeviceStreamer from '../impl/devices/MuseDeviceStreamer.js'
 import ZephyrDeviceController from '../impl/devices/ZephyrDeviceController.js'
 import FakeDeviceFactory from '../testDoubles/DeviceFactory/FakeDeviceFactory.js'
 import FakeCgxController from '../testDoubles/devices/CgxController/FakeCgxController.js'
 import SpyCgxController from '../testDoubles/devices/CgxController/SpyCgxController.js'
 import FakeDeviceController from '../testDoubles/devices/FakeDeviceController.js'
-import FakeMuseDeviceStreamer from '../testDoubles/devices/MuseDeviceStreamer/FakeMuseDeviceStreamer.js'
-import SpyMuseDeviceStreamer from '../testDoubles/devices/MuseDeviceStreamer/SpyMuseDeviceStreamer.js'
 import FakeZephyrController from '../testDoubles/devices/ZephyrController/FakeZephyrController.js'
 import FakeDeviceFTDI from '../testDoubles/FTDI/FakeDeviceFTDI.js'
 import FakeFTDI from '../testDoubles/FTDI/FakeFTDI.js'
 import FakeWebSocketGateway from '../testDoubles/WebSocketGateway/FakeWebSocketGateway.js'
+import MuseDeviceController from '../impl/devices/MuseDeviceController.js'
+import FakeMuseController from '../testDoubles/devices/MuseController/FakeMuseController.js'
 
 export default class AbstractPackageTest extends AbstractModuleTest {
     protected static fakeLiblsl: FakeLiblsl
@@ -72,7 +71,7 @@ export default class AbstractPackageTest extends AbstractModuleTest {
 
     protected static setFakeDevices() {
         this.setFakeCgxController()
-        this.setFakeMuseDeviceStreamer()
+        this.setFakeMuseController()
         this.setFakeZephyrController()
 
         FakeDeviceController.resetTestDouble()
@@ -131,9 +130,9 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         FakeStreamOutlet.resetTestDouble()
     }
 
-    protected static setFakeMuseDeviceStreamer() {
-        MuseDeviceStreamer.Class = FakeMuseDeviceStreamer
-        FakeMuseDeviceStreamer.resetTestDouble()
+    protected static setFakeMuseController() {
+        MuseDeviceController.Class = FakeMuseController
+        FakeMuseController.resetTestDouble()
     }
 
     protected static setFakeStreamInfo() {
@@ -171,10 +170,6 @@ export default class AbstractPackageTest extends AbstractModuleTest {
 
     protected static setSpyCgxController() {
         CgxDeviceController.Class = SpyCgxController
-    }
-
-    protected static setSpyMuseDeviceStreamer() {
-        MuseDeviceStreamer.Class = SpyMuseDeviceStreamer
     }
 
     protected static FakeCharacteristic(uuid: string) {

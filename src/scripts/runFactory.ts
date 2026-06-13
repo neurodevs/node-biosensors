@@ -4,6 +4,7 @@ const factory = BiosensorDeviceFactory.Create()
 
 const { device, recorder } = await factory.createDevice('Muse S Gen 2', {
     xdfRecordPath: 'test.xdf',
+    bleUuid: '',
 })
 
 recorder?.start()

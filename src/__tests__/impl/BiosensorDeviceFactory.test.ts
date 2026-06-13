@@ -17,14 +17,15 @@ import BiosensorDeviceFactory, {
     DeviceSpecification,
 } from '../../impl/BiosensorDeviceFactory.js'
 import CgxDeviceController from '../../impl/devices/CgxDeviceController.js'
-import MuseDeviceStreamer, {
-    MuseDeviceStreamerOptions,
-} from '../../impl/devices/MuseDeviceStreamer.js'
-import FakeMuseDeviceStreamer from '../../testDoubles/devices/MuseDeviceStreamer/FakeMuseDeviceStreamer.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
+import MuseDeviceController, {
+    MuseControllerOptions,
+} from '../../impl/devices/MuseDeviceController.js'
 
 export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
     private static instance: DeviceFactory
+
+    private static readonly museBleUuid = this.generateId()
 
     protected static async beforeEach() {
         await super.beforeEach()
@@ -41,38 +42,19 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async createsDeviceForCgxDeviceController() {
+    protected static async createsDeviceForCgxController() {
         const { device } = await this.createCgxController()
         this.assertDeviceIsTruthy(device)
     }
 
     @test()
-    protected static async createsDeviceForMuseDeviceStreamer() {
-        const { device } = await this.createMuseDeviceStreamer()
+    protected static async createsDeviceForMuseController() {
+        const { device } = await this.createMuseController()
         this.assertDeviceIsTruthy(device)
     }
 
     @test()
-    protected static async createsDeviceForMuseDeviceStreamerWithOptions() {
-        const options = {
-            bleUuid: generateId(),
-            rssiIntervalMs: Math.random(),
-        }
-
-        await this.createMuseDeviceStreamer(options)
-
-        const { bleUuid, rssiIntervalMs } =
-            FakeMuseDeviceStreamer.callsToConstructor[0]!
-
-        assert.isEqualDeep(
-            { bleUuid, rssiIntervalMs },
-            options,
-            'options do not match!'
-        )
-    }
-
-    @test()
-    protected static async createsDeviceForZephyrDeviceController() {
+    protected static async createsDeviceForZephyrController() {
         const { device } = await this.createZephyrController()
         this.assertDeviceIsTruthy(device)
     }
@@ -100,7 +82,7 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
 
     @test()
     protected static async createsXdfRecorderWithXdfRecordPath() {
-        await this.createDevicesWithXdfRecorder()
+        await this.createDevicesWithRecorder()
 
         assert.isEqualDeep(
             FakeXdfRecorder.callsToConstructor[0]?.xdfRecordPath,
@@ -111,13 +93,13 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
 
     @test()
     protected static async createsXdfRecorderWithStreamQueries() {
-        await this.createDevicesWithXdfRecorder()
+        await this.createDevicesWithRecorder()
 
         assert.isEqualDeep(
             FakeXdfRecorder.callsToConstructor[0]?.streamQueries,
             [
                 ...CgxDeviceController.streamQueries,
-                ...MuseDeviceStreamer.streamQueries,
+                ...MuseDeviceController.streamQueries,
             ],
             'Stream queries do not match!'
         )
@@ -125,13 +107,13 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
 
     @test()
     protected static async returnsXdfRecorder() {
-        const { recorder } = await this.createDevicesWithXdfRecorder()
+        const { recorder } = await this.createDevicesWithRecorder()
         assert.isTruthy(recorder, 'Did not return XdfRecorder!')
     }
 
     @test()
     protected static async createDeviceCreatesXdfRecorder() {
-        await this.createCgxWithXdfRecorder()
+        await this.createCgxWithRecorder()
 
         const { xdfRecordPath, streamQueries } =
             FakeXdfRecorder.callsToConstructor[0]!
@@ -148,13 +130,13 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
 
     @test()
     protected static async createDeviceReturnsXdfRecorder() {
-        const { recorder } = await this.createCgxWithXdfRecorder()
+        const { recorder } = await this.createCgxWithRecorder()
         assert.isTruthy(recorder, 'Did not return XdfRecorder!')
     }
 
     @test()
     protected static async onlyCreatesOneInstanceOfXdfRecorder() {
-        await this.createDevicesWithXdfRecorder()
+        await this.createDevicesWithRecorder()
 
         assert.isEqual(
             FakeXdfRecorder.callsToConstructor.length,
@@ -164,7 +146,7 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async createDeviceCreatesBiosensorWebSocketGateway() {
+    protected static async createDeviceCreatesWebSocketGateway() {
         await this.createDeviceWithGateway()
 
         assert.isEqualDeep(
@@ -178,13 +160,13 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async createDeviceReturnsBiosensorWebSocketGateway() {
+    protected static async createDeviceReturnsWebSocketGateway() {
         const { gateway } = await this.createDeviceWithGateway()
         assert.isTruthy(gateway, 'Did not return gateway!')
     }
 
     @test()
-    protected static async createDevicesCreatesBiosensorWebSocketGateway() {
+    protected static async createDevicesCreatesWebSocketGateway() {
         await this.createDevicesWithGateway()
 
         assert.isEqualDeep(
@@ -200,7 +182,7 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async createDevicesReturnsBiosensorWebSocketGateway() {
+    protected static async createDevicesReturnsWebSocketGateway() {
         const { gateway } = await this.createDevicesWithGateway()
         assert.isTruthy(gateway, 'Did not return gateway!')
     }
@@ -253,13 +235,13 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
         })
     }
 
-    private static async createCgxWithXdfRecorder() {
+    private static async createCgxWithRecorder() {
         return await this.createCgxController({
             xdfRecordPath: this.xdfRecordPath,
         })
     }
 
-    private static createDevicesWithXdfRecorder() {
+    private static createDevicesWithRecorder() {
         return this.createDevices({ includeXdfRecorder: true })
     }
 
@@ -290,17 +272,18 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
 
     private static deviceSpecifications: DeviceSpecification[] = [
         { deviceName: 'Cognionics Quick-20r' },
-        { deviceName: 'Muse S Gen 2' },
+        { deviceName: 'Muse S Gen 2', options: { bleUuid: this.museBleUuid } },
     ]
 
     private static createCgxController(options?: DeviceControllerOptions) {
         return this.instance.createDevice('Cognionics Quick-20r', options)
     }
 
-    private static createMuseDeviceStreamer(
-        options?: MuseDeviceStreamerOptions
-    ) {
-        return this.instance.createDevice('Muse S Gen 2', options)
+    private static createMuseController(options?: MuseControllerOptions) {
+        return this.instance.createDevice('Muse S Gen 2', {
+            bleUuid: this.museBleUuid,
+            ...options,
+        })
     }
 
     private static createZephyrController(options?: DeviceControllerOptions) {

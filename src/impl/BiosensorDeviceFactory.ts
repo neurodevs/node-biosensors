@@ -9,10 +9,10 @@ import BiosensorWebSocketGateway, {
     WebSocketGateway,
 } from './BiosensorWebSocketGateway.js'
 import CgxDeviceController from './devices/CgxDeviceController.js'
-import MuseDeviceStreamer, {
-    MuseDeviceStreamerOptions,
-} from './devices/MuseDeviceStreamer.js'
 import ZephyrDeviceController from './devices/ZephyrDeviceController.js'
+import MuseDeviceController, {
+    MuseControllerOptions,
+} from './devices/MuseDeviceController.js'
 
 export default class BiosensorDeviceFactory implements DeviceFactory {
     public static Class?: DeviceFactoryConstructor
@@ -70,7 +70,7 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
             case 'Cognionics Quick-20r':
                 return this.CgxDeviceController()
             case 'Muse S Gen 2':
-                return this.MuseDeviceStreamer()
+                return this.MuseDeviceController()
             case 'Zephyr BioHarness 3':
                 return this.ZephyrDeviceController()
             default:
@@ -144,8 +144,8 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         return CgxDeviceController.Create()
     }
 
-    private async MuseDeviceStreamer() {
-        return MuseDeviceStreamer.Create(this.options)
+    private async MuseDeviceController() {
+        return MuseDeviceController.Create({ bleUuid: '', ...this.options })
     }
 
     private ZephyrDeviceController() {
@@ -194,7 +194,6 @@ export interface DeviceController {
 
 export interface DeviceControllerOptions {
     xdfRecordPath?: string
-    webSocketPortStart?: number
 }
 
 export type DeviceControllerConstructor = new (
@@ -205,7 +204,7 @@ export type PerDeviceOptions = PerDeviceOptionsMap[DeviceName]
 
 export interface PerDeviceOptionsMap {
     'Cognionics Quick-20r': DeviceControllerOptions
-    'Muse S Gen 2': MuseDeviceStreamerOptions
+    'Muse S Gen 2': MuseControllerOptions
     'Zephyr BioHarness 3': DeviceControllerOptions
 }
 

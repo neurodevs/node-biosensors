@@ -9,6 +9,10 @@ import {
     StreamOutlet,
 } from '@neurodevs/node-lsl'
 import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
+import {
+    DeviceController,
+    DeviceControllerOptions,
+} from '../BiosensorDeviceFactory.js'
 
 export const MUSE_CHAR_UUIDS: Record<string, string> = {
     CONTROL: '273E0001-4C4D-454D-96BE-F03BAC821358',
@@ -31,6 +35,8 @@ export default class MuseDeviceController implements MuseController {
     public static Class?: MuseControllerConstructor
     public static createWriteStream = fs.createWriteStream
     public static log = console.info
+
+    public static readonly streamQueries = ['type="EEG"', 'type="PPG"']
 
     private static readonly eegSampleRateHz = 256
     private static readonly eegChunkSize = 12
@@ -165,6 +171,14 @@ export default class MuseDeviceController implements MuseController {
 
     public get bleName() {
         return this.ble.name
+    }
+
+    public get outlets() {
+        return []
+    }
+
+    public get streamQueries() {
+        return MuseDeviceController.streamQueries
     }
 
     private static generateCharCallbacks(
@@ -482,7 +496,7 @@ export default class MuseDeviceController implements MuseController {
     }
 }
 
-export interface MuseController {
+export interface MuseController extends DeviceController {
     connect(): Promise<void>
     startStreaming(): Promise<void>
     stopStreaming(): Promise<void>
@@ -491,11 +505,10 @@ export interface MuseController {
     readonly bleName: string
 }
 
-export interface MuseControllerOptions {
+export interface MuseControllerOptions extends DeviceControllerOptions {
     bleUuid: string
     enableLogs?: boolean
     rssiIntervalMs?: number
-    xdfRecordPath?: string
     txtRecordPath?: string
     disableEeg?: boolean
     disablePpg?: boolean
@@ -504,5 +517,6 @@ export interface MuseControllerOptions {
 }
 
 export type MuseControllerConstructor = new (
-    ble: BleController
+    ble: BleController,
+    recorder?: XdfRecorder
 ) => MuseController
