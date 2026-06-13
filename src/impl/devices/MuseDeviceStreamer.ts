@@ -15,8 +15,8 @@ import {
 } from '@neurodevs/node-lsl'
 
 import {
-    DeviceStreamer,
-    DeviceStreamerOptions,
+    DeviceController,
+    DeviceControllerOptions,
 } from '../../impl/BiosensorDeviceFactory.js'
 
 export default class MuseDeviceStreamer implements BleDeviceStreamer {
@@ -366,12 +366,12 @@ export default class MuseDeviceStreamer implements BleDeviceStreamer {
     }
 }
 
-export interface BleDeviceStreamer extends DeviceStreamer {
+export interface BleDeviceStreamer extends DeviceController {
     readonly bleUuid: string
     readonly bleName: string
 }
 
-export interface MuseDeviceStreamerOptions extends DeviceStreamerOptions {
+export interface MuseDeviceStreamerOptions extends DeviceControllerOptions {
     bleUuid?: string
     rssiIntervalMs?: number
 }

@@ -6,36 +6,6 @@ export * from './impl/BiosensorDeviceFactory.js'
 export { default as FakeDeviceFactory } from './testDoubles/DeviceFactory/FakeDeviceFactory.js'
 export * from './testDoubles/DeviceFactory/FakeDeviceFactory.js'
 
-// Cognionics Quick-20r
-
-export { default as CgxDeviceStreamer } from './impl/devices/CgxDeviceStreamer.js'
-export * from './impl/devices/CgxDeviceStreamer.js'
-
-export { default as SpyCgxDeviceStreamer } from './testDoubles/DeviceStreamer/CgxDeviceStreamer/SpyCgxDeviceStreamer.js'
-export * from './testDoubles/DeviceStreamer/CgxDeviceStreamer/SpyCgxDeviceStreamer.js'
-
-export { default as FakeCgxDeviceStreamer } from './testDoubles/DeviceStreamer/CgxDeviceStreamer/FakeCgxDeviceStreamer.js'
-export * from './testDoubles/DeviceStreamer/CgxDeviceStreamer/FakeCgxDeviceStreamer.js'
-
-// DeviceController
-
-export { default as MuseDeviceController } from './impl/MuseDeviceController.js'
-export * from './impl/MuseDeviceController.js'
-
-export { default as FakeDeviceController } from './testDoubles/MuseController/FakeMuseController.js'
-export * from './testDoubles/MuseController/FakeMuseController.js'
-
-// Muse S Gen 2
-
-export { default as MuseDeviceStreamer } from './impl/devices/MuseDeviceStreamer.js'
-export * from './impl/devices/MuseDeviceStreamer.js'
-
-export { default as SpyMuseDeviceStreamer } from './testDoubles/DeviceStreamer/MuseDeviceStreamer/SpyMuseDeviceStreamer.js'
-export * from './testDoubles/DeviceStreamer/MuseDeviceStreamer/SpyMuseDeviceStreamer.js'
-
-export { default as FakeMuseDeviceStreamer } from './testDoubles/DeviceStreamer/MuseDeviceStreamer/FakeMuseDeviceStreamer.js'
-export * from './testDoubles/DeviceStreamer/MuseDeviceStreamer/FakeMuseDeviceStreamer.js'
-
 // StreamingOrchestrator
 
 export { default as BiosensorStreamingOrchestrator } from './impl/BiosensorStreamingOrchestrator.js'
@@ -44,14 +14,6 @@ export * from './impl/BiosensorStreamingOrchestrator.js'
 export { default as FakeStreamingOrchestrator } from './testDoubles/StreamingOrchestrator/FakeStreamingOrchestrator.js'
 export * from './testDoubles/StreamingOrchestrator/FakeStreamingOrchestrator.js'
 
-// Zephyr BioHarness 3
-
-export { default as ZephyrDeviceStreamer } from './impl/devices/ZephyrDeviceStreamer.js'
-export * from './impl/devices/ZephyrDeviceStreamer.js'
-
-export { default as FakeZephyrDeviceStreamer } from './testDoubles/DeviceStreamer/ZephyrDeviceStreamer/FakeZephyrDeviceStreamer.js'
-export * from './testDoubles/DeviceStreamer/ZephyrDeviceStreamer/FakeZephyrDeviceStreamer.js'
-
 // WebSocketGateway
 
 export { default as BiosensorWebSocketGateway } from './impl/BiosensorWebSocketGateway.js'
@@ -59,3 +21,34 @@ export * from './impl/BiosensorWebSocketGateway.js'
 
 export { default as FakeWebSocketGateway } from './testDoubles/WebSocketGateway/FakeWebSocketGateway.js'
 export * from './testDoubles/WebSocketGateway/FakeWebSocketGateway.js'
+
+// --- BIOSENSOR DEVICE CONTROLLERS -----------------------------------------------------------------
+
+// DeviceController
+
+export { default as FakeDeviceController } from './testDoubles/devices/MuseController/FakeMuseController.js'
+export * from './testDoubles/devices/MuseController/FakeMuseController.js'
+
+// Cognionics Quick-20r
+
+export { default as CgxDeviceController } from './impl/devices/CgxDeviceController.js'
+export * from './impl/devices/CgxDeviceController.js'
+
+export { default as SpyCgxController } from './testDoubles/devices/CgxController/SpyCgxController.js'
+export * from './testDoubles/devices/CgxController/SpyCgxController.js'
+
+export { default as FakeCgxDeviceController } from './testDoubles/devices/CgxController/FakeCgxController.js'
+export * from './testDoubles/devices/CgxController/FakeCgxController.js'
+
+// Muse S Gen 2
+
+export { default as MuseDeviceController } from './impl/devices/MuseDeviceController.js'
+export * from './impl/devices/MuseDeviceController.js'
+
+// Zephyr BioHarness 3
+
+export { default as ZephyrDeviceController } from './impl/devices/ZephyrDeviceController.js'
+export * from './impl/devices/ZephyrDeviceController.js'
+
+export { default as FakeZephyrController } from './testDoubles/devices/ZephyrController/FakeZephyrController.js'
+export * from './testDoubles/devices/ZephyrController/FakeZephyrController.js'

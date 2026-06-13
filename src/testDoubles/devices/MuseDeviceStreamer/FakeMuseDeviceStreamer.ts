@@ -1,10 +1,10 @@
 import generateId from '@neurodevs/generate-id'
 import { FakeStreamOutlet } from '@neurodevs/node-lsl'
 
-import { DeviceStreamer } from '../../../impl/BiosensorDeviceFactory.js'
+import { DeviceController } from '../../../impl/BiosensorDeviceFactory.js'
 import { MuseDeviceStreamerConstructorOptions } from '../../../impl/devices/MuseDeviceStreamer.js'
 
-export default class FakeMuseDeviceStreamer implements DeviceStreamer {
+export default class FakeMuseDeviceStreamer implements DeviceController {
     public static callsToConstructor: (
         | MuseDeviceStreamerConstructorOptions
         | undefined

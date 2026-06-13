@@ -11,7 +11,7 @@ import MuseDeviceStreamer, {
     MuseDeviceStreamerOptions,
 } from '../../../impl/devices/MuseDeviceStreamer.js'
 import { MUSE_CHARACTERISTIC_UUIDS as CHAR_UUIDS } from '../../../impl/devices/MuseDeviceStreamer.js'
-import SpyMuseDeviceStreamer from '../../../testDoubles/DeviceStreamer/MuseDeviceStreamer/SpyMuseDeviceStreamer.js'
+import SpyMuseDeviceStreamer from '../../../testDoubles/devices/MuseDeviceStreamer/SpyMuseDeviceStreamer.js'
 import AbstractPackageTest from '../../AbstractPackageTest.js'
 
 export default class MuseDeviceStreamerTest extends AbstractPackageTest {

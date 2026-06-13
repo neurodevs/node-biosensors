@@ -5,7 +5,7 @@ import {
     WebSocketBridgeOptions,
 } from '@neurodevs/node-lsl'
 
-import { DeviceStreamer } from './BiosensorDeviceFactory.js'
+import { DeviceController } from './BiosensorDeviceFactory.js'
 
 export default class BiosensorWebSocketGateway implements WebSocketGateway {
     public static Class?: WebSocketGatewayConstructor
@@ -19,7 +19,7 @@ export default class BiosensorWebSocketGateway implements WebSocketGateway {
     }
 
     public static async Create(
-        devices: DeviceStreamer[],
+        devices: DeviceController[],
         options?: WebSocketGatewayOptions
     ) {
         const bridges = await this.createBridgesFrom(devices, options)
@@ -90,7 +90,7 @@ export default class BiosensorWebSocketGateway implements WebSocketGateway {
     }
 
     private static async createBridgesFrom(
-        devices: DeviceStreamer[],
+        devices: DeviceController[],
         options?: WebSocketGatewayOptions
     ) {
         const { listenPortStart = 8080 } = options ?? {}

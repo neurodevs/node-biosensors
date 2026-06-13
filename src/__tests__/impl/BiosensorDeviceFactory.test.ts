@@ -9,18 +9,18 @@ import { test, assert } from '@neurodevs/node-tdd'
 import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 
 import {
-    DeviceStreamer,
-    DeviceStreamerOptions,
+    DeviceController,
+    DeviceControllerOptions,
 } from '../../impl/BiosensorDeviceFactory.js'
 import BiosensorDeviceFactory, {
     DeviceFactory,
     DeviceSpecification,
 } from '../../impl/BiosensorDeviceFactory.js'
-import CgxDeviceStreamer from '../../impl/devices/CgxDeviceStreamer.js'
+import CgxDeviceController from '../../impl/devices/CgxDeviceController.js'
 import MuseDeviceStreamer, {
     MuseDeviceStreamerOptions,
 } from '../../impl/devices/MuseDeviceStreamer.js'
-import FakeMuseDeviceStreamer from '../../testDoubles/DeviceStreamer/MuseDeviceStreamer/FakeMuseDeviceStreamer.js'
+import FakeMuseDeviceStreamer from '../../testDoubles/devices/MuseDeviceStreamer/FakeMuseDeviceStreamer.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 
 export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
@@ -41,8 +41,8 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async createsDeviceForCgxDeviceStreamer() {
-        const { device } = await this.createCgxDeviceStreamer()
+    protected static async createsDeviceForCgxDeviceController() {
+        const { device } = await this.createCgxController()
         this.assertDeviceIsTruthy(device)
     }
 
@@ -72,8 +72,8 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async createsDeviceForZephyrDeviceStreamer() {
-        const { device } = await this.createZephyrDeviceStreamer()
+    protected static async createsDeviceForZephyrDeviceController() {
+        const { device } = await this.createZephyrController()
         this.assertDeviceIsTruthy(device)
     }
 
@@ -116,7 +116,7 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
         assert.isEqualDeep(
             FakeXdfRecorder.callsToConstructor[0]?.streamQueries,
             [
-                ...CgxDeviceStreamer.streamQueries,
+                ...CgxDeviceController.streamQueries,
                 ...MuseDeviceStreamer.streamQueries,
             ],
             'Stream queries do not match!'
@@ -140,7 +140,7 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
             { xdfRecordPath, streamQueries },
             {
                 xdfRecordPath: this.xdfRecordPath,
-                streamQueries: [...CgxDeviceStreamer.streamQueries],
+                streamQueries: [...CgxDeviceController.streamQueries],
             },
             'Passed incorrect options to XdfRecorder!'
         )
@@ -254,7 +254,7 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
     }
 
     private static async createCgxWithXdfRecorder() {
-        return await this.createCgxDeviceStreamer({
+        return await this.createCgxController({
             xdfRecordPath: this.xdfRecordPath,
         })
     }
@@ -293,7 +293,7 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
         { deviceName: 'Muse S Gen 2' },
     ]
 
-    private static createCgxDeviceStreamer(options?: DeviceStreamerOptions) {
+    private static createCgxController(options?: DeviceControllerOptions) {
         return this.instance.createDevice('Cognionics Quick-20r', options)
     }
 
@@ -303,11 +303,11 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
         return this.instance.createDevice('Muse S Gen 2', options)
     }
 
-    private static createZephyrDeviceStreamer(options?: DeviceStreamerOptions) {
+    private static createZephyrController(options?: DeviceControllerOptions) {
         return this.instance.createDevice('Zephyr BioHarness 3', options)
     }
 
-    private static assertDeviceIsTruthy(device: DeviceStreamer) {
+    private static assertDeviceIsTruthy(device: DeviceController) {
         assert.isTruthy(device, 'Failed to create device!')
     }
 

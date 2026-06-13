@@ -12,10 +12,10 @@ import { StreamOutlet, LslStreamOutlet } from '@neurodevs/node-lsl'
 import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 import FTDI from 'ftdi-d2xx'
 
-import { DeviceStreamer } from '../../impl/BiosensorDeviceFactory.js'
+import { DeviceController } from '../BiosensorDeviceFactory.js'
 
-export default class CgxDeviceStreamer implements DeviceStreamer {
-    public static Class?: CgxDeviceStreamerConstructor
+export default class CgxDeviceController implements DeviceController {
+    public static Class?: CgxControllerConstructor
     public static FTDI = FTDI
     public static readonly streamQueries = ['type="EEG"', 'type="ACCEL"']
 
@@ -43,7 +43,7 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
     private readonly oneStopBit = FTDI.FT_STOP_BITS_1
     private readonly noParityBit = FTDI.FT_PARITY_NONE
 
-    protected constructor(options: CgxDeviceStreamerConstructorOptions) {
+    protected constructor(options: CgxControllerConstructorOptions) {
         const { eegOutlet, accelOutlet, xdfRecorder } = options
 
         this.eegOutlet = eegOutlet
@@ -51,7 +51,7 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
         this.xdfRecorder = xdfRecorder
     }
 
-    public static async Create(options?: CgxDeviceStreamerOptions) {
+    public static async Create(options?: CgxControllerOptions) {
         const { xdfRecordPath } = options ?? {}
 
         const eegOutlet = await this.EegOutlet()
@@ -240,7 +240,7 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
     }
 
     private get numEegChannels() {
-        return CgxDeviceStreamer.eegCharacteristicNames.length
+        return CgxDeviceController.eegCharacteristicNames.length
     }
 
     private decode24BitAccelerometer(packet: Uint8Array<ArrayBufferLike>) {
@@ -267,7 +267,7 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
     }
 
     private get numAccelChannels() {
-        return CgxDeviceStreamer.accelCharacteristicNames.length
+        return CgxDeviceController.accelCharacteristicNames.length
     }
 
     public async stopStreaming() {
@@ -290,11 +290,11 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
     }
 
     public get streamQueries() {
-        return CgxDeviceStreamer.streamQueries
+        return CgxDeviceController.streamQueries
     }
 
     private get FTDI() {
-        return CgxDeviceStreamer.FTDI
+        return CgxDeviceController.FTDI
     }
 
     private static readonly eegCharacteristicNames = [
@@ -366,15 +366,15 @@ export default class CgxDeviceStreamer implements DeviceStreamer {
     }
 }
 
-export interface CgxDeviceStreamerOptions {
+export interface CgxControllerOptions {
     xdfRecordPath?: string
 }
 
-export type CgxDeviceStreamerConstructor = new (
-    options: CgxDeviceStreamerConstructorOptions
-) => DeviceStreamer
+export type CgxControllerConstructor = new (
+    options: CgxControllerConstructorOptions
+) => DeviceController
 
-export interface CgxDeviceStreamerConstructorOptions {
+export interface CgxControllerConstructorOptions {
     eegOutlet: StreamOutlet
     accelOutlet: StreamOutlet
     xdfRecorder?: XdfRecorder

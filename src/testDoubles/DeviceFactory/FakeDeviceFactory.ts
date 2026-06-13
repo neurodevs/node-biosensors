@@ -10,7 +10,7 @@ import {
     SingleDeviceBundle,
     MultipleDeviceBundle,
 } from '../../impl/BiosensorDeviceFactory.js'
-import FakeDeviceStreamer from '../DeviceStreamer/FakeDeviceStreamer.js'
+import FakeDeviceController from '../devices/FakeDeviceController.js'
 import FakeWebSocketGateway from '../WebSocketGateway/FakeWebSocketGateway.js'
 
 export default class FakeDeviceFactory implements DeviceFactory {
@@ -26,7 +26,7 @@ export default class FakeDeviceFactory implements DeviceFactory {
         sessionOptions?: SessionOptions
     }[] = []
 
-    public static fakeDevice = new FakeDeviceStreamer()
+    public static fakeDevice = new FakeDeviceController()
     public static fakeRecorder = new FakeXdfRecorder()
     public static fakeGateway = new FakeWebSocketGateway()
     public static fakeEmitter = new FakeEventMarkerEmitter()

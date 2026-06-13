@@ -1,25 +1,25 @@
-import { DeviceStreamer } from '../../../impl/BiosensorDeviceFactory.js'
+import { DeviceController } from '../../../impl/BiosensorDeviceFactory.js'
 
-export default class FakeZephyrDeviceStreamer implements DeviceStreamer {
+export default class FakeZephyrDeviceController implements DeviceController {
     public static numCallsToConstructor = 0
     public static numCallsToStartStreaming = 0
     public static numCallsToStopStreaming = 0
     public static numCallsToDisconnect = 0
 
     public constructor() {
-        FakeZephyrDeviceStreamer.numCallsToConstructor++
+        FakeZephyrDeviceController.numCallsToConstructor++
     }
 
     public async startStreaming() {
-        FakeZephyrDeviceStreamer.numCallsToStartStreaming++
+        FakeZephyrDeviceController.numCallsToStartStreaming++
     }
 
     public async stopStreaming() {
-        FakeZephyrDeviceStreamer.numCallsToStopStreaming++
+        FakeZephyrDeviceController.numCallsToStopStreaming++
     }
 
     public async disconnect() {
-        FakeZephyrDeviceStreamer.numCallsToDisconnect++
+        FakeZephyrDeviceController.numCallsToDisconnect++
     }
 
     public get outlets() {

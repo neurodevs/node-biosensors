@@ -4,21 +4,21 @@ import { test, assert } from '@neurodevs/node-tdd'
 import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 import FTDI from 'ftdi-d2xx'
 
-import CgxDeviceStreamer from '../../../impl/devices/CgxDeviceStreamer.js'
-import SpyCgxDeviceStreamer from '../../../testDoubles/DeviceStreamer/CgxDeviceStreamer/SpyCgxDeviceStreamer.js'
+import CgxDeviceController from '../../../impl/devices/CgxDeviceController.js'
+import SpyCgxController from '../../../testDoubles/devices/CgxController/SpyCgxController.js'
 import FakeDeviceFTDI from '../../../testDoubles/FTDI/FakeDeviceFTDI.js'
 import FakeFTDI from '../../../testDoubles/FTDI/FakeFTDI.js'
 import AbstractPackageTest from '../../AbstractPackageTest.js'
 
-export default class CgxDeviceStreamerTest extends AbstractPackageTest {
-    private static instance: SpyCgxDeviceStreamer
+export default class CgxDeviceControllerTest extends AbstractPackageTest {
+    private static instance: SpyCgxController
 
     protected static async beforeEach() {
         await super.beforeEach()
 
-        this.setSpyCgxDeviceStreamer()
+        this.setSpyCgxController()
 
-        this.instance = await this.CgxDeviceStreamer()
+        this.instance = await this.CgxDeviceController()
     }
 
     @test()
@@ -323,7 +323,7 @@ export default class CgxDeviceStreamerTest extends AbstractPackageTest {
 
     @test()
     protected static async createsXdfRecorderIfPassedPath() {
-        await this.createStreamerWithRecorder()
+        await this.createControllerWithRecorder()
 
         assert.isEqual(
             FakeXdfRecorder.callsToConstructor.length,
@@ -334,7 +334,7 @@ export default class CgxDeviceStreamerTest extends AbstractPackageTest {
 
     @test()
     protected static async passesXdfRecordPathToRecorder() {
-        await this.createStreamerWithRecorder()
+        await this.createControllerWithRecorder()
 
         const { xdfRecordPath } = FakeXdfRecorder.callsToConstructor[0] ?? {}
         assert.isEqual(xdfRecordPath, this.xdfRecordPath, 'Incorrect path!')
@@ -342,7 +342,7 @@ export default class CgxDeviceStreamerTest extends AbstractPackageTest {
 
     @test()
     protected static async passesStreamQueriesToRecorder() {
-        await this.createStreamerWithRecorder()
+        await this.createControllerWithRecorder()
 
         const { streamQueries } = FakeXdfRecorder.callsToConstructor[0] ?? {}
 
@@ -355,7 +355,7 @@ export default class CgxDeviceStreamerTest extends AbstractPackageTest {
 
     @test()
     protected static async startStreamingCallsStartOnXdfRecorder() {
-        const instance = await this.createStreamerWithRecorder()
+        const instance = await this.createControllerWithRecorder()
         await instance.startStreaming()
 
         assert.isEqual(
@@ -367,7 +367,7 @@ export default class CgxDeviceStreamerTest extends AbstractPackageTest {
 
     @test()
     protected static async stopStreamingCallsFinishOnXdfRecorder() {
-        const instance = await this.createStreamerWithRecorder()
+        const instance = await this.createControllerWithRecorder()
         await instance.stopStreaming()
 
         assert.isEqual(
@@ -379,7 +379,7 @@ export default class CgxDeviceStreamerTest extends AbstractPackageTest {
 
     @test()
     protected static async disconnectCallsFinishOnXdfRecorder() {
-        const instance = await this.createStreamerWithRecorder()
+        const instance = await this.createControllerWithRecorder()
         await instance.startStreaming()
         await instance.disconnect()
 
@@ -392,7 +392,7 @@ export default class CgxDeviceStreamerTest extends AbstractPackageTest {
 
     @test()
     protected static async disconnectReturnsEarlyIfNotRunning() {
-        const instance = await this.createStreamerWithRecorder()
+        const instance = await this.createControllerWithRecorder()
         await instance.startStreaming()
         await instance.disconnect()
         await instance.disconnect()
@@ -504,13 +504,13 @@ export default class CgxDeviceStreamerTest extends AbstractPackageTest {
         \n
     `
 
-    private static async createStreamerWithRecorder() {
-        return await this.CgxDeviceStreamer(this.xdfRecordPath)
+    private static async createControllerWithRecorder() {
+        return await this.CgxDeviceController(this.xdfRecordPath)
     }
 
-    private static async CgxDeviceStreamer(xdfRecordPath?: string) {
-        return (await CgxDeviceStreamer.Create({
+    private static async CgxDeviceController(xdfRecordPath?: string) {
+        return (await CgxDeviceController.Create({
             xdfRecordPath,
-        })) as SpyCgxDeviceStreamer
+        })) as SpyCgxController
     }
 }

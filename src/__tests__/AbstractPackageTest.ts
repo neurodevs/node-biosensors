@@ -33,19 +33,19 @@ import {
 import { Server } from 'ws'
 
 import BiosensorDeviceFactory, {
-    DeviceStreamerOptions,
+    DeviceControllerOptions,
 } from '../impl/BiosensorDeviceFactory.js'
 import BiosensorWebSocketGateway from '../impl/BiosensorWebSocketGateway.js'
-import CgxDeviceStreamer from '../impl/devices/CgxDeviceStreamer.js'
+import CgxDeviceController from '../impl/devices/CgxDeviceController.js'
 import MuseDeviceStreamer from '../impl/devices/MuseDeviceStreamer.js'
-import ZephyrDeviceStreamer from '../impl/devices/ZephyrDeviceStreamer.js'
+import ZephyrDeviceController from '../impl/devices/ZephyrDeviceController.js'
 import FakeDeviceFactory from '../testDoubles/DeviceFactory/FakeDeviceFactory.js'
-import FakeCgxDeviceStreamer from '../testDoubles/DeviceStreamer/CgxDeviceStreamer/FakeCgxDeviceStreamer.js'
-import SpyCgxDeviceStreamer from '../testDoubles/DeviceStreamer/CgxDeviceStreamer/SpyCgxDeviceStreamer.js'
-import FakeDeviceStreamer from '../testDoubles/DeviceStreamer/FakeDeviceStreamer.js'
-import FakeMuseDeviceStreamer from '../testDoubles/DeviceStreamer/MuseDeviceStreamer/FakeMuseDeviceStreamer.js'
-import SpyMuseDeviceStreamer from '../testDoubles/DeviceStreamer/MuseDeviceStreamer/SpyMuseDeviceStreamer.js'
-import FakeZephyrDeviceStreamer from '../testDoubles/DeviceStreamer/ZephyrDeviceStreamer/FakeZephyrDeviceStreamer.js'
+import FakeCgxController from '../testDoubles/devices/CgxController/FakeCgxController.js'
+import SpyCgxController from '../testDoubles/devices/CgxController/SpyCgxController.js'
+import FakeDeviceController from '../testDoubles/devices/FakeDeviceController.js'
+import FakeMuseDeviceStreamer from '../testDoubles/devices/MuseDeviceStreamer/FakeMuseDeviceStreamer.js'
+import SpyMuseDeviceStreamer from '../testDoubles/devices/MuseDeviceStreamer/SpyMuseDeviceStreamer.js'
+import FakeZephyrController from '../testDoubles/devices/ZephyrController/FakeZephyrController.js'
 import FakeDeviceFTDI from '../testDoubles/FTDI/FakeDeviceFTDI.js'
 import FakeFTDI from '../testDoubles/FTDI/FakeFTDI.js'
 import FakeWebSocketGateway from '../testDoubles/WebSocketGateway/FakeWebSocketGateway.js'
@@ -71,11 +71,11 @@ export default class AbstractPackageTest extends AbstractModuleTest {
     }
 
     protected static setFakeDevices() {
-        this.setFakeCgxDeviceStreamer()
+        this.setFakeCgxController()
         this.setFakeMuseDeviceStreamer()
-        this.setFakeZephyrDeviceStreamer()
+        this.setFakeZephyrController()
 
-        FakeDeviceStreamer.resetTestDouble()
+        FakeDeviceController.resetTestDouble()
     }
 
     protected static setFakeBleController() {
@@ -93,9 +93,9 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         FakeBleScanner.resetTestDouble()
     }
 
-    protected static setFakeCgxDeviceStreamer() {
-        CgxDeviceStreamer.Class = FakeCgxDeviceStreamer
-        FakeCgxDeviceStreamer.resetTestDouble()
+    protected static setFakeCgxController() {
+        CgxDeviceController.Class = FakeCgxController
+        FakeCgxController.resetTestDouble()
     }
 
     protected static setFakeDeviceFactory() {
@@ -104,7 +104,7 @@ export default class AbstractPackageTest extends AbstractModuleTest {
     }
 
     protected static setFakeFTDI() {
-        CgxDeviceStreamer.FTDI = FakeFTDI as any
+        CgxDeviceController.FTDI = FakeFTDI as any
         FakeFTDI.resetTestDouble()
         FakeDeviceFTDI.resetTestDouble()
 
@@ -164,13 +164,13 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         FakeXdfRecorder.resetTestDouble()
     }
 
-    protected static setFakeZephyrDeviceStreamer() {
-        ZephyrDeviceStreamer.Class = FakeZephyrDeviceStreamer
-        FakeZephyrDeviceStreamer.resetTestDouble()
+    protected static setFakeZephyrController() {
+        ZephyrDeviceController.Class = FakeZephyrController
+        FakeZephyrController.resetTestDouble()
     }
 
-    protected static setSpyCgxDeviceStreamer() {
-        CgxDeviceStreamer.Class = SpyCgxDeviceStreamer
+    protected static setSpyCgxController() {
+        CgxDeviceController.Class = SpyCgxController
     }
 
     protected static setSpyMuseDeviceStreamer() {
@@ -181,8 +181,8 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         return new FakeCharacteristic({ uuid })
     }
 
-    protected static FakeDeviceStreamer(options?: DeviceStreamerOptions) {
-        return new FakeDeviceStreamer(options)
+    protected static FakeDeviceController(options?: DeviceControllerOptions) {
+        return new FakeDeviceController(options)
     }
 
     protected static FakePeripheral(options?: PeripheralOptions) {

@@ -6,15 +6,15 @@ import MuseDeviceController, {
     MUSE_CHAR_UUIDS,
     CONTROL_UUID,
     MuseControllerOptions,
-} from '../../impl/MuseDeviceController.js'
-import AbstractPackageTest from '../AbstractPackageTest.js'
+} from '../../../impl/devices/MuseDeviceController.js'
+import AbstractPackageTest from '../../AbstractPackageTest.js'
 import {
     BleDeviceController,
     FakeBleController,
     FakeStreamOutlet,
     LslStreamOutlet,
 } from '@neurodevs/node-lsl'
-import SpyMuseController from '../../testDoubles/MuseController/SpyMuseController.js'
+import SpyMuseController from '../../../testDoubles/devices/MuseController/SpyMuseController.js'
 import { FakeXdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 
 export default class MuseDeviceControllerTest extends AbstractPackageTest {

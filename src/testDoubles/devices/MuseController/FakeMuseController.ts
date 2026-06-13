@@ -1,5 +1,5 @@
 import { BleController } from '@neurodevs/node-lsl'
-import { MuseController } from '../../impl/MuseDeviceController.js'
+import { MuseController } from '../../../impl/devices/MuseDeviceController.js'
 
 export default class FakeMuseController implements MuseController {
     public static callsToConstructor: { ble: BleController }[] = []

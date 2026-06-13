@@ -8,18 +8,18 @@ import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 import BiosensorWebSocketGateway, {
     WebSocketGateway,
 } from './BiosensorWebSocketGateway.js'
-import CgxDeviceStreamer from './devices/CgxDeviceStreamer.js'
+import CgxDeviceController from './devices/CgxDeviceController.js'
 import MuseDeviceStreamer, {
     MuseDeviceStreamerOptions,
 } from './devices/MuseDeviceStreamer.js'
-import ZephyrDeviceStreamer from './devices/ZephyrDeviceStreamer.js'
+import ZephyrDeviceController from './devices/ZephyrDeviceController.js'
 
 export default class BiosensorDeviceFactory implements DeviceFactory {
     public static Class?: DeviceFactoryConstructor
 
     private deviceName!: DeviceName
     private options?: PerDeviceOptionsMap[DeviceName]
-    private createdDevice!: DeviceStreamer
+    private createdDevice!: DeviceController
 
     private deviceSpecifications!: DeviceSpecification[]
     private createdBundles!: SingleDeviceBundle[]
@@ -68,11 +68,11 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
     private async createDeviceByName() {
         switch (this.deviceName) {
             case 'Cognionics Quick-20r':
-                return this.CgxDeviceStreamer()
+                return this.CgxDeviceController()
             case 'Muse S Gen 2':
                 return this.MuseDeviceStreamer()
             case 'Zephyr BioHarness 3':
-                return this.ZephyrDeviceStreamer()
+                return this.ZephyrDeviceController()
             default:
                 throw this.invalidNameError
         }
@@ -140,16 +140,16 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         return this.createdBundles.flatMap(({ device }) => device.streamQueries)
     }
 
-    private async CgxDeviceStreamer() {
-        return CgxDeviceStreamer.Create()
+    private async CgxDeviceController() {
+        return CgxDeviceController.Create()
     }
 
     private async MuseDeviceStreamer() {
         return MuseDeviceStreamer.Create(this.options)
     }
 
-    private ZephyrDeviceStreamer() {
-        return ZephyrDeviceStreamer.Create()
+    private ZephyrDeviceController() {
+        return ZephyrDeviceController.Create()
     }
 
     private XdfStreamRecorder(xdfRecordPath: string, streamQueries: string[]) {
@@ -157,7 +157,7 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
     }
 
     private async BiosensorWebSocketGateway(
-        devices: DeviceStreamer[],
+        devices: DeviceController[],
         webSocketPortStart: number
     ) {
         return BiosensorWebSocketGateway.Create(devices, {
@@ -184,7 +184,7 @@ export interface DeviceFactory {
 
 export type DeviceFactoryConstructor = new () => DeviceFactory
 
-export interface DeviceStreamer {
+export interface DeviceController {
     startStreaming(): Promise<void>
     stopStreaming(): Promise<void>
     disconnect(): Promise<void>
@@ -192,17 +192,21 @@ export interface DeviceStreamer {
     readonly streamQueries: string[]
 }
 
-export interface DeviceStreamerOptions {
+export interface DeviceControllerOptions {
     xdfRecordPath?: string
     webSocketPortStart?: number
 }
 
+export type DeviceControllerConstructor = new (
+    options?: DeviceControllerOptions
+) => DeviceController
+
 export type PerDeviceOptions = PerDeviceOptionsMap[DeviceName]
 
 export interface PerDeviceOptionsMap {
-    'Cognionics Quick-20r': DeviceStreamerOptions
+    'Cognionics Quick-20r': DeviceControllerOptions
     'Muse S Gen 2': MuseDeviceStreamerOptions
-    'Zephyr BioHarness 3': DeviceStreamerOptions
+    'Zephyr BioHarness 3': DeviceControllerOptions
 }
 
 export type DeviceName =
@@ -222,14 +226,14 @@ export interface SessionOptions {
 }
 
 export interface SingleDeviceBundle {
-    device: DeviceStreamer
+    device: DeviceController
     recorder?: XdfRecorder
     gateway?: WebSocketGateway
     emitter?: EventMarkerEmitter
 }
 
 export interface MultipleDeviceBundle {
-    devices: DeviceStreamer[]
+    devices: DeviceController[]
     recorder?: XdfRecorder
     gateway?: WebSocketGateway
     emitter?: EventMarkerEmitter

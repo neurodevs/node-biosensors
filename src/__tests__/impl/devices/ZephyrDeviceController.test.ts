@@ -1,16 +1,16 @@
 import { test, assert } from '@neurodevs/node-tdd'
 
-import { DeviceStreamer } from '../../../impl/BiosensorDeviceFactory.js'
-import ZephyrDeviceStreamer from '../../../impl/devices/ZephyrDeviceStreamer.js'
+import { DeviceController } from '../../../impl/BiosensorDeviceFactory.js'
+import ZephyrDeviceController from '../../../impl/devices/ZephyrDeviceController.js'
 import AbstractPackageTest from '../../AbstractPackageTest.js'
 
-export default class ZephyrDeviceStreamerTest extends AbstractPackageTest {
-    private static instance: DeviceStreamer
+export default class ZephyrDeviceControllerTest extends AbstractPackageTest {
+    private static instance: DeviceController
 
     protected static async beforeEach() {
         await super.beforeEach()
 
-        this.instance = await this.ZephyrDeviceStreamer()
+        this.instance = await this.ZephyrDeviceController()
     }
 
     @test()
@@ -27,7 +27,7 @@ export default class ZephyrDeviceStreamerTest extends AbstractPackageTest {
         )
     }
 
-    private static async ZephyrDeviceStreamer() {
-        return ZephyrDeviceStreamer.Create()
+    private static async ZephyrDeviceController() {
+        return ZephyrDeviceController.Create()
     }
 }

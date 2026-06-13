@@ -1,28 +1,28 @@
 import { FakeStreamOutlet, StreamOutlet } from '@neurodevs/node-lsl'
 
-import { DeviceStreamer } from '../../../impl/BiosensorDeviceFactory.js'
-import { CgxDeviceStreamerConstructorOptions } from '../../../impl/devices/CgxDeviceStreamer.js'
+import { DeviceController } from '../../../impl/BiosensorDeviceFactory.js'
+import { CgxControllerConstructorOptions } from '../../../impl/devices/CgxDeviceController.js'
 
-export default class FakeCgxDeviceStreamer implements DeviceStreamer {
+export default class FakeCgxController implements DeviceController {
     public static callsToConstructor: (CallToCgxConstructor | undefined)[] = []
     public static numCallsToStartStreaming = 0
     public static numCallsToStopStreaming = 0
     public static numCallsToDisconnect = 0
 
-    public constructor(options?: CgxDeviceStreamerConstructorOptions) {
-        FakeCgxDeviceStreamer.callsToConstructor.push(options)
+    public constructor(options?: CgxControllerConstructorOptions) {
+        FakeCgxController.callsToConstructor.push(options)
     }
 
     public async startStreaming() {
-        FakeCgxDeviceStreamer.numCallsToStartStreaming++
+        FakeCgxController.numCallsToStartStreaming++
     }
 
     public async stopStreaming() {
-        FakeCgxDeviceStreamer.numCallsToStopStreaming++
+        FakeCgxController.numCallsToStopStreaming++
     }
 
     public async disconnect() {
-        FakeCgxDeviceStreamer.numCallsToDisconnect++
+        FakeCgxController.numCallsToDisconnect++
     }
 
     public fakeEegOutlet = new FakeStreamOutlet()

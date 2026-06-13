@@ -3,17 +3,16 @@ import { ChannelFormat } from '@neurodevs/ndx-native'
 import { FakeStreamOutlet } from '@neurodevs/node-lsl'
 
 import {
-    DeviceStreamer,
-    DeviceStreamerOptions,
+    DeviceController,
+    DeviceControllerOptions,
 } from '../../impl/BiosensorDeviceFactory.js'
 
-export default class FakeDeviceStreamer implements DeviceStreamer {
-    public static callsToConstructor: (DeviceStreamerOptions | undefined)[] = []
+export default class FakeDeviceController implements DeviceController {
+    public static callsToConstructor: (DeviceControllerOptions | undefined)[] =
+        []
     public static numCallsToStartStreaming = 0
     public static numCallsToStopStreaming = 0
     public static numCallsToDisconnect = 0
-
-    public fakeStreamQueries: string[] = [generateId(), generateId()]
 
     public static fakeSourceId = generateId()
     public static fakeType = generateId()
@@ -26,20 +25,22 @@ export default class FakeDeviceStreamer implements DeviceStreamer {
     public static fakeManufacturer = generateId()
     public static fakeUnits = generateId()
 
-    public constructor(options?: DeviceStreamerOptions) {
-        FakeDeviceStreamer.callsToConstructor.push(options)
+    public fakeStreamQueries: string[] = [generateId(), generateId()]
+
+    public constructor(options?: DeviceControllerOptions) {
+        FakeDeviceController.callsToConstructor.push(options)
     }
 
     public async startStreaming() {
-        FakeDeviceStreamer.numCallsToStartStreaming++
+        FakeDeviceController.numCallsToStartStreaming++
     }
 
     public async stopStreaming() {
-        FakeDeviceStreamer.numCallsToStopStreaming++
+        FakeDeviceController.numCallsToStopStreaming++
     }
 
     public async disconnect() {
-        FakeDeviceStreamer.numCallsToDisconnect++
+        FakeDeviceController.numCallsToDisconnect++
     }
 
     public streamQueries = this.fakeStreamQueries
@@ -47,16 +48,16 @@ export default class FakeDeviceStreamer implements DeviceStreamer {
     public outlets = this.streamQueries.map(
         () =>
             new FakeStreamOutlet({
-                sourceId: FakeDeviceStreamer.fakeSourceId,
-                type: FakeDeviceStreamer.fakeType,
-                name: FakeDeviceStreamer.fakeName,
-                sampleRateHz: FakeDeviceStreamer.fakesampleRateHz,
-                channelNames: FakeDeviceStreamer.fakeChannelNames,
-                channelFormat: FakeDeviceStreamer.fakeChannelFormat,
-                chunkSize: FakeDeviceStreamer.fakeChunkSize,
-                maxBufferedMs: FakeDeviceStreamer.fakemaxBufferedMs,
-                manufacturer: FakeDeviceStreamer.fakeManufacturer,
-                units: FakeDeviceStreamer.fakeUnits,
+                sourceId: FakeDeviceController.fakeSourceId,
+                type: FakeDeviceController.fakeType,
+                name: FakeDeviceController.fakeName,
+                sampleRateHz: FakeDeviceController.fakesampleRateHz,
+                channelNames: FakeDeviceController.fakeChannelNames,
+                channelFormat: FakeDeviceController.fakeChannelFormat,
+                chunkSize: FakeDeviceController.fakeChunkSize,
+                maxBufferedMs: FakeDeviceController.fakemaxBufferedMs,
+                manufacturer: FakeDeviceController.fakeManufacturer,
+                units: FakeDeviceController.fakeUnits,
             })
     )
 

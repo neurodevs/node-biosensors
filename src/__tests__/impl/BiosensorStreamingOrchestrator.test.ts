@@ -10,7 +10,7 @@ import BiosensorStreamingOrchestrator, {
     StreamingOrchestratorConstructorOptions,
 } from '../../impl/BiosensorStreamingOrchestrator.js'
 import FakeDeviceFactory from '../../testDoubles/DeviceFactory/FakeDeviceFactory.js'
-import FakeDeviceStreamer from '../../testDoubles/DeviceStreamer/FakeDeviceStreamer.js'
+import FakeDeviceController from '../../testDoubles/devices/FakeDeviceController.js'
 import FakeWebSocketGateway from '../../testDoubles/WebSocketGateway/FakeWebSocketGateway.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 
@@ -89,7 +89,7 @@ export default class BiosensorStreamingOrchestratorTest extends AbstractPackageT
         await this.start()
 
         assert.isEqual(
-            FakeDeviceStreamer.numCallsToStartStreaming,
+            FakeDeviceController.numCallsToStartStreaming,
             this.deviceNames.length,
             'Did not start streaming on all devices!'
         )
@@ -117,7 +117,7 @@ export default class BiosensorStreamingOrchestratorTest extends AbstractPackageT
         await this.startThenStop()
 
         assert.isEqual(
-            FakeDeviceStreamer.numCallsToDisconnect,
+            FakeDeviceController.numCallsToDisconnect,
             this.deviceNames.length,
             'Did not disconnect all devices!'
         )

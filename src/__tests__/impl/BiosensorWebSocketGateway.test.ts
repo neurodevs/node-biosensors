@@ -200,8 +200,8 @@ export default class BiosensorWebSocketGatewayTest extends AbstractPackageTest {
     }
 
     private static devices = [
-        this.FakeDeviceStreamer(),
-        this.FakeDeviceStreamer(),
+        this.FakeDeviceController(),
+        this.FakeDeviceController(),
     ]
 
     private static currentListenPort = 8080
