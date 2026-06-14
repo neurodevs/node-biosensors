@@ -21,11 +21,19 @@ import AbstractPackageTest from '../AbstractPackageTest.js'
 import MuseDeviceController, {
     MuseControllerOptions,
 } from '../../impl/devices/MuseDeviceController.js'
+import FakeMuseController from '../../testDoubles/devices/MuseController/FakeMuseController.js'
 
 export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
     private static instance: DeviceFactory
 
+    private static readonly xdfRecordPath = generateId()
+    private static readonly webSocketPortStart = randomInt(1000, 5000)
     private static readonly museBleUuid = this.generateId()
+
+    private static readonly deviceSpecifications: DeviceSpecification[] = [
+        { deviceName: 'Cognionics Quick-20r' },
+        { deviceName: 'Muse S Gen 2', options: { bleUuid: this.museBleUuid } },
+    ]
 
     protected static async beforeEach() {
         await super.beforeEach()
@@ -223,6 +231,17 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
         assert.isTruthy(emitter, 'Did not return event marker emitter!')
     }
 
+    @test()
+    protected static async creatingMuseControllerCallsConnect() {
+        await this.createMuseController()
+
+        assert.isEqual(
+            FakeMuseController.numCallsToConnect,
+            1,
+            'Did not call connect on Muse!'
+        )
+    }
+
     private static async createDeviceWithEmitter() {
         return await this.instance.createDevice('Cognionics Quick-20r', {
             createEventMarkerEmitter: true,
@@ -241,11 +260,11 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
         })
     }
 
-    private static createDevicesWithRecorder() {
+    private static async createDevicesWithRecorder() {
         return this.createDevices({ includeXdfRecorder: true })
     }
 
-    private static createDevicesWithGateway() {
+    private static async createDevicesWithGateway() {
         return this.createDevices({ useWebSocketGateway: true })
     }
 
@@ -267,26 +286,22 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
         })
     }
 
-    private static readonly xdfRecordPath = generateId()
-    private static readonly webSocketPortStart = randomInt(1000, 5000)
-
-    private static deviceSpecifications: DeviceSpecification[] = [
-        { deviceName: 'Cognionics Quick-20r' },
-        { deviceName: 'Muse S Gen 2', options: { bleUuid: this.museBleUuid } },
-    ]
-
-    private static createCgxController(options?: DeviceControllerOptions) {
+    private static async createCgxController(
+        options?: DeviceControllerOptions
+    ) {
         return this.instance.createDevice('Cognionics Quick-20r', options)
     }
 
-    private static createMuseController(options?: MuseControllerOptions) {
+    private static async createMuseController(options?: MuseControllerOptions) {
         return this.instance.createDevice('Muse S Gen 2', {
             bleUuid: this.museBleUuid,
             ...options,
         })
     }
 
-    private static createZephyrController(options?: DeviceControllerOptions) {
+    private static async createZephyrController(
+        options?: DeviceControllerOptions
+    ) {
         return this.instance.createDevice('Zephyr BioHarness 3', options)
     }
 
