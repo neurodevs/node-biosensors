@@ -72,14 +72,14 @@ export default class MuseDeviceController implements MuseController {
         this.recorder = recorder
     }
 
-    public static async Create(options: MuseControllerOptions) {
+    public static async Create(options?: MuseControllerOptions) {
         const {
             xdfRecordPath,
             disableEeg,
             disablePpg,
             disableGyro,
             disableAccel,
-        } = options
+        } = options ?? {}
 
         const eegOutlet = !disableEeg ? await this.EegOutlet() : undefined
         const ppgOutlet = !disablePpg ? await this.PpgOutlet() : undefined
@@ -93,7 +93,7 @@ export default class MuseDeviceController implements MuseController {
             gyroOutlet,
             accelOutlet
         )
-        const ble = await this.BleDeviceController(options, charCallbacks)
+        const ble = await this.BleDeviceController(charCallbacks, options)
 
         const recorder = xdfRecordPath
             ? await this.XdfStreamRecorder(xdfRecordPath)
@@ -182,7 +182,7 @@ export default class MuseDeviceController implements MuseController {
     }
 
     private static generateCharCallbacks(
-        options: MuseControllerOptions,
+        options?: MuseControllerOptions,
         eegOutlet?: StreamOutlet,
         ppgOutlet?: StreamOutlet,
         gyroOutlet?: StreamOutlet,
@@ -195,7 +195,7 @@ export default class MuseDeviceController implements MuseController {
             disablePpg,
             disableGyro,
             disableAccel,
-        } = options
+        } = options ?? {}
 
         const log = enableLogs ? this.log : undefined
 
@@ -418,16 +418,27 @@ export default class MuseDeviceController implements MuseController {
     }
 
     private static async BleDeviceController(
-        options: MuseControllerOptions,
-        charCallbacks: CharacteristicCallbacks
+        charCallbacks: CharacteristicCallbacks,
+        options?: MuseControllerOptions
     ) {
-        const { bleUuid, rssiIntervalMs } = options
+        const { bleUuid, rssiIntervalMs } = options ?? {}
 
-        return await BleDeviceController.Create({
-            deviceUuid: bleUuid,
+        const bleOptions = {
             charCallbacks,
             rssiIntervalMs,
-        })
+        }
+
+        if (bleUuid) {
+            return await BleDeviceController.Create({
+                ...bleOptions,
+                deviceUuid: bleUuid,
+            })
+        } else {
+            return await BleDeviceController.Create({
+                ...bleOptions,
+                deviceNamePrefix: 'Muse',
+            })
+        }
     }
 
     private static async EegOutlet() {
@@ -506,10 +517,10 @@ export interface MuseController extends DeviceController {
 }
 
 export interface MuseControllerOptions extends DeviceControllerOptions {
-    bleUuid: string
-    enableLogs?: boolean
+    bleUuid?: string
     rssiIntervalMs?: number
     txtRecordPath?: string
+    enableLogs?: boolean
     disableEeg?: boolean
     disablePpg?: boolean
     disableGyro?: boolean

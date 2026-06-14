@@ -139,6 +139,25 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async createsBleControllerWithNamePrefixIfNoUuid() {
+        await MuseDeviceController.Create()
+
+        const call = FakeBleController.callsToConstructor[1]
+
+        assert.isEqualDeep(
+            {
+                deviceNamePrefix: call?.deviceNamePrefix,
+                deviceUuid: call?.deviceUuid,
+            },
+            {
+                deviceNamePrefix: 'Muse',
+                deviceUuid: undefined,
+            },
+            'Should fall back to a Muse name prefix when no bleUuid is passed!'
+        )
+    }
+
+    @test()
     protected static async connectSetsIsConnectedTrue() {
         await this.connect()
 

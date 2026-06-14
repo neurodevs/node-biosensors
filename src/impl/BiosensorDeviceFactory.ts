@@ -17,11 +17,10 @@ import MuseDeviceController, {
 export default class BiosensorDeviceFactory implements DeviceFactory {
     public static Class?: DeviceFactoryConstructor
 
-    private deviceName!: DeviceName
-    private options?: PerDeviceOptionsMap[DeviceName]
+    private spec!: CreateDeviceSpec
     private createdDevice!: DeviceController
 
-    private deviceSpecifications!: DeviceSpecification[]
+    private deviceSpecs!: DeviceSpecification[]
     private createdBundles!: SingleDeviceBundle[]
 
     protected constructor() {}
@@ -34,8 +33,7 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         deviceName: K,
         options?: PerDeviceOptionsMap[K] & SessionOptions
     ) {
-        this.deviceName = deviceName
-        this.options = options
+        this.spec = { deviceName, options } as CreateDeviceSpec
 
         const { xdfRecordPath, webSocketPortStart, createEventMarkerEmitter } =
             options ?? {}
@@ -66,11 +64,11 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
     }
 
     private async createDeviceByName() {
-        switch (this.deviceName) {
+        switch (this.spec.deviceName) {
             case 'Cognionics Quick-20r':
                 return this.CgxDeviceController()
             case 'Muse S Gen 2':
-                return this.MuseDeviceController()
+                return this.MuseDeviceController(this.spec.options)
             case 'Zephyr BioHarness 3':
                 return this.ZephyrDeviceController()
             default:
@@ -83,7 +81,7 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
     }
 
     private get invalidNameErrorMessage() {
-        return `\n\n Invalid device name: ${this.deviceName}! \n\n Please choose from: \n\n - Cognionics Quick-20r \n - Muse S Gen 2 \n - Zephyr BioHarness 3 \n\n`
+        return `\n\n Invalid device name: ${this.spec.deviceName}! \n\n Please choose from: \n\n - Cognionics Quick-20r \n - Muse S Gen 2 \n - Zephyr BioHarness 3 \n\n`
     }
 
     public async createDevices(
@@ -93,7 +91,7 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         const { xdfRecordPath, webSocketPortStart, createEventMarkerEmitter } =
             options ?? {}
 
-        this.deviceSpecifications = deviceSpecifications
+        this.deviceSpecs = deviceSpecifications
         this.createdBundles = await this.createAllDevices()
 
         const bundle: MultipleDeviceBundle = { devices: this.createdDevices }
@@ -121,7 +119,7 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
 
     private async createAllDevices() {
         return await Promise.all(
-            this.deviceSpecifications.map((device) => {
+            this.deviceSpecs.map((device) => {
                 const { deviceName, options } = device
                 return this.createDevice(deviceName, options)
             })
@@ -144,10 +142,8 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         return CgxDeviceController.Create()
     }
 
-    private async MuseDeviceController() {
-        const muse = await MuseDeviceController.Create(
-            this.options as MuseControllerOptions
-        )
+    private async MuseDeviceController(options?: MuseControllerOptions) {
+        const muse = await MuseDeviceController.Create(options)
 
         await muse.connect()
 
@@ -223,6 +219,13 @@ export interface DeviceSpecification {
     deviceName: DeviceName
     options?: PerDeviceOptionsMap[DeviceName]
 }
+
+export type CreateDeviceSpec = {
+    [K in DeviceName]: {
+        deviceName: K
+        options?: PerDeviceOptionsMap[K] & SessionOptions
+    }
+}[DeviceName]
 
 export interface SessionOptions {
     xdfRecordPath?: string
