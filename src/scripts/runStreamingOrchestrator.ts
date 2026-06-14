@@ -2,7 +2,7 @@ import BiosensorStreamingOrchestrator from '../impl/BiosensorStreamingOrchestrat
 
 const orchestrator = await BiosensorStreamingOrchestrator.Create({
     deviceNames: ['Muse S Gen 2'],
-    xdfRecordPath: './src/__tests__/test.xdf',
+    xdfRecordPath: './artifacts/test.xdf',
     webSocketPortStart: 8080,
 })
 
