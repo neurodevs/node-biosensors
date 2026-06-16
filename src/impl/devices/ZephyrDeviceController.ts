@@ -3,7 +3,7 @@ import {
     DeviceControllerOptions,
 } from '../BiosensorDeviceFactory.js'
 import { BleDeviceController } from '@neurodevs/node-lsl'
-import AbstractDeviceController from './AbstractDeviceController.js'
+import AbstractDeviceController from '../AbstractDeviceController.js'
 
 export default class ZephyrDeviceController extends AbstractDeviceController {
     public static Class?: DeviceControllerConstructor

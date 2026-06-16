@@ -1,6 +1,6 @@
 import { XdfRecorder } from '@neurodevs/node-xdf'
 
-import { DeviceController } from '../BiosensorDeviceFactory.js'
+import { DeviceController } from './BiosensorDeviceFactory.js'
 
 export default abstract class AbstractDeviceController implements DeviceController {
     protected readonly recorder?: XdfRecorder
