@@ -4,6 +4,7 @@ import ZephyrDeviceController from '../../../impl/devices/ZephyrDeviceController
 import { BleDeviceController, FakeBleController } from '@neurodevs/node-lsl'
 import SpyZephyrController from '../../../testDoubles/devices/ZephyrController/SpyZephyrController.js'
 import AbstractDeviceControllerBleTest from '../../AbstractDeviceControllerBleTest.js'
+import { DeviceControllerBleOptions } from '../../../impl/BiosensorDeviceFactory.js'
 
 export default class ZephyrDeviceControllerTest extends AbstractDeviceControllerBleTest {
     protected static async beforeEach() {
@@ -83,6 +84,30 @@ export default class ZephyrDeviceControllerTest extends AbstractDeviceController
     }
 
     @test()
+    protected static async createsBleDeviceControllerWithUuid() {
+        await this.ZephyrDeviceController({ bleUuid: this.deviceUuid })
+
+        const call = FakeBleController.callsToConstructor[1]
+
+        assert.isEqualDeep(
+            {
+                deviceUuid: call?.deviceUuid,
+                charCallbacks: call?.charCallbacks?.map(
+                    ({ charUuid, charName }) => ({ charUuid, charName })
+                ),
+            },
+            {
+                deviceUuid: this.deviceUuid,
+                charCallbacks: [],
+            }
+        )
+
+        call?.charCallbacks?.forEach(({ onData }) => {
+            assert.isFunction(onData, 'onData should be a function')
+        })
+    }
+
+    @test()
     protected static async createsBleControllerWithNamePrefixIfNoUuid() {
         assert.isEqualDeep(
             FakeBleController.callsToConstructor[0],
@@ -104,8 +129,10 @@ export default class ZephyrDeviceControllerTest extends AbstractDeviceController
         )
     }
 
-    private static async ZephyrDeviceController() {
-        const zephyr = await ZephyrDeviceController.Create()
+    private static async ZephyrDeviceController(
+        options?: DeviceControllerBleOptions
+    ) {
+        const zephyr = await ZephyrDeviceController.Create(options)
         return zephyr as SpyZephyrController
     }
 }

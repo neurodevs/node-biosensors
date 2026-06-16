@@ -4,6 +4,7 @@ import { FakeBleController } from '@neurodevs/node-lsl'
 import AbstractDeviceControllerTest from './AbstractDeviceControllerTest.js'
 
 export default abstract class AbstractDeviceControllerBleTest extends AbstractDeviceControllerTest {
+    protected static readonly deviceUuid = this.generateId()
 
     protected static async assertConnectCallsBleControllerConnect() {
         await this.connect()
@@ -46,5 +47,4 @@ export default abstract class AbstractDeviceControllerBleTest extends AbstractDe
             'Should not disconnect from BLE device if not connected!'
         )
     }
-
 }

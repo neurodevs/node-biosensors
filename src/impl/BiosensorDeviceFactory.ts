@@ -199,6 +199,10 @@ export interface DeviceControllerOptions {
     xdfRecordPath?: string
 }
 
+export interface DeviceControllerBleOptions extends DeviceControllerOptions {
+    bleUuid?: string
+}
+
 export type DeviceControllerConstructor = new (
     options?: DeviceControllerOptions
 ) => DeviceController

@@ -20,7 +20,6 @@ import AbstractDeviceControllerBleTest from '../../AbstractDeviceControllerBleTe
 export default class MuseDeviceControllerTest extends AbstractDeviceControllerBleTest {
     protected static instance: SpyMuseController
 
-    private static readonly deviceUuid = this.generateId()
     private static readonly eegSampleRateHz = 256
     private static readonly eegChunkSize = 12
 

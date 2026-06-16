@@ -1,14 +1,9 @@
 import {
     DeviceController,
-    DeviceControllerOptions,
+    DeviceControllerBleOptions,
 } from '../BiosensorDeviceFactory.js'
 import { BleController, BleDeviceController } from '@neurodevs/node-lsl'
 import AbstractDeviceController from '../AbstractDeviceController.js'
-
-export type ZephyrControllerConstructor = new (
-    ble: BleController,
-    options?: DeviceControllerOptions
-) => DeviceController
 
 export default class ZephyrDeviceController extends AbstractDeviceController {
     public static Class?: ZephyrControllerConstructor
@@ -18,15 +13,15 @@ export default class ZephyrDeviceController extends AbstractDeviceController {
 
     protected constructor(
         ble: BleController,
-        _options?: DeviceControllerOptions
+        _options?: DeviceControllerBleOptions
     ) {
         super()
 
         this.ble = ble
     }
 
-    public static async Create(options?: DeviceControllerOptions) {
-        const ble = await this.BleDeviceController()
+    public static async Create(options?: DeviceControllerBleOptions) {
+        const ble = await this.BleDeviceController(options)
 
         return new (this.Class ?? this)(ble, options)
     }
@@ -51,11 +46,20 @@ export default class ZephyrDeviceController extends AbstractDeviceController {
 
     protected async handleStopStreaming() {}
 
-    private static async BleDeviceController() {
+    private static async BleDeviceController(
+        options?: DeviceControllerBleOptions
+    ) {
+        const { bleUuid } = options ?? {}
+
         return BleDeviceController.Create({
-            charCallbacks: [],
+            deviceUuid: bleUuid,
             deviceNamePrefix: 'BH BHT',
-            deviceUuid: undefined,
+            charCallbacks: [],
         })
     }
 }
+
+export type ZephyrControllerConstructor = new (
+    ble: BleController,
+    options?: DeviceControllerBleOptions
+) => DeviceController
