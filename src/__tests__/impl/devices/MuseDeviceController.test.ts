@@ -728,7 +728,7 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
             channelNames: ['PPG_AMBIENT', 'PPG_INFRARED', 'PPG_RED'],
             sampleRateHz: 64,
             channelFormat: 'float32',
-            sourceId: 'muse-s-ppg',
+            sourceId: 'muse-ppg',
             manufacturer: 'Interaxon Inc.',
             units: 'N/A',
             chunkSize: 1,
