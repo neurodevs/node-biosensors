@@ -15,9 +15,9 @@ import {
 } from '@neurodevs/node-lsl'
 import SpyMuseController from '../../../testDoubles/devices/MuseController/SpyMuseController.js'
 import { FakeXdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
-import AbstractDeviceControllerTest from '../../AbstractDeviceControllerTest.js'
+import AbstractDeviceControllerBleTest from '../../AbstractDeviceControllerBleTest.js'
 
-export default class MuseDeviceControllerTest extends AbstractDeviceControllerTest {
+export default class MuseDeviceControllerTest extends AbstractDeviceControllerBleTest {
     protected static instance: SpyMuseController
 
     private static readonly deviceUuid = this.generateId()
@@ -189,25 +189,12 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerTe
 
     @test()
     protected static async connectCallsBleControllerConnect() {
-        await this.connect()
-
-        assert.isEqual(
-            FakeBleController.numCallsToConnect,
-            1,
-            'Did not connect to BLE device!'
-        )
+        await this.assertConnectCallsBleControllerConnect()
     }
 
     @test()
     protected static async connectDoesNotCallBleControllerIfConnected() {
-        await this.connect()
-        await this.connect()
-
-        assert.isEqual(
-            FakeBleController.numCallsToConnect,
-            1,
-            'Did not connect to BLE device!'
-        )
+        await this.assertConnectDoesNotCallBleControllerIfConnected()
     }
 
     @test()
@@ -268,25 +255,12 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerTe
 
     @test()
     protected static async disconnectCallsDisconnectBle() {
-        await this.connect()
-        await this.disconnect()
-
-        assert.isEqual(
-            FakeBleController.numCallsToDisconnect,
-            1,
-            'Did not disconnect from BLE device!'
-        )
+        await this.assertDisconnectCallsDisconnectBle()
     }
 
     @test()
     protected static async disconnectDoesNotCallBleControllerIfNotConnected() {
-        await this.disconnect()
-
-        assert.isEqual(
-            FakeBleController.numCallsToDisconnect,
-            0,
-            'Should not disconnect from BLE device if not connected!'
-        )
+        await this.assertDisconnectDoesNotCallBleControllerIfNotConnected()
     }
 
     @test()

@@ -3,9 +3,9 @@ import { test, assert } from '@neurodevs/node-tdd'
 import ZephyrDeviceController from '../../../impl/devices/ZephyrDeviceController.js'
 import { BleDeviceController, FakeBleController } from '@neurodevs/node-lsl'
 import SpyZephyrController from '../../../testDoubles/devices/ZephyrController/SpyZephyrController.js'
-import AbstractDeviceControllerTest from '../../AbstractDeviceControllerTest.js'
+import AbstractDeviceControllerBleTest from '../../AbstractDeviceControllerBleTest.js'
 
-export default class ZephyrDeviceControllerTest extends AbstractDeviceControllerTest {
+export default class ZephyrDeviceControllerTest extends AbstractDeviceControllerBleTest {
     protected static async beforeEach() {
         await super.beforeEach()
 
@@ -60,6 +60,26 @@ export default class ZephyrDeviceControllerTest extends AbstractDeviceController
     @test()
     protected static async disconnectDoesNotCallStopStreamingIfNotStreaming() {
         await this.assertDisconnectDoesNotCallStopStreamingIfNotStreaming()
+    }
+
+    @test()
+    protected static async connectCallsBleControllerConnect() {
+        await this.assertConnectCallsBleControllerConnect()
+    }
+
+    @test()
+    protected static async connectDoesNotCallBleControllerIfConnected() {
+        await this.assertConnectDoesNotCallBleControllerIfConnected()
+    }
+
+    @test()
+    protected static async disconnectCallsDisconnectBle() {
+        await this.assertDisconnectCallsDisconnectBle()
+    }
+
+    @test()
+    protected static async disconnectDoesNotCallBleControllerIfNotConnected() {
+        await this.assertDisconnectDoesNotCallBleControllerIfNotConnected()
     }
 
     @test()

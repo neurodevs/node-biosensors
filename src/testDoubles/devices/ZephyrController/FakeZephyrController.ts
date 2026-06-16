@@ -1,3 +1,4 @@
+import { BleController } from '@neurodevs/node-lsl'
 import {
     DeviceController,
     DeviceControllerOptions,
@@ -11,7 +12,7 @@ export default class FakeZephyrDeviceController implements DeviceController {
     public static numCallsToStopStreaming = 0
     public static numCallsToDisconnect = 0
 
-    public constructor(options?: DeviceControllerOptions) {
+    public constructor(_ble: BleController, options?: DeviceControllerOptions) {
         FakeZephyrDeviceController.callsToConstructor.push(options)
     }
 
