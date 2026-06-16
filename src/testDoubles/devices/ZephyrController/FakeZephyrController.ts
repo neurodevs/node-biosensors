@@ -1,13 +1,17 @@
-import { DeviceController } from '../../../impl/BiosensorDeviceFactory.js'
+import {
+    DeviceController,
+    DeviceControllerOptions,
+} from '../../../impl/BiosensorDeviceFactory.js'
 
 export default class FakeZephyrDeviceController implements DeviceController {
-    public static numCallsToConstructor = 0
+    public static callsToConstructor: (DeviceControllerOptions | undefined)[] =
+        []
     public static numCallsToStartStreaming = 0
     public static numCallsToStopStreaming = 0
     public static numCallsToDisconnect = 0
 
-    public constructor() {
-        FakeZephyrDeviceController.numCallsToConstructor++
+    public constructor(options?: DeviceControllerOptions) {
+        FakeZephyrDeviceController.callsToConstructor.push(options)
     }
 
     public async startStreaming() {
@@ -29,7 +33,7 @@ export default class FakeZephyrDeviceController implements DeviceController {
     public streamQueries = []
 
     public static resetTestDouble() {
-        this.numCallsToConstructor = 0
+        this.callsToConstructor.length = 0
         this.numCallsToStartStreaming = 0
         this.numCallsToStopStreaming = 0
         this.numCallsToDisconnect = 0

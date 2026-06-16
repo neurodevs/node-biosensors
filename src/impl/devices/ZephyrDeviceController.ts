@@ -3,6 +3,7 @@ import {
     DeviceControllerConstructor,
     DeviceControllerOptions,
 } from '../BiosensorDeviceFactory.js'
+import { BleDeviceController } from '@neurodevs/node-lsl'
 
 export default class ZephyrDeviceController implements DeviceController {
     public static Class?: DeviceControllerConstructor
@@ -11,6 +12,7 @@ export default class ZephyrDeviceController implements DeviceController {
     protected constructor(_options?: DeviceControllerOptions) {}
 
     public static async Create(options?: DeviceControllerOptions) {
+        await this.BleDeviceController()
         return new (this.Class ?? this)(options)
     }
 
@@ -31,4 +33,12 @@ export default class ZephyrDeviceController implements DeviceController {
     }
 
     public streamQueries = ZephyrDeviceController.streamQueries
+
+    private static async BleDeviceController() {
+        await BleDeviceController.Create({
+            charCallbacks: [],
+            deviceNamePrefix: 'BH BHT',
+            deviceUuid: undefined,
+        })
+    }
 }
