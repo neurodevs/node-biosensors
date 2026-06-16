@@ -3,19 +3,27 @@ import { assert } from '@neurodevs/node-tdd'
 import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 import AbstractPackageTest from './AbstractPackageTest.js'
 import { DeviceController } from '../impl/BiosensorDeviceFactory.js'
+import AbstractDeviceController from '../impl/devices/AbstractDeviceController.js'
 
 export interface SpyDeviceController extends DeviceController {
     getIsConnected(): boolean
     getIsStreaming(): boolean
+    getDeviceId(): string
 }
 
 export default abstract class AbstractDeviceControllerTest extends AbstractPackageTest {
     protected static instance: SpyDeviceController
+    protected static lastWarn: string
 
+    protected static readonly deviceId = this.generateId()
     protected static readonly xdfRecordPath = `${this.generateId()}.xdf`
 
     protected static async beforeEach() {
         await super.beforeEach()
+
+        AbstractDeviceController.warn = (msg: string) => {
+            this.lastWarn = msg
+        }
     }
 
     protected static async assertCreatesInstance() {
@@ -83,6 +91,48 @@ export default abstract class AbstractDeviceControllerTest extends AbstractPacka
         assert.isFalse(
             wasHit,
             'Should not call stopStreaming if not streaming!'
+        )
+    }
+
+    protected static async assertConnectWarnsWithDeviceId() {
+        await this.connect()
+        await this.connect()
+
+        assert.isEqual(
+            this.lastWarn,
+            `Already connected to ${this.deviceId}.`,
+            'Did not warn with deviceId!'
+        )
+    }
+
+    protected static async assertStartStreamingWarnsWithDeviceId() {
+        await this.startStreaming()
+        await this.startStreaming()
+
+        assert.isEqual(
+            this.lastWarn,
+            `Already streaming from ${this.deviceId}.`,
+            'Did not warn with deviceId!'
+        )
+    }
+
+    protected static async assertStopStreamingWarnsWithDeviceId() {
+        await this.stopStreaming()
+
+        assert.isEqual(
+            this.lastWarn,
+            `Already not streaming from ${this.deviceId}.`,
+            'Did not warn with deviceId!'
+        )
+    }
+
+    protected static async assertDisconnectWarnsWithDeviceId() {
+        await this.disconnect()
+
+        assert.isEqual(
+            this.lastWarn,
+            `Already disconnected from ${this.deviceId}.`,
+            'Did not warn with deviceId!'
         )
     }
 

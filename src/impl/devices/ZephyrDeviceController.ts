@@ -35,7 +35,7 @@ export default class ZephyrDeviceController
     }
 
     protected get deviceId() {
-        return ''
+        return this.bleUuid
     }
 
     protected async handleStartStreaming() {}

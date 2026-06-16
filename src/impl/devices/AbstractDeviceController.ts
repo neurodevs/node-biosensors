@@ -3,6 +3,8 @@ import { XdfRecorder } from '@neurodevs/node-xdf'
 import { DeviceController } from '../BiosensorDeviceFactory.js'
 
 export default abstract class AbstractDeviceController implements DeviceController {
+    public static warn = console.warn
+
     protected readonly recorder?: XdfRecorder
 
     protected isConnected = false
@@ -14,7 +16,7 @@ export default abstract class AbstractDeviceController implements DeviceControll
 
     public async connect() {
         if (this.isConnected) {
-            console.warn(`Already connected to ${this.deviceId}.`)
+            this.warn(`Already connected to ${this.deviceId}.`)
             return
         }
         this.isConnected = true
@@ -25,7 +27,7 @@ export default abstract class AbstractDeviceController implements DeviceControll
 
     public async startStreaming() {
         if (this.isStreaming) {
-            console.warn(`Already streaming from ${this.deviceId}.`)
+            this.warn(`Already streaming from ${this.deviceId}.`)
             return
         }
         this.isStreaming = true
@@ -35,7 +37,7 @@ export default abstract class AbstractDeviceController implements DeviceControll
 
     public async stopStreaming() {
         if (!this.isStreaming) {
-            console.warn(`Already not streaming from ${this.deviceId}.`)
+            this.warn(`Already not streaming from ${this.deviceId}.`)
             return
         }
         this.isStreaming = false
@@ -45,7 +47,7 @@ export default abstract class AbstractDeviceController implements DeviceControll
 
     public async disconnect() {
         if (!this.isConnected) {
-            console.warn(`Already disconnected from ${this.deviceId}.`)
+            this.warn(`Already disconnected from ${this.deviceId}.`)
             return
         }
         if (this.isStreaming) {
@@ -72,4 +74,8 @@ export default abstract class AbstractDeviceController implements DeviceControll
     protected abstract handleStartStreaming(): Promise<void>
 
     protected abstract handleStopStreaming(): Promise<void>
+
+    private get warn() {
+        return AbstractDeviceController.warn
+    }
 }

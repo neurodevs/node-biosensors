@@ -7,6 +7,10 @@ export default class SpyZephyrController extends ZephyrDeviceController {
         super(ble, recorder)
     }
 
+    public getDeviceId() {
+        return this.deviceId
+    }
+
     public getIsConnected() {
         return this.isConnected
     }

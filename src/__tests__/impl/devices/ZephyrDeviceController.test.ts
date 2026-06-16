@@ -81,6 +81,26 @@ export default class ZephyrDeviceControllerTest extends AbstractDeviceController
     }
 
     @test()
+    protected static async connectWarnsWithDeviceId() {
+        await this.assertConnectWarnsWithDeviceId()
+    }
+
+    @test()
+    protected static async startStreamingWarnsWithDeviceId() {
+        await this.assertStartStreamingWarnsWithDeviceId()
+    }
+
+    @test()
+    protected static async stopStreamingWarnsWithDeviceId() {
+        await this.assertStopStreamingWarnsWithDeviceId()
+    }
+
+    @test()
+    protected static async disconnectWarnsWithDeviceId() {
+        await this.assertDisconnectWarnsWithDeviceId()
+    }
+
+    @test()
     protected static async createsXdfRecorderIfPassedPath() {
         await this.assertCreatesXdfRecorderIfPassedPath()
     }

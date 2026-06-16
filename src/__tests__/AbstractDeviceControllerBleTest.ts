@@ -9,12 +9,13 @@ import { DeviceControllerBle } from '../impl/BiosensorDeviceFactory.js'
 export interface SpyDeviceControllerBle extends DeviceControllerBle {
     getIsConnected(): boolean
     getIsStreaming(): boolean
+    getDeviceId(): string
 }
 
 export default abstract class AbstractDeviceControllerBleTest extends AbstractDeviceControllerTest {
     protected static instance: SpyDeviceControllerBle
 
-    protected static readonly deviceUuid = this.generateId()
+    protected static readonly deviceUuid = this.deviceId
     protected static readonly deviceName = this.generateId()
     protected static readonly rssiIntervalMs = randomInt(1, 10)
 
