@@ -11,6 +11,7 @@ import {
 import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 import {
     DeviceControllerBle,
+    DeviceControllerBleConstructor,
     DeviceControllerOptions,
 } from '../BiosensorDeviceFactory.js'
 import AbstractDeviceControllerBle from '../AbstractDeviceControllerBle.js'
@@ -36,7 +37,7 @@ export default class MuseDeviceController
     extends AbstractDeviceControllerBle
     implements DeviceControllerBle
 {
-    public static Class?: MuseControllerConstructor
+    public static Class?: DeviceControllerBleConstructor
     public static createWriteStream = fs.createWriteStream
     public static log = console.info
 
@@ -111,14 +112,6 @@ export default class MuseDeviceController
 
     protected async handleStopStreaming() {
         await this.ble.writeCharacteristic(CONTROL_UUID, 'h')
-    }
-
-    public get bleUuid() {
-        return this.ble.uuid
-    }
-
-    public get bleName() {
-        return this.ble.name
     }
 
     public get streamQueries() {
@@ -461,8 +454,3 @@ export interface MuseControllerOptions extends DeviceControllerOptions {
     disableGyro?: boolean
     disableAccel?: boolean
 }
-
-export type MuseControllerConstructor = new (
-    ble: BleController,
-    recorder?: XdfRecorder
-) => DeviceControllerBle

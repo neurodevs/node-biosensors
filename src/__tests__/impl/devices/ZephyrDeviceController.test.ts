@@ -1,7 +1,7 @@
 import { test, assert } from '@neurodevs/node-tdd'
 
 import ZephyrDeviceController from '../../../impl/devices/ZephyrDeviceController.js'
-import { BleDeviceController, FakeBleController } from '@neurodevs/node-lsl'
+import { FakeBleController } from '@neurodevs/node-lsl'
 import SpyZephyrController from '../../../testDoubles/devices/ZephyrController/SpyZephyrController.js'
 import AbstractDeviceControllerBleTest from '../../AbstractDeviceControllerBleTest.js'
 import { DeviceControllerBleOptions } from '../../../impl/BiosensorDeviceFactory.js'
@@ -9,9 +9,6 @@ import { DeviceControllerBleOptions } from '../../../impl/BiosensorDeviceFactory
 export default class ZephyrDeviceControllerTest extends AbstractDeviceControllerBleTest {
     protected static async beforeEach() {
         await super.beforeEach()
-
-        BleDeviceController.Class = FakeBleController
-        FakeBleController.resetTestDouble()
 
         ZephyrDeviceController.Class = SpyZephyrController
 
@@ -54,16 +51,6 @@ export default class ZephyrDeviceControllerTest extends AbstractDeviceController
     }
 
     @test()
-    protected static async disconnectCallsStopStreaming() {
-        await this.assertDisconnectCallsStopStreaming()
-    }
-
-    @test()
-    protected static async disconnectDoesNotCallStopStreamingIfNotStreaming() {
-        await this.assertDisconnectDoesNotCallStopStreamingIfNotStreaming()
-    }
-
-    @test()
     protected static async connectCallsBleControllerConnect() {
         await this.assertConnectCallsBleControllerConnect()
     }
@@ -74,6 +61,16 @@ export default class ZephyrDeviceControllerTest extends AbstractDeviceController
     }
 
     @test()
+    protected static async disconnectCallsStopStreaming() {
+        await this.assertDisconnectCallsStopStreaming()
+    }
+
+    @test()
+    protected static async disconnectDoesNotCallStopStreamingIfNotStreaming() {
+        await this.assertDisconnectDoesNotCallStopStreamingIfNotStreaming()
+    }
+
+    @test()
     protected static async disconnectCallsDisconnectBle() {
         await this.assertDisconnectCallsDisconnectBle()
     }
@@ -81,6 +78,21 @@ export default class ZephyrDeviceControllerTest extends AbstractDeviceController
     @test()
     protected static async disconnectDoesNotCallBleControllerIfNotConnected() {
         await this.assertDisconnectDoesNotCallBleControllerIfNotConnected()
+    }
+
+    @test()
+    protected static async createsXdfRecorderIfPassedPath() {
+        await this.assertCreatesXdfRecorderIfPassedPath()
+    }
+
+    @test()
+    protected static async connectStartsXdfRecorder() {
+        await this.assertConnectStartsXdfRecorder()
+    }
+
+    @test()
+    protected static async disconnectFinishesXdfRecorder() {
+        await this.assertDisconnectFinishesXdfRecorder()
     }
 
     @test()
@@ -144,6 +156,7 @@ export default class ZephyrDeviceControllerTest extends AbstractDeviceController
     ) {
         const zephyr = await ZephyrDeviceController.Create({
             bleUuid: this.deviceUuid,
+            xdfRecordPath: this.xdfRecordPath,
             ...options,
         })
         return zephyr as SpyZephyrController

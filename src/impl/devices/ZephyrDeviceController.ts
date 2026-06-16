@@ -1,29 +1,33 @@
 import {
-    DeviceController,
     DeviceControllerBle,
+    DeviceControllerBleConstructor,
     DeviceControllerBleOptions,
 } from '../BiosensorDeviceFactory.js'
 import { BleController, BleDeviceController } from '@neurodevs/node-lsl'
 import AbstractDeviceControllerBle from '../AbstractDeviceControllerBle.js'
+import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 
 export default class ZephyrDeviceController
     extends AbstractDeviceControllerBle
     implements DeviceControllerBle
 {
-    public static Class?: ZephyrControllerConstructor
+    public static Class?: DeviceControllerBleConstructor
     public static readonly streamQueries: string[] = []
 
-    protected constructor(
-        ble: BleController,
-        _options?: DeviceControllerBleOptions
-    ) {
-        super(ble)
+    protected constructor(ble: BleController, recorder?: XdfRecorder) {
+        super(ble, recorder)
     }
 
     public static async Create(options?: DeviceControllerBleOptions) {
+        const { xdfRecordPath } = options ?? {}
+
         const ble = await this.BleDeviceController(options)
 
-        return new (this.Class ?? this)(ble, options)
+        const recorder = xdfRecordPath
+            ? await this.XdfStreamRecorder(xdfRecordPath)
+            : undefined
+
+        return new (this.Class ?? this)(ble, recorder)
     }
 
     public get streamQueries() {
@@ -49,9 +53,8 @@ export default class ZephyrDeviceController
             charCallbacks: [],
         })
     }
-}
 
-export type ZephyrControllerConstructor = new (
-    ble: BleController,
-    options?: DeviceControllerBleOptions
-) => DeviceController
+    public static async XdfStreamRecorder(xdfRecordPath: string) {
+        return XdfStreamRecorder.Create(xdfRecordPath, [])
+    }
+}

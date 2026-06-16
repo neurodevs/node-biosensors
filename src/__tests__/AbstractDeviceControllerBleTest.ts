@@ -1,6 +1,6 @@
 import { assert } from '@neurodevs/node-tdd'
+import { FakeBleController } from '@neurodevs/node-lsl'
 
-import { BleDeviceController, FakeBleController } from '@neurodevs/node-lsl'
 import AbstractDeviceControllerTest from './AbstractDeviceControllerTest.js'
 import { DeviceControllerBle } from '../impl/BiosensorDeviceFactory.js'
 
@@ -16,8 +16,7 @@ export default abstract class AbstractDeviceControllerBleTest extends AbstractDe
     protected static readonly deviceName = this.generateId()
 
     protected static async beforeEach() {
-        BleDeviceController.Class = FakeBleController
-        FakeBleController.resetTestDouble()
+        await super.beforeEach()
 
         FakeBleController.fakeName = this.deviceName
     }

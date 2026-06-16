@@ -1,4 +1,5 @@
 import {
+    BleController,
     EventMarkerEmitter,
     LslEventMarkerEmitter,
     StreamOutlet,
@@ -211,6 +212,11 @@ export interface DeviceControllerBleOptions extends DeviceControllerOptions {
 export type DeviceControllerConstructor = new (
     options?: DeviceControllerOptions
 ) => DeviceController
+
+export type DeviceControllerBleConstructor = new (
+    ble: BleController,
+    recorder?: XdfRecorder
+) => DeviceControllerBle
 
 export type PerDeviceOptions = PerDeviceOptionsMap[DeviceName]
 

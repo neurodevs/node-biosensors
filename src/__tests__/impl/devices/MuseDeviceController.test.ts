@@ -7,14 +7,8 @@ import MuseDeviceController, {
     CONTROL_UUID,
     MuseControllerOptions,
 } from '../../../impl/devices/MuseDeviceController.js'
-import {
-    BleDeviceController,
-    FakeBleController,
-    FakeStreamOutlet,
-    LslStreamOutlet,
-} from '@neurodevs/node-lsl'
+import { FakeBleController, FakeStreamOutlet } from '@neurodevs/node-lsl'
 import SpyMuseController from '../../../testDoubles/devices/MuseController/SpyMuseController.js'
-import { FakeXdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 import AbstractDeviceControllerBleTest from '../../AbstractDeviceControllerBleTest.js'
 
 export default class MuseDeviceControllerTest extends AbstractDeviceControllerBleTest {
@@ -56,7 +50,6 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
         }
     )
 
-    private static readonly xdfRecordPath = this.generateId()
     private static readonly txtRecordPath = this.generateId()
 
     private static readonly callsToCreateWriteStream: unknown[] = []
@@ -65,9 +58,6 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
 
     protected static async beforeEach() {
         await super.beforeEach()
-
-        BleDeviceController.Class = FakeBleController
-        FakeBleController.resetTestDouble()
 
         MuseDeviceController.createWriteStream = (path: any, options?: any) => {
             this.callsToCreateWriteStream.push({ path, options })
@@ -80,12 +70,6 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
 
         this.callsToCreateWriteStream.length = 0
         this.callsToWriteStream.length = 0
-
-        LslStreamOutlet.Class = FakeStreamOutlet
-        FakeStreamOutlet.resetTestDouble()
-
-        XdfStreamRecorder.Class = FakeXdfRecorder
-        FakeXdfRecorder.resetTestDouble()
 
         MuseDeviceController.Class = SpyMuseController
 
@@ -134,6 +118,16 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
     }
 
     @test()
+    protected static async connectCallsBleControllerConnect() {
+        await this.assertConnectCallsBleControllerConnect()
+    }
+
+    @test()
+    protected static async connectDoesNotCallBleControllerIfConnected() {
+        await this.assertConnectDoesNotCallBleControllerIfConnected()
+    }
+
+    @test()
     protected static async disconnectCallsStopStreaming() {
         await this.assertDisconnectCallsStopStreaming()
     }
@@ -141,6 +135,41 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
     @test()
     protected static async disconnectDoesNotCallStopStreamingIfNotStreaming() {
         await this.assertDisconnectDoesNotCallStopStreamingIfNotStreaming()
+    }
+
+    @test()
+    protected static async disconnectCallsDisconnectBle() {
+        await this.assertDisconnectCallsDisconnectBle()
+    }
+
+    @test()
+    protected static async disconnectDoesNotCallBleControllerIfNotConnected() {
+        await this.assertDisconnectDoesNotCallBleControllerIfNotConnected()
+    }
+
+    @test()
+    protected static async createsXdfRecorderIfPassedPath() {
+        await this.assertCreatesXdfRecorderIfPassedPath()
+    }
+
+    @test()
+    protected static async connectStartsXdfRecorder() {
+        await this.assertConnectStartsXdfRecorder()
+    }
+
+    @test()
+    protected static async disconnectFinishesXdfRecorder() {
+        await this.assertDisconnectFinishesXdfRecorder()
+    }
+
+    @test()
+    protected static async exposesUuidFromBleController() {
+        await this.assertExposesUuidFromBleController()
+    }
+
+    @test()
+    protected static async exposesNameFromBleController() {
+        await this.assertExposesNameFromBleController()
     }
 
     @test()
@@ -184,16 +213,6 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
             },
             'Should fall back to a Muse name prefix when no bleUuid is passed!'
         )
-    }
-
-    @test()
-    protected static async connectCallsBleControllerConnect() {
-        await this.assertConnectCallsBleControllerConnect()
-    }
-
-    @test()
-    protected static async connectDoesNotCallBleControllerIfConnected() {
-        await this.assertConnectDoesNotCallBleControllerIfConnected()
     }
 
     @test()
@@ -250,16 +269,6 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
             [],
             'Should not have written to control char!'
         )
-    }
-
-    @test()
-    protected static async disconnectCallsDisconnectBle() {
-        await this.assertDisconnectCallsDisconnectBle()
-    }
-
-    @test()
-    protected static async disconnectDoesNotCallBleControllerIfNotConnected() {
-        await this.assertDisconnectDoesNotCallBleControllerIfNotConnected()
     }
 
     @test()
@@ -653,16 +662,6 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
     }
 
     @test()
-    protected static async exposesUuidFromBleController() {
-        await this.assertExposesUuidFromBleController()
-    }
-
-    @test()
-    protected static async exposesNameFromBleController() {
-        await this.assertExposesNameFromBleController()
-    }
-
-    @test()
     protected static async passesRssiIntervalMsToBleController() {
         const rssiIntervalMs = randomInt(1, 5)
 
@@ -918,60 +917,6 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
             FakeStreamOutlet.callsToPushSample,
             [],
             'Should not push any accel samples to outlet!'
-        )
-    }
-
-    @test()
-    protected static async createsXdfRecorderIfPassedPath() {
-        await this.MuseDeviceController({
-            xdfRecordPath: this.xdfRecordPath,
-        })
-
-        const { xdfRecordPath, streamQueries } =
-            FakeXdfRecorder.callsToConstructor[0] ?? {}
-
-        assert.isEqualDeep(
-            { xdfRecordPath, streamQueries },
-            {
-                xdfRecordPath: this.xdfRecordPath,
-                streamQueries: [
-                    'type="EEG"',
-                    'type="PPG"',
-                    'type="GYRO"',
-                    'type="ACCEL"',
-                ],
-            }
-        )
-    }
-
-    @test()
-    protected static async connectStartsXdfRecorder() {
-        const instance = await this.MuseDeviceController({
-            xdfRecordPath: this.xdfRecordPath,
-        })
-
-        await instance.connect()
-
-        assert.isEqualDeep(
-            FakeXdfRecorder.numCallsToStart,
-            1,
-            'Did not start XDF recorder!'
-        )
-    }
-
-    @test()
-    protected static async disconnectFinishesXdfRecorder() {
-        const instance = await this.MuseDeviceController({
-            xdfRecordPath: this.xdfRecordPath,
-        })
-
-        await instance.connect()
-        await instance.disconnect()
-
-        assert.isEqualDeep(
-            FakeXdfRecorder.numCallsToFinish,
-            1,
-            'Did not start XDF recorder!'
         )
     }
 
@@ -1246,6 +1191,7 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
     ) {
         return (await MuseDeviceController.Create({
             bleUuid: this.deviceUuid,
+            xdfRecordPath: this.xdfRecordPath,
             enableLogs: true,
             ...options,
         })) as SpyMuseController

@@ -1,19 +1,19 @@
 import { BleController } from '@neurodevs/node-lsl'
-import {
-    DeviceController,
-    DeviceControllerOptions,
-} from '../../../impl/BiosensorDeviceFactory.js'
+import { DeviceControllerBle } from '../../../impl/BiosensorDeviceFactory.js'
+import { XdfRecorder } from '@neurodevs/node-xdf'
 
-export default class FakeZephyrDeviceController implements DeviceController {
-    public static callsToConstructor: (DeviceControllerOptions | undefined)[] =
-        []
+export default class FakeZephyrDeviceController implements DeviceControllerBle {
+    public static callsToConstructor: {
+        ble: BleController
+        recorder?: XdfRecorder
+    }[] = []
     public static numCallsToConnect = 0
     public static numCallsToStartStreaming = 0
     public static numCallsToStopStreaming = 0
     public static numCallsToDisconnect = 0
 
-    public constructor(_ble: BleController, options?: DeviceControllerOptions) {
-        FakeZephyrDeviceController.callsToConstructor.push(options)
+    public constructor(ble: BleController, recorder?: XdfRecorder) {
+        FakeZephyrDeviceController.callsToConstructor.push({ ble, recorder })
     }
 
     public async connect() {
@@ -38,8 +38,17 @@ export default class FakeZephyrDeviceController implements DeviceController {
 
     public streamQueries = []
 
+    public get bleUuid() {
+        return ''
+    }
+
+    public get bleName() {
+        return ''
+    }
+
     public static resetTestDouble() {
         this.callsToConstructor.length = 0
+        this.numCallsToConnect = 0
         this.numCallsToStartStreaming = 0
         this.numCallsToStopStreaming = 0
         this.numCallsToDisconnect = 0
