@@ -6,12 +6,17 @@ import {
 export default class FakeZephyrDeviceController implements DeviceController {
     public static callsToConstructor: (DeviceControllerOptions | undefined)[] =
         []
+    public static numCallsToConnect = 0
     public static numCallsToStartStreaming = 0
     public static numCallsToStopStreaming = 0
     public static numCallsToDisconnect = 0
 
     public constructor(options?: DeviceControllerOptions) {
         FakeZephyrDeviceController.callsToConstructor.push(options)
+    }
+
+    public async connect() {
+        FakeZephyrDeviceController.numCallsToConnect++
     }
 
     public async startStreaming() {

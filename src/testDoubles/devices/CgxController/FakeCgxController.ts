@@ -5,12 +5,17 @@ import { CgxControllerConstructorOptions } from '../../../impl/devices/CgxDevice
 
 export default class FakeCgxController implements DeviceController {
     public static callsToConstructor: (CallToCgxConstructor | undefined)[] = []
+    public static numCallsToConnect = 0
     public static numCallsToStartStreaming = 0
     public static numCallsToStopStreaming = 0
     public static numCallsToDisconnect = 0
 
     public constructor(options?: CgxControllerConstructorOptions) {
         FakeCgxController.callsToConstructor.push(options)
+    }
+
+    public async connect() {
+        FakeCgxController.numCallsToConnect++
     }
 
     public async startStreaming() {

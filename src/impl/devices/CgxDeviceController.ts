@@ -67,6 +67,8 @@ export default class CgxDeviceController implements DeviceController {
         })
     }
 
+    public async connect() {}
+
     public async startStreaming() {
         this.isRunning = true
         this.startXdfRecorderIfExists()

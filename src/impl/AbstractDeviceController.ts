@@ -13,44 +13,48 @@ export default abstract class AbstractDeviceController implements DeviceControll
     }
 
     public async connect() {
-        if (!this.isConnected) {
-            this.recorder?.start()
-            await this.handleConnect()
-        } else {
+        if (this.isConnected) {
             console.warn(`Already connected to ${this.deviceId}.`)
+            return
         }
         this.isConnected = true
+
+        this.recorder?.start()
+        await this.handleConnect()
     }
 
     public async startStreaming() {
-        if (!this.isStreaming) {
-            await this.handleStartStreaming()
-        } else {
+        if (this.isStreaming) {
             console.warn(`Already streaming from ${this.deviceId}.`)
+            return
         }
         this.isStreaming = true
+
+        await this.handleStartStreaming()
     }
 
     public async stopStreaming() {
-        if (this.isStreaming) {
-            await this.handleStopStreaming()
-        } else {
-            console.warn(`Not streaming from ${this.deviceId}.`)
+        if (!this.isStreaming) {
+            console.warn(`Already not streaming from ${this.deviceId}.`)
+            return
         }
         this.isStreaming = false
+
+        await this.handleStopStreaming()
     }
 
     public async disconnect() {
+        if (!this.isConnected) {
+            console.warn(`Already disconnected from ${this.deviceId}.`)
+            return
+        }
         if (this.isStreaming) {
             await this.stopStreaming()
         }
-        if (this.isConnected) {
-            await this.handleDisconnect()
-            this.recorder?.finish()
-        } else {
-            console.warn(`Already disconnected from ${this.deviceId}.`)
-        }
         this.isConnected = false
+
+        await this.handleDisconnect()
+        this.recorder?.finish()
     }
 
     public get outlets() {

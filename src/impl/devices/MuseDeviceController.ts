@@ -111,10 +111,6 @@ export default class MuseDeviceController
         await this.ble.connect()
     }
 
-    protected async handleDisconnect() {
-        await this.ble.disconnect()
-    }
-
     protected async handleStartStreaming() {
         for (const cmd of ['h', 'p50', 's', 'd']) {
             await this.ble.writeCharacteristic(CONTROL_UUID, cmd)
@@ -123,6 +119,10 @@ export default class MuseDeviceController
 
     protected async handleStopStreaming() {
         await this.ble.writeCharacteristic(CONTROL_UUID, 'h')
+    }
+
+    protected async handleDisconnect() {
+        await this.ble.disconnect()
     }
 
     public get bleUuid() {

@@ -187,6 +187,7 @@ export interface DeviceFactory {
 export type DeviceFactoryConstructor = new () => DeviceFactory
 
 export interface DeviceController {
+    connect(): Promise<void>
     startStreaming(): Promise<void>
     stopStreaming(): Promise<void>
     disconnect(): Promise<void>

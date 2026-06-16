@@ -1,15 +1,11 @@
 import { assert } from '@neurodevs/node-tdd'
 
 import AbstractPackageTest from './AbstractPackageTest.js'
+import { DeviceController } from '../impl/BiosensorDeviceFactory.js'
 
-export interface SpyController {
+export interface SpyController extends DeviceController {
     getIsConnected(): boolean
     getIsStreaming(): boolean
-    connect(): Promise<void>
-    startStreaming(): Promise<void>
-    stopStreaming: () => Promise<void>
-    disconnect(): Promise<void>
-    readonly outlets: unknown[]
 }
 
 export default abstract class AbstractDeviceControllerTest extends AbstractPackageTest {
@@ -29,23 +25,27 @@ export default abstract class AbstractDeviceControllerTest extends AbstractPacka
 
     protected static async assertConnectSetsIsConnectedTrue() {
         await this.connect()
+
         assert.isTrue(this.isConnected, 'Did not set isConnected true!')
     }
 
     protected static async assertStartStreamingSetsIsStreamingTrue() {
         await this.startStreaming()
+
         assert.isTrue(this.isStreaming, 'Did not set isStreaming true!')
     }
 
     protected static async assertStopStreamingSetsIsStreamingFalse() {
         await this.startStreaming()
         await this.stopStreaming()
+
         assert.isFalse(this.isStreaming, 'Did not set isStreaming false!')
     }
 
     protected static async assertDisconnectSetsIsConnectedFalse() {
         await this.connect()
         await this.disconnect()
+
         assert.isFalse(this.isConnected, 'Did not set isConnected false!')
     }
 
@@ -56,6 +56,7 @@ export default abstract class AbstractDeviceControllerTest extends AbstractPacka
             wasHit = true
         }
 
+        await this.connect()
         await this.startStreaming()
         await this.disconnect()
 
@@ -69,6 +70,7 @@ export default abstract class AbstractDeviceControllerTest extends AbstractPacka
             wasHit = true
         }
 
+        await this.startStreaming()
         await this.disconnect()
 
         assert.isFalse(
