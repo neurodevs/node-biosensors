@@ -163,6 +163,11 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
     }
 
     @test()
+    protected static async passesRssiIntervalMsToBleController() {
+        await this.assertPassesRssiIntervalMsToBleController()
+    }
+
+    @test()
     protected static async exposesUuidFromBleController() {
         await this.assertExposesUuidFromBleController()
     }
@@ -658,21 +663,6 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
             this.accelWriteStreamCalls,
             expected,
             'Should write each accel sample to write stream!'
-        )
-    }
-
-    @test()
-    protected static async passesRssiIntervalMsToBleController() {
-        const rssiIntervalMs = randomInt(1, 5)
-
-        await this.MuseDeviceController({ rssiIntervalMs })
-
-        const call = FakeBleController.callsToConstructor[1]
-
-        assert.isEqual(
-            call?.rssiIntervalMs,
-            rssiIntervalMs,
-            'Did not pass rssiIntervalMs to BLE controller!'
         )
     }
 
@@ -1192,6 +1182,7 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
         return (await MuseDeviceController.Create({
             bleUuid: this.deviceUuid,
             xdfRecordPath: this.xdfRecordPath,
+            rssiIntervalMs: this.rssiIntervalMs,
             enableLogs: true,
             ...options,
         })) as SpyMuseController

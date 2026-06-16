@@ -45,12 +45,13 @@ export default class ZephyrDeviceController
     private static async BleDeviceController(
         options?: DeviceControllerBleOptions
     ) {
-        const { bleUuid } = options ?? {}
+        const { bleUuid, rssiIntervalMs } = options ?? {}
 
         return BleDeviceController.Create({
             deviceUuid: bleUuid,
             deviceNamePrefix: 'BH BHT',
             charCallbacks: [],
+            rssiIntervalMs,
         })
     }
 

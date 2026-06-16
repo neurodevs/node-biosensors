@@ -1,3 +1,5 @@
+import { randomInt } from 'node:crypto'
+
 import { assert } from '@neurodevs/node-tdd'
 import { FakeBleController } from '@neurodevs/node-lsl'
 
@@ -14,6 +16,7 @@ export default abstract class AbstractDeviceControllerBleTest extends AbstractDe
 
     protected static readonly deviceUuid = this.generateId()
     protected static readonly deviceName = this.generateId()
+    protected static readonly rssiIntervalMs = randomInt(1, 10)
 
     protected static async beforeEach() {
         await super.beforeEach()
@@ -60,6 +63,14 @@ export default abstract class AbstractDeviceControllerBleTest extends AbstractDe
             FakeBleController.numCallsToDisconnect,
             0,
             'Should not disconnect from BLE device if not connected!'
+        )
+    }
+
+    protected static async assertPassesRssiIntervalMsToBleController() {
+        assert.isEqual(
+            FakeBleController.callsToConstructor[0]?.rssiIntervalMs,
+            this.rssiIntervalMs,
+            'Did not pass rssiIntervalMs to BLE controller!'
         )
     }
 

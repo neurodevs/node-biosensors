@@ -207,6 +207,7 @@ export interface DeviceControllerOptions {
 
 export interface DeviceControllerBleOptions extends DeviceControllerOptions {
     bleUuid?: string
+    rssiIntervalMs?: number
 }
 
 export type DeviceControllerConstructor = new (

@@ -96,6 +96,11 @@ export default class ZephyrDeviceControllerTest extends AbstractDeviceController
     }
 
     @test()
+    protected static async passesRssiIntervalMsToBleController() {
+        await this.assertPassesRssiIntervalMsToBleController()
+    }
+
+    @test()
     protected static async exposesUuidFromBleController() {
         await this.assertExposesUuidFromBleController()
     }
@@ -137,6 +142,7 @@ export default class ZephyrDeviceControllerTest extends AbstractDeviceController
                 charCallbacks: [],
                 deviceNamePrefix: 'BH BHT',
                 deviceUuid: undefined,
+                rssiIntervalMs: this.rssiIntervalMs,
             },
             'Should fall back to a Muse name prefix when no bleUuid is passed!'
         )
@@ -157,6 +163,7 @@ export default class ZephyrDeviceControllerTest extends AbstractDeviceController
         const zephyr = await ZephyrDeviceController.Create({
             bleUuid: this.deviceUuid,
             xdfRecordPath: this.xdfRecordPath,
+            rssiIntervalMs: this.rssiIntervalMs,
             ...options,
         })
         return zephyr as SpyZephyrController
