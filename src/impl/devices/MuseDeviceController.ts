@@ -445,7 +445,6 @@ export default class MuseDeviceController
 }
 
 export interface MuseControllerOptions extends DeviceControllerBleOptions {
-    rssiIntervalMs?: number
     txtRecordPath?: string
     enableLogs?: boolean
     disableEeg?: boolean
