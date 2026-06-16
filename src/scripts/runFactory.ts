@@ -3,7 +3,7 @@ import BiosensorDeviceFactory from '../impl/BiosensorDeviceFactory.js'
 const factory = BiosensorDeviceFactory.Create()
 
 const { device, recorder } = await factory.createDevice('Muse S Gen 2', {
-    xdfRecordPath: 'test.xdf',
+    xdfRecordPath: './artifacts/test.xdf',
     bleUuid: '',
 })
 
