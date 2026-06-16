@@ -1,10 +1,26 @@
 import { assert } from '@neurodevs/node-tdd'
 
-import { FakeBleController } from '@neurodevs/node-lsl'
+import { BleDeviceController, FakeBleController } from '@neurodevs/node-lsl'
 import AbstractDeviceControllerTest from './AbstractDeviceControllerTest.js'
+import { DeviceControllerBle } from '../impl/BiosensorDeviceFactory.js'
+
+export interface SpyDeviceControllerBle extends DeviceControllerBle {
+    getIsConnected(): boolean
+    getIsStreaming(): boolean
+}
 
 export default abstract class AbstractDeviceControllerBleTest extends AbstractDeviceControllerTest {
+    protected static instance: SpyDeviceControllerBle
+
     protected static readonly deviceUuid = this.generateId()
+    protected static readonly deviceName = this.generateId()
+
+    protected static async beforeEach() {
+        BleDeviceController.Class = FakeBleController
+        FakeBleController.resetTestDouble()
+
+        FakeBleController.fakeName = this.deviceName
+    }
 
     protected static async assertConnectCallsBleControllerConnect() {
         await this.connect()
@@ -45,6 +61,26 @@ export default abstract class AbstractDeviceControllerBleTest extends AbstractDe
             FakeBleController.numCallsToDisconnect,
             0,
             'Should not disconnect from BLE device if not connected!'
+        )
+    }
+
+    protected static async assertExposesUuidFromBleController() {
+        await this.startStreaming()
+
+        assert.isEqual(
+            this.instance.bleUuid,
+            this.deviceUuid,
+            'Did not expose uuid from BLE controller!'
+        )
+    }
+
+    protected static async assertExposesNameFromBleController() {
+        await this.startStreaming()
+
+        assert.isEqual(
+            this.instance.bleName,
+            this.deviceName,
+            'Did not expose name from BLE controller!'
         )
     }
 }

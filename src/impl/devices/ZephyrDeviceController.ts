@@ -1,23 +1,23 @@
 import {
     DeviceController,
+    DeviceControllerBle,
     DeviceControllerBleOptions,
 } from '../BiosensorDeviceFactory.js'
 import { BleController, BleDeviceController } from '@neurodevs/node-lsl'
-import AbstractDeviceController from '../AbstractDeviceController.js'
+import AbstractDeviceControllerBle from '../AbstractDeviceControllerBle.js'
 
-export default class ZephyrDeviceController extends AbstractDeviceController {
+export default class ZephyrDeviceController
+    extends AbstractDeviceControllerBle
+    implements DeviceControllerBle
+{
     public static Class?: ZephyrControllerConstructor
     public static readonly streamQueries: string[] = []
-
-    protected ble: BleController
 
     protected constructor(
         ble: BleController,
         _options?: DeviceControllerBleOptions
     ) {
-        super()
-
-        this.ble = ble
+        super(ble)
     }
 
     public static async Create(options?: DeviceControllerBleOptions) {
@@ -32,14 +32,6 @@ export default class ZephyrDeviceController extends AbstractDeviceController {
 
     protected get deviceId() {
         return ''
-    }
-
-    protected async handleConnect() {
-        await this.ble.connect()
-    }
-
-    protected async handleDisconnect() {
-        await this.ble.disconnect()
     }
 
     protected async handleStartStreaming() {}

@@ -10,10 +10,10 @@ import {
 } from '@neurodevs/node-lsl'
 import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 import {
-    DeviceController,
+    DeviceControllerBle,
     DeviceControllerOptions,
 } from '../BiosensorDeviceFactory.js'
-import AbstractDeviceController from '../AbstractDeviceController.js'
+import AbstractDeviceControllerBle from '../AbstractDeviceControllerBle.js'
 
 export const MUSE_CHAR_UUIDS: Record<string, string> = {
     CONTROL: '273E0001-4C4D-454D-96BE-F03BAC821358',
@@ -33,8 +33,8 @@ export const MUSE_CHAR_UUIDS: Record<string, string> = {
 export const CONTROL_UUID = MUSE_CHAR_UUIDS['CONTROL']
 
 export default class MuseDeviceController
-    extends AbstractDeviceController
-    implements MuseController
+    extends AbstractDeviceControllerBle
+    implements DeviceControllerBle
 {
     public static Class?: MuseControllerConstructor
     public static createWriteStream = fs.createWriteStream
@@ -65,12 +65,8 @@ export default class MuseDeviceController
     private static readonly imuSampleRateHz = 52
     private static readonly imuChunkSize = 3
 
-    protected readonly ble: BleController
-
     protected constructor(ble: BleController, recorder?: XdfRecorder) {
-        super(recorder)
-
-        this.ble = ble
+        super(ble, recorder)
     }
 
     public static async Create(options?: MuseControllerOptions) {
@@ -107,10 +103,6 @@ export default class MuseDeviceController
         return this.bleUuid
     }
 
-    protected async handleConnect() {
-        await this.ble.connect()
-    }
-
     protected async handleStartStreaming() {
         for (const cmd of ['h', 'p50', 's', 'd']) {
             await this.ble.writeCharacteristic(CONTROL_UUID, cmd)
@@ -119,10 +111,6 @@ export default class MuseDeviceController
 
     protected async handleStopStreaming() {
         await this.ble.writeCharacteristic(CONTROL_UUID, 'h')
-    }
-
-    protected async handleDisconnect() {
-        await this.ble.disconnect()
     }
 
     public get bleUuid() {
@@ -463,15 +451,6 @@ export default class MuseDeviceController
     }
 }
 
-export interface MuseController extends DeviceController {
-    connect(): Promise<void>
-    startStreaming(): Promise<void>
-    stopStreaming(): Promise<void>
-    disconnect(): Promise<void>
-    readonly bleUuid: string
-    readonly bleName: string
-}
-
 export interface MuseControllerOptions extends DeviceControllerOptions {
     bleUuid?: string
     rssiIntervalMs?: number
@@ -486,4 +465,4 @@ export interface MuseControllerOptions extends DeviceControllerOptions {
 export type MuseControllerConstructor = new (
     ble: BleController,
     recorder?: XdfRecorder
-) => MuseController
+) => DeviceControllerBle

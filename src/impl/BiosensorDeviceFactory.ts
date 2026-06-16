@@ -195,6 +195,11 @@ export interface DeviceController {
     readonly streamQueries: string[]
 }
 
+export interface DeviceControllerBle extends DeviceController {
+    readonly bleUuid: string
+    readonly bleName: string
+}
+
 export interface DeviceControllerOptions {
     xdfRecordPath?: string
 }

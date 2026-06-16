@@ -3,13 +3,13 @@ import { assert } from '@neurodevs/node-tdd'
 import AbstractPackageTest from './AbstractPackageTest.js'
 import { DeviceController } from '../impl/BiosensorDeviceFactory.js'
 
-export interface SpyController extends DeviceController {
+export interface SpyDeviceController extends DeviceController {
     getIsConnected(): boolean
     getIsStreaming(): boolean
 }
 
 export default abstract class AbstractDeviceControllerTest extends AbstractPackageTest {
-    protected static instance: SpyController
+    protected static instance: SpyDeviceController
 
     protected static async assertCreatesInstance() {
         assert.isTruthy(this.instance, 'Failed to create instance!')

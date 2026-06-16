@@ -84,10 +84,18 @@ export default class ZephyrDeviceControllerTest extends AbstractDeviceController
     }
 
     @test()
-    protected static async createsBleDeviceControllerWithUuid() {
-        await this.ZephyrDeviceController({ bleUuid: this.deviceUuid })
+    protected static async exposesUuidFromBleController() {
+        await this.assertExposesUuidFromBleController()
+    }
 
-        const call = FakeBleController.callsToConstructor[1]
+    @test()
+    protected static async exposesNameFromBleController() {
+        await this.assertExposesNameFromBleController()
+    }
+
+    @test()
+    protected static async createsBleDeviceControllerWithUuid() {
+        const call = FakeBleController.callsToConstructor[0]
 
         assert.isEqualDeep(
             {
@@ -109,8 +117,10 @@ export default class ZephyrDeviceControllerTest extends AbstractDeviceController
 
     @test()
     protected static async createsBleControllerWithNamePrefixIfNoUuid() {
+        await this.ZephyrDeviceController({ bleUuid: undefined })
+
         assert.isEqualDeep(
-            FakeBleController.callsToConstructor[0],
+            FakeBleController.callsToConstructor[1],
             {
                 charCallbacks: [],
                 deviceNamePrefix: 'BH BHT',
@@ -132,7 +142,10 @@ export default class ZephyrDeviceControllerTest extends AbstractDeviceController
     private static async ZephyrDeviceController(
         options?: DeviceControllerBleOptions
     ) {
-        const zephyr = await ZephyrDeviceController.Create(options)
+        const zephyr = await ZephyrDeviceController.Create({
+            bleUuid: this.deviceUuid,
+            ...options,
+        })
         return zephyr as SpyZephyrController
     }
 }

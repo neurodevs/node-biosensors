@@ -654,24 +654,12 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
 
     @test()
     protected static async exposesUuidFromBleController() {
-        await this.startStreaming()
-
-        assert.isEqual(
-            this.instance.bleUuid,
-            this.deviceUuid,
-            'Did not expose uuid from BLE controller!'
-        )
+        await this.assertExposesUuidFromBleController()
     }
 
     @test()
     protected static async exposesNameFromBleController() {
-        await this.startStreaming()
-
-        assert.isEqual(
-            this.instance.bleName,
-            this.instance.getName(),
-            'Did not expose name from BLE controller!'
-        )
+        await this.assertExposesNameFromBleController()
     }
 
     @test()

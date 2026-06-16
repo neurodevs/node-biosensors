@@ -1,8 +1,8 @@
 import { BleController, FakeStreamOutlet } from '@neurodevs/node-lsl'
-import { MuseController } from '../../../impl/devices/MuseDeviceController.js'
 import { XdfRecorder } from '@neurodevs/node-xdf'
+import { DeviceControllerBle } from '../../../impl/BiosensorDeviceFactory.js'
 
-export default class FakeMuseController implements MuseController {
+export default class FakeMuseController implements DeviceControllerBle {
     public static callsToConstructor: {
         ble: BleController
         recorder?: XdfRecorder
