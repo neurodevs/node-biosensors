@@ -12,7 +12,7 @@ import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 import {
     DeviceControllerBle,
     DeviceControllerBleConstructor,
-    DeviceControllerOptions,
+    DeviceControllerBleOptions,
 } from '../BiosensorDeviceFactory.js'
 import AbstractDeviceControllerBle from '../AbstractDeviceControllerBle.js'
 
@@ -444,8 +444,7 @@ export default class MuseDeviceController
     }
 }
 
-export interface MuseControllerOptions extends DeviceControllerOptions {
-    bleUuid?: string
+export interface MuseControllerOptions extends DeviceControllerBleOptions {
     rssiIntervalMs?: number
     txtRecordPath?: string
     enableLogs?: boolean
