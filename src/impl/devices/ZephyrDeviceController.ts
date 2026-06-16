@@ -1,38 +1,38 @@
 import {
-    DeviceController,
     DeviceControllerConstructor,
     DeviceControllerOptions,
 } from '../BiosensorDeviceFactory.js'
 import { BleDeviceController } from '@neurodevs/node-lsl'
+import AbstractDeviceController from './AbstractDeviceController.js'
 
-export default class ZephyrDeviceController implements DeviceController {
+export default class ZephyrDeviceController extends AbstractDeviceController {
     public static Class?: DeviceControllerConstructor
-    public static readonly streamQueries = []
+    public static readonly streamQueries: string[] = []
 
-    protected constructor(_options?: DeviceControllerOptions) {}
+    protected constructor(_options?: DeviceControllerOptions) {
+        super()
+    }
 
     public static async Create(options?: DeviceControllerOptions) {
         await this.BleDeviceController()
         return new (this.Class ?? this)(options)
     }
 
-    public async startStreaming() {
-        throw new Error('Method not implemented.')
+    public get streamQueries() {
+        return ZephyrDeviceController.streamQueries
     }
 
-    public async stopStreaming() {
-        throw new Error('Method not implemented.')
+    protected get deviceId() {
+        return ''
     }
 
-    public async disconnect() {
-        throw new Error('Method not implemented.')
-    }
+    protected async handleConnect() {}
 
-    public get outlets() {
-        return []
-    }
+    protected async handleDisconnect() {}
 
-    public streamQueries = ZephyrDeviceController.streamQueries
+    protected async handleStartStreaming() {}
+
+    protected async handleStopStreaming() {}
 
     private static async BleDeviceController() {
         await BleDeviceController.Create({

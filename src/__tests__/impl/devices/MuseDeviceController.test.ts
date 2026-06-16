@@ -7,7 +7,6 @@ import MuseDeviceController, {
     CONTROL_UUID,
     MuseControllerOptions,
 } from '../../../impl/devices/MuseDeviceController.js'
-import AbstractPackageTest from '../../AbstractPackageTest.js'
 import {
     BleDeviceController,
     FakeBleController,
@@ -16,9 +15,10 @@ import {
 } from '@neurodevs/node-lsl'
 import SpyMuseController from '../../../testDoubles/devices/MuseController/SpyMuseController.js'
 import { FakeXdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
+import AbstractDeviceControllerTest from '../../AbstractDeviceControllerTest.js'
 
-export default class MuseDeviceControllerTest extends AbstractPackageTest {
-    private static instance: SpyMuseController
+export default class MuseDeviceControllerTest extends AbstractDeviceControllerTest {
+    protected static instance: SpyMuseController
 
     private static readonly deviceUuid = this.generateId()
     private static readonly eegSampleRateHz = 256
@@ -101,17 +101,47 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
 
     @test()
     protected static async createsInstance() {
-        assert.isTruthy(this.instance, 'Failed to create instance!')
+        await this.assertCreatesInstance()
     }
 
     @test()
     protected static async startsWithIsConnectedFalse() {
-        assert.isFalse(this.isConnected, 'Did not set isConnected false!')
+        await this.assertStartsWithIsConnectedFalse()
     }
 
     @test()
     protected static async startsWithIsStreamingFalse() {
-        assert.isFalse(this.isStreaming, 'Did not set isStreaming false!')
+        await this.assertStartsWithIsStreamingFalse()
+    }
+
+    @test()
+    protected static async connectSetsIsConnectedTrue() {
+        await this.assertConnectSetsIsConnectedTrue()
+    }
+
+    @test()
+    protected static async startStreamingSetsIsStreamingTrue() {
+        await this.assertStartStreamingSetsIsStreamingTrue()
+    }
+
+    @test()
+    protected static async stopStreamingSetsIsStreamingFalse() {
+        await this.assertStopStreamingSetsIsStreamingFalse()
+    }
+
+    @test()
+    protected static async disconnectSetsIsConnectedFalse() {
+        await this.assertDisconnectSetsIsConnectedFalse()
+    }
+
+    @test()
+    protected static async disconnectCallsStopStreaming() {
+        await this.assertDisconnectCallsStopStreaming()
+    }
+
+    @test()
+    protected static async disconnectDoesNotCallStopStreamingIfNotStreaming() {
+        await this.assertDisconnectDoesNotCallStopStreamingIfNotStreaming()
     }
 
     @test()
@@ -158,13 +188,6 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async connectSetsIsConnectedTrue() {
-        await this.connect()
-
-        assert.isTrue(this.isConnected, 'Did not set isConnected true!')
-    }
-
-    @test()
     protected static async connectCallsBleControllerConnect() {
         await this.connect()
 
@@ -185,13 +208,6 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
             1,
             'Did not connect to BLE device!'
         )
-    }
-
-    @test()
-    protected static async startStreamingSetsIsStreamingTrue() {
-        await this.startStreaming()
-
-        assert.isTrue(this.isStreaming, 'Did not set isStreaming true!')
     }
 
     @test()
@@ -228,14 +244,6 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async stopStreamingSetsIsStreamingFalse() {
-        await this.startStreaming()
-        await this.stopStreaming()
-
-        assert.isFalse(this.isStreaming, 'Did not set isStreaming false!')
-    }
-
-    @test()
     protected static async stopStreamingWritesHaltCommandToControlChar() {
         await this.startStreaming()
         await this.stopStreaming()
@@ -259,14 +267,6 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async disconnectSetsIsConnectedFalse() {
-        await this.connect()
-        await this.disconnect()
-
-        assert.isFalse(this.isConnected, 'Did not set isConnected false!')
-    }
-
-    @test()
     protected static async disconnectCallsDisconnectBle() {
         await this.connect()
         await this.disconnect()
@@ -275,36 +275,6 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
             FakeBleController.numCallsToDisconnect,
             1,
             'Did not disconnect from BLE device!'
-        )
-    }
-
-    @test()
-    protected static async disconnectCallsStopStreaming() {
-        let wasHit = false
-
-        this.instance.stopStreaming = async () => {
-            wasHit = true
-        }
-
-        await this.startStreaming()
-        await this.disconnect()
-
-        assert.isTrue(wasHit, 'Should call stopStreaming on disconnect!')
-    }
-
-    @test()
-    protected static async disconnectDoesNotCallStopStreamingIfNotStreaming() {
-        let wasHit = false
-
-        this.instance.stopStreaming = async () => {
-            wasHit = true
-        }
-
-        await this.disconnect()
-
-        assert.isFalse(
-            wasHit,
-            'Should not call stopStreaming if not streaming!'
         )
     }
 
@@ -1042,30 +1012,6 @@ export default class MuseDeviceControllerTest extends AbstractPackageTest {
             1,
             'Did not start XDF recorder!'
         )
-    }
-
-    private static get isConnected() {
-        return this.instance.getIsConnected()
-    }
-
-    private static get isStreaming() {
-        return this.instance.getIsStreaming()
-    }
-
-    private static async connect() {
-        await this.instance.connect()
-    }
-
-    private static async startStreaming() {
-        await this.instance.startStreaming()
-    }
-
-    private static async stopStreaming() {
-        await this.instance.stopStreaming()
-    }
-
-    private static async disconnect() {
-        await this.instance.disconnect()
     }
 
     private static generateCmd(value: string) {

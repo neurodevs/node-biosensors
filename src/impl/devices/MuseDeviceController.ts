@@ -13,6 +13,7 @@ import {
     DeviceController,
     DeviceControllerOptions,
 } from '../BiosensorDeviceFactory.js'
+import AbstractDeviceController from './AbstractDeviceController.js'
 
 export const MUSE_CHAR_UUIDS: Record<string, string> = {
     CONTROL: '273E0001-4C4D-454D-96BE-F03BAC821358',
@@ -31,7 +32,10 @@ export const MUSE_CHAR_UUIDS: Record<string, string> = {
 
 export const CONTROL_UUID = MUSE_CHAR_UUIDS['CONTROL']
 
-export default class MuseDeviceController implements MuseController {
+export default class MuseDeviceController
+    extends AbstractDeviceController
+    implements MuseController
+{
     public static Class?: MuseControllerConstructor
     public static createWriteStream = fs.createWriteStream
     public static log = console.info
@@ -62,14 +66,11 @@ export default class MuseDeviceController implements MuseController {
     private static readonly imuChunkSize = 3
 
     protected readonly ble: BleController
-    private readonly recorder?: XdfRecorder
-
-    protected isConnected = false
-    protected isStreaming = false
 
     protected constructor(ble: BleController, recorder?: XdfRecorder) {
+        super(recorder)
+
         this.ble = ble
-        this.recorder = recorder
     }
 
     public static async Create(options?: MuseControllerOptions) {
@@ -102,67 +103,26 @@ export default class MuseDeviceController implements MuseController {
         return new (this.Class ?? this)(ble, recorder)
     }
 
-    public async connect() {
-        await this.idempotentConnect()
-        this.isConnected = true
+    protected get deviceId() {
+        return this.bleUuid
     }
 
-    private async idempotentConnect() {
-        if (!this.isConnected) {
-            await this.ble.connect()
-            this.recorder?.start()
-        } else {
-            console.warn(`Already connected to ${this.bleUuid}.`)
-        }
+    protected async handleConnect() {
+        await this.ble.connect()
     }
 
-    public async startStreaming() {
-        await this.idempotentStartStreaming()
-        this.isStreaming = true
+    protected async handleDisconnect() {
+        await this.ble.disconnect()
     }
 
-    private async idempotentStartStreaming() {
-        if (!this.isStreaming) {
-            await this.writeStartStreamingCommands()
-        } else {
-            console.warn(`Already streaming from ${this.bleUuid}.`)
-        }
-    }
-
-    private async writeStartStreamingCommands() {
+    protected async handleStartStreaming() {
         for (const cmd of ['h', 'p50', 's', 'd']) {
             await this.ble.writeCharacteristic(CONTROL_UUID, cmd)
         }
     }
 
-    public async stopStreaming() {
-        await this.idempotentStopStreaming()
-        this.isStreaming = false
-    }
-
-    private async idempotentStopStreaming() {
-        if (this.isStreaming) {
-            await this.ble.writeCharacteristic(CONTROL_UUID, 'h')
-        } else {
-            console.warn(`Not streaming from ${this.bleUuid}.`)
-        }
-    }
-
-    public async disconnect() {
-        if (this.isStreaming) {
-            await this.stopStreaming()
-        }
-        await this.idempotentDisconnect()
-        this.isConnected = false
-    }
-
-    private async idempotentDisconnect() {
-        if (this.isConnected) {
-            await this.ble.disconnect()
-            this.recorder?.finish()
-        } else {
-            console.warn(`Already disconnected from ${this.bleUuid}.`)
-        }
+    protected async handleStopStreaming() {
+        await this.ble.writeCharacteristic(CONTROL_UUID, 'h')
     }
 
     public get bleUuid() {
@@ -171,10 +131,6 @@ export default class MuseDeviceController implements MuseController {
 
     public get bleName() {
         return this.ble.name
-    }
-
-    public get outlets() {
-        return []
     }
 
     public get streamQueries() {

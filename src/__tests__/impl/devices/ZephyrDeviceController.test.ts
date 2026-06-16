@@ -1,25 +1,65 @@
 import { test, assert } from '@neurodevs/node-tdd'
 
-import { DeviceController } from '../../../impl/BiosensorDeviceFactory.js'
 import ZephyrDeviceController from '../../../impl/devices/ZephyrDeviceController.js'
-import AbstractPackageTest from '../../AbstractPackageTest.js'
 import { BleDeviceController, FakeBleController } from '@neurodevs/node-lsl'
+import SpyZephyrController from '../../../testDoubles/devices/ZephyrController/SpyZephyrController.js'
+import AbstractDeviceControllerTest from '../../AbstractDeviceControllerTest.js'
 
-export default class ZephyrDeviceControllerTest extends AbstractPackageTest {
-    private static instance: DeviceController
-
+export default class ZephyrDeviceControllerTest extends AbstractDeviceControllerTest {
     protected static async beforeEach() {
         await super.beforeEach()
 
         BleDeviceController.Class = FakeBleController
         FakeBleController.resetTestDouble()
 
+        ZephyrDeviceController.Class = SpyZephyrController
+
         this.instance = await this.ZephyrDeviceController()
     }
 
     @test()
     protected static async createsInstance() {
-        assert.isTruthy(this.instance, 'Failed to create instance!')
+        await this.assertCreatesInstance()
+    }
+
+    @test()
+    protected static async startsWithIsConnectedFalse() {
+        await this.assertStartsWithIsConnectedFalse()
+    }
+
+    @test()
+    protected static async startsWithIsStreamingFalse() {
+        await this.assertStartsWithIsStreamingFalse()
+    }
+
+    @test()
+    protected static async connectSetsIsConnectedTrue() {
+        await this.assertConnectSetsIsConnectedTrue()
+    }
+
+    @test()
+    protected static async startStreamingSetsIsStreamingTrue() {
+        await this.assertStartStreamingSetsIsStreamingTrue()
+    }
+
+    @test()
+    protected static async stopStreamingSetsIsStreamingFalse() {
+        await this.assertStopStreamingSetsIsStreamingFalse()
+    }
+
+    @test()
+    protected static async disconnectSetsIsConnectedFalse() {
+        await this.assertDisconnectSetsIsConnectedFalse()
+    }
+
+    @test()
+    protected static async disconnectCallsStopStreaming() {
+        await this.assertDisconnectCallsStopStreaming()
+    }
+
+    @test()
+    protected static async disconnectDoesNotCallStopStreamingIfNotStreaming() {
+        await this.assertDisconnectDoesNotCallStopStreamingIfNotStreaming()
     }
 
     @test()
@@ -45,6 +85,7 @@ export default class ZephyrDeviceControllerTest extends AbstractPackageTest {
     }
 
     private static async ZephyrDeviceController() {
-        return ZephyrDeviceController.Create()
+        const zephyr = await ZephyrDeviceController.Create()
+        return zephyr as SpyZephyrController
     }
 }
