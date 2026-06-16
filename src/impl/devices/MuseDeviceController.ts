@@ -14,7 +14,7 @@ import {
     DeviceControllerBleConstructor,
     DeviceControllerBleOptions,
 } from '../BiosensorDeviceFactory.js'
-import AbstractDeviceControllerBle from '../AbstractDeviceControllerBle.js'
+import AbstractDeviceControllerBle from './AbstractDeviceControllerBle.js'
 
 export const MUSE_CHAR_UUIDS: Record<string, string> = {
     CONTROL: '273E0001-4C4D-454D-96BE-F03BAC821358',
