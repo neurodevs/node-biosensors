@@ -155,20 +155,20 @@ export default class MuseDeviceController
         const handleData = (
             charName: string,
             bytes: number[],
-            timestamp: number
+            timestampSec: number
         ) => {
             switch (true) {
                 case this.eegCharNames.includes(charName):
-                    handleEeg(charName, bytes, timestamp)
+                    handleEeg(charName, bytes, timestampSec)
                     break
                 case this.ppgCharNames.includes(charName):
-                    handlePpg(charName, bytes, timestamp)
+                    handlePpg(charName, bytes, timestampSec)
                     break
                 case charName === 'GYROSCOPE':
-                    handleGyro(bytes, timestamp)
+                    handleGyro(bytes, timestampSec)
                     break
                 case charName === 'ACCELEROMETER':
-                    handleAccel(bytes, timestamp)
+                    handleAccel(bytes, timestampSec)
                     break
             }
         }
@@ -176,7 +176,7 @@ export default class MuseDeviceController
         return Object.entries(MUSE_CHAR_UUIDS).map(([name, uuid]) => ({
             charUuid: uuid,
             charName: name,
-            onData: (data: Buffer, length: number, timestamp: number) => {
+            onData: (data: Buffer, length: number, timestampSec: number) => {
                 if (disabledChars.has(name)) {
                     return
                 }
@@ -185,11 +185,11 @@ export default class MuseDeviceController
                     koffi.decode(data, 'uint8', length)
                 )
 
-                const msg = `${name.padEnd(13)} | ${timestamp.toFixed(5).padEnd(15)} | ${JSON.stringify(bytes)}`
+                const msg = `${name.padEnd(13)} | ${timestampSec.toFixed(5).padEnd(15)} | ${JSON.stringify(bytes)}`
                 stream?.write(`${msg}\n`)
                 log?.(msg)
 
-                handleData(name, bytes, timestamp)
+                handleData(name, bytes, timestampSec)
             },
         }))
     }
@@ -202,11 +202,11 @@ export default class MuseDeviceController
         const charChunks: number[][] = []
         let t0 = 0
 
-        return (charName: string, bytes: number[], timestamp: number) => {
+        return (charName: string, bytes: number[], timestampSec: number) => {
             const charIdx = this.eegCharNames.indexOf(charName)
 
             if (charIdx === 0) {
-                t0 = timestamp
+                t0 = timestampSec
             }
 
             charChunks[charIdx] = this.decodeEegCharChunk(bytes.slice(2))
@@ -215,7 +215,7 @@ export default class MuseDeviceController
                 for (let i = 0; i < this.eegChunkSize; i++) {
                     const sample = charChunks.map((c) => c[i])
 
-                    const ts = t0 + (1000 * i) / this.eegSampleRateHz
+                    const ts = t0 + i / this.eegSampleRateHz
                     eegOutlet?.pushSample(sample, ts)
 
                     const msg = `${'EEG'.padEnd(13)} | ${ts.toFixed(5).padEnd(15)} | ${JSON.stringify(sample)}`
@@ -251,11 +251,11 @@ export default class MuseDeviceController
         const charChunks: number[][] = []
         let t0 = 0
 
-        return (charName: string, bytes: number[], timestamp: number) => {
+        return (charName: string, bytes: number[], timestampSec: number) => {
             const charIdx = this.ppgCharNames.indexOf(charName)
 
             if (charIdx === 0) {
-                t0 = timestamp
+                t0 = timestampSec
             }
 
             charChunks[charIdx] = this.decodePpgCharChunk(bytes.slice(2))
@@ -264,7 +264,7 @@ export default class MuseDeviceController
                 for (let i = 0; i < this.ppgChunkSize; i++) {
                     const sample = charChunks.map((c) => c[i])
 
-                    const ts = t0 + (1000 * i) / this.ppgSampleRateHz
+                    const ts = t0 + i / this.ppgSampleRateHz
                     ppgOutlet?.pushSample(sample, ts)
 
                     const msg = `${'PPG'.padEnd(13)} | ${ts.toFixed(5).padEnd(15)} | ${JSON.stringify(sample)}`
@@ -322,11 +322,11 @@ export default class MuseDeviceController
         stream?: WriteStream,
         outlet?: StreamOutlet
     ) {
-        return (bytes: number[], timestamp: number) => {
+        return (bytes: number[], timestampSec: number) => {
             const samples = this.decodeImuPacket(bytes, scale)
 
             samples.forEach((sample, i) => {
-                const ts = timestamp + (1000 * i) / this.imuSampleRateHz
+                const ts = timestampSec + i / this.imuSampleRateHz
                 outlet?.pushSample(sample, ts)
 
                 const msg = `${name.padEnd(13)} | ${ts.toFixed(5).padEnd(15)} | ${JSON.stringify(sample)}`

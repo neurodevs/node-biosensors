@@ -44,7 +44,7 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
                 onData: (
                     _data: Buffer,
                     _length: number,
-                    _timestamp: number
+                    _timestampSec: number
                 ) => {},
             }
         }
@@ -298,11 +298,19 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
 
     @test()
     protected static async onDataDecodesAndLogsBytesToConsole() {
-        const { timestamp, fakeBytes, name } = this.simulateOnData()
+        const { timestampSec, fakeBytes, name } = this.simulateOnData()
 
         assert.isEqualDeep(
             this.logCalls,
-            [[this.generateExpectedOnDataMessage(name, timestamp, fakeBytes)]],
+            [
+                [
+                    this.generateExpectedOnDataMessage(
+                        name,
+                        timestampSec,
+                        fakeBytes
+                    ),
+                ],
+            ],
             'Did not log expected data to console!'
         )
     }
@@ -354,12 +362,12 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
             txtRecordPath: this.txtRecordPath,
         })
 
-        const { name, timestamp, fakeBytes } = this.simulateOnData()
+        const { name, timestampSec, fakeBytes } = this.simulateOnData()
 
         assert.isEqualDeep(
             this.callsToWriteStream,
             [
-                `${this.generateExpectedOnDataMessage(name, timestamp, fakeBytes)}\n`,
+                `${this.generateExpectedOnDataMessage(name, timestampSec, fakeBytes)}\n`,
             ],
             'Did not write expected content to write stream!'
         )
@@ -367,7 +375,7 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
 
     @test()
     protected static async onDataPushesEegSamplesToOutlet() {
-        const { ts, charValues } = this.simulateEegOnData()
+        const { timestampSec, charValues } = this.simulateEegOnData()
 
         const expected = Array.from(
             { length: this.eegChunkSize },
@@ -375,7 +383,7 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
                 sample: charValues.map(
                     (values) => 0.48828125 * (values[sampleIdx] - 2048)
                 ),
-                timestamp: ts + (1000 * sampleIdx) / this.eegSampleRateHz,
+                timestampSec: timestampSec + sampleIdx / this.eegSampleRateHz,
             })
         )
 
@@ -410,11 +418,12 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
 
     @test()
     protected static async onDataLogsEegSamplesOnceChunkIsFormed() {
-        const { ts, charValues } = this.simulateEegOnData()
+        const { timestampSec, charValues } = this.simulateEegOnData()
 
-        const expected = this.generateExpectedEegMessages(ts, charValues).map(
-            (msg) => [msg]
-        )
+        const expected = this.generateExpectedEegMessages(
+            timestampSec,
+            charValues
+        ).map((msg) => [msg])
 
         assert.isEqualDeep(
             this.eegLogCalls,
@@ -427,11 +436,12 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
     protected static async onDataWritesEegSamplesToWriteStreamOnceChunkIsFormed() {
         await this.MuseDeviceController({ txtRecordPath: this.txtRecordPath })
 
-        const { ts, charValues } = this.simulateEegOnData()
+        const { timestampSec, charValues } = this.simulateEegOnData()
 
-        const expected = this.generateExpectedEegMessages(ts, charValues).map(
-            (msg) => `${msg}\n`
-        )
+        const expected = this.generateExpectedEegMessages(
+            timestampSec,
+            charValues
+        ).map((msg) => `${msg}\n`)
 
         assert.isEqualDeep(
             this.eegWriteStreamCalls,
@@ -442,13 +452,13 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
 
     @test()
     protected static async onDataPushesPpgSamplesToOutlet() {
-        const { ts, charValues } = this.simulatePpgOnData()
+        const { timestampSec, charValues } = this.simulatePpgOnData()
 
         const expected = Array.from(
             { length: this.ppgChunkSize },
             (_, sampleIdx) => ({
                 sample: charValues.map((values) => values[sampleIdx]),
-                timestamp: ts + (1000 * sampleIdx) / this.ppgSampleRateHz,
+                timestampSec: timestampSec + sampleIdx / this.ppgSampleRateHz,
             })
         )
 
@@ -461,11 +471,12 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
 
     @test()
     protected static async onDataLogsPpgSamplesOnceChunkIsFormed() {
-        const { ts, charValues } = this.simulatePpgOnData()
+        const { timestampSec, charValues } = this.simulatePpgOnData()
 
-        const expected = this.generateExpectedPpgMessages(ts, charValues).map(
-            (msg) => [msg]
-        )
+        const expected = this.generateExpectedPpgMessages(
+            timestampSec,
+            charValues
+        ).map((msg) => [msg])
 
         assert.isEqualDeep(
             this.ppgLogCalls,
@@ -478,11 +489,12 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
     protected static async onDataWritesPpgSamplesToWriteStreamOnceChunkIsFormed() {
         await this.MuseDeviceController({ txtRecordPath: this.txtRecordPath })
 
-        const { ts, charValues } = this.simulatePpgOnData()
+        const { timestampSec, charValues } = this.simulatePpgOnData()
 
-        const expected = this.generateExpectedPpgMessages(ts, charValues).map(
-            (msg) => `${msg}\n`
-        )
+        const expected = this.generateExpectedPpgMessages(
+            timestampSec,
+            charValues
+        ).map((msg) => `${msg}\n`)
 
         assert.isEqualDeep(
             this.ppgWriteStreamCalls,
@@ -494,11 +506,15 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
     @test()
     protected static async onDataPushesGyroSamplesToOutlet() {
         const samples = this.generateImuSamples()
-        const { ts } = this.simulateImuOnDataWithSamples('GYROSCOPE', samples)
+
+        const { timestampSec } = this.simulateImuOnDataWithSamples(
+            'GYROSCOPE',
+            samples
+        )
 
         const expected = samples.map((sample, i) => ({
             sample: sample.map((v) => 0.0074768 * v),
-            timestamp: ts + (1000 * i) / this.imuSampleRateHz,
+            timestampSec: timestampSec + i / this.imuSampleRateHz,
         }))
 
         assert.isEqualDeep(
@@ -535,16 +551,22 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
     protected static async onDataLogsGyroSamplesOncePacketIsReceived() {
         const samples = this.generateImuSamples()
 
-        const { ts, fakeBytes } = this.simulateImuOnDataWithSamples(
+        const { timestampSec, fakeBytes } = this.simulateImuOnDataWithSamples(
             'GYROSCOPE',
             samples
         )
 
         const expected = [
-            [this.generateExpectedOnDataMessage('GYROSCOPE', ts, fakeBytes)],
+            [
+                this.generateExpectedOnDataMessage(
+                    'GYROSCOPE',
+                    timestampSec,
+                    fakeBytes
+                ),
+            ],
             ...this.generateExpectedImuMessages(
                 'GYROSCOPE',
-                ts,
+                timestampSec,
                 samples,
                 0.0074768
             ).map((msg) => [msg]),
@@ -563,16 +585,16 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
 
         const samples = this.generateImuSamples()
 
-        const { ts, fakeBytes } = this.simulateImuOnDataWithSamples(
+        const { timestampSec, fakeBytes } = this.simulateImuOnDataWithSamples(
             'GYROSCOPE',
             samples
         )
 
         const expected = [
-            `${this.generateExpectedOnDataMessage('GYROSCOPE', ts, fakeBytes)}\n`,
+            `${this.generateExpectedOnDataMessage('GYROSCOPE', timestampSec, fakeBytes)}\n`,
             ...this.generateExpectedImuMessages(
                 'GYROSCOPE',
-                ts,
+                timestampSec,
                 samples,
                 0.0074768
             ).map((msg) => `${msg}\n`),
@@ -588,14 +610,15 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
     @test()
     protected static async onDataPushesAccelSamplesToOutlet() {
         const samples = this.generateImuSamples()
-        const { ts } = this.simulateImuOnDataWithSamples(
+
+        const { timestampSec } = this.simulateImuOnDataWithSamples(
             'ACCELEROMETER',
             samples
         )
 
         const expected = samples.map((sample, i) => ({
             sample: sample.map((v) => 0.0000610352 * v),
-            timestamp: ts + (1000 * i) / this.imuSampleRateHz,
+            timestampSec: timestampSec + i / this.imuSampleRateHz,
         }))
 
         assert.isEqualDeep(
@@ -631,7 +654,7 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
     @test()
     protected static async onDataLogsAccelSamplesOncePacketIsReceived() {
         const samples = this.generateImuSamples()
-        const { ts, fakeBytes } = this.simulateImuOnDataWithSamples(
+        const { timestampSec, fakeBytes } = this.simulateImuOnDataWithSamples(
             'ACCELEROMETER',
             samples
         )
@@ -640,13 +663,13 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
             [
                 this.generateExpectedOnDataMessage(
                     'ACCELEROMETER',
-                    ts,
+                    timestampSec,
                     fakeBytes
                 ),
             ],
             ...this.generateExpectedImuMessages(
                 'ACCELEROMETER',
-                ts,
+                timestampSec,
                 samples,
                 0.0000610352
             ).map((msg) => [msg]),
@@ -664,16 +687,16 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
         await this.MuseDeviceController({ txtRecordPath: this.txtRecordPath })
 
         const samples = this.generateImuSamples()
-        const { ts, fakeBytes } = this.simulateImuOnDataWithSamples(
+        const { timestampSec, fakeBytes } = this.simulateImuOnDataWithSamples(
             'ACCELEROMETER',
             samples
         )
 
         const expected = [
-            `${this.generateExpectedOnDataMessage('ACCELEROMETER', ts, fakeBytes)}\n`,
+            `${this.generateExpectedOnDataMessage('ACCELEROMETER', timestampSec, fakeBytes)}\n`,
             ...this.generateExpectedImuMessages(
                 'ACCELEROMETER',
-                ts,
+                timestampSec,
                 samples,
                 0.0000610352
             ).map((msg) => `${msg}\n`),
@@ -944,30 +967,30 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
 
         const fakeBytes = [10, 20, 30]
         const fakeBuffer = Buffer.from(fakeBytes)
-        const timestamp = 12345
+        const timestampSec = 12345
 
-        onData(fakeBuffer, fakeBytes.length, timestamp)
+        onData(fakeBuffer, fakeBytes.length, timestampSec)
 
-        return { timestamp, fakeBytes, name: charName }
+        return { timestampSec, fakeBytes, name: charName }
     }
 
     private static generateExpectedOnDataMessage(
         name: string | undefined,
-        timestamp: number,
+        timestampSec: number,
         fakeBytes: number[]
     ): unknown {
-        return `${name?.padEnd(13)} | ${timestamp.toFixed(5).padEnd(15)} | ${JSON.stringify(fakeBytes)}`
+        return `${name?.padEnd(13)} | ${timestampSec.toFixed(5).padEnd(15)} | ${JSON.stringify(fakeBytes)}`
     }
 
     private static generateExpectedEegMessages(
-        timestamp: number,
+        timestampSec: number,
         charValues: number[][]
     ) {
         return Array.from({ length: this.eegChunkSize }, (_, sampleIdx) => {
             const sample = charValues.map(
                 (values) => 0.48828125 * (values[sampleIdx] - 2048)
             )
-            const ts = timestamp + (1000 * sampleIdx) / this.eegSampleRateHz
+            const ts = timestampSec + sampleIdx / this.eegSampleRateHz
 
             return `${'EEG'.padEnd(13)} | ${ts.toFixed(5).padEnd(15)} | ${JSON.stringify(sample)}`
         })
@@ -990,16 +1013,16 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
             this.generateEegCharValues()
         )
 
-        const ts = this.simulateEegOnDataWithValues(charValues)
+        const timestampSec = this.simulateEegOnDataWithValues(charValues)
 
-        return { ts, charValues }
+        return { timestampSec, charValues }
     }
 
     private static simulateEegOnDataWithValues(charValues: number[][]) {
         const calls = FakeBleController.callsToConstructor
         const { charCallbacks } = calls[calls.length - 1]!
 
-        const ts = randomInt(1, 100)
+        const timestampSec = randomInt(1, 100)
 
         this.eegCharNames.forEach((charName, charIdx) => {
             const { onData } = charCallbacks!.find(
@@ -1009,10 +1032,10 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
             const fakeBytes = this.generateEegBytes(charValues[charIdx])
             const fakeBuffer = Buffer.from(fakeBytes)
 
-            onData(fakeBuffer, fakeBytes.length, ts)
+            onData(fakeBuffer, fakeBytes.length, timestampSec)
         })
 
-        return ts
+        return timestampSec
     }
 
     private static generateEegCharValues() {
@@ -1040,7 +1063,7 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
         const calls = FakeBleController.callsToConstructor
         const { charCallbacks } = calls[calls.length - 1]!
 
-        const ts = randomInt(1, 100)
+        const timestampSec = randomInt(1, 100)
 
         const charValues = this.ppgCharNames.map(() =>
             this.generatePpgCharValues()
@@ -1054,10 +1077,10 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
             const fakeBytes = this.generatePpgBytes(charValues[charIdx]!)
             const fakeBuffer = Buffer.from(fakeBytes)
 
-            onData(fakeBuffer, fakeBytes.length, ts)
+            onData(fakeBuffer, fakeBytes.length, timestampSec)
         })
 
-        return { ts, charValues }
+        return { timestampSec, charValues }
     }
 
     private static generatePpgCharValues() {
@@ -1078,12 +1101,12 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
     }
 
     private static generateExpectedPpgMessages(
-        timestamp: number,
+        timestampSec: number,
         charValues: number[][]
     ) {
         return Array.from({ length: this.ppgChunkSize }, (_, sampleIdx) => {
             const sample = charValues.map((values) => values[sampleIdx])
-            const ts = timestamp + (1000 * sampleIdx) / this.ppgSampleRateHz
+            const ts = timestampSec + sampleIdx / this.ppgSampleRateHz
 
             return `${'PPG'.padEnd(13)} | ${ts.toFixed(5).padEnd(15)} | ${JSON.stringify(sample)}`
         })
@@ -1111,13 +1134,13 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
             (cb) => cb.charName === charName
         )!
 
-        const ts = randomInt(1, 100)
+        const timestampSec = randomInt(1, 100)
         const fakeBytes = this.generateImuBytes(samples)
         const fakeBuffer = Buffer.from(fakeBytes)
 
-        onData(fakeBuffer, fakeBytes.length, ts)
+        onData(fakeBuffer, fakeBytes.length, timestampSec)
 
-        return { ts, fakeBytes }
+        return { timestampSec, fakeBytes }
     }
 
     private static generateImuSamples(): [number, number, number][] {
@@ -1153,13 +1176,13 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
 
     private static generateExpectedImuMessages(
         label: string,
-        timestamp: number,
+        timestampSec: number,
         samples: [number, number, number][],
         scale: number
     ) {
         return samples.map((sample, i) => {
             const scaled = sample.map((v) => scale * v)
-            const ts = timestamp + (1000 * i) / this.imuSampleRateHz
+            const ts = timestampSec + i / this.imuSampleRateHz
             return `${label.padEnd(13)} | ${ts.toFixed(5).padEnd(15)} | ${JSON.stringify(scaled)}`
         })
     }
