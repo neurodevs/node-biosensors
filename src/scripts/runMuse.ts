@@ -1,10 +1,14 @@
+import { TimestampJitterGrapher } from '@neurodevs/node-biosignal-processing'
+
 import MuseDeviceController from '../impl/devices/MuseDeviceController.js'
+
+const xdfRecordPath = './artifacts/muse_data.xdf'
 
 const muse = await MuseDeviceController.Create({
     bleUuid: 'CA6A61B7-B7A8-AF24-3C9E-04A6A5012554',
-    rssiIntervalMs: 1000,
-    xdfRecordPath: './artifacts/muse_data.xdf',
-    txtRecordPath: './artifacts/muse_data.txt',
+    rssiIntervalMs: undefined,
+    xdfRecordPath,
+    txtRecordPath: undefined,
     enableLogs: false,
     disableEeg: false,
     disablePpg: false,
@@ -15,7 +19,7 @@ const muse = await MuseDeviceController.Create({
 await muse.connect()
 await muse.startStreaming()
 
-await new Promise((resolve) => setTimeout(resolve, 200000))
+await new Promise((resolve) => setTimeout(resolve, 5000))
 
 await muse.stopStreaming()
 
@@ -25,7 +29,6 @@ await muse.startStreaming()
 
 await new Promise((resolve) => setTimeout(resolve, 2000))
 
-await muse.stopStreaming()
 await muse.disconnect()
 
 await muse.connect()
@@ -35,5 +38,19 @@ await new Promise((resolve) => setTimeout(resolve, 2000))
 
 await muse.stopStreaming()
 await muse.disconnect()
+
+await new Promise((resolve) => setTimeout(resolve, 5000))
+
+const grapher = await TimestampJitterGrapher.Create(
+    xdfRecordPath,
+    './artifacts',
+    {
+        totalSecs: 1,
+        ignoreInterpolatedTimestamps: false,
+        showIdealIntervalMs: true,
+        xAxisUnits: 'milliseconds',
+    }
+)
+await grapher.run()
 
 console.log('Done!')
