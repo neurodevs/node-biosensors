@@ -971,7 +971,16 @@
     "@neurodevs/node-mangled-names" "^1.0.1"
     ffi-rs "^1.3.1"
 
-"@neurodevs/node-biosignal-processing@^1.2.0":
+"@neurodevs/ndx-native@^7.0.1":
+  version "7.0.1"
+  resolved "https://registry.yarnpkg.com/@neurodevs/ndx-native/-/ndx-native-7.0.1.tgz#9f7a42d4223ddececfabc749e1829bbb9c2d0081"
+  integrity sha512-aO+hjKWq7H5VOijOkRavMZBUQAIweFISSQzqcPvWDnDVJKxG3D18Lapc4oMlSy7UMcsukjPvbcYyCWrQBvJF9A==
+  dependencies:
+    "@neurodevs/node-mangled-names" "^1.0.1"
+    ffi-rs "^1.3.2"
+    koffi "^3.0.1"
+
+"@neurodevs/node-biosignal-processing@^1.2.1":
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/@neurodevs/node-biosignal-processing/-/node-biosignal-processing-1.2.1.tgz#5697db632e49b64b37c654ac6797d2a01864b440"
   integrity sha512-/LsmspgihE8PwuZ3sYae4bPBOA824ObvUQbKVbZ/6jl2gn+RWzRJhfi56REKYgdeMtUJaMlv++niSPrZWX9ixg==
@@ -3128,7 +3137,7 @@ fdir@^6.5.0:
   resolved "https://registry.yarnpkg.com/fdir/-/fdir-6.5.0.tgz#ed2ab967a331ade62f18d077dae192684d50d350"
   integrity sha512-tIbYtZbucOs0BRGqPJkshJUYdL+SDH7dVM8gjy+ERp3WAUjLEFJE+02kanyHtwjWOnwrKYBiwAmM0p4kLJAnXg==
 
-ffi-rs@^1.0.98, ffi-rs@^1.3.1:
+ffi-rs@^1.0.98, ffi-rs@^1.3.1, ffi-rs@^1.3.2:
   version "1.3.2"
   resolved "https://registry.yarnpkg.com/ffi-rs/-/ffi-rs-1.3.2.tgz#2b265640cd4a5fe6304520eed4ab983c364d72ff"
   integrity sha512-4s8dX9VbBw/jd5NOuE3EJRqXaIVdjMyiumeeDzrOhtjQRwp6Bz2za7iksWXTnvTQKV/tTdm1s1w7mObe92zPjQ==
@@ -4376,7 +4385,7 @@ keyv@^4.5.4:
   dependencies:
     json-buffer "3.0.1"
 
-koffi@^3.0.2:
+koffi@^3.0.1, koffi@^3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/koffi/-/koffi-3.0.2.tgz#89c3533f382034260b093abfcf4fff60eaffeb19"
   integrity sha512-YS4sGzlVMhFNNkKbkB3tcLKJxH9WGP3jHTxi4Eyx+ieMRKVz4K2i+6rebYr9ngHN36jhIW6YXnxkzBeOQ51lsw==
