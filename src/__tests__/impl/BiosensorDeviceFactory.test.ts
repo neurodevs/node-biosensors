@@ -18,10 +18,9 @@ import BiosensorDeviceFactory, {
 } from '../../impl/BiosensorDeviceFactory.js'
 import CgxDeviceController from '../../impl/devices/CgxDeviceController.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
-import MuseDeviceController, {
-    MuseControllerOptions,
-} from '../../impl/devices/MuseDeviceController.js'
+import { MuseControllerOptions } from '../../impl/devices/MuseDeviceController.js'
 import FakeMuseController from '../../testDoubles/devices/MuseController/FakeMuseController.js'
+import MuseSGen2 from '../../impl/devices/MuseSGen2.js'
 
 export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
     private static instance: DeviceFactory
@@ -105,10 +104,7 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
 
         assert.isEqualDeep(
             FakeXdfRecorder.callsToConstructor[0]?.streamQueries,
-            [
-                ...CgxDeviceController.streamQueries,
-                ...MuseDeviceController.streamQueries,
-            ],
+            [...CgxDeviceController.streamQueries, ...MuseSGen2.streamQueries],
             'Stream queries do not match!'
         )
     }

@@ -1,103 +1,56 @@
-import fs, { WriteStream } from 'node:fs'
+import fs from 'node:fs'
 
-import koffi from 'koffi'
 import {
     BleController,
     BleDeviceController,
     CharacteristicCallbacks,
-    LslStreamOutlet,
-    StreamOutlet,
 } from '@neurodevs/node-lsl'
 import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
+
 import {
     DeviceControllerBle,
-    DeviceControllerBleConstructor,
     DeviceControllerBleOptions,
 } from '../BiosensorDeviceFactory.js'
 import AbstractDeviceControllerBle from './AbstractDeviceControllerBle.js'
+import MuseSGen2 from './MuseSGen2.js'
 
-export const MUSE_CHAR_UUIDS: Record<string, string> = {
-    CONTROL: '273E0001-4C4D-454D-96BE-F03BAC821358',
-    TELEMETRY: '273E000B-4C4D-454D-96BE-F03BAC821358',
-    GYROSCOPE: '273E0009-4C4D-454D-96BE-F03BAC821358',
-    ACCELEROMETER: '273E000A-4C4D-454D-96BE-F03BAC821358',
-    PPG_AMBIENT: '273E000F-4C4D-454D-96BE-F03BAC821358',
-    PPG_INFRARED: '273E0010-4C4D-454D-96BE-F03BAC821358',
-    PPG_RED: '273E0011-4C4D-454D-96BE-F03BAC821358',
-    EEG_TP9: '273E0003-4C4D-454D-96BE-F03BAC821358',
-    EEG_AF7: '273E0004-4C4D-454D-96BE-F03BAC821358',
-    EEG_AF8: '273E0005-4C4D-454D-96BE-F03BAC821358',
-    EEG_TP10: '273E0006-4C4D-454D-96BE-F03BAC821358',
-    EEG_AUX: '273E0007-4C4D-454D-96BE-F03BAC821358',
-}
-
-export const CONTROL_UUID = MUSE_CHAR_UUIDS['CONTROL']
+export const CONTROL_UUID = '273E0001-4C4D-454D-96BE-F03BAC821358'
 
 export default class MuseDeviceController
     extends AbstractDeviceControllerBle
     implements DeviceControllerBle
 {
-    public static Class?: DeviceControllerBleConstructor
+    public static Class?: MuseDeviceControllerConstructor
     public static createWriteStream = fs.createWriteStream
     public static log = console.info
 
-    public static readonly streamQueries = ['type="EEG"', 'type="PPG"']
+    private readonly variant: MuseVariant
 
-    private static readonly eegSampleRateHz = 256
-    private static readonly eegChunkSize = 12
-
-    private static readonly eegCharNames = [
-        'EEG_TP10',
-        'EEG_AF8',
-        'EEG_TP9',
-        'EEG_AF7',
-        'EEG_AUX',
-    ]
-
-    private static readonly ppgSampleRateHz = 64
-    private static readonly ppgChunkSize = 6
-
-    private static readonly ppgCharNames = [
-        'PPG_AMBIENT',
-        'PPG_INFRARED',
-        'PPG_RED',
-    ]
-
-    private static readonly imuSampleRateHz = 52
-    private static readonly imuChunkSize = 3
-
-    protected constructor(ble: BleController, recorder?: XdfRecorder) {
+    protected constructor(
+        variant: MuseVariant,
+        ble: BleController,
+        recorder?: XdfRecorder
+    ) {
         super(ble, recorder)
+
+        this.variant = variant
     }
 
     public static async Create(options?: MuseControllerOptions) {
-        const {
-            xdfRecordPath,
-            disableEeg,
-            disablePpg,
-            disableGyro,
-            disableAccel,
-        } = options ?? {}
+        const { xdfRecordPath } = options ?? {}
 
-        const eegOutlet = !disableEeg ? await this.EegOutlet() : undefined
-        const ppgOutlet = !disablePpg ? await this.PpgOutlet() : undefined
-        const gyroOutlet = !disableGyro ? await this.GyroOutlet() : undefined
-        const accelOutlet = !disableAccel ? await this.AccelOutlet() : undefined
+        const variant = await MuseSGen2.Create(options)
 
-        const charCallbacks = this.generateCharCallbacks(
-            options,
-            eegOutlet,
-            ppgOutlet,
-            gyroOutlet,
-            accelOutlet
+        const ble = await this.BleDeviceController(
+            variant.charCallbacks,
+            options
         )
-        const ble = await this.BleDeviceController(charCallbacks, options)
 
         const recorder = xdfRecordPath
-            ? await this.XdfStreamRecorder(xdfRecordPath)
+            ? await this.XdfStreamRecorder(variant.streamQueries, xdfRecordPath)
             : undefined
 
-        return new (this.Class ?? this)(ble, recorder)
+        return new (this.Class ?? this)(variant, ble, recorder)
     }
 
     protected get deviceId() {
@@ -105,7 +58,7 @@ export default class MuseDeviceController
     }
 
     protected async handleStartStreaming() {
-        for (const cmd of ['h', 'p50', 's', 'd']) {
+        for (const cmd of this.variant.startCommands) {
             await this.ble.writeCharacteristic(CONTROL_UUID, cmd)
         }
     }
@@ -115,243 +68,7 @@ export default class MuseDeviceController
     }
 
     public get streamQueries() {
-        return MuseDeviceController.streamQueries
-    }
-
-    private static generateCharCallbacks(
-        options?: MuseControllerOptions,
-        eegOutlet?: StreamOutlet,
-        ppgOutlet?: StreamOutlet,
-        gyroOutlet?: StreamOutlet,
-        accelOutlet?: StreamOutlet
-    ) {
-        const {
-            enableLogs,
-            txtRecordPath,
-            disableEeg,
-            disablePpg,
-            disableGyro,
-            disableAccel,
-        } = options ?? {}
-
-        const log = enableLogs ? this.log : undefined
-
-        const stream = txtRecordPath
-            ? this.createWriteStream(txtRecordPath, { flags: 'a' })
-            : undefined
-
-        const disabledChars = new Set<string>([
-            ...(disableEeg ? this.eegCharNames : []),
-            ...(disablePpg ? this.ppgCharNames : []),
-            ...(disableGyro ? ['GYROSCOPE'] : []),
-            ...(disableAccel ? ['ACCELEROMETER'] : []),
-        ])
-
-        const handleEeg = this.createEegHandler(log, stream, eegOutlet)
-        const handlePpg = this.createPpgHandler(log, stream, ppgOutlet)
-        const handleGyro = this.createGyroHandler(log, stream, gyroOutlet)
-        const handleAccel = this.createAccelHandler(log, stream, accelOutlet)
-
-        const handleData = (
-            charName: string,
-            bytes: number[],
-            timestampSec: number
-        ) => {
-            switch (true) {
-                case this.eegCharNames.includes(charName):
-                    handleEeg(charName, bytes, timestampSec)
-                    break
-                case this.ppgCharNames.includes(charName):
-                    handlePpg(charName, bytes, timestampSec)
-                    break
-                case charName === 'GYROSCOPE':
-                    handleGyro(bytes, timestampSec)
-                    break
-                case charName === 'ACCELEROMETER':
-                    handleAccel(bytes, timestampSec)
-                    break
-            }
-        }
-
-        return Object.entries(MUSE_CHAR_UUIDS).map(([name, uuid]) => ({
-            charUuid: uuid,
-            charName: name,
-            onData: (data: Buffer, length: number, timestampSec: number) => {
-                if (disabledChars.has(name)) {
-                    return
-                }
-
-                const bytes = Array.from<number>(
-                    koffi.decode(data, 'uint8', length)
-                )
-
-                const msg = `${name.padEnd(13)} | ${timestampSec.toFixed(5).padEnd(15)} | ${JSON.stringify(bytes)}`
-                stream?.write(`${msg}\n`)
-                log?.(msg)
-
-                handleData(name, bytes, timestampSec)
-            },
-        }))
-    }
-
-    private static createEegHandler(
-        log?: (...data: any[]) => void,
-        stream?: WriteStream,
-        eegOutlet?: StreamOutlet
-    ) {
-        const charChunks: number[][] = []
-        let t0 = 0
-
-        return (charName: string, bytes: number[], timestampSec: number) => {
-            const charIdx = this.eegCharNames.indexOf(charName)
-
-            if (charIdx === 0) {
-                t0 = timestampSec
-            }
-
-            charChunks[charIdx] = this.decodeEegCharChunk(bytes.slice(2))
-
-            if (charIdx === this.eegCharNames.length - 1) {
-                for (let i = 0; i < this.eegChunkSize; i++) {
-                    const sample = charChunks.map((c) => c[i])
-
-                    const ts = t0 + i / this.eegSampleRateHz
-                    eegOutlet?.pushSample(sample, ts)
-
-                    const msg = `${'EEG'.padEnd(13)} | ${ts.toFixed(5).padEnd(15)} | ${JSON.stringify(sample)}`
-                    stream?.write(`${msg}\n`)
-                    log?.(msg)
-                }
-            }
-        }
-    }
-
-    private static decodeEegCharChunk(bytes: number[]) {
-        const decoded: number[] = []
-
-        for (let i = 0; i < bytes.length; i += 3) {
-            const first = (bytes[i]! << 4) | (bytes[i + 1]! >> 4)
-            const second = ((bytes[i + 1]! & 0x0f) << 8) | bytes[i + 2]!
-
-            decoded.push(first, second)
-        }
-
-        const decodedInMicrovolts = decoded.map((c) => {
-            return 0.48828125 * (c - 2048)
-        })
-
-        return decodedInMicrovolts
-    }
-
-    private static createPpgHandler(
-        log?: (...data: any[]) => void,
-        stream?: WriteStream,
-        ppgOutlet?: StreamOutlet
-    ) {
-        const charChunks: number[][] = []
-        let t0 = 0
-
-        return (charName: string, bytes: number[], timestampSec: number) => {
-            const charIdx = this.ppgCharNames.indexOf(charName)
-
-            if (charIdx === 0) {
-                t0 = timestampSec
-            }
-
-            charChunks[charIdx] = this.decodePpgCharChunk(bytes.slice(2))
-
-            if (charIdx === this.ppgCharNames.length - 1) {
-                for (let i = 0; i < this.ppgChunkSize; i++) {
-                    const sample = charChunks.map((c) => c[i])
-
-                    const ts = t0 + i / this.ppgSampleRateHz
-                    ppgOutlet?.pushSample(sample, ts)
-
-                    const msg = `${'PPG'.padEnd(13)} | ${ts.toFixed(5).padEnd(15)} | ${JSON.stringify(sample)}`
-                    stream?.write(`${msg}\n`)
-                    log?.(msg)
-                }
-            }
-        }
-    }
-
-    private static decodePpgCharChunk(bytes: number[]) {
-        const charSamples: number[] = []
-
-        for (let i = 0; i < bytes.length; i += 3) {
-            charSamples.push(
-                (bytes[i]! << 16) | (bytes[i + 1]! << 8) | bytes[i + 2]!
-            )
-        }
-
-        return charSamples
-    }
-
-    private static createAccelHandler(
-        log?: (...data: any[]) => void,
-        stream?: fs.WriteStream,
-        accelOutlet?: StreamOutlet
-    ) {
-        return this.createImuHandler(
-            'ACCELEROMETER',
-            0.0000610352,
-            log,
-            stream,
-            accelOutlet
-        )
-    }
-
-    private static createGyroHandler(
-        log?: (...data: any[]) => void,
-        stream?: fs.WriteStream,
-        gyroOutlet?: StreamOutlet
-    ) {
-        return this.createImuHandler(
-            'GYROSCOPE',
-            0.0074768,
-            log,
-            stream,
-            gyroOutlet
-        )
-    }
-
-    private static createImuHandler(
-        name: string,
-        scale: number,
-        log?: (...data: any[]) => void,
-        stream?: WriteStream,
-        outlet?: StreamOutlet
-    ) {
-        return (bytes: number[], timestampSec: number) => {
-            const samples = this.decodeImuPacket(bytes, scale)
-
-            samples.forEach((sample, i) => {
-                const ts = timestampSec + i / this.imuSampleRateHz
-                outlet?.pushSample(sample, ts)
-
-                const msg = `${name.padEnd(13)} | ${ts.toFixed(5).padEnd(15)} | ${JSON.stringify(sample)}`
-                stream?.write(`${msg}\n`)
-                log?.(msg)
-            })
-        }
-    }
-
-    private static decodeImuPacket(bytes: number[], scale: number) {
-        const samples: number[][] = []
-
-        for (let i = 0; i < this.imuChunkSize; i++) {
-            const x = this.readInt16BE(bytes, 2 + i * 2)
-            const y = this.readInt16BE(bytes, 2 + (i + 3) * 2)
-            const z = this.readInt16BE(bytes, 2 + (i + 6) * 2)
-            samples.push([x * scale, y * scale, z * scale])
-        }
-
-        return samples
-    }
-
-    private static readInt16BE(bytes: number[], offset: number) {
-        const value = (bytes[offset]! << 8) | bytes[offset + 1]!
-        return value >= 0x8000 ? value - 0x10000 : value
+        return this.variant.streamQueries
     }
 
     private static async BleDeviceController(
@@ -378,71 +95,25 @@ export default class MuseDeviceController
         }
     }
 
-    private static async EegOutlet() {
-        return await LslStreamOutlet.Create({
-            name: 'Muse EEG',
-            type: 'EEG',
-            channelNames: this.eegCharNames,
-            sampleRateHz: this.eegSampleRateHz,
-            channelFormat: 'float32',
-            sourceId: 'muse-eeg',
-            manufacturer: 'Interaxon Inc.',
-            units: 'microvolt',
-            chunkSize: 1,
-        })
-    }
-
-    private static async PpgOutlet() {
-        return await LslStreamOutlet.Create({
-            name: 'Muse PPG',
-            type: 'PPG',
-            channelNames: ['PPG_AMBIENT', 'PPG_INFRARED', 'PPG_RED'],
-            sampleRateHz: 64,
-            channelFormat: 'float32',
-            sourceId: 'muse-ppg',
-            manufacturer: 'Interaxon Inc.',
-            units: 'N/A',
-            chunkSize: 1,
-        })
-    }
-
-    private static async GyroOutlet() {
-        return await LslStreamOutlet.Create({
-            name: 'Muse Gyroscope',
-            type: 'GYRO',
-            channelNames: ['X', 'Y', 'Z'],
-            sampleRateHz: this.imuSampleRateHz,
-            channelFormat: 'float32',
-            sourceId: 'muse-gyroscope',
-            manufacturer: 'Interaxon Inc.',
-            units: 'degrees/s',
-            chunkSize: 1,
-        })
-    }
-
-    private static async AccelOutlet() {
-        return await LslStreamOutlet.Create({
-            name: 'Muse Accelerometer',
-            type: 'ACCEL',
-            channelNames: ['X', 'Y', 'Z'],
-            sampleRateHz: this.imuSampleRateHz,
-            channelFormat: 'float32',
-            sourceId: 'muse-accelerometer',
-            manufacturer: 'Interaxon Inc.',
-            units: 'g',
-            chunkSize: 1,
-        })
-    }
-
-    private static XdfStreamRecorder(xdfRecordPath: string) {
-        return XdfStreamRecorder.Create(xdfRecordPath, [
-            'type="EEG"',
-            'type="PPG"',
-            'type="GYRO"',
-            'type="ACCEL"',
-        ])
+    private static XdfStreamRecorder(
+        streamQueries: string[],
+        xdfRecordPath: string
+    ) {
+        return XdfStreamRecorder.Create(xdfRecordPath, streamQueries)
     }
 }
+
+export interface MuseVariant {
+    readonly charCallbacks: CharacteristicCallbacks
+    readonly streamQueries: string[]
+    readonly startCommands: string[]
+}
+
+export type MuseDeviceControllerConstructor = new (
+    variant: MuseVariant,
+    ble: BleController,
+    recorder?: XdfRecorder
+) => DeviceControllerBle
 
 export interface MuseControllerOptions extends DeviceControllerBleOptions {
     txtRecordPath?: string

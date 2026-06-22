@@ -3,10 +3,10 @@ import { randomInt } from 'node:crypto'
 import { test, assert } from '@neurodevs/node-tdd'
 
 import MuseDeviceController, {
-    MUSE_CHAR_UUIDS,
     CONTROL_UUID,
     MuseControllerOptions,
 } from '../../../impl/devices/MuseDeviceController.js'
+import { MUSE_CHAR_UUIDS } from '../../../impl/devices/MuseSGen2.js'
 import { FakeBleController, FakeStreamOutlet } from '@neurodevs/node-lsl'
 import SpyMuseController from '../../../testDoubles/devices/MuseController/SpyMuseController.js'
 import AbstractDeviceControllerBleTest from '../../AbstractDeviceControllerBleTest.js'

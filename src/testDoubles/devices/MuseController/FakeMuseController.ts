@@ -1,9 +1,11 @@
 import { BleController, FakeStreamOutlet } from '@neurodevs/node-lsl'
 import { XdfRecorder } from '@neurodevs/node-xdf'
 import { DeviceControllerBle } from '../../../impl/BiosensorDeviceFactory.js'
+import { MuseVariant } from '../../../impl/devices/MuseDeviceController.js'
 
 export default class FakeMuseController implements DeviceControllerBle {
     public static callsToConstructor: {
+        variant: MuseVariant
         ble: BleController
         recorder?: XdfRecorder
     }[] = []
@@ -12,12 +14,23 @@ export default class FakeMuseController implements DeviceControllerBle {
     public static numCallsToStopStreaming = 0
     public static numCallsToDisconnect = 0
 
+    public variant: MuseVariant
     public ble: BleController
     public recorder?: XdfRecorder
 
-    public constructor(ble: BleController, recorder?: XdfRecorder) {
-        FakeMuseController.callsToConstructor.push({ ble, recorder })
+    public constructor(
+        variant: MuseVariant,
+        ble: BleController,
+        recorder?: XdfRecorder
+    ) {
+        FakeMuseController.callsToConstructor.push({
+            ble,
+            variant,
+            recorder,
+        })
+
         this.ble = ble
+        this.variant = variant
         this.recorder = recorder
     }
 
