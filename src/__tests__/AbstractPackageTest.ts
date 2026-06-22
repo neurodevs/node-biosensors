@@ -1,14 +1,5 @@
 import { FakeLiblsl, LiblslAdapter } from '@neurodevs/ndx-native'
 import {
-    BleDeviceScanner,
-    FakeBleScanner,
-    FakePeripheral,
-    PeripheralOptions,
-    FakeCharacteristic,
-    BleDeviceConnector,
-    FakeBleConnector,
-} from '@neurodevs/node-ble'
-import {
     LslStreamOutlet,
     FakeStreamOutlet,
     LslStreamInfo,
@@ -56,8 +47,6 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         await super.beforeEach()
 
         this.setFakeBleController()
-        this.setFakeBleConnector()
-        this.setFakeBleScanner()
         this.setFakeFTDI()
         this.setFakeLiblsl()
         this.setFakeEventMarkerEmitter()
@@ -80,16 +69,6 @@ export default class AbstractPackageTest extends AbstractModuleTest {
     protected static setFakeBleController() {
         BleDeviceController.Class = FakeBleController
         FakeBleController.resetTestDouble()
-    }
-
-    protected static setFakeBleConnector() {
-        BleDeviceConnector.Class = FakeBleConnector
-        FakeBleConnector.resetTestDouble()
-    }
-
-    protected static setFakeBleScanner() {
-        BleDeviceScanner.Class = FakeBleScanner
-        FakeBleScanner.resetTestDouble()
     }
 
     protected static setFakeCgxController() {
@@ -172,15 +151,7 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         CgxDeviceController.Class = SpyCgxController
     }
 
-    protected static FakeCharacteristic(uuid: string) {
-        return new FakeCharacteristic({ uuid })
-    }
-
     protected static FakeDeviceController(options?: DeviceControllerOptions) {
         return new FakeDeviceController(options)
-    }
-
-    protected static FakePeripheral(options?: PeripheralOptions) {
-        return new FakePeripheral(options)
     }
 }
