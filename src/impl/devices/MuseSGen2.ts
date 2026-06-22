@@ -30,7 +30,7 @@ export const MUSE_CHAR_UUIDS: Record<string, string> = {
 export default class MuseSGen2 implements MuseVariant {
     public static readonly streamQueries = [
         'type="EEG"',
-        'type="PPfG"',
+        'type="PPG"',
         'type="GYRO"',
         'type="ACCEL"',
     ]
@@ -68,12 +68,8 @@ export default class MuseSGen2 implements MuseVariant {
     }
 
     public static async Create(options?: MuseControllerOptions) {
-        const {
-            disableEeg,
-            disablePpg,
-            disableGyro,
-            disableAccel,
-        } = options ?? {}
+        const { disableEeg, disablePpg, disableGyro, disableAccel } =
+            options ?? {}
 
         const eegOutlet = !disableEeg ? await this.EegOutlet() : undefined
         const ppgOutlet = !disablePpg ? await this.PpgOutlet() : undefined

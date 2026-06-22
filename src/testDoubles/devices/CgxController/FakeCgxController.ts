@@ -1,7 +1,9 @@
 import { FakeStreamOutlet, StreamOutlet } from '@neurodevs/node-lsl'
 
 import { DeviceController } from '../../../impl/BiosensorDeviceFactory.js'
-import { CgxControllerConstructorOptions } from '../../../impl/devices/CgxDeviceController.js'
+import CgxDeviceController, {
+    CgxControllerConstructorOptions,
+} from '../../../impl/devices/CgxDeviceController.js'
 
 export default class FakeCgxController implements DeviceController {
     public static callsToConstructor: (CallToCgxConstructor | undefined)[] = []
@@ -37,7 +39,7 @@ export default class FakeCgxController implements DeviceController {
         return [this.fakeEegOutlet, this.fakeAccelOutlet]
     }
 
-    public streamQueries = ['type="EEG"', 'type="ACCEL"']
+    public streamQueries = CgxDeviceController.streamQueries
 
     public static resetTestDouble() {
         this.callsToConstructor = []

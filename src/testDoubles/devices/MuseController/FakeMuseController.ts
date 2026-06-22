@@ -2,6 +2,7 @@ import { BleController, FakeStreamOutlet } from '@neurodevs/node-lsl'
 import { XdfRecorder } from '@neurodevs/node-xdf'
 import { DeviceControllerBle } from '../../../impl/BiosensorDeviceFactory.js'
 import { MuseVariant } from '../../../impl/devices/MuseDeviceController.js'
+import MuseSGen2 from '../../../impl/devices/MuseSGen2.js'
 
 export default class FakeMuseController implements DeviceControllerBle {
     public static callsToConstructor: {
@@ -63,7 +64,7 @@ export default class FakeMuseController implements DeviceControllerBle {
     }
 
     public get streamQueries() {
-        return ['type="EEG"', 'type="PPG"', 'type="GYRO"', 'type="ACCEL"']
+        return MuseSGen2.streamQueries
     }
 
     public static resetTestDouble() {
