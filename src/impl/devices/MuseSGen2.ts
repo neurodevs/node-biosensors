@@ -28,7 +28,12 @@ export const MUSE_CHAR_UUIDS: Record<string, string> = {
 }
 
 export default class MuseSGen2 implements MuseVariant {
-    public static readonly streamQueries = ['type="EEG"', 'type="PPG"']
+    public static readonly streamQueries = [
+        'type="EEG"',
+        'type="PPfG"',
+        'type="GYRO"',
+        'type="ACCEL"',
+    ]
     public static readonly startCommands = ['h', 'p50', 's', 'd']
 
     private static readonly eegSampleRateHz = 256

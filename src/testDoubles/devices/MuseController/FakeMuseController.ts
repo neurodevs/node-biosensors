@@ -63,7 +63,7 @@ export default class FakeMuseController implements DeviceControllerBle {
     }
 
     public get streamQueries() {
-        return ['type="EEG"', 'type="PPG"']
+        return ['type="EEG"', 'type="PPG"', 'type="GYRO"', 'type="ACCEL"']
     }
 
     public static resetTestDouble() {

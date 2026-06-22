@@ -16,11 +16,9 @@ import BiosensorDeviceFactory, {
     DeviceFactory,
     DeviceSpecification,
 } from '../../impl/BiosensorDeviceFactory.js'
-import CgxDeviceController from '../../impl/devices/CgxDeviceController.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 import { MuseControllerOptions } from '../../impl/devices/MuseDeviceController.js'
 import FakeMuseController from '../../testDoubles/devices/MuseController/FakeMuseController.js'
-import MuseSGen2 from '../../impl/devices/MuseSGen2.js'
 
 export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
     private static instance: DeviceFactory
@@ -28,6 +26,13 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
     private static readonly xdfRecordPath = generateId()
     private static readonly webSocketPortStart = randomInt(1000, 5000)
     private static readonly museBleUuid = this.generateId()
+    private static readonly cgxStreamQueries = ['type="EEG"', 'type="ACCEL"']
+    private static readonly museSGen2StreamQueries = [
+        'type="EEG"',
+        'type="PPG"',
+        'type="GYRO"',
+        'type="ACCEL"',
+    ]
 
     private static readonly deviceSpecifications: DeviceSpecification[] = [
         { deviceName: 'Cognionics Quick-20r' },
@@ -104,7 +109,7 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
 
         assert.isEqualDeep(
             FakeXdfRecorder.callsToConstructor[0]?.streamQueries,
-            [...CgxDeviceController.streamQueries, ...MuseSGen2.streamQueries],
+            [...this.cgxStreamQueries, ...this.museSGen2StreamQueries],
             'Stream queries do not match!'
         )
     }
@@ -126,7 +131,7 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
             { xdfRecordPath, streamQueries },
             {
                 xdfRecordPath: this.xdfRecordPath,
-                streamQueries: [...CgxDeviceController.streamQueries],
+                streamQueries: [...this.cgxStreamQueries],
             },
             'Passed incorrect options to XdfRecorder!'
         )
