@@ -47,7 +47,7 @@
     "watch.build.dev": "tsc-watch --sourceMap --onCompilationComplete 'yarn run build.copy-files'"
   },
   "dependencies": {
-    "@neurodevs/node-lsl": "^18.0.0",
+    "@neurodevs/node-lsl": "^18.1.0",
     "@neurodevs/node-runtime-monitors": "^0.0.2",
     "@neurodevs/node-xdf": "^5.0.0",
     "ftdi-d2xx": "^1.3.1",
