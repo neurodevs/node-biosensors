@@ -5,7 +5,8 @@ import MuseDeviceController from '../impl/devices/MuseDeviceController.js'
 const xdfRecordPath = './artifacts/muse_data.xdf'
 
 const muse = await MuseDeviceController.Create({
-    bleUuid: 'CA6A61B7-B7A8-AF24-3C9E-04A6A5012554',
+    // bleUuid: 'CA6A61B7-B7A8-AF24-3C9E-04A6A5012554',
+    bleUuid: 'F57439F1-3287-71B4-2251-F15797949214',
     rssiIntervalMs: undefined,
     xdfRecordPath,
     txtRecordPath: undefined,
@@ -21,22 +22,6 @@ await muse.startStreaming()
 
 await new Promise((resolve) => setTimeout(resolve, 5000))
 
-await muse.stopStreaming()
-
-await new Promise((resolve) => setTimeout(resolve, 2000))
-
-await muse.startStreaming()
-
-await new Promise((resolve) => setTimeout(resolve, 2000))
-
-await muse.disconnect()
-
-await muse.connect()
-await muse.startStreaming()
-
-await new Promise((resolve) => setTimeout(resolve, 2000))
-
-await muse.stopStreaming()
 await muse.disconnect()
 
 await new Promise((resolve) => setTimeout(resolve, 5000))
