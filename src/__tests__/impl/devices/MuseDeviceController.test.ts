@@ -160,7 +160,7 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
 
     @test()
     protected static async createsBleControllerWithNamePrefixIfNoUuid() {
-        await MuseDeviceController.Create()
+        await MuseDeviceController.Create('Muse S Gen 2')
 
         const call = FakeBleController.callsToConstructor[1]
 
@@ -234,7 +234,9 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
 
     @test()
     protected static async doesNotLogByDefault() {
-        await MuseDeviceController.Create({ bleUuid: this.deviceUuid })
+        await MuseDeviceController.Create('Muse S Gen 2', {
+            bleUuid: this.deviceUuid,
+        })
 
         this.simulateOnData()
 
@@ -309,7 +311,7 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
     private static async MuseDeviceController(
         options?: Partial<MuseControllerOptions>
     ) {
-        return (await MuseDeviceController.Create({
+        return (await MuseDeviceController.Create('Muse S Gen 2', {
             bleUuid: this.deviceUuid,
             xdfRecordPath: this.xdfRecordPath,
             rssiIntervalMs: this.rssiIntervalMs,

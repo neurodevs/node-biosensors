@@ -12,6 +12,7 @@ import {
     DeviceControllerBleOptions,
 } from '../BiosensorDeviceFactory.js'
 import AbstractDeviceControllerBle from './AbstractDeviceControllerBle.js'
+import MuseSAthena from './MuseSAthena.js'
 import MuseSGen2 from './MuseSGen2.js'
 
 export const CONTROL_UUID = '273E0001-4C4D-454D-96BE-F03BAC821358'
@@ -36,10 +37,14 @@ export default class MuseDeviceController
         this.variant = variant
     }
 
-    public static async Create(options?: MuseControllerOptions) {
+    public static async Create(
+        model: MuseDeviceModel,
+        options?: MuseControllerOptions
+    ) {
         const { xdfRecordPath } = options ?? {}
 
-        const variant = await MuseSGen2.Create(options)
+        const MuseVariant = model === 'Muse S Athena' ? MuseSAthena : MuseSGen2
+        const variant = await MuseVariant.Create(options)
 
         const ble = await this.BleDeviceController(
             variant.charCallbacks,
@@ -60,6 +65,10 @@ export default class MuseDeviceController
     protected async handleStartStreaming() {
         for (const cmd of this.variant.startCommands) {
             await this.ble.writeCharacteristic(CONTROL_UUID, cmd)
+
+            await new Promise((resolve) => {
+                setTimeout(resolve, 100)
+            })
         }
     }
 
@@ -123,3 +132,5 @@ export interface MuseControllerOptions extends DeviceControllerBleOptions {
     disableGyro?: boolean
     disableAccel?: boolean
 }
+
+export type MuseDeviceModel = 'Muse S Gen 2' | 'Muse S Athena'

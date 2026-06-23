@@ -974,7 +974,7 @@ export default class MuseSGen2Test extends AbstractDeviceControllerBleTest {
     private static async MuseDeviceController(
         options?: Partial<MuseControllerOptions>
     ) {
-        return (await MuseDeviceController.Create({
+        return (await MuseDeviceController.Create('Muse S Gen 2', {
             bleUuid: this.deviceUuid,
             xdfRecordPath: this.xdfRecordPath,
             rssiIntervalMs: this.rssiIntervalMs,
