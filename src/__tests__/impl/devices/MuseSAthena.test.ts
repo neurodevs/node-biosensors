@@ -248,10 +248,7 @@ export default class MuseSAthenaTest extends AbstractDeviceControllerBleTest {
             [15, 25, 35, 45, 55, 65],
         ]
 
-        const message = [
-            ...this.imuPacket(first),
-            ...this.imuPacket(second),
-        ]
+        const message = [...this.imuPacket(first), ...this.imuPacket(second)]
 
         const ts = this.simulateData('OTHER', message)
 
