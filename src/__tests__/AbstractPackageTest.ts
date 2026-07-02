@@ -43,8 +43,12 @@ import FakeMuseController from '../testDoubles/devices/MuseController/FakeMuseCo
 export default class AbstractPackageTest extends AbstractModuleTest {
     protected static fakeLiblsl: FakeLiblsl
 
+    private static readonly realSetTimeout = globalThis.setTimeout
+
     protected static async beforeEach() {
         await super.beforeEach()
+
+        this.setImmediateTimeouts()
 
         this.setFakeBleController()
         this.setFakeFTDI()
@@ -56,6 +60,23 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         this.setFakeWebSocketBridge()
         this.setFakeXdfLoader()
         this.setFakeXdfRecorder()
+    }
+
+    protected static async afterEach() {
+        globalThis.setTimeout = this.realSetTimeout
+
+        await super.afterEach()
+    }
+
+    protected static setImmediateTimeouts() {
+        globalThis.setTimeout = ((
+            callback: (...args: unknown[]) => void,
+            _delayMs?: number,
+            ...args: unknown[]
+        ) => {
+            callback(...args)
+            return 0
+        }) as unknown as typeof setTimeout
     }
 
     protected static setFakeDevices() {
