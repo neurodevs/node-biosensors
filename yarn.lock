@@ -980,10 +980,10 @@
     ffi-rs "^1.3.2"
     koffi "^3.0.1"
 
-"@neurodevs/node-biosignal-processing@^1.2.1":
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/@neurodevs/node-biosignal-processing/-/node-biosignal-processing-1.2.1.tgz#5697db632e49b64b37c654ac6797d2a01864b440"
-  integrity sha512-/LsmspgihE8PwuZ3sYae4bPBOA824ObvUQbKVbZ/6jl2gn+RWzRJhfi56REKYgdeMtUJaMlv++niSPrZWX9ixg==
+"@neurodevs/node-biosignal-processing@^1.2.2":
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/@neurodevs/node-biosignal-processing/-/node-biosignal-processing-1.2.2.tgz#cdf1db88ad4040cbd5bf6cf2a2fbe877b8011a52"
+  integrity sha512-BH4muBaUQxfbK7ZCCp1glSOTbCCbJ+ZW7+Vg69THl2wtC1zczgNudh6CXwLITV70UTrJkLKwN2BLj4M2rxOtzA==
   dependencies:
     "@neurodevs/node-server-plots" "^0.4.3"
     "@neurodevs/node-signal-processing" "^3.0.5"
