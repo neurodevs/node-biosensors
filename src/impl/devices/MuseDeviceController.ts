@@ -28,12 +28,6 @@ export default class MuseDeviceController
 
     private readonly variant: MuseVariant
 
-    private static readonly variantsByModel = {
-        'Muse 2': Muse2,
-        'Muse S Gen 2': MuseSGen2,
-        'Muse S Athena': MuseSAthena,
-    }
-
     protected constructor(
         variant: MuseVariant,
         ble: BleController,
@@ -50,7 +44,7 @@ export default class MuseDeviceController
     ) {
         const { xdfRecordPath } = options ?? {}
 
-        const MuseVariant = this.variantsByModel[model]
+        const MuseVariant = await this.resolveVariant(model)
         const variant = await MuseVariant.Create(options)
 
         const ble = await this.BleDeviceController(
@@ -63,6 +57,17 @@ export default class MuseDeviceController
             : undefined
 
         return new (this.Class ?? this)(variant, ble, recorder)
+    }
+
+    private static async resolveVariant(model: MuseDeviceModel) {
+        switch (model) {
+            case 'Muse 2':
+                return Muse2
+            case 'Muse S Athena':
+                return MuseSAthena
+            case 'Muse S Gen 2':
+                return MuseSGen2
+        }
     }
 
     protected get deviceId() {
