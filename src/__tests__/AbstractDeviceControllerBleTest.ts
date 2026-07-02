@@ -16,6 +16,7 @@ export default abstract class AbstractDeviceControllerBleTest extends AbstractDe
     protected static instance: SpyDeviceControllerBle
 
     protected static readonly deviceUuid = this.deviceId
+    protected static readonly shortUuid = this.deviceUuid.slice(0, 6)
     protected static readonly deviceName = this.generateId()
     protected static readonly rssiIntervalMs = randomInt(1, 10)
 

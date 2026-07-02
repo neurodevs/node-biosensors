@@ -437,12 +437,12 @@ export default abstract class Muse2FamilyTest extends AbstractDeviceControllerBl
         const firstCall = FakeStreamOutlet.callsToConstructor[0]
 
         assert.isEqualDeep(firstCall, {
-            name: 'Muse EEG',
+            name: `Muse EEG (${this.shortUuid})`,
             type: 'EEG',
             channelNames: this.eegCharNames,
             sampleRateHz: this.eegSampleRateHz,
             channelFormat: 'float32',
-            sourceId: 'muse-eeg',
+            sourceId: `muse-eeg-${this.shortUuid}`,
             manufacturer: 'Interaxon Inc.',
             units: 'microvolt',
             chunkSize: 1,
@@ -456,7 +456,7 @@ export default abstract class Muse2FamilyTest extends AbstractDeviceControllerBl
 
         assert.isEqual(
             FakeStreamOutlet.callsToConstructor.filter(
-                (call) => call?.name === 'Muse EEG'
+                (call) => call?.name === `Muse EEG (${this.shortUuid})`
             ).length,
             0,
             'Should not create any EEG outlets!'
@@ -467,12 +467,12 @@ export default abstract class Muse2FamilyTest extends AbstractDeviceControllerBl
         const secondCall = FakeStreamOutlet.callsToConstructor[1]
 
         assert.isEqualDeep(secondCall, {
-            name: 'Muse PPG',
+            name: `Muse PPG (${this.shortUuid})`,
             type: 'PPG',
             channelNames: ['PPG_AMBIENT', 'PPG_INFRARED', 'PPG_RED'],
             sampleRateHz: 64,
             channelFormat: 'float32',
-            sourceId: 'muse-ppg',
+            sourceId: `muse-ppg-${this.shortUuid}`,
             manufacturer: 'Interaxon Inc.',
             units: 'N/A',
             chunkSize: 1,
@@ -486,7 +486,7 @@ export default abstract class Muse2FamilyTest extends AbstractDeviceControllerBl
 
         assert.isEqual(
             FakeStreamOutlet.callsToConstructor.filter(
-                (call) => call?.name === 'Muse PPG'
+                (call) => call?.name === `Muse PPG (${this.shortUuid})`
             ).length,
             0,
             'Should not create any PPG outlets!'
@@ -497,12 +497,12 @@ export default abstract class Muse2FamilyTest extends AbstractDeviceControllerBl
         const call = FakeStreamOutlet.callsToConstructor[2]
 
         assert.isEqualDeep(call, {
-            name: 'Muse Gyroscope',
+            name: `Muse Gyroscope (${this.shortUuid})`,
             type: 'GYRO',
             channelNames: ['X', 'Y', 'Z'],
             sampleRateHz: this.imuSampleRateHz,
             channelFormat: 'float32',
-            sourceId: 'muse-gyroscope',
+            sourceId: `muse-gyroscope-${this.shortUuid}`,
             manufacturer: 'Interaxon Inc.',
             units: 'degrees/s',
             chunkSize: 1,
@@ -516,7 +516,7 @@ export default abstract class Muse2FamilyTest extends AbstractDeviceControllerBl
 
         assert.isEqual(
             FakeStreamOutlet.callsToConstructor.filter(
-                (call) => call?.name === 'Muse Gyroscope'
+                (call) => call?.name === `Muse Gyroscope (${this.shortUuid})`
             ).length,
             0,
             'Should not create any Gyroscope outlets!'
@@ -527,12 +527,12 @@ export default abstract class Muse2FamilyTest extends AbstractDeviceControllerBl
         const call = FakeStreamOutlet.callsToConstructor[3]
 
         assert.isEqualDeep(call, {
-            name: 'Muse Accelerometer',
+            name: `Muse Accelerometer (${this.shortUuid})`,
             type: 'ACCEL',
             channelNames: ['X', 'Y', 'Z'],
             sampleRateHz: this.imuSampleRateHz,
             channelFormat: 'float32',
-            sourceId: 'muse-accelerometer',
+            sourceId: `muse-accelerometer-${this.shortUuid}`,
             manufacturer: 'Interaxon Inc.',
             units: 'g',
             chunkSize: 1,
@@ -546,7 +546,8 @@ export default abstract class Muse2FamilyTest extends AbstractDeviceControllerBl
 
         assert.isEqual(
             FakeStreamOutlet.callsToConstructor.filter(
-                (call) => call?.name === 'Muse Accelerometer'
+                (call) =>
+                    call?.name === `Muse Accelerometer (${this.shortUuid})`
             ).length,
             0,
             'Should not create any Accelerometer outlets!'

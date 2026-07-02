@@ -113,16 +113,19 @@ export default class MuseSAthena implements MuseVariant {
     }
 
     public static async Create(options?: MuseControllerOptions) {
-        const { disableEeg, disablePpg, disableGyro, disableAccel } =
+        const { disableEeg, disablePpg, disableGyro, disableAccel, bleUuid } =
             options ?? {}
 
-        // Accel + gyro share one IMU stream; only drop it if both are disabled.
+        const shortUuid = (bleUuid ?? '').slice(0, 6)
+
         const disableImu = disableGyro && disableAccel
 
         const outlets: AthenaOutlets = {
-            EEG: !disableEeg ? await this.EegOutlet() : undefined,
-            IMU: !disableImu ? await this.ImuOutlet() : undefined,
-            OPTICS: !disablePpg ? await this.OpticsOutlet() : undefined,
+            EEG: !disableEeg ? await this.EegOutlet(shortUuid) : undefined,
+            IMU: !disableImu ? await this.ImuOutlet(shortUuid) : undefined,
+            OPTICS: !disablePpg
+                ? await this.OpticsOutlet(shortUuid)
+                : undefined,
         }
 
         const charCallbacks = this.generateCharCallbacks(options, outlets)
@@ -417,42 +420,42 @@ export default class MuseSAthena implements MuseVariant {
         return value >= 0x8000 ? value - 0x10000 : value
     }
 
-    private static async EegOutlet() {
+    private static async EegOutlet(shortUuid: string) {
         return await LslStreamOutlet.Create({
-            name: 'Muse EEG',
+            name: `Muse EEG (${shortUuid})`,
             type: 'EEG',
             channelNames: EEG_CHANNELS,
             sampleRateHz: SAMPLES_RATES_HZ.EEG!,
             channelFormat: 'float32',
-            sourceId: 'muse-eeg',
+            sourceId: `muse-eeg-${shortUuid}`,
             manufacturer: 'Interaxon Inc.',
             units: 'microvolt',
             chunkSize: 1,
         })
     }
 
-    private static async ImuOutlet() {
+    private static async ImuOutlet(shortUuid: string) {
         return await LslStreamOutlet.Create({
-            name: 'Muse IMU',
+            name: `Muse IMU (${shortUuid})`,
             type: 'IMU',
             channelNames: IMU_CHANNELS,
             sampleRateHz: SAMPLES_RATES_HZ.IMU!,
             channelFormat: 'float32',
-            sourceId: 'muse-imu',
+            sourceId: `muse-imu-${shortUuid}`,
             manufacturer: 'Interaxon Inc.',
             units: 'N/A',
             chunkSize: 1,
         })
     }
 
-    private static async OpticsOutlet() {
+    private static async OpticsOutlet(shortUuid: string) {
         return await LslStreamOutlet.Create({
-            name: 'Muse Optics',
+            name: `Muse Optics (${shortUuid})`,
             type: 'PPG',
             channelNames: OPTICS_CHANNELS,
             sampleRateHz: SAMPLES_RATES_HZ.OPTICS!,
             channelFormat: 'float32',
-            sourceId: 'muse-optics',
+            sourceId: `muse-optics-${shortUuid}`,
             manufacturer: 'Interaxon Inc.',
             units: 'N/A',
             chunkSize: 1,
