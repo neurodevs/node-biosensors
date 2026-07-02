@@ -12,6 +12,7 @@ import {
     DeviceControllerBleOptions,
 } from '../BiosensorDeviceFactory.js'
 import AbstractDeviceControllerBle from './AbstractDeviceControllerBle.js'
+import Muse2 from './Muse2.js'
 import MuseSAthena from './MuseSAthena.js'
 import MuseSGen2 from './MuseSGen2.js'
 
@@ -26,6 +27,12 @@ export default class MuseDeviceController
     public static log = console.info
 
     private readonly variant: MuseVariant
+
+    private static readonly variantsByModel = {
+        'Muse 2': Muse2,
+        'Muse S Gen 2': MuseSGen2,
+        'Muse S Athena': MuseSAthena,
+    }
 
     protected constructor(
         variant: MuseVariant,
@@ -43,7 +50,7 @@ export default class MuseDeviceController
     ) {
         const { xdfRecordPath } = options ?? {}
 
-        const MuseVariant = model === 'Muse S Athena' ? MuseSAthena : MuseSGen2
+        const MuseVariant = this.variantsByModel[model]
         const variant = await MuseVariant.Create(options)
 
         const ble = await this.BleDeviceController(
@@ -133,4 +140,4 @@ export interface MuseControllerOptions extends DeviceControllerBleOptions {
     disableAccel?: boolean
 }
 
-export type MuseDeviceModel = 'Muse S Gen 2' | 'Muse S Athena'
+export type MuseDeviceModel = 'Muse 2' | 'Muse S Gen 2' | 'Muse S Athena'

@@ -34,12 +34,16 @@ export default class MuseSGen2 implements MuseVariant {
         'type="GYRO"',
         'type="ACCEL"',
     ]
+
+    // p50 = 5-channel EEG + PPG + accel + gyro
     public static readonly startCommands = ['h', 'p50', 's', 'd']
+
+    protected static readonly charUuids = MUSE_CHAR_UUIDS
 
     private static readonly eegSampleRateHz = 256
     private static readonly eegChunkSize = 12
 
-    private static readonly eegCharNames = [
+    protected static readonly eegCharNames = [
         'EEG_TP10',
         'EEG_AF8',
         'EEG_TP9',
@@ -144,7 +148,7 @@ export default class MuseSGen2 implements MuseVariant {
             }
         }
 
-        return Object.entries(MUSE_CHAR_UUIDS).map(([name, uuid]) => ({
+        return Object.entries(this.charUuids).map(([name, uuid]) => ({
             charUuid: uuid,
             charName: name,
             onData: (data: Buffer, length: number, timestampSec: number) => {
