@@ -1,5 +1,5 @@
 import { test, assert } from '@neurodevs/node-tdd'
-import { FakeBleController } from '@neurodevs/node-lsl'
+import { FakeBleController, FakeStreamOutlet } from '@neurodevs/node-lsl'
 
 import MuseDeviceController, {
     CONTROL_UUID,
@@ -39,6 +39,8 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
         }
 
         this.logCalls.length = 0
+
+        MuseDeviceController.fallbackDeviceCounter = 1
 
         this.instance = await this.MuseDeviceController()
     }
@@ -174,6 +176,28 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
                 deviceUuid: undefined,
             },
             'Should fall back to a Muse name prefix when no bleUuid is passed!'
+        )
+    }
+
+    @test()
+    protected static async assignsIncrementingFallbackWhenNoBleUuidProvided() {
+        await MuseDeviceController.Create('Muse S Gen 2')
+        await MuseDeviceController.Create('Muse S Athena')
+
+        const eegNames = FakeStreamOutlet.callsToConstructor.filter((call) =>
+            call?.name?.startsWith('Muse EEG')
+        )
+
+        assert.isEqualDeep(
+            {
+                firstName: eegNames[1]?.name,
+                secondName: eegNames[2]?.name,
+            },
+            {
+                firstName: 'Muse EEG (Device-1)',
+                secondName: 'Muse EEG (Device-2)',
+            },
+            'Should start the fallback short id at 1 when no bleUuid is passed!'
         )
     }
 

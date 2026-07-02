@@ -72,22 +72,29 @@ export default class MuseSGen2 implements MuseVariant {
     }
 
     public static async Create(options?: MuseControllerOptions) {
-        const { disableEeg, disablePpg, disableGyro, disableAccel, bleUuid } =
-            options ?? {}
+        const {
+            disableEeg,
+            disablePpg,
+            disableGyro,
+            disableAccel,
+            bleUuid = '',
+        } = options ?? {}
 
-        const shortUuid = (bleUuid ?? '').slice(0, 6)
+        const identifier = bleUuid
+            ? bleUuid.slice(0, 6)
+            : `Device-${MuseDeviceController.fallbackDeviceCounter++}`
 
         const eegOutlet = !disableEeg
-            ? await this.EegOutlet(shortUuid)
+            ? await this.EegOutlet(identifier)
             : undefined
         const ppgOutlet = !disablePpg
-            ? await this.PpgOutlet(shortUuid)
+            ? await this.PpgOutlet(identifier)
             : undefined
         const gyroOutlet = !disableGyro
-            ? await this.GyroOutlet(shortUuid)
+            ? await this.GyroOutlet(identifier)
             : undefined
         const accelOutlet = !disableAccel
-            ? await this.AccelOutlet(shortUuid)
+            ? await this.AccelOutlet(identifier)
             : undefined
 
         const charCallbacks = this.generateCharCallbacks(
@@ -339,56 +346,56 @@ export default class MuseSGen2 implements MuseVariant {
         return value >= 0x8000 ? value - 0x10000 : value
     }
 
-    private static async EegOutlet(shortUuid: string) {
+    private static async EegOutlet(identifier: string) {
         return await LslStreamOutlet.Create({
-            name: `Muse EEG (${shortUuid})`,
+            name: `Muse EEG (${identifier})`,
             type: 'EEG',
             channelNames: this.eegCharNames,
             sampleRateHz: this.eegSampleRateHz,
             channelFormat: 'float32',
-            sourceId: `muse-eeg-${shortUuid}`,
+            sourceId: `muse-eeg-${identifier}`,
             manufacturer: 'Interaxon Inc.',
             units: 'microvolt',
             chunkSize: 1,
         })
     }
 
-    private static async PpgOutlet(shortUuid: string) {
+    private static async PpgOutlet(identifier: string) {
         return await LslStreamOutlet.Create({
-            name: `Muse PPG (${shortUuid})`,
+            name: `Muse PPG (${identifier})`,
             type: 'PPG',
             channelNames: ['PPG_AMBIENT', 'PPG_INFRARED', 'PPG_RED'],
             sampleRateHz: 64,
             channelFormat: 'float32',
-            sourceId: `muse-ppg-${shortUuid}`,
+            sourceId: `muse-ppg-${identifier}`,
             manufacturer: 'Interaxon Inc.',
             units: 'N/A',
             chunkSize: 1,
         })
     }
 
-    private static async GyroOutlet(shortUuid: string) {
+    private static async GyroOutlet(identifier: string) {
         return await LslStreamOutlet.Create({
-            name: `Muse Gyroscope (${shortUuid})`,
+            name: `Muse Gyroscope (${identifier})`,
             type: 'GYRO',
             channelNames: ['X', 'Y', 'Z'],
             sampleRateHz: this.imuSampleRateHz,
             channelFormat: 'float32',
-            sourceId: `muse-gyroscope-${shortUuid}`,
+            sourceId: `muse-gyroscope-${identifier}`,
             manufacturer: 'Interaxon Inc.',
             units: 'degrees/s',
             chunkSize: 1,
         })
     }
 
-    private static async AccelOutlet(shortUuid: string) {
+    private static async AccelOutlet(identifier: string) {
         return await LslStreamOutlet.Create({
-            name: `Muse Accelerometer (${shortUuid})`,
+            name: `Muse Accelerometer (${identifier})`,
             type: 'ACCEL',
             channelNames: ['X', 'Y', 'Z'],
             sampleRateHz: this.imuSampleRateHz,
             channelFormat: 'float32',
-            sourceId: `muse-accelerometer-${shortUuid}`,
+            sourceId: `muse-accelerometer-${identifier}`,
             manufacturer: 'Interaxon Inc.',
             units: 'g',
             chunkSize: 1,

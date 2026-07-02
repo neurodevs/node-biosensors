@@ -25,6 +25,7 @@ export default class MuseDeviceController
     public static Class?: MuseDeviceControllerConstructor
     public static createWriteStream = fs.createWriteStream
     public static log = console.info
+    public static fallbackDeviceCounter = 1
 
     private readonly variant: MuseVariant
 
