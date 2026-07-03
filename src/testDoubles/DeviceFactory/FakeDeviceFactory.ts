@@ -10,7 +10,7 @@ import {
     SingleDeviceBundle,
     MultipleDeviceBundle,
 } from '../../impl/BiosensorDeviceFactory.js'
-import FakeDeviceController from '../devices/FakeDeviceController.js'
+import FakeDeviceController from '../DeviceController/FakeDeviceController.js'
 import FakeWebSocketGateway from '../WebSocketGateway/FakeWebSocketGateway.js'
 
 export default class FakeDeviceFactory implements DeviceFactory {

@@ -26,29 +26,38 @@ export * from './testDoubles/WebSocketGateway/FakeWebSocketGateway.js'
 
 // DeviceController
 
-export { default as FakeDeviceController } from './testDoubles/devices/MuseController/FakeMuseController.js'
-export * from './testDoubles/devices/MuseController/FakeMuseController.js'
+export { default as FakeDeviceController } from './testDoubles/MuseController/FakeMuseController.js'
+export * from './testDoubles/MuseController/FakeMuseController.js'
 
 // Cognionics Quick-20r
 
-export { default as CgxDeviceController } from './impl/devices/CgxDeviceController.js'
-export * from './impl/devices/CgxDeviceController.js'
+export { default as CgxDeviceController } from './impl/cognionics/CgxDeviceController.js'
+export * from './impl/cognionics/CgxDeviceController.js'
 
-export { default as SpyCgxController } from './testDoubles/devices/CgxController/SpyCgxController.js'
-export * from './testDoubles/devices/CgxController/SpyCgxController.js'
+export { default as FakeCgxDeviceController } from './testDoubles/CgxController/FakeCgxController.js'
+export * from './testDoubles/CgxController/FakeCgxController.js'
 
-export { default as FakeCgxDeviceController } from './testDoubles/devices/CgxController/FakeCgxController.js'
-export * from './testDoubles/devices/CgxController/FakeCgxController.js'
+export { default as SpyCgxController } from './testDoubles/CgxController/SpyCgxController.js'
+export * from './testDoubles/CgxController/SpyCgxController.js'
 
-// Muse S Gen 2
+// Muse Headsets (supports Muse 2, Muse S Athena, and Muse S Gen 2)
 
-export { default as MuseDeviceController } from './impl/devices/MuseDeviceController.js'
-export * from './impl/devices/MuseDeviceController.js'
+export { default as MuseDeviceController } from './impl/muse/MuseDeviceController.js'
+export * from './impl/muse/MuseDeviceController.js'
 
-// Zephyr BioHarness 3
+export { default as FakeMuseController } from './testDoubles/MuseController/FakeMuseController.js'
+export * from './testDoubles/MuseController/FakeMuseController.js'
 
-export { default as ZephyrDeviceController } from './impl/devices/ZephyrDeviceController.js'
-export * from './impl/devices/ZephyrDeviceController.js'
+export { default as SpyMuseController } from './testDoubles/MuseController/SpyMuseController.js'
+export * from './testDoubles/MuseController/SpyMuseController.js'
 
-export { default as FakeZephyrController } from './testDoubles/devices/ZephyrController/FakeZephyrController.js'
-export * from './testDoubles/devices/ZephyrController/FakeZephyrController.js'
+// Zephyr BioHarness 3.0
+
+export { default as ZephyrDeviceController } from './impl/zephyr/ZephyrDeviceController.js'
+export * from './impl/zephyr/ZephyrDeviceController.js'
+
+export { default as FakeZephyrController } from './testDoubles/ZephyrController/FakeZephyrController.js'
+export * from './testDoubles/ZephyrController/FakeZephyrController.js'
+
+export { default as SpyZephyrController } from './testDoubles/ZephyrController/SpyZephyrController.js'
+export * from './testDoubles/ZephyrController/SpyZephyrController.js'

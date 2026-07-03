@@ -27,18 +27,18 @@ import BiosensorDeviceFactory, {
     DeviceControllerOptions,
 } from '../impl/BiosensorDeviceFactory.js'
 import BiosensorWebSocketGateway from '../impl/BiosensorWebSocketGateway.js'
-import CgxDeviceController from '../impl/devices/CgxDeviceController.js'
-import ZephyrDeviceController from '../impl/devices/ZephyrDeviceController.js'
+import CgxDeviceController from '../impl/cognionics/CgxDeviceController.js'
+import ZephyrDeviceController from '../impl/zephyr/ZephyrDeviceController.js'
 import FakeDeviceFactory from '../testDoubles/DeviceFactory/FakeDeviceFactory.js'
-import FakeCgxController from '../testDoubles/devices/CgxController/FakeCgxController.js'
-import SpyCgxController from '../testDoubles/devices/CgxController/SpyCgxController.js'
-import FakeDeviceController from '../testDoubles/devices/FakeDeviceController.js'
-import FakeZephyrController from '../testDoubles/devices/ZephyrController/FakeZephyrController.js'
+import FakeCgxController from '../testDoubles/CgxController/FakeCgxController.js'
+import SpyCgxController from '../testDoubles/CgxController/SpyCgxController.js'
+import FakeDeviceController from '../testDoubles/DeviceController/FakeDeviceController.js'
+import FakeZephyrController from '../testDoubles/ZephyrController/FakeZephyrController.js'
 import FakeDeviceFTDI from '../testDoubles/FTDI/FakeDeviceFTDI.js'
 import FakeFTDI from '../testDoubles/FTDI/FakeFTDI.js'
 import FakeWebSocketGateway from '../testDoubles/WebSocketGateway/FakeWebSocketGateway.js'
-import MuseDeviceController from '../impl/devices/MuseDeviceController.js'
-import FakeMuseController from '../testDoubles/devices/MuseController/FakeMuseController.js'
+import MuseDeviceController from '../impl/muse/MuseDeviceController.js'
+import FakeMuseController from '../testDoubles/MuseController/FakeMuseController.js'
 
 export default class AbstractPackageTest extends AbstractModuleTest {
     protected static fakeLiblsl: FakeLiblsl

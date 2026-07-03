@@ -1,6 +1,6 @@
 import CgxDeviceController, {
     CgxControllerConstructorOptions,
-} from '../../../impl/devices/CgxDeviceController.js'
+} from '../../impl/cognionics/CgxDeviceController.js'
 
 export default class SpyCgxController extends CgxDeviceController {
     public constructor(options: CgxControllerConstructorOptions) {

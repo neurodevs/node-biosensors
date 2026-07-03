@@ -2,7 +2,7 @@ import { BleController } from '@neurodevs/node-lsl'
 import { XdfRecorder } from '@neurodevs/node-xdf'
 import MuseDeviceController, {
     MuseVariant,
-} from '../../../impl/devices/MuseDeviceController.js'
+} from '../../impl/muse/MuseDeviceController.js'
 
 export default class SpyMuseController extends MuseDeviceController {
     public constructor(

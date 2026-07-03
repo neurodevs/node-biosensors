@@ -3,7 +3,7 @@ import { assert } from '@neurodevs/node-tdd'
 import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 import AbstractPackageTest from './AbstractPackageTest.js'
 import { DeviceController } from '../impl/BiosensorDeviceFactory.js'
-import AbstractDeviceController from '../impl/devices/AbstractDeviceController.js'
+import AbstractDeviceController from '../impl/abstract/AbstractDeviceController.js'
 
 export interface SpyDeviceController extends DeviceController {
     getIsConnected(): boolean

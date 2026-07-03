@@ -11,10 +11,10 @@ import {
     DeviceControllerBle,
     DeviceControllerBleOptions,
 } from '../BiosensorDeviceFactory.js'
-import AbstractDeviceControllerBle from './AbstractDeviceControllerBle.js'
-import Muse2 from './Muse2.js'
-import MuseSAthena from './MuseSAthena.js'
-import MuseSGen2 from './MuseSGen2.js'
+import AbstractDeviceControllerBle from '../abstract/AbstractDeviceControllerBle.js'
+import Muse2 from './variants/Muse2.js'
+import MuseSAthena from './variants/MuseSAthena.js'
+import MuseSGen2 from './variants/MuseSGen2.js'
 
 export const CONTROL_UUID = '273E0001-4C4D-454D-96BE-F03BAC821358'
 

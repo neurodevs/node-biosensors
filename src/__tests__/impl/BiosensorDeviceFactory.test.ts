@@ -17,8 +17,8 @@ import BiosensorDeviceFactory, {
     DeviceSpecification,
 } from '../../impl/BiosensorDeviceFactory.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
-import { MuseControllerOptions } from '../../impl/devices/MuseDeviceController.js'
-import FakeMuseController from '../../testDoubles/devices/MuseController/FakeMuseController.js'
+import { MuseControllerOptions } from '../../impl/muse/MuseDeviceController.js'
+import FakeMuseController from '../../testDoubles/MuseController/FakeMuseController.js'
 
 export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
     private static instance: DeviceFactory

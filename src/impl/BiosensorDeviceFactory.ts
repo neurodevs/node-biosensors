@@ -9,11 +9,11 @@ import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 import BiosensorWebSocketGateway, {
     WebSocketGateway,
 } from './BiosensorWebSocketGateway.js'
-import CgxDeviceController from './devices/CgxDeviceController.js'
-import ZephyrDeviceController from './devices/ZephyrDeviceController.js'
+import CgxDeviceController from './cognionics/CgxDeviceController.js'
+import ZephyrDeviceController from './zephyr/ZephyrDeviceController.js'
 import MuseDeviceController, {
     MuseControllerOptions,
-} from './devices/MuseDeviceController.js'
+} from './muse/MuseDeviceController.js'
 
 export default class BiosensorDeviceFactory implements DeviceFactory {
     public static Class?: DeviceFactoryConstructor

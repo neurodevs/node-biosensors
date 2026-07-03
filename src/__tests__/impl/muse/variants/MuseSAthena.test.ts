@@ -6,9 +6,9 @@ import { FakeBleController, FakeStreamOutlet } from '@neurodevs/node-lsl'
 import MuseDeviceController, {
     CONTROL_UUID,
     MuseControllerOptions,
-} from '../../../impl/devices/MuseDeviceController.js'
-import SpyMuseController from '../../../testDoubles/devices/MuseController/SpyMuseController.js'
-import AbstractDeviceControllerBleTest from '../../AbstractDeviceControllerBleTest.js'
+} from '../../../../impl/muse/MuseDeviceController.js'
+import SpyMuseController from '../../../../testDoubles/MuseController/SpyMuseController.js'
+import AbstractDeviceControllerBleTest from '../../../AbstractDeviceControllerBleTest.js'
 
 const EEG_UUID = '273E0013-4C4D-454D-96BE-F03BAC821358'
 const OTHER_UUID = '273E0014-4C4D-454D-96BE-F03BAC821358'

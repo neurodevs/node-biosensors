@@ -1,5 +1,5 @@
 import { BleController } from '@neurodevs/node-lsl'
-import ZephyrDeviceController from '../../../impl/devices/ZephyrDeviceController.js'
+import ZephyrDeviceController from '../../impl/zephyr/ZephyrDeviceController.js'
 import { XdfRecorder } from '@neurodevs/node-xdf'
 
 export default class SpyZephyrController extends ZephyrDeviceController {

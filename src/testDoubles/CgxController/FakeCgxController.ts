@@ -1,9 +1,9 @@
 import { FakeStreamOutlet, StreamOutlet } from '@neurodevs/node-lsl'
 
-import { DeviceController } from '../../../impl/BiosensorDeviceFactory.js'
+import { DeviceController } from '../../impl/BiosensorDeviceFactory.js'
 import CgxDeviceController, {
     CgxControllerConstructorOptions,
-} from '../../../impl/devices/CgxDeviceController.js'
+} from '../../impl/cognionics/CgxDeviceController.js'
 
 export default class FakeCgxController implements DeviceController {
     public static callsToConstructor: (CallToCgxConstructor | undefined)[] = []

@@ -7,8 +7,8 @@ import MuseDeviceController, {
     CONTROL_UUID,
     MuseControllerOptions,
     MuseDeviceModel,
-} from '../impl/devices/MuseDeviceController.js'
-import SpyMuseController from '../testDoubles/devices/MuseController/SpyMuseController.js'
+} from '../impl/muse/MuseDeviceController.js'
+import SpyMuseController from '../testDoubles/MuseController/SpyMuseController.js'
 import AbstractDeviceControllerBleTest from './AbstractDeviceControllerBleTest.js'
 
 // For "Muse 2" and "Muse S Gen 2" models

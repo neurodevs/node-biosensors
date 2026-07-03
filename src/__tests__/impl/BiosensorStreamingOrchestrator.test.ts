@@ -10,7 +10,7 @@ import BiosensorStreamingOrchestrator, {
     StreamingOrchestratorConstructorOptions,
 } from '../../impl/BiosensorStreamingOrchestrator.js'
 import FakeDeviceFactory from '../../testDoubles/DeviceFactory/FakeDeviceFactory.js'
-import FakeDeviceController from '../../testDoubles/devices/FakeDeviceController.js'
+import FakeDeviceController from '../../testDoubles/DeviceController/FakeDeviceController.js'
 import FakeWebSocketGateway from '../../testDoubles/WebSocketGateway/FakeWebSocketGateway.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 
