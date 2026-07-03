@@ -16,53 +16,22 @@ const muse = await MuseDeviceController.Create('Muse S Gen 2', {
     disableGyro: false,
 })
 
+console.info('Connecting...')
 await muse.connect()
+
+console.info('Starting streaming...')
 await muse.startStreaming()
 
-const muse2 = await MuseDeviceController.Create('Muse S Athena', {
-    bleUuid: 'F57439F1-3287-71B4-2251-F15797949214',
-    rssiIntervalMs: undefined,
-    xdfRecordPath,
-    txtRecordPath: undefined,
-    enableLogs: false,
-    disableEeg: false,
-    disablePpg: false,
-    disableAccel: false,
-    disableGyro: false,
-})
-
-await muse2.connect()
-await muse2.startStreaming()
-
-const muse3 = await MuseDeviceController.Create('Muse 2', {
-    bleUuid: 'F868B42C-FA67-F9CA-BC95-76269D21C38F',
-    rssiIntervalMs: undefined,
-    xdfRecordPath,
-    txtRecordPath: undefined,
-    enableLogs: false,
-    disableEeg: false,
-    disablePpg: false,
-    disableAccel: false,
-    disableGyro: false,
-})
-
-await muse3.connect()
-await muse3.startStreaming()
-
 console.info('Streaming for 10 seconds...')
-
 await new Promise((resolve) => setTimeout(resolve, 10000))
 
-console.info('Disconnect 1')
+console.info('Disconnecting...')
 await muse.disconnect()
-console.info('Disconnect 2')
-await muse2.disconnect()
-console.info('Disconnect 3')
-await muse3.disconnect()
-console.info('Disconnected all')
 
+console.info('Waiting for 5 seconds...')
 await new Promise((resolve) => setTimeout(resolve, 5000))
 
+console.info('Running timestamp jitter grapher...')
 const grapher = await TimestampJitterGrapher.Create(
     xdfRecordPath,
     './artifacts',
@@ -75,4 +44,4 @@ const grapher = await TimestampJitterGrapher.Create(
 )
 await grapher.run()
 
-console.log('Done!')
+console.info('Done!\n')
