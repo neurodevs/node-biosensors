@@ -113,7 +113,7 @@ export default abstract class Muse2FamilyTest extends AbstractDeviceControllerBl
     }
 
     protected static async assertPushesEegSamplesToOutlet() {
-        const { timestampSec, charValues } = this.simulateEegOnData()
+        const { charValues } = this.simulateEegOnData()
 
         const expected = Array.from(
             { length: this.eegChunkSize },
@@ -121,7 +121,7 @@ export default abstract class Muse2FamilyTest extends AbstractDeviceControllerBl
                 sample: charValues.map(
                     (values) => 0.48828125 * (values[sampleIdx] - 2048)
                 ),
-                timestampSec: timestampSec + sampleIdx / this.eegSampleRateHz,
+                timestampSec: this.fakeClockRegressorValue,
             })
         )
 
@@ -186,13 +186,13 @@ export default abstract class Muse2FamilyTest extends AbstractDeviceControllerBl
     }
 
     protected static async assertPushesPpgSamplesToOutlet() {
-        const { timestampSec, charValues } = this.simulatePpgOnData()
+        const { charValues } = this.simulatePpgOnData()
 
         const expected = Array.from(
             { length: this.ppgChunkSize },
             (_, sampleIdx) => ({
                 sample: charValues.map((values) => values[sampleIdx]),
-                timestampSec: timestampSec + sampleIdx / this.ppgSampleRateHz,
+                timestampSec: this.fakeClockRegressorValue,
             })
         )
 
@@ -238,14 +238,11 @@ export default abstract class Muse2FamilyTest extends AbstractDeviceControllerBl
     protected static async assertPushesGyroSamplesToOutlet() {
         const samples = this.generateImuSamples()
 
-        const { timestampSec } = this.simulateImuOnDataWithSamples(
-            'GYROSCOPE',
-            samples
-        )
+        this.simulateImuOnDataWithSamples('GYROSCOPE', samples)
 
-        const expected = samples.map((sample, i) => ({
+        const expected = samples.map((sample) => ({
             sample: sample.map((v) => 0.0074768 * v),
-            timestampSec: timestampSec + i / this.imuSampleRateHz,
+            timestampSec: this.fakeClockRegressorValue,
         }))
 
         assert.isEqualDeep(
@@ -338,14 +335,11 @@ export default abstract class Muse2FamilyTest extends AbstractDeviceControllerBl
     protected static async assertPushesAccelSamplesToOutlet() {
         const samples = this.generateImuSamples()
 
-        const { timestampSec } = this.simulateImuOnDataWithSamples(
-            'ACCELEROMETER',
-            samples
-        )
+        this.simulateImuOnDataWithSamples('ACCELEROMETER', samples)
 
-        const expected = samples.map((sample, i) => ({
+        const expected = samples.map((sample) => ({
             sample: sample.map((v) => 0.0000610352 * v),
-            timestampSec: timestampSec + i / this.imuSampleRateHz,
+            timestampSec: this.fakeClockRegressorValue,
         }))
 
         assert.isEqualDeep(
@@ -570,6 +564,52 @@ export default abstract class Muse2FamilyTest extends AbstractDeviceControllerBl
         this.assertConstructsClockRegressorWith(this.imuSampleRateHz)
     }
 
+    protected static async assertCallsDeriveTimestampsOnEegRegressor() {
+        const { timestampSec, packetCounter } = this.simulateEegOnData()
+
+        this.assertDerivesTimestampsWith(
+            (packetCounter * this.eegChunkSize) / this.eegSampleRateHz,
+            timestampSec,
+            this.eegChunkSize
+        )
+    }
+
+    protected static async assertCallsDeriveTimestampsOnPpgRegressor() {
+        const { timestampSec, packetCounter } = this.simulatePpgOnData()
+
+        this.assertDerivesTimestampsWith(
+            (packetCounter * this.ppgChunkSize) / this.ppgSampleRateHz,
+            timestampSec,
+            this.ppgChunkSize
+        )
+    }
+
+    protected static async assertCallsDeriveTimestampsOnAccelRegressor() {
+        const samples = this.generateImuSamples()
+
+        const { timestampSec, packetCounter } =
+            this.simulateImuOnDataWithSamples('ACCELEROMETER', samples)
+
+        this.assertDerivesTimestampsWith(
+            (packetCounter * this.imuChunkSize) / this.imuSampleRateHz,
+            timestampSec,
+            this.imuChunkSize
+        )
+    }
+
+    protected static async assertCallsDeriveTimestampsOnGyroRegressor() {
+        const samples = this.generateImuSamples()
+
+        const { timestampSec, packetCounter } =
+            this.simulateImuOnDataWithSamples('GYROSCOPE', samples)
+
+        this.assertDerivesTimestampsWith(
+            (packetCounter * this.imuChunkSize) / this.imuSampleRateHz,
+            timestampSec,
+            this.imuChunkSize
+        )
+    }
+
     protected static async assertDisableEegIgnoresAllEegData() {
         await this.MuseDeviceController({
             enableLogs: true,
@@ -737,9 +777,10 @@ export default abstract class Muse2FamilyTest extends AbstractDeviceControllerBl
             this.generateEegCharValues()
         )
 
-        const timestampSec = this.simulateEegOnDataWithValues(charValues)
+        const { timestampSec, packetCounter } =
+            this.simulateEegOnDataWithValues(charValues)
 
-        return { timestampSec, charValues }
+        return { timestampSec, charValues, packetCounter }
     }
 
     protected static simulateEegOnDataWithValues(charValues: number[][]) {
@@ -747,6 +788,7 @@ export default abstract class Muse2FamilyTest extends AbstractDeviceControllerBl
         const { charCallbacks } = calls[calls.length - 1]!
 
         const timestampSec = randomInt(1, 100)
+        let packetCounter = 0
 
         this.eegCharNames.forEach((charName, charIdx) => {
             const { onData } = charCallbacks!.find(
@@ -756,10 +798,18 @@ export default abstract class Muse2FamilyTest extends AbstractDeviceControllerBl
             const fakeBytes = this.generateEegBytes(charValues[charIdx])
             const fakeBuffer = Buffer.from(fakeBytes)
 
+            if (charIdx === 0) {
+                packetCounter = this.readUInt16BE(fakeBytes, 0)
+            }
+
             onData(fakeBuffer, fakeBytes.length, timestampSec)
         })
 
-        return timestampSec
+        return { timestampSec, packetCounter }
+    }
+
+    protected static readUInt16BE(bytes: number[], offset: number) {
+        return (bytes[offset]! << 8) | bytes[offset + 1]!
     }
 
     protected static generateEegCharValues() {
@@ -788,6 +838,7 @@ export default abstract class Muse2FamilyTest extends AbstractDeviceControllerBl
         const { charCallbacks } = calls[calls.length - 1]!
 
         const timestampSec = randomInt(1, 100)
+        let packetCounter = 0
 
         const charValues = this.ppgCharNames.map(() =>
             this.generatePpgCharValues()
@@ -801,10 +852,14 @@ export default abstract class Muse2FamilyTest extends AbstractDeviceControllerBl
             const fakeBytes = this.generatePpgBytes(charValues[charIdx]!)
             const fakeBuffer = Buffer.from(fakeBytes)
 
+            if (charIdx === 0) {
+                packetCounter = this.readUInt16BE(fakeBytes, 0)
+            }
+
             onData(fakeBuffer, fakeBytes.length, timestampSec)
         })
 
-        return { timestampSec, charValues }
+        return { timestampSec, charValues, packetCounter }
     }
 
     protected static generatePpgCharValues() {
@@ -861,10 +916,11 @@ export default abstract class Muse2FamilyTest extends AbstractDeviceControllerBl
         const timestampSec = randomInt(1, 100)
         const fakeBytes = this.generateImuBytes(samples)
         const fakeBuffer = Buffer.from(fakeBytes)
+        const packetCounter = this.readUInt16BE(fakeBytes, 0)
 
         onData(fakeBuffer, fakeBytes.length, timestampSec)
 
-        return { timestampSec, fakeBytes }
+        return { timestampSec, fakeBytes, packetCounter }
     }
 
     protected static generateImuSamples(): [number, number, number][] {

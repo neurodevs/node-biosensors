@@ -186,17 +186,68 @@ export default class MuseSAthenaTest extends AbstractDeviceControllerBleTest {
     }
 
     @test()
+    protected static async onDataCallsEegClockRegressorDeriveTimestamps() {
+        const samples = [
+            [100, 200, 300, 400, 500, 600, 700, 800],
+            [150, 250, 350, 450, 550, 650, 750, 850],
+        ]
+        const pktTimeRaw = randomInt(1, 1_000_000)
+
+        const ts = this.simulateData('EEG', this.eegPacket(samples, pktTimeRaw))
+
+        this.assertDerivesTimestampsWith(
+            pktTimeRaw / EEG_HZ,
+            ts,
+            samples.length
+        )
+    }
+
+    @test()
+    protected static async onDataCallsImuClockRegressorDeriveTimestamps() {
+        const samples = [
+            [10, 20, 30, 40, 50, 60],
+            [11, 21, 31, 41, 51, 61],
+            [12, 22, 32, 42, 52, 62],
+        ]
+        const pktTimeRaw = randomInt(1, 1_000_000)
+
+        const ts = this.simulateData(
+            'OTHER',
+            this.imuPacket(samples, pktTimeRaw)
+        )
+
+        this.assertDerivesTimestampsWith(
+            pktTimeRaw / IMU_HZ,
+            ts,
+            samples.length
+        )
+    }
+
+    @test()
+    protected static async onDataCallsOpticsClockRegressorDeriveTimestamps() {
+        const sample = Array.from({ length: 16 }, (_, i) => 1000 + i * 1000)
+        const pktTimeRaw = randomInt(1, 1_000_000)
+
+        const ts = this.simulateData(
+            'OTHER',
+            this.opticsPacket([sample], pktTimeRaw)
+        )
+
+        this.assertDerivesTimestampsWith(pktTimeRaw / OPTICS_HZ, ts, 1)
+    }
+
+    @test()
     protected static async decodesEegPacketAndPushesScaledSamples() {
         const samples = [
             [100, 200, 300, 400, 500, 600, 700, 800],
             [150, 250, 350, 450, 550, 650, 750, 850],
         ]
 
-        const ts = this.simulateData('EEG', this.eegPacket(samples))
+        this.simulateData('EEG', this.eegPacket(samples))
 
-        const expected = samples.map((sample, i) => ({
+        const expected = samples.map((sample) => ({
             sample: sample.map((v) => EEG_SCALE * v),
-            timestampSec: ts + i / EEG_HZ,
+            timestampSec: this.fakeClockRegressorValue,
         }))
 
         assert.isEqualDeep(
@@ -214,9 +265,9 @@ export default class MuseSAthenaTest extends AbstractDeviceControllerBleTest {
             [12, 22, 32, 42, 52, 62],
         ]
 
-        const ts = this.simulateData('OTHER', this.imuPacket(samples))
+        this.simulateData('OTHER', this.imuPacket(samples))
 
-        const expected = samples.map((sample, i) => ({
+        const expected = samples.map((sample) => ({
             sample: [
                 ACC_SCALE * sample[0],
                 ACC_SCALE * sample[1],
@@ -225,7 +276,7 @@ export default class MuseSAthenaTest extends AbstractDeviceControllerBleTest {
                 GYRO_SCALE * sample[4],
                 GYRO_SCALE * sample[5],
             ],
-            timestampSec: ts + i / IMU_HZ,
+            timestampSec: this.fakeClockRegressorValue,
         }))
 
         assert.isEqualDeep(
@@ -239,14 +290,14 @@ export default class MuseSAthenaTest extends AbstractDeviceControllerBleTest {
     protected static async decodesOpticsWith20BitScale() {
         const sample = Array.from({ length: 16 }, (_, i) => 1000 + i * 1000)
 
-        const ts = this.simulateData('OTHER', this.opticsPacket([sample]))
+        this.simulateData('OTHER', this.opticsPacket([sample]))
 
         assert.isEqualDeep(
             FakeStreamOutlet.callsToPushSample,
             [
                 {
                     sample: sample.map((v) => OPTICS_SCALE * v),
-                    timestampSec: ts,
+                    timestampSec: this.fakeClockRegressorValue,
                 },
             ],
             'Should decode 20-bit optics into scaled samples!'
@@ -266,12 +317,18 @@ export default class MuseSAthenaTest extends AbstractDeviceControllerBleTest {
             [15, 25, 35, 45, 55, 65],
         ]
 
-        const message = [...this.imuPacket(first), ...this.imuPacket(second)]
+        const firstPktTimeRaw = randomInt(1, 1_000_000)
+        const secondPktTimeRaw = randomInt(1, 1_000_000)
+
+        const message = [
+            ...this.imuPacket(first, firstPktTimeRaw),
+            ...this.imuPacket(second, secondPktTimeRaw),
+        ]
 
         const ts = this.simulateData('OTHER', message)
 
         const allSamples = [...first, ...second]
-        const expected = allSamples.map((sample, i) => ({
+        const expected = allSamples.map((sample) => ({
             sample: [
                 ACC_SCALE * sample[0],
                 ACC_SCALE * sample[1],
@@ -280,13 +337,19 @@ export default class MuseSAthenaTest extends AbstractDeviceControllerBleTest {
                 GYRO_SCALE * sample[4],
                 GYRO_SCALE * sample[5],
             ],
-            timestampSec: ts + i / IMU_HZ,
+            timestampSec: this.fakeClockRegressorValue,
         }))
 
         assert.isEqualDeep(
             FakeStreamOutlet.callsToPushSample,
             expected,
             'Should decode every packet in a multi-packet message!'
+        )
+
+        this.assertDerivesTimestampsWith(
+            firstPktTimeRaw / IMU_HZ,
+            ts,
+            allSamples.length
         )
     }
 
@@ -355,28 +418,33 @@ export default class MuseSAthenaTest extends AbstractDeviceControllerBleTest {
         return timestampSec
     }
 
-    private static eegPacket(samples: number[][]) {
-        return this.packet(TAG_EEG8, this.pack(samples.flat(), 14))
+    private static eegPacket(samples: number[][], pktTimeRaw = 0) {
+        return this.packet(TAG_EEG8, this.pack(samples.flat(), 14), pktTimeRaw)
     }
 
-    private static opticsPacket(samples: number[][]) {
-        return this.packet(TAG_OPTICS16, this.pack(samples.flat(), 20))
+    private static opticsPacket(samples: number[][], pktTimeRaw = 0) {
+        return this.packet(
+            TAG_OPTICS16,
+            this.pack(samples.flat(), 20),
+            pktTimeRaw
+        )
     }
 
-    private static imuPacket(samples: number[][]) {
-        return this.packet(TAG_ACCGYRO, this.packInt16LE(samples.flat()))
+    private static imuPacket(samples: number[][], pktTimeRaw = 0) {
+        return this.packet(
+            TAG_ACCGYRO,
+            this.packInt16LE(samples.flat()),
+            pktTimeRaw
+        )
     }
 
-    private static packet(pktId: number, data: number[]) {
+    private static packet(pktId: number, data: number[], pktTimeRaw = 0) {
         const pktLen = PACKET_HEADER_SIZE + data.length
 
         const header = [
             pktLen,
             0, // pkt_index
-            0,
-            0,
-            0,
-            0, // pkt_time_raw (uint32 LE)
+            ...this.packUInt32LE(pktTimeRaw), // pkt_time_raw (uint32 LE)
             0,
             0,
             0, // unknown1
@@ -388,6 +456,15 @@ export default class MuseSAthenaTest extends AbstractDeviceControllerBleTest {
         ]
 
         return [...header, ...data]
+    }
+
+    private static packUInt32LE(value: number) {
+        return [
+            value & 0xff,
+            (value >>> 8) & 0xff,
+            (value >>> 16) & 0xff,
+            (value >>> 24) & 0xff,
+        ]
     }
 
     private static pack(values: number[], bitWidth: number) {

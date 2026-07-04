@@ -3,6 +3,7 @@ import fs, { WriteStream } from 'node:fs'
 import koffi from 'koffi'
 import {
     CharacteristicCallbacks,
+    ClockRegressor,
     LslStreamOutlet,
     StreamOutlet,
     WindowedClockRegressor,
@@ -98,18 +99,22 @@ export default class MuseSGen2 implements MuseVariant {
             ? await this.AccelOutlet(identifier)
             : undefined
 
+        const eegRegressor = this.WindowedClockRegressor(this.eegSampleRateHz)
+        const ppgRegressor = this.WindowedClockRegressor(this.ppgSampleRateHz)
+        const gyroRegressor = this.WindowedClockRegressor(this.imuSampleRateHz)
+        const accelRegressor = this.WindowedClockRegressor(this.imuSampleRateHz)
+
         const charCallbacks = this.generateCharCallbacks(
             options,
             eegOutlet,
             ppgOutlet,
             gyroOutlet,
-            accelOutlet
+            accelOutlet,
+            eegRegressor,
+            ppgRegressor,
+            gyroRegressor,
+            accelRegressor
         )
-
-        WindowedClockRegressor.Create(this.eegSampleRateHz)
-        WindowedClockRegressor.Create(this.ppgSampleRateHz)
-        WindowedClockRegressor.Create(this.imuSampleRateHz)
-        WindowedClockRegressor.Create(this.imuSampleRateHz)
 
         return new this(charCallbacks)
     }
@@ -119,7 +124,11 @@ export default class MuseSGen2 implements MuseVariant {
         eegOutlet?: StreamOutlet,
         ppgOutlet?: StreamOutlet,
         gyroOutlet?: StreamOutlet,
-        accelOutlet?: StreamOutlet
+        accelOutlet?: StreamOutlet,
+        eegRegressor?: ClockRegressor,
+        ppgRegressor?: ClockRegressor,
+        gyroRegressor?: ClockRegressor,
+        accelRegressor?: ClockRegressor
     ) {
         const {
             enableLogs,
@@ -145,10 +154,30 @@ export default class MuseSGen2 implements MuseVariant {
             ...(disableAccel ? ['ACCELEROMETER'] : []),
         ])
 
-        const handleEeg = this.createEegHandler(log, stream, eegOutlet)
-        const handlePpg = this.createPpgHandler(log, stream, ppgOutlet)
-        const handleGyro = this.createGyroHandler(log, stream, gyroOutlet)
-        const handleAccel = this.createAccelHandler(log, stream, accelOutlet)
+        const handleEeg = this.createEegHandler(
+            log,
+            stream,
+            eegOutlet,
+            eegRegressor
+        )
+        const handlePpg = this.createPpgHandler(
+            log,
+            stream,
+            ppgOutlet,
+            ppgRegressor
+        )
+        const handleGyro = this.createGyroHandler(
+            log,
+            stream,
+            gyroOutlet,
+            gyroRegressor
+        )
+        const handleAccel = this.createAccelHandler(
+            log,
+            stream,
+            accelOutlet,
+            accelRegressor
+        )
 
         const handleData = (
             charName: string,
@@ -195,26 +224,37 @@ export default class MuseSGen2 implements MuseVariant {
     private static createEegHandler(
         log?: (...data: any[]) => void,
         stream?: WriteStream,
-        eegOutlet?: StreamOutlet
+        outlet?: StreamOutlet,
+        regressor?: ClockRegressor
     ) {
         const charChunks: number[][] = []
         let t0 = 0
+        let packetCounter = 0
 
         return (charName: string, bytes: number[], timestampSec: number) => {
             const charIdx = this.eegCharNames.indexOf(charName)
 
             if (charIdx === 0) {
                 t0 = timestampSec
+                packetCounter = this.readUInt16BE(bytes, 0)
             }
 
             charChunks[charIdx] = this.decodeEegCharChunk(bytes.slice(2))
 
             if (charIdx === this.eegCharNames.length - 1) {
+                const pushTimestamps = this.derivePushTimestamps(
+                    regressor,
+                    (packetCounter * this.eegChunkSize) / this.eegSampleRateHz,
+                    t0,
+                    this.eegChunkSize,
+                    this.eegSampleRateHz
+                )
+
                 for (let i = 0; i < this.eegChunkSize; i++) {
                     const sample = charChunks.map((c) => c[i])
 
                     const ts = t0 + i / this.eegSampleRateHz
-                    eegOutlet?.pushSample(sample, ts)
+                    outlet?.pushSample(sample, pushTimestamps[i]!)
 
                     const msg = `${'EEG'.padEnd(13)} | ${ts.toFixed(5).padEnd(15)} | ${JSON.stringify(sample)}`
                     stream?.write(`${msg}\n`)
@@ -222,6 +262,31 @@ export default class MuseSGen2 implements MuseVariant {
                 }
             }
         }
+    }
+
+    private static readUInt16BE(bytes: number[], offset: number) {
+        return (bytes[offset]! << 8) | bytes[offset + 1]!
+    }
+
+    private static derivePushTimestamps(
+        regressor: ClockRegressor | undefined,
+        deviceTime: number,
+        earliestLslTime: number,
+        chunkSize: number,
+        sampleRateHz: number
+    ) {
+        if (!regressor) {
+            return Array.from(
+                { length: chunkSize },
+                (_, i) => earliestLslTime + i / sampleRateHz
+            )
+        }
+
+        return regressor.deriveTimestamps(
+            deviceTime,
+            earliestLslTime,
+            chunkSize
+        )
     }
 
     private static decodeEegCharChunk(bytes: number[]) {
@@ -244,26 +309,37 @@ export default class MuseSGen2 implements MuseVariant {
     private static createPpgHandler(
         log?: (...data: any[]) => void,
         stream?: WriteStream,
-        ppgOutlet?: StreamOutlet
+        outlet?: StreamOutlet,
+        regressor?: ClockRegressor
     ) {
         const charChunks: number[][] = []
         let t0 = 0
+        let packetCounter = 0
 
         return (charName: string, bytes: number[], timestampSec: number) => {
             const charIdx = this.ppgCharNames.indexOf(charName)
 
             if (charIdx === 0) {
                 t0 = timestampSec
+                packetCounter = this.readUInt16BE(bytes, 0)
             }
 
             charChunks[charIdx] = this.decodePpgCharChunk(bytes.slice(2))
 
             if (charIdx === this.ppgCharNames.length - 1) {
+                const pushTimestamps = this.derivePushTimestamps(
+                    regressor,
+                    (packetCounter * this.ppgChunkSize) / this.ppgSampleRateHz,
+                    t0,
+                    this.ppgChunkSize,
+                    this.ppgSampleRateHz
+                )
+
                 for (let i = 0; i < this.ppgChunkSize; i++) {
                     const sample = charChunks.map((c) => c[i])
 
                     const ts = t0 + i / this.ppgSampleRateHz
-                    ppgOutlet?.pushSample(sample, ts)
+                    outlet?.pushSample(sample, pushTimestamps[i]!)
 
                     const msg = `${'PPG'.padEnd(13)} | ${ts.toFixed(5).padEnd(15)} | ${JSON.stringify(sample)}`
                     stream?.write(`${msg}\n`)
@@ -288,28 +364,32 @@ export default class MuseSGen2 implements MuseVariant {
     private static createAccelHandler(
         log?: (...data: any[]) => void,
         stream?: fs.WriteStream,
-        accelOutlet?: StreamOutlet
+        outlet?: StreamOutlet,
+        regressor?: ClockRegressor
     ) {
         return this.createImuHandler(
             'ACCELEROMETER',
             0.0000610352,
             log,
             stream,
-            accelOutlet
+            outlet,
+            regressor
         )
     }
 
     private static createGyroHandler(
         log?: (...data: any[]) => void,
         stream?: fs.WriteStream,
-        gyroOutlet?: StreamOutlet
+        outlet?: StreamOutlet,
+        regressor?: ClockRegressor
     ) {
         return this.createImuHandler(
             'GYROSCOPE',
             0.0074768,
             log,
             stream,
-            gyroOutlet
+            outlet,
+            regressor
         )
     }
 
@@ -318,14 +398,24 @@ export default class MuseSGen2 implements MuseVariant {
         scale: number,
         log?: (...data: any[]) => void,
         stream?: WriteStream,
-        outlet?: StreamOutlet
+        outlet?: StreamOutlet,
+        regressor?: ClockRegressor
     ) {
         return (bytes: number[], timestampSec: number) => {
             const samples = this.decodeImuPacket(bytes, scale)
+            const packetCounter = this.readUInt16BE(bytes, 0)
+
+            const pushTimestamps = this.derivePushTimestamps(
+                regressor,
+                (packetCounter * this.imuChunkSize) / this.imuSampleRateHz,
+                timestampSec,
+                this.imuChunkSize,
+                this.imuSampleRateHz
+            )
 
             samples.forEach((sample, i) => {
                 const ts = timestampSec + i / this.imuSampleRateHz
-                outlet?.pushSample(sample, ts)
+                outlet?.pushSample(sample, pushTimestamps[i]!)
 
                 const msg = `${name.padEnd(13)} | ${ts.toFixed(5).padEnd(15)} | ${JSON.stringify(sample)}`
                 stream?.write(`${msg}\n`)
@@ -406,5 +496,9 @@ export default class MuseSGen2 implements MuseVariant {
             units: 'g',
             chunkSize: 1,
         })
+    }
+
+    private static WindowedClockRegressor(nominalHz: number) {
+        return WindowedClockRegressor.Create(nominalHz)
     }
 }

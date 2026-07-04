@@ -167,6 +167,26 @@ export default class MuseSGen2Test extends Muse2FamilyTest {
     }
 
     @test()
+    protected static async onDataCallsEegClockRegressorDeriveTimestamps() {
+        await this.assertCallsDeriveTimestampsOnEegRegressor()
+    }
+
+    @test()
+    protected static async onDataCallsPpgClockRegressorDeriveTimestamps() {
+        await this.assertCallsDeriveTimestampsOnPpgRegressor()
+    }
+
+    @test()
+    protected static async onDataCallsGyroClockRegressorDeriveTimestamps() {
+        await this.assertCallsDeriveTimestampsOnGyroRegressor()
+    }
+
+    @test()
+    protected static async onDataCallsAccelClockRegressorDeriveTimestamps() {
+        await this.assertCallsDeriveTimestampsOnAccelRegressor()
+    }
+
+    @test()
     protected static async disableEegIgnoresAllEegData() {
         await this.assertDisableEegIgnoresAllEegData()
     }

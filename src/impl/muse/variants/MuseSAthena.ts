@@ -3,6 +3,7 @@ import { WriteStream } from 'node:fs'
 import koffi from 'koffi'
 import {
     CharacteristicCallbacks,
+    ClockRegressor,
     LslStreamOutlet,
     StreamOutlet,
     WindowedClockRegressor,
@@ -138,10 +139,6 @@ export default class MuseSAthena implements MuseVariant {
 
         const charCallbacks = this.generateCharCallbacks(options, outlets)
 
-        WindowedClockRegressor.Create(SAMPLES_RATES_HZ.EEG!)
-        WindowedClockRegressor.Create(SAMPLES_RATES_HZ.IMU!)
-        WindowedClockRegressor.Create(SAMPLES_RATES_HZ.OPTICS!)
-
         return new this(charCallbacks)
     }
 
@@ -159,7 +156,18 @@ export default class MuseSAthena implements MuseVariant {
               })
             : undefined
 
-        const handleMessage = this.createMessageHandler(log, stream, outlets)
+        const regressors = {
+            EEG: WindowedClockRegressor.Create(SAMPLES_RATES_HZ.EEG),
+            IMU: WindowedClockRegressor.Create(SAMPLES_RATES_HZ.IMU),
+            OPTICS: WindowedClockRegressor.Create(SAMPLES_RATES_HZ.OPTICS),
+        }
+
+        const handleMessage = this.createMessageHandler(
+            log,
+            stream,
+            outlets,
+            regressors
+        )
 
         const decodeBytes = (data: Buffer, length: number) =>
             Array.from<number>(koffi.decode(data, 'uint8', length))
@@ -179,7 +187,8 @@ export default class MuseSAthena implements MuseVariant {
     private static createMessageHandler(
         log: ((...data: any[]) => void) | undefined,
         stream: WriteStream | undefined,
-        outlets: AthenaOutlets
+        outlets: AthenaOutlets,
+        regressors: AthenaClockRegressors
     ) {
         return (bytes: number[], timestampSec: number) => {
             const samplesByType: Record<string, number[][]> = {
@@ -187,26 +196,39 @@ export default class MuseSAthena implements MuseVariant {
                 IMU: [],
                 OPTICS: [],
             }
+            const deviceTimeByType: Record<string, number | undefined> = {
+                EEG: undefined,
+                IMU: undefined,
+                OPTICS: undefined,
+            }
 
             for (const packet of this.parsePackets(bytes)) {
                 for (const subpacket of this.parseSubpackets(packet)) {
                     const decoded = this.decodeSubpacket(subpacket)
                     if (decoded) {
                         samplesByType[decoded.type]!.push(...decoded.samples)
+
+                        if (deviceTimeByType[decoded.type] === undefined) {
+                            deviceTimeByType[decoded.type] =
+                                packet.pktTimeRaw /
+                                SAMPLES_RATES_HZ[decoded.type]!
+                        }
                     }
                 }
             }
 
-            for (const [type, outlet] of [
-                ['EEG', outlets.EEG],
-                ['IMU', outlets.IMU],
-                ['OPTICS', outlets.OPTICS],
+            for (const [type, outlet, regressor] of [
+                ['EEG', outlets.EEG, regressors.EEG],
+                ['IMU', outlets.IMU, regressors.IMU],
+                ['OPTICS', outlets.OPTICS, regressors.OPTICS],
             ] as const) {
                 this.pushSamples(
                     type,
                     samplesByType[type]!,
+                    deviceTimeByType[type] ?? 0,
                     timestampSec,
                     outlet,
+                    regressor,
                     log,
                     stream
                 )
@@ -217,16 +239,30 @@ export default class MuseSAthena implements MuseVariant {
     private static pushSamples(
         type: string,
         samples: number[][],
-        t0: number,
-        outlet: StreamOutlet | undefined,
+        deviceTime: number,
+        earliestLslTime: number,
+        outlet?: StreamOutlet,
+        regressor?: ClockRegressor,
         log?: (...data: any[]) => void,
         stream?: WriteStream
     ) {
         const rate = SAMPLES_RATES_HZ[type]!
 
+        if (samples.length === 0) {
+            return
+        }
+
+        const pushTimestamps = regressor
+            ? regressor.deriveTimestamps(
+                  deviceTime,
+                  earliestLslTime,
+                  samples.length
+              )
+            : samples.map((_, i) => earliestLslTime + i / rate)
+
         samples.forEach((sample, i) => {
-            const ts = t0 + i / rate
-            outlet?.pushSample(sample, ts)
+            const ts = earliestLslTime + i / rate
+            outlet?.pushSample(sample, pushTimestamps[i])
 
             const msg = `${type.padEnd(13)} | ${ts.toFixed(5).padEnd(15)} | ${JSON.stringify(sample)}`
             stream?.write(`${msg}\n`)
@@ -235,7 +271,12 @@ export default class MuseSAthena implements MuseVariant {
     }
 
     private static parsePackets(payload: number[]) {
-        const packets: { tag: number; data: number[]; valid: boolean }[] = []
+        const packets: {
+            tag: number
+            data: number[]
+            valid: boolean
+            pktTimeRaw: number
+        }[] = []
         let offset = 0
 
         while (offset < payload.length) {
@@ -253,17 +294,33 @@ export default class MuseSAthena implements MuseVariant {
             }
 
             const tag = payload[offset + 9]!
+            const pktTimeRaw = this.readUInt32LE(payload, offset + 2)
             const data = payload.slice(
                 offset + PACKET_HEADER_SIZE,
                 offset + pktLen
             )
 
-            packets.push({ tag, data, valid: SENSORS[tag] !== undefined })
+            packets.push({
+                tag,
+                data,
+                valid: SENSORS[tag] !== undefined,
+                pktTimeRaw,
+            })
 
             offset += pktLen
         }
 
         return packets
+    }
+
+    private static readUInt32LE(bytes: number[], offset: number) {
+        return (
+            (bytes[offset]! |
+                (bytes[offset + 1]! << 8) |
+                (bytes[offset + 2]! << 16) |
+                (bytes[offset + 3]! << 24)) >>>
+            0
+        )
     }
 
     private static parseSubpackets(packet: {
@@ -479,6 +536,12 @@ interface AthenaOutlets {
     EEG?: StreamOutlet
     IMU?: StreamOutlet
     OPTICS?: StreamOutlet
+}
+
+interface AthenaClockRegressors {
+    EEG?: ClockRegressor
+    IMU?: ClockRegressor
+    OPTICS?: ClockRegressor
 }
 
 interface Subpacket {

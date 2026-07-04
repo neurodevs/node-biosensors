@@ -1,3 +1,6 @@
+import { randomInt } from 'node:crypto'
+
+import { Server } from 'ws'
 import { FakeLiblsl, LiblslAdapter } from '@neurodevs/ndx-native'
 import {
     LslStreamOutlet,
@@ -23,7 +26,6 @@ import {
     XdfFileLoader,
     FakeXdfLoader,
 } from '@neurodevs/node-xdf'
-import { Server } from 'ws'
 
 import BiosensorDeviceFactory, {
     DeviceControllerOptions,
@@ -44,6 +46,8 @@ import FakeMuseController from '../testDoubles/MuseController/FakeMuseController
 
 export default class AbstractPackageTest extends AbstractModuleTest {
     protected static fakeLiblsl: FakeLiblsl
+
+    protected static readonly fakeClockRegressorValue = randomInt(1, 10)
 
     private static readonly realSetTimeout = globalThis.setTimeout
 
@@ -80,6 +84,26 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         )
     }
 
+    protected static assertDerivesTimestampsWith(
+        deviceTime: number,
+        earliestLslTime: number,
+        chunkSize: number
+    ) {
+        const call = FakeClockRegressor.callsToDeriveTimestamps.find(
+            (call) => call.deviceTime === deviceTime
+        )
+
+        assert.isEqualDeep(
+            call,
+            {
+                deviceTime,
+                earliestLslTime,
+                chunkSize,
+            },
+            'Did not call deriveTimestamps as expected!'
+        )
+    }
+
     protected static setImmediateTimeouts() {
         globalThis.setTimeout = ((
             callback: (...args: unknown[]) => void,
@@ -112,6 +136,8 @@ export default class AbstractPackageTest extends AbstractModuleTest {
     protected static setFakeClockRegressor() {
         WindowedClockRegressor.Class = FakeClockRegressor
         FakeClockRegressor.resetTestDouble()
+
+        FakeClockRegressor.fakeResultValue = this.fakeClockRegressorValue
     }
 
     protected static setFakeDeviceFactory() {

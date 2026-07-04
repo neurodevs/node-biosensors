@@ -36,7 +36,7 @@ const grapher = await TimestampJitterGrapher.Create(
     xdfRecordPath,
     './artifacts',
     {
-        totalSecs: 1,
+        totalSecs: 3,
         ignoreInterpolatedTimestamps: false,
         showIdealIntervalMs: true,
         xAxisUnits: 'milliseconds',
