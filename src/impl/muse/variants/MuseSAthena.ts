@@ -5,6 +5,7 @@ import {
     CharacteristicCallbacks,
     LslStreamOutlet,
     StreamOutlet,
+    WindowedClockRegressor,
 } from '@neurodevs/node-lsl'
 
 import MuseDeviceController, {
@@ -136,6 +137,10 @@ export default class MuseSAthena implements MuseVariant {
         }
 
         const charCallbacks = this.generateCharCallbacks(options, outlets)
+
+        WindowedClockRegressor.Create(SAMPLES_RATES_HZ.EEG!)
+        WindowedClockRegressor.Create(SAMPLES_RATES_HZ.IMU!)
+        WindowedClockRegressor.Create(SAMPLES_RATES_HZ.OPTICS!)
 
         return new this(charCallbacks)
     }

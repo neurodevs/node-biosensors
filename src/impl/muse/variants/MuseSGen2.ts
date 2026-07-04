@@ -5,6 +5,7 @@ import {
     CharacteristicCallbacks,
     LslStreamOutlet,
     StreamOutlet,
+    WindowedClockRegressor,
 } from '@neurodevs/node-lsl'
 
 import MuseDeviceController, {
@@ -104,6 +105,11 @@ export default class MuseSGen2 implements MuseVariant {
             gyroOutlet,
             accelOutlet
         )
+
+        WindowedClockRegressor.Create(this.eegSampleRateHz)
+        WindowedClockRegressor.Create(this.ppgSampleRateHz)
+        WindowedClockRegressor.Create(this.imuSampleRateHz)
+        WindowedClockRegressor.Create(this.imuSampleRateHz)
 
         return new this(charCallbacks)
     }

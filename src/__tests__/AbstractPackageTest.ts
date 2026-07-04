@@ -13,8 +13,10 @@ import {
     FakeEventMarkerEmitter,
     BleDeviceController,
     FakeBleController,
+    WindowedClockRegressor,
+    FakeClockRegressor,
 } from '@neurodevs/node-lsl'
-import AbstractModuleTest from '@neurodevs/node-tdd'
+import AbstractModuleTest, { assert } from '@neurodevs/node-tdd'
 import {
     XdfStreamRecorder,
     FakeXdfRecorder,
@@ -60,12 +62,22 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         this.setFakeWebSocketBridge()
         this.setFakeXdfLoader()
         this.setFakeXdfRecorder()
+        this.setFakeClockRegressor()
     }
 
     protected static async afterEach() {
         globalThis.setTimeout = this.realSetTimeout
 
         await super.afterEach()
+    }
+
+    protected static assertConstructsClockRegressorWith(nominalHz: number) {
+        assert.isTrue(
+            FakeClockRegressor.callsToConstructor.some(
+                (call) => call.nominalHz === nominalHz
+            ),
+            `Should construct a WindowedClockRegressor with nominalHz ${nominalHz}!`
+        )
     }
 
     protected static setImmediateTimeouts() {
@@ -95,6 +107,11 @@ export default class AbstractPackageTest extends AbstractModuleTest {
     protected static setFakeCgxController() {
         CgxDeviceController.Class = FakeCgxController
         FakeCgxController.resetTestDouble()
+    }
+
+    protected static setFakeClockRegressor() {
+        WindowedClockRegressor.Class = FakeClockRegressor
+        FakeClockRegressor.resetTestDouble()
     }
 
     protected static setFakeDeviceFactory() {

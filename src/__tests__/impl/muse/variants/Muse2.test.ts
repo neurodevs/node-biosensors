@@ -146,6 +146,26 @@ export default class Muse2Test extends Muse2FamilyTest {
     }
 
     @test()
+    protected static async createsEegClockRegressor() {
+        await this.assertCreatesEegClockRegressor()
+    }
+
+    @test()
+    protected static async createsPpgClockRegressor() {
+        await this.assertCreatesPpgClockRegressor()
+    }
+
+    @test()
+    protected static async createsGyroClockRegressor() {
+        await this.assertCreatesGyroClockRegressor()
+    }
+
+    @test()
+    protected static async createsAccelClockRegressor() {
+        await this.assertCreatesAccelClockRegressor()
+    }
+
+    @test()
     protected static async disableEegIgnoresAllEegData() {
         await this.assertDisableEegIgnoresAllEegData()
     }

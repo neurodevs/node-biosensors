@@ -171,6 +171,21 @@ export default class MuseSAthenaTest extends AbstractDeviceControllerBleTest {
     }
 
     @test()
+    protected static async createsEegClockRegressor() {
+        this.assertConstructsClockRegressorWith(EEG_HZ)
+    }
+
+    @test()
+    protected static async createsImuClockRegressor() {
+        this.assertConstructsClockRegressorWith(IMU_HZ)
+    }
+
+    @test()
+    protected static async createsOpticsClockRegressor() {
+        this.assertConstructsClockRegressorWith(OPTICS_HZ)
+    }
+
+    @test()
     protected static async decodesEegPacketAndPushesScaledSamples() {
         const samples = [
             [100, 200, 300, 400, 500, 600, 700, 800],

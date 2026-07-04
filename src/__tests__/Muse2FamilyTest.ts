@@ -554,6 +554,22 @@ export default abstract class Muse2FamilyTest extends AbstractDeviceControllerBl
         )
     }
 
+    protected static async assertCreatesEegClockRegressor() {
+        this.assertConstructsClockRegressorWith(this.eegSampleRateHz)
+    }
+
+    protected static async assertCreatesPpgClockRegressor() {
+        this.assertConstructsClockRegressorWith(this.ppgSampleRateHz)
+    }
+
+    protected static async assertCreatesGyroClockRegressor() {
+        this.assertConstructsClockRegressorWith(this.imuSampleRateHz)
+    }
+
+    protected static async assertCreatesAccelClockRegressor() {
+        this.assertConstructsClockRegressorWith(this.imuSampleRateHz)
+    }
+
     protected static async assertDisableEegIgnoresAllEegData() {
         await this.MuseDeviceController({
             enableLogs: true,
