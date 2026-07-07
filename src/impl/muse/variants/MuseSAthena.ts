@@ -41,6 +41,8 @@ const SENSORS: Record<number, SensorConfig> = {
 const PACKET_HEADER_SIZE = 14
 const SUBPACKET_HEADER_SIZE = 5
 
+const DEVICE_CLOCK_HZ = 256000
+
 const EEG_SCALE = 1450 / 16383
 const OPTICS_SCALE = 1 / 32768
 const ACC_SCALE = 0.0000610352
@@ -190,13 +192,22 @@ export default class MuseSAthena implements MuseVariant {
         outlets: AthenaOutlets,
         regressors: AthenaClockRegressors
     ) {
+        const clocks: Record<
+            string,
+            (rawTick: number, nSamples: number) => number
+        > = {
+            EEG: this.createDeviceClock(SAMPLES_RATES_HZ.EEG!),
+            IMU: this.createDeviceClock(SAMPLES_RATES_HZ.IMU!),
+            OPTICS: this.createDeviceClock(SAMPLES_RATES_HZ.OPTICS!),
+        }
+
         return (bytes: number[], timestampSec: number) => {
             const samplesByType: Record<string, number[][]> = {
                 EEG: [],
                 IMU: [],
                 OPTICS: [],
             }
-            const deviceTimeByType: Record<string, number | undefined> = {
+            const rawTickByType: Record<string, number | undefined> = {
                 EEG: undefined,
                 IMU: undefined,
                 OPTICS: undefined,
@@ -208,10 +219,8 @@ export default class MuseSAthena implements MuseVariant {
                     if (decoded) {
                         samplesByType[decoded.type]!.push(...decoded.samples)
 
-                        if (deviceTimeByType[decoded.type] === undefined) {
-                            deviceTimeByType[decoded.type] =
-                                packet.pktTimeRaw /
-                                SAMPLES_RATES_HZ[decoded.type]!
+                        if (rawTickByType[decoded.type] === undefined) {
+                            rawTickByType[decoded.type] = packet.pktTimeRaw
                         }
                     }
                 }
@@ -222,10 +231,19 @@ export default class MuseSAthena implements MuseVariant {
                 ['IMU', outlets.IMU, regressors.IMU],
                 ['OPTICS', outlets.OPTICS, regressors.OPTICS],
             ] as const) {
+                const samples = samplesByType[type]!
+                const rawTick = rawTickByType[type]
+
+                if (samples.length === 0 || rawTick === undefined) {
+                    continue
+                }
+
+                const deviceTime = clocks[type]!(rawTick, samples.length)
+
                 this.pushSamples(
                     type,
-                    samplesByType[type]!,
-                    deviceTimeByType[type] ?? 0,
+                    samples,
+                    deviceTime,
                     timestampSec,
                     outlet,
                     regressor,
@@ -233,6 +251,51 @@ export default class MuseSAthena implements MuseVariant {
                     stream
                 )
             }
+        }
+    }
+
+    private static createDeviceClock(rate: number) {
+        let initialized = false
+        let baseTick = 0
+        let wrapOffset = 0
+        let lastAbsTick = 0
+        let sampleCounter = 0
+
+        return (rawTick: number, nSamples: number) => {
+            const clockMod = 2 ** 32
+
+            if (!initialized) {
+                initialized = true
+                baseTick = rawTick
+                lastAbsTick = rawTick
+            }
+
+            const prevRawTick = lastAbsTick % clockMod
+            let absTick: number
+
+            if (rawTick < prevRawTick) {
+                if (prevRawTick - rawTick > clockMod / 2) {
+                    wrapOffset += clockMod
+                    absTick = rawTick + wrapOffset
+                } else {
+                    absTick = lastAbsTick
+                }
+            } else {
+                absTick = Math.max(rawTick + wrapOffset, lastAbsTick)
+            }
+
+            lastAbsTick = absTick
+
+            const elapsedSeconds = (absTick - baseTick) / DEVICE_CLOCK_HZ
+
+            const sampleIndex = Math.max(
+                Math.round(elapsedSeconds * rate),
+                sampleCounter
+            )
+
+            sampleCounter = sampleIndex + nSamples
+
+            return (sampleIndex + nSamples - 1) / rate
         }
     }
 

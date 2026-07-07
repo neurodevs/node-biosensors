@@ -22,6 +22,8 @@ const EEG_HZ = 256
 const IMU_HZ = 52
 const OPTICS_HZ = 64
 
+const DEVICE_CLOCK_HZ = 256000
+
 const TAG_EEG4 = 0x11
 const TAG_EEG8 = 0x12
 const TAG_OPTICS16 = 0x36
@@ -191,36 +193,76 @@ export default class MuseSAthenaTest extends AbstractDeviceControllerBleTest {
             [100, 200, 300, 400, 500, 600, 700, 800],
             [150, 250, 350, 450, 550, 650, 750, 850],
         ]
-        const pktTimeRaw = randomInt(1, 1_000_000)
+        const baseTick = randomInt(1, 1_000_000)
 
-        const ts = this.simulateData('EEG', this.eegPacket(samples, pktTimeRaw))
+        this.simulateData('EEG', this.eegPacket(samples, baseTick))
+
+        const elapsedSamples = 256
+        const ticksPerSample = DEVICE_CLOCK_HZ / EEG_HZ
+        const secondTick = baseTick + elapsedSamples * ticksPerSample
+
+        const ts = this.simulateData('EEG', this.eegPacket(samples, secondTick))
 
         this.assertDerivesTimestampsWith(
-            pktTimeRaw / EEG_HZ,
+            (elapsedSamples + samples.length - 1) / EEG_HZ,
             ts,
             samples.length
         )
     }
 
     @test()
-    protected static async onDataCallsImuClockRegressorDeriveTimestamps() {
-        const samples = [
+    protected static async onDataDerivesMonotonicImuDeviceTimeDespiteDuplicateTick() {
+        const first = [
             [10, 20, 30, 40, 50, 60],
             [11, 21, 31, 41, 51, 61],
             [12, 22, 32, 42, 52, 62],
         ]
-        const pktTimeRaw = randomInt(1, 1_000_000)
+        const second = [
+            [13, 23, 33, 43, 53, 63],
+            [14, 24, 34, 44, 54, 64],
+            [15, 25, 35, 45, 55, 65],
+        ]
 
-        const ts = this.simulateData(
-            'OTHER',
-            this.imuPacket(samples, pktTimeRaw)
-        )
+        const tick = randomInt(1, 1_000_000)
+
+        this.simulateData('OTHER', this.imuPacket(first, tick))
+        const ts = this.simulateData('OTHER', this.imuPacket(second, tick))
 
         this.assertDerivesTimestampsWith(
-            pktTimeRaw / IMU_HZ,
+            (first.length + second.length - 1) / IMU_HZ,
             ts,
-            samples.length
+            second.length
         )
+    }
+
+    @test()
+    protected static async derivesUniformImuDeviceTimeAcrossVariableBatchSizes() {
+        const a = [
+            [10, 20, 30, 40, 50, 60],
+            [11, 21, 31, 41, 51, 61],
+            [12, 22, 32, 42, 52, 62],
+        ]
+        const b = [
+            [13, 23, 33, 43, 53, 63],
+            [14, 24, 34, 44, 54, 64],
+            [15, 25, 35, 45, 55, 65],
+        ]
+        const c = [
+            [16, 26, 36, 46, 56, 66],
+            [17, 27, 37, 47, 57, 67],
+            [18, 28, 38, 48, 58, 68],
+        ]
+
+        const tick = randomInt(1, 1_000_000)
+
+        const ts1 = this.simulateData('OTHER', this.imuPacket(a, tick))
+        const ts2 = this.simulateData('OTHER', [
+            ...this.imuPacket(b, tick),
+            ...this.imuPacket(c, tick),
+        ])
+
+        this.assertDerivesTimestampsWith(2 / IMU_HZ, ts1, 3)
+        this.assertDerivesTimestampsWith(8 / IMU_HZ, ts2, 6)
     }
 
     @test()
@@ -233,7 +275,7 @@ export default class MuseSAthenaTest extends AbstractDeviceControllerBleTest {
             this.opticsPacket([sample], pktTimeRaw)
         )
 
-        this.assertDerivesTimestampsWith(pktTimeRaw / OPTICS_HZ, ts, 1)
+        this.assertDerivesTimestampsWith(0, ts, 1)
     }
 
     @test()
@@ -347,7 +389,7 @@ export default class MuseSAthenaTest extends AbstractDeviceControllerBleTest {
         )
 
         this.assertDerivesTimestampsWith(
-            firstPktTimeRaw / IMU_HZ,
+            (allSamples.length - 1) / IMU_HZ,
             ts,
             allSamples.length
         )
@@ -355,8 +397,6 @@ export default class MuseSAthenaTest extends AbstractDeviceControllerBleTest {
 
     @test()
     protected static async ignoresPacketWithMismatchedChannelCount() {
-        // EEG4 (0x11) carries 4 channels, but our EEG outlet is 8 — pushing a
-        // 4-wide sample into an 8-wide outlet corrupts the XDF, so skip it.
         const samples = [
             [100, 200, 300, 400],
             [150, 250, 350, 450],
@@ -443,16 +483,16 @@ export default class MuseSAthenaTest extends AbstractDeviceControllerBleTest {
 
         const header = [
             pktLen,
-            0, // pkt_index
-            ...this.packUInt32LE(pktTimeRaw), // pkt_time_raw (uint32 LE)
+            0,
+            ...this.packUInt32LE(pktTimeRaw),
             0,
             0,
-            0, // unknown1
+            0,
             pktId,
             0,
             0,
-            0, // unknown2
-            0, // byte_13
+            0,
+            0,
         ]
 
         return [...header, ...data]
