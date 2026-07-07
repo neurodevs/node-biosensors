@@ -1,7 +1,7 @@
 import { TimestampJitterGrapher } from '@neurodevs/node-biosignal-processing'
+import { XdfStreamRecorder } from '@neurodevs/node-xdf'
 
 import MuseDeviceController from '../impl/muse/MuseDeviceController.js'
-import { XdfStreamRecorder } from '@neurodevs/node-xdf'
 
 const xdfRecordPath = './artifacts/muse_data.xdf'
 
