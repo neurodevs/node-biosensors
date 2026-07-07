@@ -246,8 +246,7 @@ export default class MuseSGen2 implements MuseVariant {
                     regressor,
                     (packetCounter * this.eegChunkSize) / this.eegSampleRateHz,
                     t0,
-                    this.eegChunkSize,
-                    this.eegSampleRateHz
+                    this.eegChunkSize
                 )
 
                 for (let i = 0; i < this.eegChunkSize; i++) {
@@ -272,20 +271,14 @@ export default class MuseSGen2 implements MuseVariant {
         regressor: ClockRegressor | undefined,
         deviceTime: number,
         earliestLslTime: number,
-        chunkSize: number,
-        sampleRateHz: number
+        chunkSize: number
     ) {
-        if (!regressor) {
-            return Array.from(
-                { length: chunkSize },
-                (_, i) => earliestLslTime + i / sampleRateHz
-            )
-        }
-
-        return regressor.deriveTimestamps(
-            deviceTime,
-            earliestLslTime,
-            chunkSize
+        return (
+            regressor?.deriveTimestamps(
+                deviceTime,
+                earliestLslTime,
+                chunkSize
+            ) ?? []
         )
     }
 
@@ -331,8 +324,7 @@ export default class MuseSGen2 implements MuseVariant {
                     regressor,
                     (packetCounter * this.ppgChunkSize) / this.ppgSampleRateHz,
                     t0,
-                    this.ppgChunkSize,
-                    this.ppgSampleRateHz
+                    this.ppgChunkSize
                 )
 
                 for (let i = 0; i < this.ppgChunkSize; i++) {
@@ -409,8 +401,7 @@ export default class MuseSGen2 implements MuseVariant {
                 regressor,
                 (packetCounter * this.imuChunkSize) / this.imuSampleRateHz,
                 timestampSec,
-                this.imuChunkSize,
-                this.imuSampleRateHz
+                this.imuChunkSize
             )
 
             samples.forEach((sample, i) => {
