@@ -17,6 +17,10 @@ export default class SpyMuseController extends MuseDeviceController {
         return this.deviceId
     }
 
+    public getVariant() {
+        return this.variant
+    }
+
     public getName() {
         return this.ble.name
     }

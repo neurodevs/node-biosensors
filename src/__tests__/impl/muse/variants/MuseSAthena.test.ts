@@ -545,7 +545,8 @@ export default class MuseSAthenaTest extends AbstractDeviceControllerBleTest {
     private static async MuseDeviceController(
         options?: Partial<MuseControllerOptions>
     ) {
-        return (await MuseDeviceController.Create('Muse S Athena', {
+        return (await MuseDeviceController.Create({
+            model: 'Muse S Athena',
             bleUuid: this.deviceUuid,
             xdfRecordPath: this.xdfRecordPath,
             rssiIntervalMs: this.rssiIntervalMs,

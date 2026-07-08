@@ -144,7 +144,10 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
     }
 
     private async MuseDeviceController(options?: MuseControllerOptions) {
-        const muse = await MuseDeviceController.Create('Muse S Gen 2', options)
+        const muse = await MuseDeviceController.Create({
+            ...options,
+            model: 'Muse S Gen 2',
+        })
         await muse.connect()
 
         return muse

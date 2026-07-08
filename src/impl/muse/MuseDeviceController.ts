@@ -1,5 +1,6 @@
 import fs from 'node:fs'
 
+import koffi from 'koffi'
 import {
     BleController,
     BleDeviceController,
@@ -18,6 +19,15 @@ import MuseSGen2 from './variants/MuseSGen2.js'
 
 export const CONTROL_UUID = '273E0001-4C4D-454D-96BE-F03BAC821358'
 
+export const MUSE_CODENAME_MODELS: {
+    pattern: string
+    model: MuseDeviceModel
+}[] = [
+    { pattern: 'Letto', model: 'Muse S Gen 2' },
+    { pattern: 'Athena', model: 'Muse S Athena' },
+    { pattern: 'Blackcomb', model: 'Muse 2' },
+]
+
 export default class MuseDeviceController
     extends AbstractDeviceControllerBle
     implements DeviceControllerBle
@@ -26,8 +36,11 @@ export default class MuseDeviceController
     public static createWriteStream = fs.createWriteStream
     public static log = console.info
     public static fallbackDeviceCounter = 1
+    public static controlDetectTimeoutMs = 5000
+    public static controlDetectWindowMs = 500
 
-    private readonly variant: MuseVariant
+    protected readonly variant: MuseVariant
+    protected preConnected = false
 
     protected constructor(
         variant: MuseVariant,
@@ -39,40 +52,55 @@ export default class MuseDeviceController
         this.variant = variant
     }
 
-    public static async Create(
-        model: MuseDeviceModel,
-        options?: MuseControllerOptions
-    ) {
-        const { xdfRecordPath } = options ?? {}
+    public static async Create(options?: MuseControllerOptions) {
+        const { xdfRecordPath, model: passedModel } = options ?? {}
 
-        const MuseVariant = await this.resolveVariant(model)
-        const variant = await MuseVariant.Create(options)
+        let ble: BleController
+        let variant: MuseVariant
+        let preConnected = false
 
-        const ble = await this.BleDeviceController(
-            variant.charCallbacks,
-            options
-        )
+        if (passedModel) {
+            variant = await this.createVariant(passedModel, options)
+            ble = await this.BleDeviceController(variant.charCallbacks, options)
+        } else {
+            const controlBuffer = { text: '' }
+
+            ble = await this.BleDeviceController(
+                this.detectionCharCallbacks(controlBuffer),
+                options
+            )
+
+            await ble.connect()
+            preConnected = true
+
+            const model = this.resolveModelFrom(
+                await this.readControlResponse(ble, controlBuffer)
+            )
+
+            variant = await this.createVariant(model, options)
+
+            await ble.subscribeCharacteristics(variant.charCallbacks)
+        }
 
         const recorder = xdfRecordPath
             ? await this.XdfStreamRecorder(variant.streamQueries, xdfRecordPath)
             : undefined
 
-        return new (this.Class ?? this)(variant, ble, recorder)
-    }
+        const controller = new (this.Class ?? this)(variant, ble, recorder)
 
-    private static async resolveVariant(model: MuseDeviceModel) {
-        switch (model) {
-            case 'Muse 2':
-                return Muse2
-            case 'Muse S Athena':
-                return MuseSAthena
-            case 'Muse S Gen 2':
-                return MuseSGen2
+        if (preConnected && controller instanceof MuseDeviceController) {
+            controller.preConnected = true
         }
+
+        return controller
     }
 
-    protected get deviceId() {
-        return this.bleUuid
+    protected async handleConnect() {
+        if (this.preConnected) {
+            return
+        }
+
+        await super.handleConnect()
     }
 
     protected async handleStartStreaming() {
@@ -89,8 +117,114 @@ export default class MuseDeviceController
         await this.ble.writeCharacteristic(CONTROL_UUID, 'h')
     }
 
+    protected get deviceId() {
+        return this.bleUuid
+    }
+
     public get streamQueries() {
         return this.variant.streamQueries
+    }
+
+    private static async createVariant(
+        model: MuseDeviceModel,
+        options?: MuseControllerOptions
+    ) {
+        const MuseVariant = await this.resolveVariant(model)
+        return await MuseVariant.Create({ ...(options ?? {}), model })
+    }
+
+    private static async resolveVariant(model: MuseDeviceModel) {
+        switch (model) {
+            case 'Muse 2':
+                return Muse2
+            case 'Muse S Athena':
+                return MuseSAthena
+            case 'Muse S Gen 2':
+                return MuseSGen2
+        }
+    }
+
+    private static detectionCharCallbacks(controlBuffer: { text: string }) {
+        return [
+            {
+                charUuid: CONTROL_UUID,
+                charName: 'CONTROL',
+                onData: (data: Buffer, length: number) => {
+                    controlBuffer.text += this.decodeControlFragment(
+                        data,
+                        length
+                    )
+                },
+            },
+        ]
+    }
+
+    private static decodeControlFragment(data: Buffer, length: number) {
+        const bytes = Array.from<number>(koffi.decode(data, 'uint8', length))
+        const fragmentLength = Math.min(bytes[0]!, bytes.length - 1)
+        const asciiBytes = bytes.slice(1, 1 + fragmentLength)
+
+        return String.fromCharCode(...asciiBytes)
+    }
+
+    private static resolveModelFrom(controlResponse: string) {
+        const match = controlResponse.match(/"sp"\s*:\s*"([^"]*)"/)
+        const codename = match?.[1] ?? ''
+
+        for (const { pattern, model } of MUSE_CODENAME_MODELS) {
+            if (codename.startsWith(pattern)) {
+                return model
+            }
+        }
+
+        throw new Error(
+            `Could not resolve Muse model from unknown CONTROL hardware codename "${codename}" (sp field)! Response: ${controlResponse}`
+        )
+    }
+
+    private static readControlResponse = async (
+        ble: BleController,
+        controlBuffer: { text: string }
+    ) => {
+        const deadline =
+            Date.now() + MuseDeviceController.controlDetectTimeoutMs
+
+        do {
+            await ble.writeCharacteristic(CONTROL_UUID, 'v6')
+
+            const text = await MuseDeviceController.awaitControlJson(
+                controlBuffer,
+                MuseDeviceController.controlDetectWindowMs
+            )
+
+            if (MuseDeviceController.isCompleteControlJson(text)) {
+                return text
+            }
+        } while (Date.now() < deadline)
+
+        return controlBuffer.text
+    }
+
+    private static async awaitControlJson(
+        controlBuffer: { text: string },
+        windowMs: number
+    ) {
+        const deadline = Date.now() + windowMs
+
+        do {
+            if (this.isCompleteControlJson(controlBuffer.text)) {
+                return controlBuffer.text
+            }
+
+            await new Promise((resolve) => setTimeout(resolve, 20))
+        } while (Date.now() < deadline)
+
+        return controlBuffer.text
+    }
+
+    private static isCompleteControlJson(text: string) {
+        const trimmed = text.trim()
+        return /"rc"\s*:/.test(trimmed) && trimmed.endsWith('}')
     }
 
     private static async BleDeviceController(
@@ -138,6 +272,7 @@ export type MuseDeviceControllerConstructor = new (
 ) => DeviceControllerBle
 
 export interface MuseControllerOptions extends DeviceControllerBleOptions {
+    model?: MuseDeviceModel
     txtRecordPath?: string
     enableLogs?: boolean
     disableEeg?: boolean

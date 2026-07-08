@@ -1002,7 +1002,8 @@ export default abstract class Muse2FamilyTest extends AbstractDeviceControllerBl
     protected static async MuseDeviceController(
         options?: Partial<MuseControllerOptions>
     ) {
-        return (await MuseDeviceController.Create(this.model, {
+        return (await MuseDeviceController.Create({
+            model: this.model,
             bleUuid: this.deviceUuid,
             xdfRecordPath: this.xdfRecordPath,
             rssiIntervalMs: this.rssiIntervalMs,

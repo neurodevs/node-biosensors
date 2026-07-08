@@ -4,12 +4,13 @@ import MuseDeviceController from '../impl/muse/MuseDeviceController.js'
 
 const xdfRecordPath = './artifacts/muse_data.xdf'
 
-const muse = await MuseDeviceController.Create('Muse S Gen 2', {
-    bleUuid: 'CA6A61B7-B7A8-AF24-3C9E-04A6A5012554',
+const muse = await MuseDeviceController.Create({
+    bleUuid: undefined,
+    model: undefined,
     rssiIntervalMs: undefined,
     xdfRecordPath,
     txtRecordPath: undefined,
-    enableLogs: false,
+    enableLogs: true,
     disableEeg: false,
     disablePpg: false,
     disableAccel: false,

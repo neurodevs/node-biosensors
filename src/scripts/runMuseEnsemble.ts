@@ -15,8 +15,9 @@ const recorder = await XdfStreamRecorder.Create(xdfRecordPath, [
 
 recorder.start()
 
-const muse = await MuseDeviceController.Create('Muse S Gen 2', {
+const muse = await MuseDeviceController.Create({
     bleUuid: 'CA6A61B7-B7A8-AF24-3C9E-04A6A5012554',
+    model: 'Muse S Gen 2',
     rssiIntervalMs: undefined,
     xdfRecordPath: undefined,
     txtRecordPath: undefined,
@@ -30,8 +31,9 @@ const muse = await MuseDeviceController.Create('Muse S Gen 2', {
 await muse.connect()
 await muse.startStreaming()
 
-const muse2 = await MuseDeviceController.Create('Muse S Athena', {
+const muse2 = await MuseDeviceController.Create({
     bleUuid: 'F57439F1-3287-71B4-2251-F15797949214',
+    model: 'Muse S Athena',
     rssiIntervalMs: undefined,
     xdfRecordPath: undefined,
     txtRecordPath: undefined,
@@ -45,8 +47,9 @@ const muse2 = await MuseDeviceController.Create('Muse S Athena', {
 await muse2.connect()
 await muse2.startStreaming()
 
-const muse3 = await MuseDeviceController.Create('Muse 2', {
+const muse3 = await MuseDeviceController.Create({
     bleUuid: 'F868B42C-FA67-F9CA-BC95-76269D21C38F',
+    model: 'Muse 2',
     rssiIntervalMs: undefined,
     xdfRecordPath: undefined,
     txtRecordPath: undefined,
