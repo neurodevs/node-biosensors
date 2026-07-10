@@ -186,18 +186,17 @@ export default class MuseDeviceController
         ble: BleController,
         controlBuffer: { text: string }
     ) => {
-        const deadline =
-            Date.now() + MuseDeviceController.controlDetectTimeoutMs
+        const deadline = Date.now() + this.controlDetectTimeoutMs
 
         do {
             await ble.writeCharacteristic(CONTROL_UUID, 'v6')
 
-            const text = await MuseDeviceController.awaitControlJson(
+            const text = await this.awaitControlJson(
                 controlBuffer,
-                MuseDeviceController.controlDetectWindowMs
+                this.controlDetectWindowMs
             )
 
-            if (MuseDeviceController.isCompleteControlJson(text)) {
+            if (this.isCompleteControlJson(text)) {
                 return text
             }
         } while (Date.now() < deadline)
