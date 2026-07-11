@@ -426,12 +426,11 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
 
     @test()
     protected static async readControlResponseWritesV6AndReturnsReply() {
-        const ble = await this.MuseDeviceController()
-
+        const ble = await this.fakeBleForDetection()
         const controlBuffer = { text: this.gen2ControlResponse }
 
         const response = await this.originalReadControlResponse(
-            (ble as any).ble,
+            ble,
             controlBuffer
         )
 

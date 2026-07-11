@@ -69,11 +69,11 @@ export default abstract class AbstractDeviceController implements DeviceControll
 
     protected abstract handleConnect(): Promise<void>
 
-    protected abstract handleDisconnect(): Promise<void>
-
     protected abstract handleStartStreaming(): Promise<void>
 
     protected abstract handleStopStreaming(): Promise<void>
+
+    protected abstract handleDisconnect(): Promise<void>
 
     private get warn() {
         return AbstractDeviceController.warn
