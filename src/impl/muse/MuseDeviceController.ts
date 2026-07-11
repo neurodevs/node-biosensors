@@ -42,9 +42,8 @@ export default class MuseDeviceController
     public static createWriteStream = fs.createWriteStream
     public static log = console.info
     public static fallbackDeviceCounter = 1
-    public static controlBuffer = { text: '' }
-    public static controlDetectTimeoutMs = 5000
-    public static controlDetectWindowMs = 500
+    public static detectModelTimeoutMs = 5000
+    public static detectModelWindowMs = 500
 
     protected readonly variant: MuseVariant
     protected preConnected = false
@@ -163,7 +162,7 @@ export default class MuseDeviceController
             text: string
         }
     ) => {
-        const deadline = Date.now() + this.controlDetectTimeoutMs
+        const deadline = Date.now() + this.detectModelTimeoutMs
 
         do {
             await ble?.writeCharacteristic(CONTROL_UUID, 'v6')
@@ -179,7 +178,7 @@ export default class MuseDeviceController
     }
 
     private static async checkForUpdates(controlBuffer: { text: string }) {
-        const deadline = Date.now() + this.controlDetectWindowMs
+        const deadline = Date.now() + this.detectModelWindowMs
 
         do {
             if (this.isControlBufferComplete(controlBuffer.text)) {

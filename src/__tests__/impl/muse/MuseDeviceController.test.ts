@@ -58,8 +58,8 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
 
         MuseDeviceController.fallbackDeviceCounter = 1
 
-        MuseDeviceController.controlDetectWindowMs = 5
-        MuseDeviceController.controlDetectTimeoutMs = 200
+        MuseDeviceController.detectModelWindowMs = 5
+        MuseDeviceController.detectModelTimeoutMs = 50
 
         this.instance = await this.MuseDeviceController()
     }
@@ -486,8 +486,6 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
 
     @test()
     protected static async readControlResponseGivesUpWhenDeviceNeverReplies() {
-        MuseDeviceController.controlDetectTimeoutMs = 60
-
         const ble = await this.fakeBleForDetection()
         const controlBuffer = { text: '' }
 
