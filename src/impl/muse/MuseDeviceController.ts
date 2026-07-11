@@ -41,9 +41,10 @@ export default class MuseDeviceController
     public static Class?: MuseDeviceControllerConstructor
     public static createWriteStream = fs.createWriteStream
     public static log = console.info
-    public static fallbackDeviceCounter = 1
     public static detectModelTimeoutMs = 5000
     public static detectModelWindowMs = 500
+
+    public static fallbackDeviceCounter = 1
 
     protected readonly variant: MuseVariant
     protected preConnected = false
