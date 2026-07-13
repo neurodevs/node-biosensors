@@ -6,6 +6,14 @@ export * from './impl/BiosensorDeviceFactory.js'
 export { default as FakeDeviceFactory } from './testDoubles/DeviceFactory/FakeDeviceFactory.js'
 export * from './testDoubles/DeviceFactory/FakeDeviceFactory.js'
 
+// CytonController
+
+export { default as CytonDeviceController } from './impl/openbci/CytonDeviceController.js'
+export * from './impl/openbci/CytonDeviceController.js'
+
+export { default as FakeCytonController } from './testDoubles/CytonController/FakeCytonController.js'
+export * from './testDoubles/CytonController/FakeCytonController.js'
+
 // StreamingOrchestrator
 
 export { default as BiosensorStreamingOrchestrator } from './impl/BiosensorStreamingOrchestrator.js'

@@ -4,11 +4,11 @@ import { test, assert } from '@neurodevs/node-tdd'
 import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 import FTDI from 'ftdi-d2xx'
 
-import CgxDeviceController from '../../../impl/cognionics/CgxDeviceController.js'
-import SpyCgxController from '../../../testDoubles/CgxController/SpyCgxController.js'
-import FakeDeviceFTDI from '../../../testDoubles/FTDI/FakeDeviceFTDI.js'
-import FakeFTDI from '../../../testDoubles/FTDI/FakeFTDI.js'
-import AbstractPackageTest from '../../AbstractPackageTest.js'
+import CgxDeviceController from '../../impl/cognionics/CgxDeviceController.js'
+import SpyCgxController from '../../testDoubles/CgxController/SpyCgxController.js'
+import FakeDeviceFTDI from '../../testDoubles/FTDI/FakeDeviceFTDI.js'
+import FakeFTDI from '../../testDoubles/FTDI/FakeFTDI.js'
+import AbstractPackageTest from '../AbstractPackageTest.js'
 
 export default class CgxDeviceControllerTest extends AbstractPackageTest {
     private static instance: SpyCgxController
