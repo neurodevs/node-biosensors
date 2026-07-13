@@ -7,6 +7,11 @@ import {
     MuseDeviceModel,
 } from './MuseDeviceController.js'
 
+export async function detectModel(bleUuid?: string) {
+    const detector = await MuseModelDetector.Create(bleUuid)
+    return await detector.detectModel()
+}
+
 export default class MuseModelDetector implements MuseDetector {
     public static Class?: MuseDetectorConstructor
     public static detectModelTimeoutMs = 5000

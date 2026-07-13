@@ -1,10 +1,13 @@
 import { test, assert } from '@neurodevs/node-tdd'
 import { FakeBleController } from '@neurodevs/node-lsl'
 
-import MuseModelDetector from '../../impl/muse/MuseModelDetector.js'
+import MuseModelDetector, {
+    detectModel,
+} from '../../impl/muse/MuseModelDetector.js'
 import { CONTROL_UUID } from '../../impl/muse/MuseDeviceController.js'
 import SpyMuseDetector from '../../testDoubles/MuseDetector/SpyMuseDetector.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
+import FakeMuseDetector from '../../testDoubles/MuseDetector/FakeMuseDetector.js'
 
 export default class MuseModelDetectorTest extends AbstractPackageTest {
     private static instance: SpyMuseDetector
@@ -177,6 +180,25 @@ export default class MuseModelDetectorTest extends AbstractPackageTest {
             v6Writes,
             1,
             'Should re-send v6 several times before giving up!'
+        )
+    }
+
+    @test()
+    protected static async exposesDetectModelHelperFunction() {
+        MuseModelDetector.Class = FakeMuseDetector
+
+        await detectModel(this.deviceUuid)
+
+        assert.isEqualDeep(
+            FakeMuseDetector.callsToConstructor[0]?.ble.uuid,
+            this.deviceUuid,
+            'Did not create detector with correct uuid!'
+        )
+
+        assert.isEqual(
+            FakeMuseDetector.numCallsToDetectModel,
+            1,
+            'Did not expose detectModel helper function!'
         )
     }
 
