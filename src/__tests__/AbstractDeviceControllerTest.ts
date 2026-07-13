@@ -12,7 +12,7 @@ export interface SpyDeviceController extends DeviceController {
 }
 
 export default abstract class AbstractDeviceControllerTest extends AbstractPackageTest {
-    protected static instance: SpyDeviceController
+    protected static instance: SpyDeviceController | any
     protected static lastWarn: string
 
     protected static readonly deviceId = this.generateId()

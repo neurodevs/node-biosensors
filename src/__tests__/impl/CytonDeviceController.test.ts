@@ -1,17 +1,18 @@
 import { test, assert } from '@neurodevs/node-tdd'
 
-import CytonDeviceController, {
-    CytonController,
-} from '../../impl/openbci/CytonDeviceController.js'
-import AbstractPackageTest from '../AbstractPackageTest.js'
+import CytonDeviceController from '../../impl/openbci/CytonDeviceController.js'
+import AbstractDeviceControllerTest from '../AbstractDeviceControllerTest.js'
+import SpyCytonController from '../../testDoubles/CytonController/SpyCytonController.js'
 
-export default class CytonDeviceControllerTest extends AbstractPackageTest {
-    private static instance: CytonController
+export default class CytonDeviceControllerTest extends AbstractDeviceControllerTest {
+    protected static instance: SpyCytonController
 
     protected static async beforeEach() {
         await super.beforeEach()
 
-        this.instance = this.CytonDeviceController()
+        CytonDeviceController.Class = SpyCytonController
+
+        this.instance = await this.CytonDeviceController()
     }
 
     @test()
@@ -19,7 +20,85 @@ export default class CytonDeviceControllerTest extends AbstractPackageTest {
         assert.isTruthy(this.instance, 'Failed to create instance!')
     }
 
-    private static CytonDeviceController() {
-        return CytonDeviceController.Create()
+    @test()
+    protected static async startsWithIsConnectedFalse() {
+        await this.assertStartsWithIsConnectedFalse()
+    }
+
+    @test()
+    protected static async startsWithIsStreamingFalse() {
+        await this.assertStartsWithIsStreamingFalse()
+    }
+
+    @test()
+    protected static async connectSetsIsConnectedTrue() {
+        await this.assertConnectSetsIsConnectedTrue()
+    }
+
+    @test()
+    protected static async startStreamingSetsIsStreamingTrue() {
+        await this.assertStartStreamingSetsIsStreamingTrue()
+    }
+
+    @test()
+    protected static async stopStreamingSetsIsStreamingFalse() {
+        await this.assertStopStreamingSetsIsStreamingFalse()
+    }
+
+    @test()
+    protected static async disconnectSetsIsConnectedFalse() {
+        await this.assertDisconnectSetsIsConnectedFalse()
+    }
+
+    @test()
+    protected static async disconnectCallsStopStreaming() {
+        await this.assertDisconnectCallsStopStreaming()
+    }
+
+    @test()
+    protected static async disconnectDoesNotCallStopStreamingIfNotStreaming() {
+        await this.assertDisconnectDoesNotCallStopStreamingIfNotStreaming()
+    }
+
+    @test()
+    protected static async connectWarnsWithDeviceId() {
+        await this.assertConnectWarnsWithDeviceId()
+    }
+
+    @test()
+    protected static async startStreamingWarnsWithDeviceId() {
+        await this.assertStartStreamingWarnsWithDeviceId()
+    }
+
+    @test()
+    protected static async stopStreamingWarnsWithDeviceId() {
+        await this.assertStopStreamingWarnsWithDeviceId()
+    }
+
+    @test()
+    protected static async disconnectWarnsWithDeviceId() {
+        await this.assertDisconnectWarnsWithDeviceId()
+    }
+
+    @test()
+    protected static async createsXdfRecorderIfPassedPath() {
+        await this.assertCreatesXdfRecorderIfPassedPath()
+    }
+
+    @test()
+    protected static async connectStartsXdfRecorder() {
+        await this.assertConnectStartsXdfRecorder()
+    }
+
+    @test()
+    protected static async disconnectFinishesXdfRecorder() {
+        await this.assertDisconnectFinishesXdfRecorder()
+    }
+
+    private static async CytonDeviceController() {
+        return (await CytonDeviceController.Create({
+            serialNumber: this.deviceId,
+            xdfRecordPath: this.xdfRecordPath,
+        })) as SpyCytonController
     }
 }
