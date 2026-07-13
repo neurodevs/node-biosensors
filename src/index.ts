@@ -22,6 +22,9 @@ export * from './impl/muse/MuseModelDetector.js'
 export { default as FakeMuseDetector } from './testDoubles/MuseDetector/FakeMuseDetector.js'
 export * from './testDoubles/MuseDetector/FakeMuseDetector.js'
 
+export { default as SpyMuseDetector } from './testDoubles/MuseDetector/SpyMuseDetector.js'
+export * from './testDoubles/MuseDetector/SpyMuseDetector.js'
+
 // StreamingOrchestrator
 
 export { default as BiosensorStreamingOrchestrator } from './impl/BiosensorStreamingOrchestrator.js'
