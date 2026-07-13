@@ -14,6 +14,14 @@ export * from './impl/openbci/CytonDeviceController.js'
 export { default as FakeCytonController } from './testDoubles/CytonController/FakeCytonController.js'
 export * from './testDoubles/CytonController/FakeCytonController.js'
 
+// MuseDetector
+
+export { default as MuseModelDetector } from './impl/muse/MuseModelDetector.js'
+export * from './impl/muse/MuseModelDetector.js'
+
+export { default as FakeMuseDetector } from './testDoubles/MuseDetector/FakeMuseDetector.js'
+export * from './testDoubles/MuseDetector/FakeMuseDetector.js'
+
 // StreamingOrchestrator
 
 export { default as BiosensorStreamingOrchestrator } from './impl/BiosensorStreamingOrchestrator.js'
