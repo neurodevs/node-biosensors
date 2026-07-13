@@ -1,4 +1,4 @@
-import { XdfRecorder } from '@neurodevs/node-xdf'
+import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 
 import { DeviceController } from '../BiosensorDeviceFactory.js'
 
@@ -77,5 +77,12 @@ export default abstract class AbstractDeviceController implements DeviceControll
 
     private get warn() {
         return AbstractDeviceController.warn
+    }
+
+    protected static async XdfStreamRecorder(
+        xdfRecordPath: string,
+        streamQueries: string[]
+    ) {
+        return await XdfStreamRecorder.Create(xdfRecordPath, streamQueries)
     }
 }

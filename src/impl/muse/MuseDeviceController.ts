@@ -6,7 +6,7 @@ import {
     BleDeviceController,
     CharacteristicCallbacks,
 } from '@neurodevs/node-lsl'
-import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
+import { XdfRecorder } from '@neurodevs/node-xdf'
 
 import {
     DeviceControllerBle,
@@ -89,7 +89,7 @@ export default class MuseDeviceController
         }
 
         const recorder = xdfRecordPath
-            ? await this.XdfStreamRecorder(variant.streamQueries, xdfRecordPath)
+            ? await this.XdfStreamRecorder(xdfRecordPath, variant.streamQueries)
             : undefined
 
         const controller = new (this.Class ?? this)(variant, ble, recorder)
@@ -225,13 +225,6 @@ export default class MuseDeviceController
                 ? { deviceUuid: bleUuid }
                 : { deviceNamePrefix: 'Muse' }),
         })
-    }
-
-    private static async XdfStreamRecorder(
-        streamQueries: string[],
-        xdfRecordPath: string
-    ) {
-        return await XdfStreamRecorder.Create(xdfRecordPath, streamQueries)
     }
 }
 

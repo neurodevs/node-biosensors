@@ -1,4 +1,4 @@
-import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
+import { XdfRecorder } from '@neurodevs/node-xdf'
 
 import {
     DeviceController,
@@ -25,7 +25,7 @@ export default class CytonDeviceController
         const { serialNumber, xdfRecordPath } = options ?? {}
 
         const recorder = xdfRecordPath
-            ? await this.XdfStreamRecorder(xdfRecordPath)
+            ? await this.XdfStreamRecorder(xdfRecordPath, this.streamQueries)
             : undefined
 
         return new (this.Class ?? this)(serialNumber, recorder)
@@ -46,10 +46,6 @@ export default class CytonDeviceController
     protected async handleStopStreaming() {}
 
     protected async handleDisconnect() {}
-
-    private static async XdfStreamRecorder(xdfRecordPath: string) {
-        return XdfStreamRecorder.Create(xdfRecordPath, this.streamQueries)
-    }
 }
 
 export interface CytonController extends DeviceController {}
