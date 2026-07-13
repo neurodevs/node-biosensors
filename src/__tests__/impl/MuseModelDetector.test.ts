@@ -79,7 +79,7 @@ export default class MuseModelDetectorTest extends AbstractPackageTest {
         assert.isEqual(
             FakeBleController.numCallsToConnect,
             1,
-            'Detection should connect the BLE device once!'
+            'Did not connect the BLE device once!'
         )
     }
 
@@ -180,6 +180,19 @@ export default class MuseModelDetectorTest extends AbstractPackageTest {
             v6Writes,
             1,
             'Should re-send v6 several times before giving up!'
+        )
+    }
+
+    @test()
+    protected static async disconnectsBleAfterDetection() {
+        this.fakeControlResponse(this.instance, this.gen2ControlResponse)
+
+        await this.instance.detectModel()
+
+        assert.isEqual(
+            FakeBleController.numCallsToDisconnect,
+            1,
+            'Did not disconnect the BLE device once!'
         )
     }
 

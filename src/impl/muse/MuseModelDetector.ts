@@ -38,6 +38,8 @@ export default class MuseModelDetector implements MuseDetector {
         const response = await this.readControlResponse()
         const model = this.resolveModelFrom(response)
 
+        await this.ble.disconnect()
+
         return model
     }
 
