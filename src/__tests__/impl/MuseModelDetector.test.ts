@@ -2,7 +2,7 @@ import { test, assert } from '@neurodevs/node-tdd'
 import { FakeBleController } from '@neurodevs/node-lsl'
 
 import MuseModelDetector, {
-    detectModel,
+    detectMuseModel,
 } from '../../impl/muse/MuseModelDetector.js'
 import { CONTROL_UUID } from '../../impl/muse/MuseDeviceController.js'
 import SpyMuseDetector from '../../testDoubles/MuseDetector/SpyMuseDetector.js'
@@ -187,7 +187,7 @@ export default class MuseModelDetectorTest extends AbstractPackageTest {
     protected static async exposesDetectModelHelperFunction() {
         MuseModelDetector.Class = FakeMuseDetector
 
-        await detectModel(this.deviceUuid)
+        await detectMuseModel(this.deviceUuid)
 
         assert.isEqualDeep(
             FakeMuseDetector.callsToConstructor[0]?.ble.uuid,

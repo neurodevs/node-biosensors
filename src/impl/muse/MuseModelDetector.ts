@@ -7,7 +7,7 @@ import {
     MuseDeviceModel,
 } from './MuseDeviceController.js'
 
-export async function detectModel(bleUuid?: string) {
+export async function detectMuseModel(bleUuid?: string) {
     const detector = await MuseModelDetector.Create(bleUuid)
     return await detector.detectModel()
 }
