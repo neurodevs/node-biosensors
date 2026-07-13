@@ -5,9 +5,9 @@ import MuseDeviceController, {
     CONTROL_UUID,
     MuseControllerOptions,
 } from '../../impl/muse/MuseDeviceController.js'
-import MuseSAthena from '../../impl/muse/variants/MuseSAthena.js'
 import SpyMuseController from '../../testDoubles/MuseController/SpyMuseController.js'
 import AbstractDeviceControllerBleTest from '../AbstractDeviceControllerBleTest.js'
+import FakeMuseDetector from '../../testDoubles/MuseDetector/FakeMuseDetector.js'
 
 export default class MuseDeviceControllerTest extends AbstractDeviceControllerBleTest {
     protected static instance: SpyMuseController
@@ -21,6 +21,8 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
     protected static async beforeEach() {
         await super.beforeEach()
 
+        this.setFakeMuseDetector()
+
         MuseDeviceController.createWriteStream = (path: any, options?: any) => {
             this.callsToCreateWriteStream.push({ path, options })
             return {
@@ -33,8 +35,6 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
         this.callsToCreateWriteStream.length = 0
         this.callsToWriteStream.length = 0
 
-        MuseDeviceController.Class = SpyMuseController
-
         MuseDeviceController.log = (...args: unknown[]) => {
             this.logCalls.push(args)
         }
@@ -45,6 +45,8 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
 
         MuseDeviceController.detectModelWindowMs = 5
         MuseDeviceController.detectModelTimeoutMs = 50
+
+        MuseDeviceController.Class = SpyMuseController
 
         this.instance = await this.MuseDeviceController()
     }
@@ -309,28 +311,36 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
     }
 
     @test()
-    protected static async passedModelSkipsDetection() {
-        let didRead = false
+    protected static async createsMuseDetectorWhenNotPassedModel() {
+        await this.autoDetectMuseModel()
 
-        const instance = (await MuseDeviceController.Create({
-            model: 'Muse S Athena',
-            bleUuid: this.deviceUuid,
-        })) as SpyMuseController
-
-        assert.isFalse(
-            didRead,
-            'Should not read the CONTROL characteristic when a model is passed!'
+        assert.isEqualDeep(
+            FakeMuseDetector.callsToConstructor[0].ble.uuid,
+            this.deviceUuid
         )
+    }
 
-        assert.isTrue(
-            instance.getVariant() instanceof MuseSAthena,
-            'Explicit options.model should still select the requested variant!'
-        )
+    @test()
+    protected static async callsDetectModelWhenNotPassedModel() {
+        await this.autoDetectMuseModel()
 
         assert.isEqual(
-            FakeBleController.callsToSubscribeCharacteristics.length,
+            FakeMuseDetector.numCallsToDetectModel,
+            1,
+            'Did not call detectModel()!'
+        )
+    }
+
+    @test()
+    protected static async doesNotCreateMuseDetectorWhenPassedModel() {
+        await this.MuseDeviceController({
+            model: 'Muse S Athena',
+        })
+
+        assert.isEqual(
+            FakeMuseDetector.callsToConstructor.length,
             0,
-            'Passing a model should not use the detection subscribe flow!'
+            'Should not create detector when passed model!'
         )
     }
 
@@ -361,6 +371,12 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
         fakeBytes: number[]
     ): unknown {
         return `${name?.padEnd(13)} | ${timestampSec.toFixed(5).padEnd(15)} | ${JSON.stringify(fakeBytes)}`
+    }
+
+    private static async autoDetectMuseModel() {
+        await this.MuseDeviceController({
+            model: undefined,
+        })
     }
 
     private static async MuseDeviceController(

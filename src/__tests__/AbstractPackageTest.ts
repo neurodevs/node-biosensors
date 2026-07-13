@@ -43,6 +43,8 @@ import FakeFTDI from '../testDoubles/FTDI/FakeFTDI.js'
 import FakeWebSocketGateway from '../testDoubles/WebSocketGateway/FakeWebSocketGateway.js'
 import MuseDeviceController from '../impl/muse/MuseDeviceController.js'
 import FakeMuseController from '../testDoubles/MuseController/FakeMuseController.js'
+import MuseModelDetector from '../impl/muse/MuseModelDetector.js'
+import FakeMuseDetector from '../testDoubles/MuseDetector/FakeMuseDetector.js'
 
 export default class AbstractPackageTest extends AbstractModuleTest {
     protected static fakeLiblsl: FakeLiblsl
@@ -161,6 +163,11 @@ export default class AbstractPackageTest extends AbstractModuleTest {
     protected static setFakeEventMarkerEmitter() {
         LslEventMarkerEmitter.Class = FakeEventMarkerEmitter
         FakeEventMarkerEmitter.resetTestDouble()
+    }
+
+    protected static setFakeMuseDetector() {
+        MuseModelDetector.Class = FakeMuseDetector
+        FakeMuseDetector.resetTestDouble()
     }
 
     protected static setFakeStreamInlet() {
