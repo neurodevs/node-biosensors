@@ -62,7 +62,9 @@ export default class CytonDeviceController
         this.usb.writeUsb('s')
     }
 
-    protected async handleDisconnect() {}
+    protected async handleDisconnect() {
+        this.usb.disconnect()
+    }
 }
 
 export interface CytonController extends DeviceController {}
