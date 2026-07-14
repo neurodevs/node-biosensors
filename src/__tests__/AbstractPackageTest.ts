@@ -18,6 +18,8 @@ import {
     FakeBleController,
     WindowedClockRegressor,
     FakeClockRegressor,
+    UsbDeviceController,
+    FakeUsbController,
 } from '@neurodevs/node-lsl'
 import AbstractModuleTest, { assert } from '@neurodevs/node-tdd'
 import {
@@ -189,6 +191,11 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         LslStreamInfo.Class = FakeStreamInfo
         FakeStreamInfo.resetTestDouble()
     }
+
+    protected static setFakeUsbController() {
+        UsbDeviceController.Class = FakeUsbController
+        FakeUsbController.resetTestDouble()
+     }
 
     protected static setFakeWebSocketBridge() {
         LslWebSocketBridge.Class = FakeWebSocketBridge

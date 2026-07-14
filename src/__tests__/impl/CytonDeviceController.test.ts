@@ -3,12 +3,17 @@ import { test, assert } from '@neurodevs/node-tdd'
 import CytonDeviceController from '../../impl/openbci/CytonDeviceController.js'
 import AbstractDeviceControllerTest from '../AbstractDeviceControllerTest.js'
 import SpyCytonController from '../../testDoubles/CytonController/SpyCytonController.js'
+import { FakeUsbController } from '@neurodevs/node-lsl'
 
 export default class CytonDeviceControllerTest extends AbstractDeviceControllerTest {
     protected static instance: SpyCytonController
 
+    private static readonly serialNumber = this.deviceId
+
     protected static async beforeEach() {
         await super.beforeEach()
+
+        this.setFakeUsbController()
 
         CytonDeviceController.Class = SpyCytonController
 
@@ -95,9 +100,16 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
         await this.assertDisconnectFinishesXdfRecorder()
     }
 
+    @test()
+    protected static async createsUsbDeviceController() {
+        assert.isEqualDeep(FakeUsbController.callsToConstructor[0], {
+            serialNumber: this.serialNumber,
+        })
+    }
+
     private static async CytonDeviceController() {
         return (await CytonDeviceController.Create({
-            serialNumber: this.deviceId,
+            serialNumber: this.serialNumber,
             xdfRecordPath: this.xdfRecordPath,
         })) as SpyCytonController
     }

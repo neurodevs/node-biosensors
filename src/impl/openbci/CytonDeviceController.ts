@@ -5,6 +5,7 @@ import {
     DeviceControllerOptions,
 } from '../BiosensorDeviceFactory.js'
 import AbstractDeviceController from '../abstract/AbstractDeviceController.js'
+import { UsbDeviceController } from '@neurodevs/node-lsl'
 
 export default class CytonDeviceController
     extends AbstractDeviceController
@@ -23,6 +24,10 @@ export default class CytonDeviceController
 
     public static async Create(options?: CytonControllerOptions) {
         const { serialNumber, xdfRecordPath } = options ?? {}
+
+        UsbDeviceController.Create({
+            serialNumber,
+        })
 
         const recorder = xdfRecordPath
             ? await this.XdfStreamRecorder(xdfRecordPath, this.streamQueries)
