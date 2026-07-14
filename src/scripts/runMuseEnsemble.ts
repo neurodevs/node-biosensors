@@ -3,7 +3,7 @@ import { XdfStreamRecorder } from '@neurodevs/node-xdf'
 
 import MuseDeviceController from '../impl/muse/MuseDeviceController.js'
 
-const xdfRecordPath = './artifacts/muse_data.xdf'
+const xdfRecordPath = './artifacts/muse_ensemble.xdf'
 
 const recorder = await XdfStreamRecorder.Create(xdfRecordPath, [
     'type="EEG"',

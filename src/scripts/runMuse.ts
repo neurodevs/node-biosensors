@@ -2,7 +2,7 @@ import { TimestampJitterGrapher } from '@neurodevs/node-biosignal-processing'
 
 import MuseDeviceController from '../impl/muse/MuseDeviceController.js'
 
-const xdfRecordPath = './artifacts/muse_data.xdf'
+const xdfRecordPath = './artifacts/muse.xdf'
 
 const muse = await MuseDeviceController.Create({
     bleUuid: undefined,
