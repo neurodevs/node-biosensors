@@ -125,6 +125,14 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
         assert.isEqualDeep(FakeUsbController.callsToWriteUsb[0], 'b')
     }
 
+    @test()
+    protected static async callsWriteUsbToStopStreaming() {
+        await this.startStreaming()
+        await this.stopStreaming()
+
+        assert.isEqualDeep(FakeUsbController.callsToWriteUsb[1], 's')
+    }
+
     private static async CytonDeviceController() {
         return (await CytonDeviceController.Create({
             serialNumber: this.serialNumber,
