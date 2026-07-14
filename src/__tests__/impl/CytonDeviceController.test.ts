@@ -126,6 +126,14 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
     }
 
     @test()
+    protected static async callsWriteUsbToStopStreaming() {
+        await this.startStreaming()
+        await this.stopStreaming()
+
+        assert.isEqualDeep(FakeUsbController.callsToWriteUsb[1], 's')
+    }
+
+    @test()
     protected static async disconnectsUsbController() {
         await this.connect()
         await this.disconnect()
@@ -135,14 +143,6 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
             1,
             'Did not call disconnect!'
         )
-    }
-
-    @test()
-    protected static async callsWriteUsbToStopStreaming() {
-        await this.startStreaming()
-        await this.stopStreaming()
-
-        assert.isEqualDeep(FakeUsbController.callsToWriteUsb[1], 's')
     }
 
     private static async CytonDeviceController() {
