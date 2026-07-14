@@ -36,6 +36,7 @@ export default class CytonDeviceController
         const { serialNumber, xdfRecordPath } = options ?? {}
 
         await this.ExgOutlet(serialNumber)
+        await this.AccelOutlet(serialNumber)
 
         const usb = this.UsbDeviceController(serialNumber)
 
@@ -102,6 +103,20 @@ export default class CytonDeviceController
             sourceId: `cyton-exg-${serialNumber}`,
             manufacturer: 'OpenBCI',
             units: 'microvolt',
+            chunkSize: 1,
+        })
+    }
+
+    private static async AccelOutlet(serialNumber?: string) {
+        await LslStreamOutlet.Create({
+            name: `Cyton Accelerometer (${serialNumber})`,
+            type: 'ACCEL',
+            channelNames: ['X', 'Y', 'Z'],
+            sampleRateHz: 25,
+            channelFormat: 'float32',
+            sourceId: `cyton-accelerometer-${serialNumber}`,
+            manufacturer: 'OpenBCI',
+            units: 'g',
             chunkSize: 1,
         })
     }

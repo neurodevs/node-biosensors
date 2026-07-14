@@ -148,9 +148,7 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
 
     @test()
     protected static async createsExgLslOutlet() {
-        const firstCall = FakeStreamOutlet.callsToConstructor[0]
-
-        assert.isEqualDeep(firstCall, {
+        assert.isEqualDeep(FakeStreamOutlet.callsToConstructor[0], {
             name: `Cyton ExG (${this.serialNumber})`,
             type: 'ExG',
             channelNames: [
@@ -168,6 +166,21 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
             sourceId: `cyton-exg-${this.serialNumber}`,
             manufacturer: 'OpenBCI',
             units: 'microvolt',
+            chunkSize: 1,
+        })
+    }
+
+    @test()
+    protected static async createsAccelLslOutlet() {
+        assert.isEqualDeep(FakeStreamOutlet.callsToConstructor[1], {
+            name: `Cyton Accelerometer (${this.serialNumber})`,
+            type: 'ACCEL',
+            channelNames: ['X', 'Y', 'Z'],
+            sampleRateHz: 25,
+            channelFormat: 'float32',
+            sourceId: `cyton-accelerometer-${this.serialNumber}`,
+            manufacturer: 'OpenBCI',
+            units: 'g',
             chunkSize: 1,
         })
     }
