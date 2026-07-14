@@ -230,9 +230,7 @@ export interface PerDeviceOptionsMap {
 }
 
 export type DeviceName =
-    | 'Cognionics Quick-20r'
-    | 'Muse S Gen 2'
-    | 'Zephyr BioHarness 3'
+    'Cognionics Quick-20r' | 'Muse S Gen 2' | 'Zephyr BioHarness 3'
 
 export interface DeviceSpecification {
     deviceName: DeviceName

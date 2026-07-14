@@ -5,8 +5,7 @@ import {
 
 export default class FakeStreamingOrchestrator implements StreamingOrchestrator {
     public static callsToConstructor: (
-        | StreamingOrchestratorConstructorOptions
-        | undefined
+        StreamingOrchestratorConstructorOptions | undefined
     )[] = []
 
     public static numCallsToStart = 0
