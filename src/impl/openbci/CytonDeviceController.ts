@@ -54,7 +54,9 @@ export default class CytonDeviceController
         this.usb.connect()
     }
 
-    protected async handleStartStreaming() {}
+    protected async handleStartStreaming() {
+        this.usb.writeUsb('b')
+    }
 
     protected async handleStopStreaming() {}
 
