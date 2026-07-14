@@ -3,7 +3,7 @@ import { test, assert } from '@neurodevs/node-tdd'
 import CytonDeviceController from '../../impl/openbci/CytonDeviceController.js'
 import AbstractDeviceControllerTest from '../AbstractDeviceControllerTest.js'
 import SpyCytonController from '../../testDoubles/CytonController/SpyCytonController.js'
-import { FakeUsbController } from '@neurodevs/node-lsl'
+import { FakeUsbController, FakeStreamOutlet } from '@neurodevs/node-lsl'
 
 export default class CytonDeviceControllerTest extends AbstractDeviceControllerTest {
     protected static instance: SpyCytonController
@@ -103,6 +103,7 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
     @test()
     protected static async createsUsbController() {
         assert.isEqualDeep(FakeUsbController.callsToConstructor[0], {
+            onData: this.instance.getOnData(),
             serialNumber: this.serialNumber,
         })
     }
@@ -143,6 +144,32 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
             1,
             'Did not call disconnect!'
         )
+    }
+
+    @test()
+    protected static async createsExgLslOutlet() {
+        const firstCall = FakeStreamOutlet.callsToConstructor[0]
+
+        assert.isEqualDeep(firstCall, {
+            name: `Cyton ExG (${this.serialNumber})`,
+            type: 'ExG',
+            channelNames: [
+                'CH1',
+                'CH2',
+                'CH3',
+                'CH4',
+                'CH5',
+                'CH6',
+                'CH7',
+                'CH8',
+            ],
+            sampleRateHz: 250,
+            channelFormat: 'float32',
+            sourceId: `cyton-exg-${this.serialNumber}`,
+            manufacturer: 'OpenBCI',
+            units: 'microvolt',
+            chunkSize: 1,
+        })
     }
 
     private static async CytonDeviceController() {

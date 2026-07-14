@@ -195,7 +195,7 @@ export default class AbstractPackageTest extends AbstractModuleTest {
     protected static setFakeUsbController() {
         UsbDeviceController.Class = FakeUsbController
         FakeUsbController.resetTestDouble()
-     }
+    }
 
     protected static setFakeWebSocketBridge() {
         LslWebSocketBridge.Class = FakeWebSocketBridge

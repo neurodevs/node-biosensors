@@ -18,4 +18,8 @@ export default class SpyCytonController extends CytonDeviceController {
     public getIsStreaming() {
         return this.isStreaming
     }
+
+    public getOnData() {
+        return CytonDeviceController.onData
+    }
 }
