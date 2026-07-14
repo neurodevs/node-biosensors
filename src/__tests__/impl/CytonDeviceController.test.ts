@@ -101,10 +101,21 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
     }
 
     @test()
-    protected static async createsUsbDeviceController() {
+    protected static async createsUsbController() {
         assert.isEqualDeep(FakeUsbController.callsToConstructor[0], {
             serialNumber: this.serialNumber,
         })
+    }
+
+    @test()
+    protected static async callsConnectOnUsbController() {
+        await this.instance.connect()
+
+        assert.isEqual(
+            FakeUsbController.numCallsToConnect,
+            1,
+            'Did not call connect!'
+        )
     }
 
     private static async CytonDeviceController() {

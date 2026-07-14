@@ -5,7 +5,7 @@ import {
     DeviceControllerOptions,
 } from '../BiosensorDeviceFactory.js'
 import AbstractDeviceController from '../abstract/AbstractDeviceController.js'
-import { UsbDeviceController } from '@neurodevs/node-lsl'
+import { UsbController, UsbDeviceController } from '@neurodevs/node-lsl'
 
 export default class CytonDeviceController
     extends AbstractDeviceController
@@ -14,18 +14,24 @@ export default class CytonDeviceController
     public static Class?: CytonControllerConstructor
     public static readonly streamQueries: string[] = []
 
-    private readonly _serialNumber?: string
+    private readonly usb: UsbController
+    private readonly serialNumber?: string
 
-    protected constructor(serialNumber?: string, recorder?: XdfRecorder) {
+    protected constructor(
+        usb: UsbController,
+        serialNumber?: string,
+        recorder?: XdfRecorder
+    ) {
         super(recorder)
 
-        this._serialNumber = serialNumber
+        this.usb = usb
+        this.serialNumber = serialNumber
     }
 
     public static async Create(options?: CytonControllerOptions) {
         const { serialNumber, xdfRecordPath } = options ?? {}
 
-        UsbDeviceController.Create({
+        const usb = UsbDeviceController.Create({
             serialNumber,
         })
 
@@ -33,7 +39,7 @@ export default class CytonDeviceController
             ? await this.XdfStreamRecorder(xdfRecordPath, this.streamQueries)
             : undefined
 
-        return new (this.Class ?? this)(serialNumber, recorder)
+        return new (this.Class ?? this)(usb, serialNumber, recorder)
     }
 
     public get streamQueries() {
@@ -41,10 +47,12 @@ export default class CytonDeviceController
     }
 
     protected get deviceId() {
-        return this._serialNumber ?? ''
+        return this.serialNumber ?? ''
     }
 
-    protected async handleConnect() {}
+    protected async handleConnect() {
+        this.usb.connect()
+    }
 
     protected async handleStartStreaming() {}
 
@@ -56,6 +64,7 @@ export default class CytonDeviceController
 export interface CytonController extends DeviceController {}
 
 export type CytonControllerConstructor = new (
+    usb: UsbController,
     serialNumber?: string,
     recorder?: XdfRecorder
 ) => CytonController
