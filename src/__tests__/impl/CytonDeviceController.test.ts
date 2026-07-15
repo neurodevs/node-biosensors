@@ -9,8 +9,8 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
     protected static instance: SpyCytonController
 
     private static readonly serialNumber = this.deviceId
-    private static readonly startTimeoutMs = 10
-    private static readonly retryIntervalMs = 2
+    private static readonly fakeStartTimeoutMs = 10
+    private static readonly fakeRetryIntervalMs = 2
 
     protected static async beforeAll() {
         await super.beforeAll()
@@ -23,7 +23,7 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
 
         assert.isEqual(
             CytonDeviceController.retryIntervalMs,
-            500,
+            100,
             'Did not set expected value for retryIntervalMs!'
         )
     }
@@ -35,8 +35,8 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
 
         CytonDeviceController.Class = SpyCytonController
 
-        CytonDeviceController.startTimeoutMs = this.startTimeoutMs
-        CytonDeviceController.retryIntervalMs = this.retryIntervalMs
+        CytonDeviceController.startTimeoutMs = this.fakeStartTimeoutMs
+        CytonDeviceController.retryIntervalMs = this.fakeRetryIntervalMs
 
         this.instance = await this.CytonDeviceController()
     }
@@ -144,7 +144,8 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
     protected static async retriesStartCommandUntilTimeoutIfNoDataReceived() {
         await this.startStreaming()
 
-        const expectedRetries = this.startTimeoutMs / this.retryIntervalMs
+        const expectedRetries =
+            this.fakeStartTimeoutMs / this.fakeRetryIntervalMs
 
         assert.isEqual(
             FakeUsbController.callsToWriteUsb.filter((v) => v === 'b').length,
@@ -161,7 +162,7 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
 
         await startPromise
 
-        const maxAttempts = this.startTimeoutMs / this.retryIntervalMs
+        const maxAttempts = this.fakeStartTimeoutMs / this.fakeRetryIntervalMs
 
         assert.isBetween(
             FakeUsbController.callsToWriteUsb.filter((v) => v === 'b').length,

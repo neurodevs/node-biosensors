@@ -18,7 +18,7 @@ export default class CytonDeviceController
     public static Class?: CytonControllerConstructor
     public static readonly streamQueries: string[] = []
     public static startTimeoutMs = 5000
-    public static retryIntervalMs = 500
+    public static retryIntervalMs = 100
 
     protected readonly onData: OnUsbData
 
@@ -83,15 +83,15 @@ export default class CytonDeviceController
 
     protected async handleStartStreaming() {
         for (let attempt = 0; attempt < this.maxAttempts; attempt++) {
-            if (this.getHasReceivedData()) {
-                break
-            }
-
             this.usb.writeUsb('b')
 
             await new Promise((r) =>
                 setTimeout(r, CytonDeviceController.retryIntervalMs)
             )
+
+            if (this.getHasReceivedData()) {
+                break
+            }
         }
     }
 
