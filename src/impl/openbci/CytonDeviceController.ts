@@ -17,6 +17,8 @@ export default class CytonDeviceController
 {
     public static Class?: CytonControllerConstructor
     public static readonly streamQueries: string[] = []
+    public static startTimeoutMs = 5000
+    public static retryIntervalMs = 500
 
     private readonly usb: UsbController
     private readonly serialNumber?: string
@@ -60,7 +62,20 @@ export default class CytonDeviceController
     }
 
     protected async handleStartStreaming() {
-        this.usb.writeUsb('b')
+        for (let attempt = 0; attempt < this.maxAttempts; attempt++) {
+            this.usb.writeUsb('b')
+
+            await new Promise((r) =>
+                setTimeout(r, CytonDeviceController.retryIntervalMs)
+            )
+        }
+    }
+
+    private get maxAttempts() {
+        return Math.ceil(
+            CytonDeviceController.startTimeoutMs /
+                CytonDeviceController.retryIntervalMs
+        )
     }
 
     protected async handleStopStreaming() {
@@ -72,10 +87,12 @@ export default class CytonDeviceController
     }
 
     protected static onData = (
-        _data: Buffer,
-        _length: number,
-        _timestampSec: number
-    ) => {}
+        data: Buffer,
+        length: number,
+        timestampSec: number
+    ) => {
+        console.info(timestampSec, data, length)
+    }
 
     private static UsbDeviceController(serialNumber: string | undefined) {
         return UsbDeviceController.Create({

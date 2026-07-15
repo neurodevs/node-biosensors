@@ -11,6 +11,8 @@ console.info('Connecting to Cyton controller....')
 
 await cyton.connect()
 
+await new Promise((resolve) => setTimeout(resolve, 1500))
+
 console.info('Starting streaming from Cyton...')
 
 await cyton.startStreaming()

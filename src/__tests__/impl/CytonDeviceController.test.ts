@@ -9,6 +9,24 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
     protected static instance: SpyCytonController
 
     private static readonly serialNumber = this.deviceId
+    private static readonly startTimeoutMs = 10
+    private static readonly startRetryMs = 2
+
+    protected static async beforeAll() {
+        await super.beforeAll()
+
+        assert.isEqual(
+            CytonDeviceController.startTimeoutMs,
+            5000,
+            'Did not set expected value for startTimeoutMs!'
+        )
+
+        assert.isEqual(
+            CytonDeviceController.retryIntervalMs,
+            500,
+            'Did not set expected value for retryIntervalMs!'
+        )
+    }
 
     protected static async beforeEach() {
         await super.beforeEach()
@@ -16,6 +34,9 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
         this.setFakeUsbController()
 
         CytonDeviceController.Class = SpyCytonController
+
+        CytonDeviceController.startTimeoutMs = this.startTimeoutMs
+        CytonDeviceController.retryIntervalMs = this.startRetryMs
 
         this.instance = await this.CytonDeviceController()
     }
@@ -120,6 +141,19 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
     }
 
     @test()
+    protected static async retriesStartCommandUntilTimeoutIfNoDataReceived() {
+        await this.startStreaming()
+
+        const expectedRetries = this.startTimeoutMs / this.startRetryMs
+
+        assert.isEqual(
+            FakeUsbController.callsToWriteUsb.filter((v) => v === 'b').length,
+            expectedRetries,
+            'Should retry writing the start command every retry interval until the timeout elapses!'
+        )
+    }
+
+    @test()
     protected static async callsWriteUsbToStartStreaming() {
         await this.startStreaming()
 
@@ -131,7 +165,8 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
         await this.startStreaming()
         await this.stopStreaming()
 
-        assert.isEqualDeep(FakeUsbController.callsToWriteUsb[1], 's')
+        const calls = FakeUsbController.callsToWriteUsb
+        assert.isEqualDeep(calls[calls.length - 1], 's')
     }
 
     @test()
