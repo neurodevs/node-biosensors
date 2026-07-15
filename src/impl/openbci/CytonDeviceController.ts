@@ -17,19 +17,15 @@ export default class CytonDeviceController
 {
     public static Class?: CytonControllerConstructor
     public static readonly streamQueries: string[] = []
-    public static startTimeoutMs = 5000
-    public static retryIntervalMs = 100
-
-    protected readonly onData: OnUsbData
+    public static wait = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
     private readonly usb: UsbController
     private readonly serialNumber?: string
-    private readonly getHasReceivedData: () => boolean
+    private readonly waitAfterConnectMs: number
 
     protected constructor(
         usb: UsbController,
-        onDataHandler: OnUsbData,
-        getHasReceivedData: () => boolean,
+        waitAfterConnectMs: number,
         serialNumber?: string,
         recorder?: XdfRecorder
     ) {
@@ -37,24 +33,20 @@ export default class CytonDeviceController
 
         this.usb = usb
         this.serialNumber = serialNumber
-        this.onData = onDataHandler
-        this.getHasReceivedData = getHasReceivedData
+        this.waitAfterConnectMs = waitAfterConnectMs
     }
 
     public static async Create(options?: CytonControllerOptions) {
-        const { serialNumber, xdfRecordPath } = options ?? {}
+        const {
+            serialNumber,
+            xdfRecordPath,
+            waitAfterConnectMs = 2000,
+        } = options ?? {}
 
         await this.ExgOutlet(serialNumber)
         await this.AccelOutlet(serialNumber)
 
-        let hasReceivedData = false
-
-        const onData: OnUsbData = (data, length, timestampSec) => {
-            hasReceivedData = true
-            console.info(timestampSec, data, length)
-        }
-
-        const usb = this.UsbDeviceController(serialNumber, onData)
+        const usb = this.UsbDeviceController(serialNumber)
 
         const recorder = xdfRecordPath
             ? await this.XdfStreamRecorder(xdfRecordPath, this.streamQueries)
@@ -62,8 +54,7 @@ export default class CytonDeviceController
 
         return new (this.Class ?? this)(
             usb,
-            onData,
-            () => hasReceivedData,
+            waitAfterConnectMs,
             serialNumber,
             recorder
         )
@@ -79,27 +70,11 @@ export default class CytonDeviceController
 
     protected async handleConnect() {
         this.usb.connect()
+        await CytonDeviceController.wait(this.waitAfterConnectMs)
     }
 
     protected async handleStartStreaming() {
-        for (let attempt = 0; attempt < this.maxAttempts; attempt++) {
-            this.usb.writeUsb('b')
-
-            await new Promise((r) =>
-                setTimeout(r, CytonDeviceController.retryIntervalMs)
-            )
-
-            if (this.getHasReceivedData()) {
-                break
-            }
-        }
-    }
-
-    private get maxAttempts() {
-        return Math.ceil(
-            CytonDeviceController.startTimeoutMs /
-                CytonDeviceController.retryIntervalMs
-        )
+        this.usb.writeUsb('b')
     }
 
     protected async handleStopStreaming() {
@@ -110,12 +85,13 @@ export default class CytonDeviceController
         this.usb.disconnect()
     }
 
-    private static UsbDeviceController(
-        serialNumber: string | undefined,
-        onData: OnUsbData
-    ) {
+    protected static onData: OnUsbData = (data, length, timestampSec) => {
+        console.info(timestampSec, data, length)
+    }
+
+    private static UsbDeviceController(serialNumber: string | undefined) {
         return UsbDeviceController.Create({
-            onData,
+            onData: this.onData,
             serialNumber,
         })
     }
@@ -162,14 +138,14 @@ export interface CytonController extends DeviceController {}
 
 export type CytonControllerConstructor = new (
     usb: UsbController,
-    onDataHandler: OnUsbData,
-    getHasReceivedData: () => boolean,
+    waitAfterConnectMs: number,
     serialNumber?: string,
     recorder?: XdfRecorder
 ) => CytonController
 
 export interface CytonControllerOptions extends DeviceControllerOptions {
     serialNumber?: string
+    waitAfterConnectMs?: number
 }
 
 export type OnUsbData = (

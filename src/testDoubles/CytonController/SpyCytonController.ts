@@ -1,18 +1,15 @@
 import { XdfRecorder } from '@neurodevs/node-xdf'
-import CytonDeviceController, {
-    OnUsbData,
-} from '../../impl/openbci/CytonDeviceController.js'
+import CytonDeviceController from '../../impl/openbci/CytonDeviceController.js'
 import { UsbController } from '@neurodevs/node-lsl'
 
 export default class SpyCytonController extends CytonDeviceController {
     public constructor(
         usb: UsbController,
-        onDataHandler: OnUsbData,
-        getHasReceivedData: () => boolean,
+        waitAfterConnectMs: number,
         serialNumber?: string,
         recorder?: XdfRecorder
     ) {
-        super(usb, onDataHandler, getHasReceivedData, serialNumber, recorder)
+        super(usb, waitAfterConnectMs, serialNumber, recorder)
     }
 
     public getIsConnected() {
@@ -24,6 +21,6 @@ export default class SpyCytonController extends CytonDeviceController {
     }
 
     public getOnData() {
-        return this.onData
+        return CytonDeviceController.onData
     }
 }

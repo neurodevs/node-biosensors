@@ -1,32 +1,20 @@
+import { randomInt } from 'node:crypto'
+
+import { FakeUsbController, FakeStreamOutlet } from '@neurodevs/node-lsl'
 import { test, assert } from '@neurodevs/node-tdd'
 
-import CytonDeviceController from '../../impl/openbci/CytonDeviceController.js'
+import CytonDeviceController, {
+    CytonControllerOptions,
+} from '../../impl/openbci/CytonDeviceController.js'
 import AbstractDeviceControllerTest from '../AbstractDeviceControllerTest.js'
 import SpyCytonController from '../../testDoubles/CytonController/SpyCytonController.js'
-import { FakeUsbController, FakeStreamOutlet } from '@neurodevs/node-lsl'
 
 export default class CytonDeviceControllerTest extends AbstractDeviceControllerTest {
     protected static instance: SpyCytonController
 
     private static readonly serialNumber = this.deviceId
-    private static readonly fakeStartTimeoutMs = 10
-    private static readonly fakeRetryIntervalMs = 2
 
-    protected static async beforeAll() {
-        await super.beforeAll()
-
-        assert.isEqual(
-            CytonDeviceController.startTimeoutMs,
-            5000,
-            'Did not set expected value for startTimeoutMs!'
-        )
-
-        assert.isEqual(
-            CytonDeviceController.retryIntervalMs,
-            100,
-            'Did not set expected value for retryIntervalMs!'
-        )
-    }
+    private static readonly waitCalls: number[] = []
 
     protected static async beforeEach() {
         await super.beforeEach()
@@ -35,8 +23,10 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
 
         CytonDeviceController.Class = SpyCytonController
 
-        CytonDeviceController.startTimeoutMs = this.fakeStartTimeoutMs
-        CytonDeviceController.retryIntervalMs = this.fakeRetryIntervalMs
+        CytonDeviceController.wait = async (ms: number) => {
+            this.waitCalls.push(ms)
+        }
+        this.waitCalls.length = 0
 
         this.instance = await this.CytonDeviceController()
     }
@@ -141,34 +131,29 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
     }
 
     @test()
-    protected static async retriesStartCommandUntilTimeoutIfNoDataReceived() {
-        await this.startStreaming()
-
-        const expectedRetries =
-            this.fakeStartTimeoutMs / this.fakeRetryIntervalMs
+    protected static async connectWaitsForBoardToReboot() {
+        await this.connect()
 
         assert.isEqual(
-            FakeUsbController.callsToWriteUsb.filter((v) => v === 'b').length,
-            expectedRetries,
-            'Should retry writing the start command every retry interval until the timeout elapses!'
+            this.waitCalls[0],
+            2000,
+            'Should default waitAfterConnectMs to 2000ms!'
         )
     }
 
     @test()
-    protected static async stopsRetryingOnceDataIsReceived() {
-        const startPromise = this.instance.startStreaming()
+    protected static async overridesDefaultWaitAfterConnectMs() {
+        const fakeWaitAfterConnectMs = randomInt(1, 100)
 
-        this.instance.getOnData()(Buffer.from([]), 0, 0)
+        const instance = await this.CytonDeviceController({
+            waitAfterConnectMs: fakeWaitAfterConnectMs,
+        })
+        await instance.connect()
 
-        await startPromise
-
-        const maxAttempts = this.fakeStartTimeoutMs / this.fakeRetryIntervalMs
-
-        assert.isBetween(
-            FakeUsbController.callsToWriteUsb.filter((v) => v === 'b').length,
-            0,
-            maxAttempts,
-            'Should stop retrying the start command once data has been received!'
+        assert.isEqual(
+            this.waitCalls[0],
+            fakeWaitAfterConnectMs,
+            'Did not override waitAfterConnectMs!'
         )
     }
 
@@ -239,10 +224,13 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
         })
     }
 
-    private static async CytonDeviceController() {
+    private static async CytonDeviceController(
+        options?: Partial<CytonControllerOptions>
+    ) {
         return (await CytonDeviceController.Create({
             serialNumber: this.serialNumber,
             xdfRecordPath: this.xdfRecordPath,
+            ...options,
         })) as SpyCytonController
     }
 }
