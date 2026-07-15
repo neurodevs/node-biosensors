@@ -20,11 +20,16 @@ export default class CytonDeviceController
     public static startTimeoutMs = 5000
     public static retryIntervalMs = 500
 
+    protected readonly onData: OnUsbData
+
     private readonly usb: UsbController
     private readonly serialNumber?: string
+    private readonly getHasReceivedData: () => boolean
 
     protected constructor(
         usb: UsbController,
+        onDataHandler: OnUsbData,
+        getHasReceivedData: () => boolean,
         serialNumber?: string,
         recorder?: XdfRecorder
     ) {
@@ -32,6 +37,8 @@ export default class CytonDeviceController
 
         this.usb = usb
         this.serialNumber = serialNumber
+        this.onData = onDataHandler
+        this.getHasReceivedData = getHasReceivedData
     }
 
     public static async Create(options?: CytonControllerOptions) {
@@ -40,13 +47,26 @@ export default class CytonDeviceController
         await this.ExgOutlet(serialNumber)
         await this.AccelOutlet(serialNumber)
 
-        const usb = this.UsbDeviceController(serialNumber)
+        let hasReceivedData = false
+
+        const onData: OnUsbData = (data, length, timestampSec) => {
+            hasReceivedData = true
+            console.info(timestampSec, data, length)
+        }
+
+        const usb = this.UsbDeviceController(serialNumber, onData)
 
         const recorder = xdfRecordPath
             ? await this.XdfStreamRecorder(xdfRecordPath, this.streamQueries)
             : undefined
 
-        return new (this.Class ?? this)(usb, serialNumber, recorder)
+        return new (this.Class ?? this)(
+            usb,
+            onData,
+            () => hasReceivedData,
+            serialNumber,
+            recorder
+        )
     }
 
     public get streamQueries() {
@@ -63,6 +83,10 @@ export default class CytonDeviceController
 
     protected async handleStartStreaming() {
         for (let attempt = 0; attempt < this.maxAttempts; attempt++) {
+            if (this.getHasReceivedData()) {
+                break
+            }
+
             this.usb.writeUsb('b')
 
             await new Promise((r) =>
@@ -86,17 +110,12 @@ export default class CytonDeviceController
         this.usb.disconnect()
     }
 
-    protected static onData = (
-        data: Buffer,
-        length: number,
-        timestampSec: number
-    ) => {
-        console.info(timestampSec, data, length)
-    }
-
-    private static UsbDeviceController(serialNumber: string | undefined) {
+    private static UsbDeviceController(
+        serialNumber: string | undefined,
+        onData: OnUsbData
+    ) {
         return UsbDeviceController.Create({
-            onData: this.onData,
+            onData,
             serialNumber,
         })
     }
@@ -143,6 +162,8 @@ export interface CytonController extends DeviceController {}
 
 export type CytonControllerConstructor = new (
     usb: UsbController,
+    onDataHandler: OnUsbData,
+    getHasReceivedData: () => boolean,
     serialNumber?: string,
     recorder?: XdfRecorder
 ) => CytonController
@@ -150,3 +171,9 @@ export type CytonControllerConstructor = new (
 export interface CytonControllerOptions extends DeviceControllerOptions {
     serialNumber?: string
 }
+
+export type OnUsbData = (
+    data: Buffer,
+    length: number,
+    timestampSec: number
+) => void

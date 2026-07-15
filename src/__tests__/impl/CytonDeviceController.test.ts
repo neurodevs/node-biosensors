@@ -10,7 +10,7 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
 
     private static readonly serialNumber = this.deviceId
     private static readonly startTimeoutMs = 10
-    private static readonly startRetryMs = 2
+    private static readonly retryIntervalMs = 2
 
     protected static async beforeAll() {
         await super.beforeAll()
@@ -36,7 +36,7 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
         CytonDeviceController.Class = SpyCytonController
 
         CytonDeviceController.startTimeoutMs = this.startTimeoutMs
-        CytonDeviceController.retryIntervalMs = this.startRetryMs
+        CytonDeviceController.retryIntervalMs = this.retryIntervalMs
 
         this.instance = await this.CytonDeviceController()
     }
@@ -144,12 +144,30 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
     protected static async retriesStartCommandUntilTimeoutIfNoDataReceived() {
         await this.startStreaming()
 
-        const expectedRetries = this.startTimeoutMs / this.startRetryMs
+        const expectedRetries = this.startTimeoutMs / this.retryIntervalMs
 
         assert.isEqual(
             FakeUsbController.callsToWriteUsb.filter((v) => v === 'b').length,
             expectedRetries,
             'Should retry writing the start command every retry interval until the timeout elapses!'
+        )
+    }
+
+    @test()
+    protected static async stopsRetryingOnceDataIsReceived() {
+        const startPromise = this.instance.startStreaming()
+
+        this.instance.getOnData()(Buffer.from([]), 0, 0)
+
+        await startPromise
+
+        const maxAttempts = this.startTimeoutMs / this.retryIntervalMs
+
+        assert.isBetween(
+            FakeUsbController.callsToWriteUsb.filter((v) => v === 'b').length,
+            0,
+            maxAttempts,
+            'Should stop retrying the start command once data has been received!'
         )
     }
 
