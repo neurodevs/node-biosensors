@@ -24,24 +24,16 @@ export default class CytonDeviceController
 
     private readonly usb: UsbController
     private readonly waitAfterConnectMs: number
-    private readonly logDeviceInfo: boolean
     private readonly serialNumber?: string
 
     protected constructor(options: CytonControllerConstructorOptions) {
-        const {
-            usb,
-            waitAfterConnectMs,
-            logDeviceInfo,
-            onData,
-            serialNumber,
-            recorder,
-        } = options
+        const { usb, waitAfterConnectMs, onData, serialNumber, recorder } =
+            options
 
         super(recorder)
 
         this.usb = usb
         this.serialNumber = serialNumber
-        this.logDeviceInfo = logDeviceInfo
         this.waitAfterConnectMs = waitAfterConnectMs
         this.onData = onData
     }
@@ -67,7 +59,6 @@ export default class CytonDeviceController
         return new (this.Class ?? this)({
             usb,
             waitAfterConnectMs,
-            logDeviceInfo,
             onData,
             serialNumber,
             recorder,
@@ -87,9 +78,7 @@ export default class CytonDeviceController
 
         await CytonDeviceController.wait(this.waitAfterConnectMs)
 
-        if (this.logDeviceInfo) {
-            await this.usb.writeUsb('v')
-        }
+        await this.usb.writeUsb('v')
     }
 
     protected async handleStartStreaming() {
@@ -196,7 +185,6 @@ export interface CytonControllerOptions extends DeviceControllerOptions {
 export interface CytonControllerConstructorOptions {
     usb: UsbController
     waitAfterConnectMs: number
-    logDeviceInfo: boolean
     onData: OnUsbData
     serialNumber?: string
     recorder?: XdfRecorder

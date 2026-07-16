@@ -160,8 +160,17 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
     }
 
     @test()
-    protected static async getsDeviceInfoWhenPassedOptionWithWriteUsbV() {
-        const instance = await this.LogEnabledCyton()
+    protected static async resetsDeviceWithWriteUsbV() {
+        await this.connect()
+
+        assert.isEqualDeep(FakeUsbController.callsToWriteUsb[0], 'v')
+    }
+
+    @test()
+    protected static async writesUsbVOnConnectEvenWithLogDeviceInfoFalse() {
+        const instance = await this.CytonDeviceController({
+            logDeviceInfo: false,
+        })
         await instance.connect()
 
         assert.isEqualDeep(FakeUsbController.callsToWriteUsb[0], 'v')
@@ -182,8 +191,7 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
         }
 
         try {
-            const instance = await this.LogEnabledCyton()
-            await instance.connect()
+            await this.connect()
         } finally {
             FakeUsbController.prototype.writeUsb = originalWriteUsb
         }
@@ -192,19 +200,6 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
             order,
             ['wait', 'writeUsb:v'],
             `Should write 'v' after waiting for waitAfterConnectMs!`
-        )
-    }
-
-    @test()
-    protected static async withoutPassedOptionDoesNotWriteUsbV() {
-        await this.connect()
-
-        const calls = FakeUsbController.callsToWriteUsb.filter((c) => c == 'v')
-
-        assert.isLength(
-            calls,
-            0,
-            `Should not call writeUsb('v') without option!`
         )
     }
 
