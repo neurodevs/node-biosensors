@@ -5,6 +5,7 @@ console.info('\nCreating Cyton controller...')
 const cyton = await CytonDeviceController.Create({
     serialNumber: 'DP04WG8J',
     xdfRecordPath: './artifacts/cyton.xdf',
+    logDeviceInfo: true,
 })
 
 console.info('Connecting to Cyton controller....')

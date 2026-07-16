@@ -13,6 +13,8 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
     protected static instance: SpyCytonController
 
     private static readonly serialNumber = this.deviceId
+    private static readonly realDeviceInfo = `OpenBCI V3 8-16 channel\nOn Board ADS1299 Device ID: 0x3E\nLIS3DH Device ID: 0x33\nFirmware: v3.1.2\n$$$`
+    private static readonly realBuffer = Buffer.from(this.realDeviceInfo)
 
     private static readonly waitCalls: number[] = []
 
@@ -114,7 +116,7 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
     @test()
     protected static async createsUsbController() {
         assert.isEqualDeep(FakeUsbController.callsToConstructor[0], {
-            onData: this.instance.getOnData(),
+            onData: this.getOnData(),
             serialNumber: this.serialNumber,
         })
     }
@@ -158,19 +160,157 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
     }
 
     @test()
-    protected static async callsWriteUsbToStartStreaming() {
+    protected static async getsDeviceInfoWhenPassedOptionWithWriteUsbV() {
+        const instance = await this.LogEnabledCyton()
+        await instance.connect()
+
+        assert.isEqualDeep(FakeUsbController.callsToWriteUsb[0], 'v')
+    }
+
+    @test()
+    protected static async writesUsbVAfterWaitAfterConnectMs() {
+        const order: string[] = []
+
+        CytonDeviceController.wait = async () => {
+            order.push('wait')
+        }
+
+        const originalWriteUsb = FakeUsbController.prototype.writeUsb
+        FakeUsbController.prototype.writeUsb = async function (value: string) {
+            order.push(`writeUsb:${value}`)
+            return originalWriteUsb.call(this, value)
+        }
+
+        try {
+            const instance = await this.LogEnabledCyton()
+            await instance.connect()
+        } finally {
+            FakeUsbController.prototype.writeUsb = originalWriteUsb
+        }
+
+        assert.isEqualDeep(
+            order,
+            ['wait', 'writeUsb:v'],
+            `Should write 'v' after waiting for waitAfterConnectMs!`
+        )
+    }
+
+    @test()
+    protected static async withoutPassedOptionDoesNotWriteUsbV() {
+        await this.connect()
+
+        const calls = FakeUsbController.callsToWriteUsb.filter((c) => c == 'v')
+
+        assert.isLength(
+            calls,
+            0,
+            `Should not call writeUsb('v') without option!`
+        )
+    }
+
+    @test()
+    protected static async startsStreamingWithWriteUsbB() {
         await this.startStreaming()
 
         assert.isEqualDeep(FakeUsbController.callsToWriteUsb[0], 'b')
     }
 
     @test()
-    protected static async callsWriteUsbToStopStreaming() {
+    protected static async stopsStreamingWithWriteUsbS() {
         await this.startStreaming()
         await this.stopStreaming()
 
         const calls = FakeUsbController.callsToWriteUsb
         assert.isEqualDeep(calls[calls.length - 1], 's')
+    }
+
+    @test()
+    protected static async logsDeviceInfoAccumulatedAcrossMultipleOnDataCalls() {
+        let loggedDeviceInfo: string | undefined
+
+        CytonDeviceController.log = (msg: string) => {
+            loggedDeviceInfo = msg
+        }
+
+        const onData = await this.getLogEnabledOnData()
+
+        const chunks = [
+            this.realDeviceInfo.slice(0, 17),
+            this.realDeviceInfo.slice(17, 62),
+            this.realDeviceInfo.slice(62),
+        ]
+
+        for (const chunk of chunks) {
+            assert.isFalsy(
+                loggedDeviceInfo,
+                'Should not log device info before "$$$" is fully received!'
+            )
+
+            const data = Buffer.from(chunk)
+            onData(data, data.length, 0)
+        }
+
+        assert.isEqual(
+            loggedDeviceInfo,
+            `\n${this.realDeviceInfo}\n`,
+            'Did not log device info!'
+        )
+    }
+
+    @test()
+    protected static async stopsAccumulatingDeviceInfoBufferAfterFirstLog() {
+        let numCallsToLog = 0
+
+        CytonDeviceController.log = () => {
+            numCallsToLog++
+        }
+
+        const onData = await this.getLogEnabledOnData()
+
+        onData(this.realBuffer, this.realBuffer.length, 0)
+        onData(this.realBuffer, this.realBuffer.length, 0)
+
+        assert.isEqual(
+            numCallsToLog,
+            1,
+            'Should not keep logging device info after the first time it is received!'
+        )
+    }
+
+    @test()
+    protected static async stripsInvalidBytesFromLoggedDeviceInfo() {
+        let loggedDeviceInfo: string | undefined
+
+        CytonDeviceController.log = (msg: string) => {
+            loggedDeviceInfo = msg
+        }
+
+        const onData = await this.getLogEnabledOnData()
+
+        const strayByte = Buffer.from([0xff])
+        onData(strayByte, strayByte.length, 0)
+        onData(this.realBuffer, this.realBuffer.length, 0)
+
+        assert.isEqual(
+            loggedDeviceInfo,
+            `\n${this.realDeviceInfo}\n`,
+            'Should strip invalid bytes from logged device info!'
+        )
+    }
+
+    @test()
+    protected static async doesNotLogDeviceInfoByDefault() {
+        let wasCalled = false
+
+        CytonDeviceController.log = () => {
+            wasCalled = true
+        }
+
+        const onData = this.getOnData()
+
+        onData(this.realBuffer, this.realBuffer.length, 0)
+
+        assert.isFalse(wasCalled, 'Should not have logged!')
     }
 
     @test()
@@ -224,6 +364,15 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
         })
     }
 
+    private static getOnData() {
+        return this.instance.getOnData()
+    }
+
+    private static async getLogEnabledOnData() {
+        const instance = await this.LogEnabledCyton()
+        return instance.getOnData()
+    }
+
     private static async CytonDeviceController(
         options?: Partial<CytonControllerOptions>
     ) {
@@ -232,5 +381,11 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
             xdfRecordPath: this.xdfRecordPath,
             ...options,
         })) as SpyCytonController
+    }
+
+    private static async LogEnabledCyton() {
+        return await this.CytonDeviceController({
+            logDeviceInfo: true,
+        })
     }
 }

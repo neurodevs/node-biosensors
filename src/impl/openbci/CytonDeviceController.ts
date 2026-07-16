@@ -18,14 +18,20 @@ export default class CytonDeviceController
     public static Class?: CytonControllerConstructor
     public static readonly streamQueries: string[] = []
     public static wait = (ms: number) => new Promise((r) => setTimeout(r, ms))
+    public static log = console.info
+
+    protected readonly onData: OnUsbData
 
     private readonly usb: UsbController
-    private readonly serialNumber?: string
     private readonly waitAfterConnectMs: number
+    private readonly logDeviceInfo: boolean
+    private readonly serialNumber?: string
 
     protected constructor(
         usb: UsbController,
         waitAfterConnectMs: number,
+        logDeviceInfo: boolean,
+        onData: OnUsbData,
         serialNumber?: string,
         recorder?: XdfRecorder
     ) {
@@ -33,7 +39,9 @@ export default class CytonDeviceController
 
         this.usb = usb
         this.serialNumber = serialNumber
+        this.logDeviceInfo = logDeviceInfo
         this.waitAfterConnectMs = waitAfterConnectMs
+        this.onData = onData
     }
 
     public static async Create(options?: CytonControllerOptions) {
@@ -41,12 +49,14 @@ export default class CytonDeviceController
             serialNumber,
             xdfRecordPath,
             waitAfterConnectMs = 2000,
+            logDeviceInfo = false,
         } = options ?? {}
 
         await this.ExgOutlet(serialNumber)
         await this.AccelOutlet(serialNumber)
 
-        const usb = this.UsbDeviceController(serialNumber)
+        const onData = this.createOnData(logDeviceInfo)
+        const usb = this.UsbDeviceController(serialNumber, onData)
 
         const recorder = xdfRecordPath
             ? await this.XdfStreamRecorder(xdfRecordPath, this.streamQueries)
@@ -55,6 +65,8 @@ export default class CytonDeviceController
         return new (this.Class ?? this)(
             usb,
             waitAfterConnectMs,
+            logDeviceInfo,
+            onData,
             serialNumber,
             recorder
         )
@@ -70,7 +82,12 @@ export default class CytonDeviceController
 
     protected async handleConnect() {
         this.usb.connect()
+
         await CytonDeviceController.wait(this.waitAfterConnectMs)
+
+        if (this.logDeviceInfo) {
+            await this.usb.writeUsb('v')
+        }
     }
 
     protected async handleStartStreaming() {
@@ -85,13 +102,41 @@ export default class CytonDeviceController
         this.usb.disconnect()
     }
 
-    protected static onData: OnUsbData = (data, length, timestampSec) => {
+    private static createOnData(logDeviceInfo: boolean): OnUsbData {
+        let deviceInfoBuffer = Buffer.alloc(0)
+        let hasLoggedDeviceInfo = false
+
+        return (data, length, timestampSec) => {
+            this.defaultOnData(data, length, timestampSec)
+
+            if (!logDeviceInfo || hasLoggedDeviceInfo) {
+                return
+            }
+
+            deviceInfoBuffer = Buffer.concat([deviceInfoBuffer, data])
+
+            if (deviceInfoBuffer.includes('$$$')) {
+                const text = deviceInfoBuffer
+                    .toString('utf8')
+                    .replace(/[^\x20-\x7E\n]/g, '')
+
+                this.log(`\n${text}\n`)
+                hasLoggedDeviceInfo = true
+                deviceInfoBuffer = Buffer.alloc(0)
+            }
+        }
+    }
+
+    private static defaultOnData: OnUsbData = (data, length, timestampSec) => {
         console.info(timestampSec, data, length)
     }
 
-    private static UsbDeviceController(serialNumber: string | undefined) {
+    private static UsbDeviceController(
+        serialNumber: string | undefined,
+        onData: OnUsbData
+    ) {
         return UsbDeviceController.Create({
-            onData: this.onData,
+            onData,
             serialNumber,
         })
     }
@@ -139,6 +184,8 @@ export interface CytonController extends DeviceController {}
 export type CytonControllerConstructor = new (
     usb: UsbController,
     waitAfterConnectMs: number,
+    logDeviceInfo: boolean,
+    onData: OnUsbData,
     serialNumber?: string,
     recorder?: XdfRecorder
 ) => CytonController
@@ -146,6 +193,7 @@ export type CytonControllerConstructor = new (
 export interface CytonControllerOptions extends DeviceControllerOptions {
     serialNumber?: string
     waitAfterConnectMs?: number
+    logDeviceInfo?: boolean
 }
 
 export type OnUsbData = (
