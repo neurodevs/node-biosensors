@@ -8,6 +8,12 @@ const cyton = await CytonDeviceController.Create({
     logDeviceInfo: true,
 })
 
+process.on('SIGINT', async () => {
+    console.info('\nCaught interrupt, disconnecting from Cyton controller...')
+    await cyton.disconnect()
+    process.exit()
+})
+
 console.info('Connecting to Cyton controller....')
 
 await cyton.connect()
