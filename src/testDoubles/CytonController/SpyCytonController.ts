@@ -1,26 +1,10 @@
-import { XdfRecorder } from '@neurodevs/node-xdf'
 import CytonDeviceController, {
-    OnUsbData,
+    CytonControllerConstructorOptions,
 } from '../../impl/openbci/CytonDeviceController.js'
-import { UsbController } from '@neurodevs/node-lsl'
 
 export default class SpyCytonController extends CytonDeviceController {
-    public constructor(
-        usb: UsbController,
-        waitAfterConnectMs: number,
-        logDeviceInfo: boolean,
-        onData: OnUsbData,
-        serialNumber?: string,
-        recorder?: XdfRecorder
-    ) {
-        super(
-            usb,
-            waitAfterConnectMs,
-            logDeviceInfo,
-            onData,
-            serialNumber,
-            recorder
-        )
+    public constructor(options: CytonControllerConstructorOptions) {
+        super(options)
     }
 
     public getIsConnected() {
