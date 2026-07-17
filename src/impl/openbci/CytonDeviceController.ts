@@ -95,31 +95,34 @@ export default class CytonDeviceController
 
     private static createOnData(logDeviceInfo: boolean): OnUsbData {
         let deviceInfoBuffer = Buffer.alloc(0)
-        let hasLoggedDeviceInfo = false
+        let hasReceivedDeviceInfo = false
 
         return (data, length, timestampSec) => {
-            this.defaultOnData(data, length, timestampSec)
-
-            if (!logDeviceInfo || hasLoggedDeviceInfo) {
+            if (hasReceivedDeviceInfo) {
+                this.defaultOnData(data, length, timestampSec)
                 return
             }
 
             deviceInfoBuffer = Buffer.concat([deviceInfoBuffer, data])
 
             if (deviceInfoBuffer.includes('$$$')) {
-                const text = deviceInfoBuffer
-                    .toString('utf8')
-                    .replace(/[^\x20-\x7E\n]/g, '')
+                hasReceivedDeviceInfo = true
 
-                this.log(`\n${text}\n`)
-                hasLoggedDeviceInfo = true
+                if (logDeviceInfo) {
+                    const text = deviceInfoBuffer
+                        .toString('utf8')
+                        .replace(/[^\x20-\x7E\n]/g, '')
+
+                    this.log(`\n${text}\n`)
+                }
+
                 deviceInfoBuffer = Buffer.alloc(0)
             }
         }
     }
 
     private static defaultOnData: OnUsbData = (data, length, timestampSec) => {
-        console.info(timestampSec, data, length)
+        this.log(timestampSec, data, length)
     }
 
     private static UsbDeviceController(

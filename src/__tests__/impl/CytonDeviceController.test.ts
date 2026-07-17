@@ -253,11 +253,13 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
     }
 
     @test()
-    protected static async stopsAccumulatingDeviceInfoBufferAfterFirstLog() {
-        let numCallsToLog = 0
+    protected static async stopsLoggingDeviceInfoAfterFirstReceipt() {
+        const deviceInfoLogs: string[] = []
 
-        CytonDeviceController.log = () => {
-            numCallsToLog++
+        CytonDeviceController.log = (msg: unknown) => {
+            if (typeof msg === 'string') {
+                deviceInfoLogs.push(msg)
+            }
         }
 
         const onData = await this.getLogEnabledOnData()
@@ -265,10 +267,10 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
         onData(this.realBuffer, this.realBuffer.length, 0)
         onData(this.realBuffer, this.realBuffer.length, 0)
 
-        assert.isEqual(
-            numCallsToLog,
+        assert.isLength(
+            deviceInfoLogs,
             1,
-            'Should not keep logging device info after the first time it is received!'
+            'Should not keep logging device info text after the first time it is received!'
         )
     }
 
@@ -306,6 +308,25 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
         onData(this.realBuffer, this.realBuffer.length, 0)
 
         assert.isFalse(wasCalled, 'Should not have logged!')
+    }
+
+    @test()
+    protected static async doesNotLogPacketsBeforeDeviceInfoReceived() {
+        let wasCalled = false
+
+        CytonDeviceController.log = () => {
+            wasCalled = true
+        }
+
+        const onData = await this.getLogEnabledOnData()
+
+        const noise = Buffer.from([0xff])
+        onData(noise, noise.length, 0)
+
+        assert.isFalse(
+            wasCalled,
+            'Should not log packets before device info has been received!'
+        )
     }
 
     @test()
