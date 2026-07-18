@@ -4,15 +4,11 @@ import {
     DeviceController,
     DeviceControllerOptions,
 } from '../BiosensorDeviceFactory.js'
-import AbstractDeviceController from '../abstract/AbstractDeviceController.js'
-import {
-    LslStreamOutlet,
-    UsbController,
-    UsbDeviceController,
-} from '@neurodevs/node-lsl'
+import AbstractDeviceControllerUsb from '../abstract/AbstractDeviceControllerUsb.js'
+import { LslStreamOutlet, UsbController, UsbDeviceController } from '@neurodevs/node-lsl'
 
 export default class CytonDeviceController
-    extends AbstractDeviceController
+    extends AbstractDeviceControllerUsb
     implements CytonController
 {
     public static Class?: CytonControllerConstructor
@@ -22,7 +18,6 @@ export default class CytonDeviceController
 
     protected readonly onData: OnUsbData
 
-    private readonly usb: UsbController
     private readonly waitAfterConnectMs: number
     private readonly serialNumber?: string
 
@@ -30,9 +25,8 @@ export default class CytonDeviceController
         const { usb, waitAfterConnectMs, onData, serialNumber, recorder } =
             options
 
-        super(recorder)
+        super(usb, recorder)
 
-        this.usb = usb
         this.serialNumber = serialNumber
         this.waitAfterConnectMs = waitAfterConnectMs
         this.onData = onData
@@ -74,7 +68,7 @@ export default class CytonDeviceController
     }
 
     protected async handleConnect() {
-        this.usb.connect()
+        await super.handleConnect()
 
         await CytonDeviceController.wait(this.waitAfterConnectMs)
 
@@ -87,10 +81,6 @@ export default class CytonDeviceController
 
     protected async handleStopStreaming() {
         this.usb.writeUsb('s')
-    }
-
-    protected async handleDisconnect() {
-        this.usb.disconnect()
     }
 
     private static createOnData(logDeviceInfo: boolean): OnUsbData {
