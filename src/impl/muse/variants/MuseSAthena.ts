@@ -98,6 +98,7 @@ export default class MuseSAthena implements MuseVariant {
         'type="IMU"',
         'type="PPG"',
     ]
+
     public static readonly startCommands = [
         'v6',
         's',

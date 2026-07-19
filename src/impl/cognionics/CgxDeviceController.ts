@@ -17,6 +17,7 @@ import { DeviceController } from '../BiosensorDeviceFactory.js'
 export default class CgxDeviceController implements DeviceController {
     public static Class?: CgxControllerConstructor
     public static FTDI = FTDI
+
     public static readonly streamQueries = ['type="EEG"', 'type="ACCEL"']
 
     public isRunning = false

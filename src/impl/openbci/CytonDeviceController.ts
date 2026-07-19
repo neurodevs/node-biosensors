@@ -16,9 +16,10 @@ export default class CytonDeviceController
     implements CytonController
 {
     public static Class?: CytonControllerConstructor
-    public static readonly streamQueries: string[] = []
     public static wait = (ms: number) => new Promise((r) => setTimeout(r, ms))
     public static log = console.info
+
+    public static readonly streamQueries: string[] = []
 
     protected readonly onData: OnUsbData
 
