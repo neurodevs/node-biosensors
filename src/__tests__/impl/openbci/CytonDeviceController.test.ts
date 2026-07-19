@@ -5,9 +5,9 @@ import { test, assert } from '@neurodevs/node-tdd'
 
 import CytonDeviceController, {
     CytonControllerOptions,
-} from '../../impl/openbci/CytonDeviceController.js'
-import AbstractDeviceControllerTest from '../AbstractDeviceControllerTest.js'
-import SpyCytonController from '../../testDoubles/CytonController/SpyCytonController.js'
+} from '../../../impl/openbci/CytonDeviceController.js'
+import AbstractDeviceControllerTest from '../../AbstractDeviceControllerTest.js'
+import SpyCytonController from '../../../testDoubles/CytonController/SpyCytonController.js'
 
 export default class CytonDeviceControllerTest extends AbstractDeviceControllerTest {
     protected static instance: SpyCytonController

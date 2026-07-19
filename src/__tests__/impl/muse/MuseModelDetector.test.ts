@@ -3,11 +3,11 @@ import { FakeBleController } from '@neurodevs/node-lsl'
 
 import MuseModelDetector, {
     detectMuseModel,
-} from '../../impl/muse/MuseModelDetector.js'
-import { CONTROL_UUID } from '../../impl/muse/MuseDeviceController.js'
-import SpyMuseDetector from '../../testDoubles/MuseDetector/SpyMuseDetector.js'
-import AbstractPackageTest from '../AbstractPackageTest.js'
-import FakeMuseDetector from '../../testDoubles/MuseDetector/FakeMuseDetector.js'
+} from '../../../impl/muse/MuseModelDetector.js'
+import { CONTROL_UUID } from '../../../impl/muse/MuseDeviceController.js'
+import SpyMuseDetector from '../../../testDoubles/MuseDetector/SpyMuseDetector.js'
+import AbstractPackageTest from '../../AbstractPackageTest.js'
+import FakeMuseDetector from '../../../testDoubles/MuseDetector/FakeMuseDetector.js'
 
 export default class MuseModelDetectorTest extends AbstractPackageTest {
     private static instance: SpyMuseDetector

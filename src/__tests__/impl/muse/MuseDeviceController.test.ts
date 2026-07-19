@@ -4,10 +4,10 @@ import { FakeBleController, FakeStreamOutlet } from '@neurodevs/node-lsl'
 import MuseDeviceController, {
     CONTROL_UUID,
     MuseControllerOptions,
-} from '../../impl/muse/MuseDeviceController.js'
-import SpyMuseController from '../../testDoubles/MuseController/SpyMuseController.js'
-import AbstractDeviceControllerBleTest from '../AbstractDeviceControllerBleTest.js'
-import FakeMuseDetector from '../../testDoubles/MuseDetector/FakeMuseDetector.js'
+} from '../../../impl/muse/MuseDeviceController.js'
+import SpyMuseController from '../../../testDoubles/MuseController/SpyMuseController.js'
+import AbstractDeviceControllerBleTest from '../../AbstractDeviceControllerBleTest.js'
+import FakeMuseDetector from '../../../testDoubles/MuseDetector/FakeMuseDetector.js'
 
 export default class MuseDeviceControllerTest extends AbstractDeviceControllerBleTest {
     protected static instance: SpyMuseController

@@ -1,19 +1,20 @@
 import { test } from '@neurodevs/node-tdd'
 
-import Muse2FamilyTest from '../Muse2FamilyTest.js'
-import { MuseDeviceModel } from '../../impl/muse/MuseDeviceController.js'
-import { MUSE_2_CHAR_UUIDS } from '../../impl/muse/variants/Muse2.js'
+import Muse2FamilyTest from '../../../Muse2FamilyTest.js'
+import { MuseDeviceModel } from '../../../../impl/muse/MuseDeviceController.js'
+import { MUSE_CHAR_UUIDS } from '../../../../impl/muse/variants/MuseSGen2.js'
 
-export default class Muse2Test extends Muse2FamilyTest {
-    protected static readonly model: MuseDeviceModel = 'Muse 2'
-    protected static readonly charUuids = MUSE_2_CHAR_UUIDS
+export default class MuseSGen2Test extends Muse2FamilyTest {
+    protected static readonly model: MuseDeviceModel = 'Muse S Gen 2'
+    protected static readonly charUuids = MUSE_CHAR_UUIDS
     protected static readonly eegCharNames = [
         'EEG_TP10',
         'EEG_AF8',
         'EEG_TP9',
         'EEG_AF7',
+        'EEG_AUX',
     ]
-    protected static readonly startPreset = 'p51'
+    protected static readonly startPreset = 'p50'
 
     @test()
     protected static async createsBleDeviceController() {
@@ -21,7 +22,7 @@ export default class Muse2Test extends Muse2FamilyTest {
     }
 
     @test()
-    protected static async startStreamingWritesMuse2CommandsToControlChar() {
+    protected static async startStreamingWritesCommandsToControlChar() {
         await this.assertStartStreamingWritesStartCommands()
     }
 
