@@ -12,9 +12,11 @@ import {
     DeviceControllerBleOptions,
 } from '../BiosensorDeviceFactory.js'
 import AbstractDeviceControllerBle from '../abstract/AbstractDeviceControllerBle.js'
-import Muse2 from './variants/Muse2.js'
 import MuseSAthena from './variants/MuseSAthena.js'
 import MuseSGen2 from './variants/MuseSGen2.js'
+import MuseSGen1 from './variants/MuseSGen1.js'
+import Muse2 from './variants/Muse2.js'
+import Muse1Gen2 from './variants/Muse1Gen2.js'
 import { detectMuseModel } from './MuseModelDetector.js'
 
 export const CONTROL_UUID = '273E0001-4C4D-454D-96BE-F03BAC821358'
@@ -23,15 +25,19 @@ export const MUSE_CODENAME_MODELS: {
     pattern: string
     model: MuseDeviceModel
 }[] = [
-    { pattern: 'Blackcomb', model: 'Muse 2' },
-    { pattern: 'Letto', model: 'Muse S Gen 2' },
     { pattern: 'Athena', model: 'Muse S Athena' },
+    { pattern: 'Letto', model: 'Muse S Gen 2' },
+    { pattern: 'Newton', model: 'Muse S Gen 1' },
+    { pattern: 'Blackcomb', model: 'Muse 2' },
+    { pattern: 'MU-02', model: 'Muse 1 Gen 2' },
 ]
 
 export const MUSE_VARIANTS = {
-    'Muse 2': Muse2,
-    'Muse S Gen 2': MuseSGen2,
     'Muse S Athena': MuseSAthena,
+    'Muse S Gen 2': MuseSGen2,
+    'Muse S Gen 1': MuseSGen1,
+    'Muse 2': Muse2,
+    'Muse 1 Gen 2': Muse1Gen2,
 }
 
 export default class MuseDeviceController
@@ -153,4 +159,9 @@ export interface MuseControllerOptions extends DeviceControllerBleOptions {
     disableAccel?: boolean
 }
 
-export type MuseDeviceModel = 'Muse 2' | 'Muse S Gen 2' | 'Muse S Athena'
+export type MuseDeviceModel =
+    | 'Muse S Athena'
+    | 'Muse S Gen 2'
+    | 'Muse S Gen 1'
+    | 'Muse 2'
+    | 'Muse 1 Gen 2'
