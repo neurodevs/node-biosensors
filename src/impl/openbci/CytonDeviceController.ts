@@ -5,7 +5,11 @@ import {
     DeviceControllerOptions,
 } from '../BiosensorDeviceFactory.js'
 import AbstractDeviceControllerUsb from '../abstract/AbstractDeviceControllerUsb.js'
-import { LslStreamOutlet, UsbController, UsbDeviceController } from '@neurodevs/node-lsl'
+import {
+    LslStreamOutlet,
+    UsbController,
+    UsbDeviceController,
+} from '@neurodevs/node-lsl'
 
 export default class CytonDeviceController
     extends AbstractDeviceControllerUsb
