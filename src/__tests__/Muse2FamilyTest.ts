@@ -11,7 +11,6 @@ import MuseDeviceController, {
 import SpyMuseController from '../testDoubles/MuseController/SpyMuseController.js'
 import AbstractDeviceControllerBleTest from './AbstractDeviceControllerBleTest.js'
 
-// For "Muse 2" and "Muse S Gen 2" models
 export default abstract class Muse2FamilyTest extends AbstractDeviceControllerBleTest {
     protected static instance: SpyMuseController
 
@@ -19,6 +18,27 @@ export default abstract class Muse2FamilyTest extends AbstractDeviceControllerBl
     protected static readonly charUuids: Record<string, string>
     protected static readonly eegCharNames: string[]
     protected static readonly startPreset: string
+
+    protected static readonly charUuids5ChEeg: Record<string, string> = {
+        CONTROL: '273E0001-4C4D-454D-96BE-F03BAC821358',
+        TELEMETRY: '273E000B-4C4D-454D-96BE-F03BAC821358',
+        GYROSCOPE: '273E0009-4C4D-454D-96BE-F03BAC821358',
+        ACCELEROMETER: '273E000A-4C4D-454D-96BE-F03BAC821358',
+        PPG_AMBIENT: '273E000F-4C4D-454D-96BE-F03BAC821358',
+        PPG_INFRARED: '273E0010-4C4D-454D-96BE-F03BAC821358',
+        PPG_RED: '273E0011-4C4D-454D-96BE-F03BAC821358',
+        EEG_TP9: '273E0003-4C4D-454D-96BE-F03BAC821358',
+        EEG_AF7: '273E0004-4C4D-454D-96BE-F03BAC821358',
+        EEG_AF8: '273E0005-4C4D-454D-96BE-F03BAC821358',
+        EEG_TP10: '273E0006-4C4D-454D-96BE-F03BAC821358',
+        EEG_AUX: '273E0007-4C4D-454D-96BE-F03BAC821358',
+    }
+
+    protected static readonly charUuids4ChEeg = Object.fromEntries(
+        Object.entries(this.charUuids5ChEeg).filter(
+            ([name]) => name !== 'EEG_AUX'
+        )
+    )
 
     protected static readonly eegSampleRateHz = 256
     protected static readonly eegChunkSize = 12
@@ -89,6 +109,14 @@ export default abstract class Muse2FamilyTest extends AbstractDeviceControllerBl
         call?.charCallbacks?.forEach(({ onData }) => {
             assert.isFunction(onData, 'onData should be a function')
         })
+    }
+
+    protected static async assertExposesStreamQueries() {
+        assert.isEqualDeep(
+            this.instance.streamQueries,
+            ['type="EEG"', 'type="PPG"', 'type="GYRO"', 'type="ACCEL"'],
+            'Did not expose the expected stream queries!'
+        )
     }
 
     protected static async assertStartStreamingWritesStartCommands() {

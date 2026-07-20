@@ -2,11 +2,10 @@ import { test } from '@neurodevs/node-tdd'
 
 import Muse2FamilyTest from '../../../Muse2FamilyTest.js'
 import { MuseDeviceModel } from '../../../../impl/muse/MuseDeviceController.js'
-import { MUSE_CHAR_UUIDS } from '../../../../impl/muse/variants/MuseSGen2.js'
 
 export default class MuseSGen2Test extends Muse2FamilyTest {
     protected static readonly model: MuseDeviceModel = 'Muse S Gen 2'
-    protected static readonly charUuids = MUSE_CHAR_UUIDS
+    protected static readonly charUuids = this.charUuids5ChEeg
     protected static readonly eegCharNames = [
         'EEG_TP10',
         'EEG_AF8',
@@ -19,6 +18,11 @@ export default class MuseSGen2Test extends Muse2FamilyTest {
     @test()
     protected static async createsBleDeviceController() {
         await this.assertCreatesBleController()
+    }
+
+    @test()
+    protected static async exposesStreamQueries() {
+        await this.assertExposesStreamQueries()
     }
 
     @test()

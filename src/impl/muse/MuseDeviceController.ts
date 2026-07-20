@@ -137,12 +137,6 @@ export default class MuseDeviceController
     }
 }
 
-export interface MuseVariant {
-    readonly charCallbacks: CharacteristicCallbacks
-    readonly streamQueries: string[]
-    readonly startCommands: string[]
-}
-
 export type MuseDeviceControllerConstructor = new (
     variant: MuseVariant,
     ble: BleController,
@@ -157,6 +151,12 @@ export interface MuseControllerOptions extends DeviceControllerBleOptions {
     disablePpg?: boolean
     disableGyro?: boolean
     disableAccel?: boolean
+}
+
+export interface MuseVariant {
+    readonly charCallbacks: CharacteristicCallbacks
+    readonly streamQueries: string[]
+    readonly startCommands: string[]
 }
 
 export type MuseDeviceModel =

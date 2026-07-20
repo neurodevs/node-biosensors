@@ -1,5 +1,8 @@
-import MuseSGen2, { MUSE_CHAR_UUIDS } from './MuseSGen2.js'
+import MuseBleVariant from '../MuseBleVariant.js'
 
-export const MUSE_S_GEN_1_CHAR_UUIDS: Record<string, string> = MUSE_CHAR_UUIDS
+export default class MuseSGen1 extends MuseBleVariant {
+    protected static readonly charUuids = this.charUuids5ChEeg
+    protected static readonly eegCharNames = this.eegCharNames5Ch
 
-export default class MuseSGen1 extends MuseSGen2 {}
+    public readonly startCommands = ['h', 'p50', 's', 'd']
+}

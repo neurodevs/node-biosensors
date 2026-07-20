@@ -106,6 +106,15 @@ export default class MuseSAthenaTest extends AbstractDeviceControllerBleTest {
     }
 
     @test()
+    protected static async exposesStreamQueries() {
+        assert.isEqualDeep(
+            this.instance.streamQueries,
+            ['type="EEG"', 'type="IMU"', 'type="PPG"'],
+            'Did not expose the expected stream queries!'
+        )
+    }
+
+    @test()
     protected static async startStreamingWritesAthenaCommandsToControlChar() {
         await this.startStreaming()
 

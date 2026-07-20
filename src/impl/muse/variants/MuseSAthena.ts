@@ -1,105 +1,145 @@
 import { WriteStream } from 'node:fs'
 
-import koffi from 'koffi'
-import {
-    CharacteristicCallbacks,
-    ClockRegressor,
-    LslStreamOutlet,
-    StreamOutlet,
-    WindowedClockRegressor,
-} from '@neurodevs/node-lsl'
+import { ClockRegressor, StreamOutlet } from '@neurodevs/node-lsl'
 
-import MuseDeviceController, {
-    type MuseControllerOptions,
-    type MuseVariant,
-} from '../MuseDeviceController.js'
+import { type MuseControllerOptions } from '../MuseDeviceController.js'
+import MuseBleVariant from '../MuseBleVariant.js'
 
-export const MUSE_ATHENA_CHAR_UUIDS: Record<string, string> = {
-    CONTROL: '273E0001-4C4D-454D-96BE-F03BAC821358',
-    EEG: '273E0013-4C4D-454D-96BE-F03BAC821358',
-    OTHER: '273E0014-4C4D-454D-96BE-F03BAC821358',
-}
-
-const SENSORS: Record<number, SensorConfig> = {
-    0x11: { type: 'EEG', nChannels: 4, nSamples: 4, rate: 256, dataLen: 28 },
-    0x12: { type: 'EEG', nChannels: 8, nSamples: 2, rate: 256, dataLen: 28 },
-    0x34: { type: 'OPTICS', nChannels: 4, nSamples: 3, rate: 64, dataLen: 30 },
-    0x35: { type: 'OPTICS', nChannels: 8, nSamples: 2, rate: 64, dataLen: 40 },
-    0x36: { type: 'OPTICS', nChannels: 16, nSamples: 1, rate: 64, dataLen: 40 },
-    0x47: { type: 'IMU', nChannels: 6, nSamples: 3, rate: 52, dataLen: 36 },
-    0x53: { type: 'Unknown', nChannels: 0, nSamples: 0, rate: 0, dataLen: 24 },
-    0x88: {
-        type: 'BATTERY',
-        nChannels: 1,
-        nSamples: 1,
-        rate: 0.2,
-        dataLen: 188,
-    },
-    0x98: { type: 'BATTERY', nChannels: 1, nSamples: 1, rate: 1, dataLen: 20 },
-}
-
-const PACKET_HEADER_SIZE = 14
-const SUBPACKET_HEADER_SIZE = 5
-
-const DEVICE_CLOCK_HZ = 256000
-
-const EEG_SCALE = 1450 / 16383
-const OPTICS_SCALE = 1 / 32768
-const ACC_SCALE = 0.0000610352
-const GYRO_SCALE = -0.0074768
-
-const SAMPLES_RATES_HZ: Record<string, number> = {
-    EEG: 256,
-    IMU: 52,
-    OPTICS: 64,
-}
-
-const EXPECTED_CHANNELS: Record<string, number> = {
-    EEG: 8,
-    IMU: 6,
-    OPTICS: 16,
-}
-
-const IMU_CHANNELS = ['ACC_X', 'ACC_Y', 'ACC_Z', 'GYRO_X', 'GYRO_Y', 'GYRO_Z']
-
-const EEG_CHANNELS = [
-    'EEG_TP9',
-    'EEG_AF7',
-    'EEG_AF8',
-    'EEG_TP10',
-    'AUX_1',
-    'AUX_2',
-    'AUX_3',
-    'AUX_4',
-]
-
-const OPTICS_CHANNELS = [
-    'OPTICS_LO_NIR',
-    'OPTICS_RO_NIR',
-    'OPTICS_LO_IR',
-    'OPTICS_RO_IR',
-    'OPTICS_LI_NIR',
-    'OPTICS_RI_NIR',
-    'OPTICS_LI_IR',
-    'OPTICS_RI_IR',
-    'OPTICS_LO_RED',
-    'OPTICS_RO_RED',
-    'OPTICS_LO_AMB',
-    'OPTICS_RO_AMB',
-    'OPTICS_LI_RED',
-    'OPTICS_RI_RED',
-    'OPTICS_LI_AMB',
-    'OPTICS_RI_AMB',
-]
-
-export default class MuseSAthena implements MuseVariant {
-    public static readonly streamQueries = [
+export default class MuseSAthena extends MuseBleVariant {
+    protected static readonly streamQueries = [
         'type="EEG"',
         'type="IMU"',
         'type="PPG"',
     ]
 
-    public static readonly startCommands = [
+    protected static readonly charUuids: Record<string, string> = {
+        CONTROL: '273E0001-4C4D-454D-96BE-F03BAC821358',
+        EEG: '273E0013-4C4D-454D-96BE-F03BAC821358',
+        OTHER: '273E0014-4C4D-454D-96BE-F03BAC821358',
+    }
+
+    private static readonly sensors: Record<number, SensorConfig> = {
+        0x11: {
+            type: 'EEG',
+            nChannels: 4,
+            nSamples: 4,
+            rate: 256,
+            dataLen: 28,
+        },
+        0x12: {
+            type: 'EEG',
+            nChannels: 8,
+            nSamples: 2,
+            rate: 256,
+            dataLen: 28,
+        },
+        0x34: {
+            type: 'OPTICS',
+            nChannels: 4,
+            nSamples: 3,
+            rate: 64,
+            dataLen: 30,
+        },
+        0x35: {
+            type: 'OPTICS',
+            nChannels: 8,
+            nSamples: 2,
+            rate: 64,
+            dataLen: 40,
+        },
+        0x36: {
+            type: 'OPTICS',
+            nChannels: 16,
+            nSamples: 1,
+            rate: 64,
+            dataLen: 40,
+        },
+        0x47: { type: 'IMU', nChannels: 6, nSamples: 3, rate: 52, dataLen: 36 },
+        0x53: {
+            type: 'Unknown',
+            nChannels: 0,
+            nSamples: 0,
+            rate: 0,
+            dataLen: 24,
+        },
+        0x88: {
+            type: 'BATTERY',
+            nChannels: 1,
+            nSamples: 1,
+            rate: 0.2,
+            dataLen: 188,
+        },
+        0x98: {
+            type: 'BATTERY',
+            nChannels: 1,
+            nSamples: 1,
+            rate: 1,
+            dataLen: 20,
+        },
+    }
+
+    private static readonly packetHeaderSize = 14
+    private static readonly subpacketHeaderSize = 5
+
+    private static readonly deviceClockHz = 256000
+
+    private static readonly eegScale = 1450 / 16383
+    private static readonly opticsScale = 1 / 32768
+    private static readonly accScale = 0.0000610352
+    private static readonly gyroScale = -0.0074768
+
+    private static readonly sampleRatesHz: Record<string, number> = {
+        EEG: 256,
+        IMU: 52,
+        OPTICS: 64,
+    }
+
+    private static readonly expectedChannels: Record<string, number> = {
+        EEG: 8,
+        IMU: 6,
+        OPTICS: 16,
+    }
+
+    private static readonly imuChannels = [
+        'ACC_X',
+        'ACC_Y',
+        'ACC_Z',
+        'GYRO_X',
+        'GYRO_Y',
+        'GYRO_Z',
+    ]
+
+    private static readonly eegChannels = [
+        'EEG_TP9',
+        'EEG_AF7',
+        'EEG_AF8',
+        'EEG_TP10',
+        'AUX_1',
+        'AUX_2',
+        'AUX_3',
+        'AUX_4',
+    ]
+
+    private static readonly opticsChannels = [
+        'OPTICS_LO_NIR',
+        'OPTICS_RO_NIR',
+        'OPTICS_LO_IR',
+        'OPTICS_RO_IR',
+        'OPTICS_LI_NIR',
+        'OPTICS_RI_NIR',
+        'OPTICS_LI_IR',
+        'OPTICS_RI_IR',
+        'OPTICS_LO_RED',
+        'OPTICS_RO_RED',
+        'OPTICS_LO_AMB',
+        'OPTICS_RO_AMB',
+        'OPTICS_LI_RED',
+        'OPTICS_RI_RED',
+        'OPTICS_LI_AMB',
+        'OPTICS_RI_AMB',
+    ]
+
+    public readonly startCommands = [
         'v6',
         's',
         'h',
@@ -108,14 +148,6 @@ export default class MuseSAthena implements MuseVariant {
         'dc001',
         'L1',
     ]
-
-    public readonly charCallbacks: CharacteristicCallbacks
-    public readonly streamQueries = MuseSAthena.streamQueries
-    public readonly startCommands = MuseSAthena.startCommands
-
-    protected constructor(charCallbacks: CharacteristicCallbacks) {
-        this.charCallbacks = charCallbacks
-    }
 
     public static async Create(options?: MuseControllerOptions) {
         const {
@@ -126,43 +158,37 @@ export default class MuseSAthena implements MuseVariant {
             bleUuid = '',
         } = options ?? {}
 
-        const identifier = bleUuid
-            ? bleUuid.slice(0, 6)
-            : `Device-${MuseDeviceController.fallbackDeviceCounter++}`
+        const identifier = this.resolveIdentifier(bleUuid)
 
         const disableImu = disableGyro && disableAccel
 
         const outlets: AthenaOutlets = {
-            EEG: !disableEeg ? await this.EegOutlet(identifier) : undefined,
-            IMU: !disableImu ? await this.ImuOutlet(identifier) : undefined,
+            EEG: !disableEeg
+                ? await this.createEegOutlet(identifier)
+                : undefined,
+            IMU: !disableImu
+                ? await this.createImuOutlet(identifier)
+                : undefined,
             OPTICS: !disablePpg
-                ? await this.OpticsOutlet(identifier)
+                ? await this.createOpticsOutlet(identifier)
                 : undefined,
         }
 
-        const charCallbacks = this.generateCharCallbacks(options, outlets)
+        const charCallbacks = this.createCharCallbacks(options, outlets)
 
-        return new this(charCallbacks)
+        return new this(charCallbacks, this.streamQueries)
     }
 
-    private static generateCharCallbacks(
+    private static createCharCallbacks(
         options: MuseControllerOptions | undefined,
         outlets: AthenaOutlets
     ) {
-        const { enableLogs, txtRecordPath } = options ?? {}
-
-        const log = enableLogs ? MuseDeviceController.log : undefined
-
-        const stream = txtRecordPath
-            ? MuseDeviceController.createWriteStream(txtRecordPath, {
-                  flags: 'a',
-              })
-            : undefined
+        const { log, stream } = this.resolveLogAndStream(options)
 
         const regressors = {
-            EEG: WindowedClockRegressor.Create(SAMPLES_RATES_HZ.EEG),
-            IMU: WindowedClockRegressor.Create(SAMPLES_RATES_HZ.IMU),
-            OPTICS: WindowedClockRegressor.Create(SAMPLES_RATES_HZ.OPTICS),
+            EEG: this.WindowedClockRegressor(this.sampleRatesHz.EEG!),
+            IMU: this.WindowedClockRegressor(this.sampleRatesHz.IMU!),
+            OPTICS: this.WindowedClockRegressor(this.sampleRatesHz.OPTICS!),
         }
 
         const handleMessage = this.createMessageHandler(
@@ -172,17 +198,14 @@ export default class MuseSAthena implements MuseVariant {
             regressors
         )
 
-        const decodeBytes = (data: Buffer, length: number) =>
-            Array.from<number>(koffi.decode(data, 'uint8', length))
-
-        return Object.entries(MUSE_ATHENA_CHAR_UUIDS).map(([name, uuid]) => ({
+        return Object.entries(this.charUuids).map(([name, uuid]) => ({
             charUuid: uuid,
             charName: name,
             onData: (data: Buffer, length: number, timestampSec: number) => {
                 if (name === 'CONTROL') {
                     return
                 }
-                handleMessage(decodeBytes(data, length), timestampSec)
+                handleMessage(this.decodeBytes(data, length), timestampSec)
             },
         }))
     }
@@ -197,9 +220,9 @@ export default class MuseSAthena implements MuseVariant {
             string,
             (rawTick: number, nSamples: number) => number
         > = {
-            EEG: this.createDeviceClock(SAMPLES_RATES_HZ.EEG!),
-            IMU: this.createDeviceClock(SAMPLES_RATES_HZ.IMU!),
-            OPTICS: this.createDeviceClock(SAMPLES_RATES_HZ.OPTICS!),
+            EEG: this.createDeviceClock(this.sampleRatesHz.EEG!),
+            IMU: this.createDeviceClock(this.sampleRatesHz.IMU!),
+            OPTICS: this.createDeviceClock(this.sampleRatesHz.OPTICS!),
         }
 
         return (bytes: number[], timestampSec: number) => {
@@ -287,7 +310,7 @@ export default class MuseSAthena implements MuseVariant {
 
             lastAbsTick = absTick
 
-            const elapsedSeconds = (absTick - baseTick) / DEVICE_CLOCK_HZ
+            const elapsedSeconds = (absTick - baseTick) / this.deviceClockHz
 
             const sampleIndex = Math.max(
                 Math.round(elapsedSeconds * rate),
@@ -310,7 +333,7 @@ export default class MuseSAthena implements MuseVariant {
         log?: (...data: any[]) => void,
         stream?: WriteStream
     ) {
-        const rate = SAMPLES_RATES_HZ[type]!
+        const rate = this.sampleRatesHz[type]!
 
         if (samples.length === 0) {
             return
@@ -328,7 +351,7 @@ export default class MuseSAthena implements MuseVariant {
             const ts = earliestLslTime + i / rate
             outlet?.pushSample(sample, pushTimestamps[i])
 
-            const msg = `${type.padEnd(13)} | ${ts.toFixed(5).padEnd(15)} | ${JSON.stringify(sample)}`
+            const msg = this.formatMessage(type, ts, sample)
             stream?.write(`${msg}\n`)
             log?.(msg)
         })
@@ -344,14 +367,14 @@ export default class MuseSAthena implements MuseVariant {
         let offset = 0
 
         while (offset < payload.length) {
-            if (offset + PACKET_HEADER_SIZE > payload.length) {
+            if (offset + this.packetHeaderSize > payload.length) {
                 break
             }
 
             const pktLen = payload[offset]!
 
             if (
-                pktLen < PACKET_HEADER_SIZE ||
+                pktLen < this.packetHeaderSize ||
                 offset + pktLen > payload.length
             ) {
                 break
@@ -360,14 +383,14 @@ export default class MuseSAthena implements MuseVariant {
             const tag = payload[offset + 9]!
             const pktTimeRaw = this.readUInt32LE(payload, offset + 2)
             const data = payload.slice(
-                offset + PACKET_HEADER_SIZE,
+                offset + this.packetHeaderSize,
                 offset + pktLen
             )
 
             packets.push({
                 tag,
                 data,
-                valid: SENSORS[tag] !== undefined,
+                valid: this.sensors[tag] !== undefined,
                 pktTimeRaw,
             })
 
@@ -397,7 +420,7 @@ export default class MuseSAthena implements MuseVariant {
         let offset = 0
 
         // First subpacket: raw sensor data (no TAG, no header), type = packet tag.
-        const firstConfig = packet.valid ? SENSORS[packet.tag] : undefined
+        const firstConfig = packet.valid ? this.sensors[packet.tag] : undefined
         if (firstConfig && offset + firstConfig.dataLen <= data.length) {
             subpackets.push({
                 tag: packet.tag,
@@ -408,18 +431,18 @@ export default class MuseSAthena implements MuseVariant {
 
         // Additional subpackets: [TAG][4-byte header][data].
         while (offset < data.length) {
-            if (offset + SUBPACKET_HEADER_SIZE > data.length) {
+            if (offset + this.subpacketHeaderSize > data.length) {
                 break
             }
 
             const tag = data[offset]!
-            const config = SENSORS[tag]
+            const config = this.sensors[tag]
 
             if (!config || config.dataLen === 0) {
                 break
             }
 
-            const start = offset + SUBPACKET_HEADER_SIZE
+            const start = offset + this.subpacketHeaderSize
             const end = start + config.dataLen
 
             if (end > data.length) {
@@ -436,7 +459,7 @@ export default class MuseSAthena implements MuseVariant {
     private static decodeSubpacket(
         subpacket: Subpacket
     ): DecodedSubpacket | undefined {
-        const config = SENSORS[subpacket.tag]
+        const config = this.sensors[subpacket.tag]
 
         if (!config) {
             return undefined
@@ -445,7 +468,7 @@ export default class MuseSAthena implements MuseVariant {
         const { type, nChannels, nSamples } = config
         const { dataBytes } = subpacket
 
-        const expected = EXPECTED_CHANNELS[type]
+        const expected = this.expectedChannels[type]
         if (expected !== undefined && expected !== nChannels) {
             return undefined
         }
@@ -459,7 +482,7 @@ export default class MuseSAthena implements MuseVariant {
                         nChannels,
                         nSamples,
                         14,
-                        EEG_SCALE
+                        this.eegScale
                     ),
                 }
             case 'OPTICS':
@@ -470,7 +493,7 @@ export default class MuseSAthena implements MuseVariant {
                         nChannels,
                         nSamples,
                         20,
-                        OPTICS_SCALE
+                        this.opticsScale
                     ),
                 }
             case 'IMU':
@@ -514,7 +537,7 @@ export default class MuseSAthena implements MuseVariant {
 
             for (let c = 0; c < 6; c++) {
                 const value = this.readInt16LE(dataBytes, (s * 6 + c) * 2)
-                const scale = c < 3 ? ACC_SCALE : GYRO_SCALE
+                const scale = c < 3 ? this.accScale : this.gyroScale
                 sample.push(scale * value)
             }
 
@@ -553,45 +576,36 @@ export default class MuseSAthena implements MuseVariant {
         return value >= 0x8000 ? value - 0x10000 : value
     }
 
-    private static async EegOutlet(identifier: string) {
-        return await LslStreamOutlet.Create({
+    private static async createEegOutlet(identifier: string) {
+        return await this.LslOutlet({
             name: `Muse EEG (${identifier})`,
             type: 'EEG',
-            channelNames: EEG_CHANNELS,
-            sampleRateHz: SAMPLES_RATES_HZ.EEG!,
-            channelFormat: 'float32',
+            channelNames: this.eegChannels,
+            sampleRateHz: this.sampleRatesHz.EEG!,
             sourceId: `muse-eeg-${identifier}`,
-            manufacturer: 'Interaxon Inc.',
             units: 'microvolt',
-            chunkSize: 1,
         })
     }
 
-    private static async ImuOutlet(identifier: string) {
-        return await LslStreamOutlet.Create({
+    private static async createImuOutlet(identifier: string) {
+        return await this.LslOutlet({
             name: `Muse IMU (${identifier})`,
             type: 'IMU',
-            channelNames: IMU_CHANNELS,
-            sampleRateHz: SAMPLES_RATES_HZ.IMU!,
-            channelFormat: 'float32',
+            channelNames: this.imuChannels,
+            sampleRateHz: this.sampleRatesHz.IMU!,
             sourceId: `muse-imu-${identifier}`,
-            manufacturer: 'Interaxon Inc.',
             units: 'N/A',
-            chunkSize: 1,
         })
     }
 
-    private static async OpticsOutlet(identifier: string) {
-        return await LslStreamOutlet.Create({
+    private static async createOpticsOutlet(identifier: string) {
+        return await this.LslOutlet({
             name: `Muse Optics (${identifier})`,
             type: 'PPG',
-            channelNames: OPTICS_CHANNELS,
-            sampleRateHz: SAMPLES_RATES_HZ.OPTICS!,
-            channelFormat: 'float32',
+            channelNames: this.opticsChannels,
+            sampleRateHz: this.sampleRatesHz.OPTICS!,
             sourceId: `muse-optics-${identifier}`,
-            manufacturer: 'Interaxon Inc.',
             units: 'N/A',
-            chunkSize: 1,
         })
     }
 }
