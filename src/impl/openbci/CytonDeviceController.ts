@@ -19,7 +19,7 @@ export default class CytonDeviceController
     public static wait = (ms: number) => new Promise((r) => setTimeout(r, ms))
     public static log = console.info
 
-    public static readonly streamQueries: string[] = []
+    public static readonly streamQueries = ['type="ExG"', 'type="ACCEL"']
 
     protected readonly onData: OnUsbData
 

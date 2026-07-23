@@ -380,6 +380,15 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
         })
     }
 
+    @test()
+    protected static async exposesStreamQueriesReadonlyField() {
+        assert.isEqualDeep(
+            this.instance.streamQueries,
+            ['type="ExG"', 'type="ACCEL"'],
+            'Should expose stream queries!'
+        )
+    }
+
     private static getOnData() {
         return this.instance.getOnData()
     }
