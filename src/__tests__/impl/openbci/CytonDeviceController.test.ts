@@ -390,6 +390,43 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
         )
     }
 
+    @test('defaults exgType to ExG', undefined, 'ExG')
+    @test('overrides exgType with EEG', 'EEG', 'EEG')
+    @test('overrides exgType with EMG', 'EMG', 'EMG')
+    protected static async setsExgOutletTypeFromExgType(
+        exgType: string | undefined,
+        expected: string
+    ) {
+        FakeStreamOutlet.resetTestDouble()
+
+        await this.CytonDeviceController({ exgType })
+
+        assert.isEqual(
+            FakeStreamOutlet.callsToConstructor[0]?.type,
+            expected,
+            'Did not set the ExG outlet type from exgType!'
+        )
+    }
+
+    @test()
+    protected static async exgTypeUpdatesStreamQueries() {
+        const instance = await this.CytonDeviceController({ exgType: 'EMG' })
+
+        assert.isEqualDeep(
+            instance.streamQueries,
+            ['type="EMG"', 'type="ACCEL"'],
+            'Should derive stream queries from exgType!'
+        )
+
+        const { streamQueries } = FakeXdfRecorder.callsToConstructor[1] ?? {}
+
+        assert.isEqualDeep(
+            streamQueries,
+            ['type="EMG"', 'type="ACCEL"'],
+            'Should pass exgType stream queries to the recorder!'
+        )
+    }
+
     @test()
     protected static async passesStreamQueriesToRecorder() {
         const { streamQueries } = FakeXdfRecorder.callsToConstructor[0] ?? {}

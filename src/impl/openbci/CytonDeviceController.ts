@@ -19,22 +19,28 @@ export default class CytonDeviceController
     public static wait = (ms: number) => new Promise((r) => setTimeout(r, ms))
     public static log = console.info
 
-    public static readonly streamQueries = ['type="ExG"', 'type="ACCEL"']
-
     protected readonly onData: OnUsbData
 
     private readonly waitAfterConnectMs: number
     private readonly serialNumber?: string
+    private readonly exgType: string
 
     protected constructor(options: CytonControllerConstructorOptions) {
-        const { usb, waitAfterConnectMs, onData, serialNumber, recorder } =
-            options
+        const {
+            usb,
+            waitAfterConnectMs,
+            onData,
+            exgType,
+            serialNumber,
+            recorder,
+        } = options
 
         super(usb, recorder)
 
         this.serialNumber = serialNumber
         this.waitAfterConnectMs = waitAfterConnectMs
         this.onData = onData
+        this.exgType = exgType
     }
 
     public static async Create(options?: CytonControllerOptions) {
@@ -43,16 +49,20 @@ export default class CytonDeviceController
             xdfRecordPath,
             waitAfterConnectMs = 2000,
             logDeviceInfo = false,
+            exgType = 'ExG',
         } = options ?? {}
 
-        await this.ExgOutlet(serialNumber)
+        await this.ExgOutlet(serialNumber, exgType)
         await this.AccelOutlet(serialNumber)
 
         const onData = this.createOnData(logDeviceInfo)
         const usb = this.UsbDeviceController(serialNumber, onData)
 
         const recorder = xdfRecordPath
-            ? await this.XdfStreamRecorder(xdfRecordPath, this.streamQueries)
+            ? await this.XdfStreamRecorder(
+                  xdfRecordPath,
+                  this.generateStreamQueries(exgType)
+              )
             : undefined
 
         return new (this.Class ?? this)({
@@ -61,11 +71,16 @@ export default class CytonDeviceController
             onData,
             serialNumber,
             recorder,
+            exgType,
         })
     }
 
     public get streamQueries() {
-        return CytonDeviceController.streamQueries
+        return CytonDeviceController.generateStreamQueries(this.exgType)
+    }
+
+    private static generateStreamQueries(exgType: string) {
+        return [`type="${exgType}"`, 'type="ACCEL"']
     }
 
     protected get deviceId() {
@@ -130,10 +145,13 @@ export default class CytonDeviceController
         })
     }
 
-    private static async ExgOutlet(serialNumber?: string) {
+    private static async ExgOutlet(
+        serialNumber: string | undefined,
+        exgType: string
+    ) {
         await LslStreamOutlet.Create({
-            name: `Cyton ExG (${serialNumber})`,
-            type: 'ExG',
+            name: `Cyton ${exgType} (${serialNumber})`,
+            type: exgType,
             channelNames: [
                 'CH1',
                 'CH2',
@@ -176,6 +194,7 @@ export type CytonControllerConstructor = new (
 
 export interface CytonControllerOptions extends DeviceControllerOptions {
     serialNumber?: string
+    exgType?: string
     waitAfterConnectMs?: number
     logDeviceInfo?: boolean
 }
@@ -184,6 +203,7 @@ export interface CytonControllerConstructorOptions {
     usb: UsbController
     waitAfterConnectMs: number
     onData: OnUsbData
+    exgType: string
     serialNumber?: string
     recorder?: XdfRecorder
 }
