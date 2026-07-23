@@ -2,6 +2,7 @@ import { randomInt } from 'node:crypto'
 
 import { FakeUsbController, FakeStreamOutlet } from '@neurodevs/node-lsl'
 import { test, assert } from '@neurodevs/node-tdd'
+import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 
 import CytonDeviceController, {
     CytonControllerOptions,
@@ -386,6 +387,17 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
             this.instance.streamQueries,
             ['type="ExG"', 'type="ACCEL"'],
             'Should expose stream queries!'
+        )
+    }
+
+    @test()
+    protected static async passesStreamQueriesToRecorder() {
+        const { streamQueries } = FakeXdfRecorder.callsToConstructor[0] ?? {}
+
+        assert.isEqualDeep(
+            streamQueries,
+            ['type="ExG"', 'type="ACCEL"'],
+            'Incorrect stream queries!'
         )
     }
 
