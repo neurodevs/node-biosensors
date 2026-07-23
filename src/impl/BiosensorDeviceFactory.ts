@@ -13,7 +13,22 @@ import CgxDeviceController from './cognionics/CgxDeviceController.js'
 import ZephyrDeviceController from './zephyr/ZephyrDeviceController.js'
 import MuseDeviceController, {
     MuseControllerOptions,
+    MuseDeviceModel,
 } from './muse/MuseDeviceController.js'
+import CytonDeviceController, {
+    CytonControllerOptions,
+} from './openbci/CytonDeviceController.js'
+
+export const DEVICE_NAMES = [
+    'Cognionics Quick-20r',
+    'Muse S Athena',
+    'Muse S Gen 2',
+    'Muse S Gen 1',
+    'Muse 2',
+    'Muse 1 Gen 2',
+    'OpenBCI Cyton',
+    'Zephyr BioHarness 3',
+] as const
 
 export default class BiosensorDeviceFactory implements DeviceFactory {
     public static Class?: DeviceFactoryConstructor
@@ -65,11 +80,19 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
     }
 
     private async createDeviceByName() {
-        switch (this.spec.deviceName) {
+        const { deviceName, options } = this.spec
+
+        switch (deviceName) {
             case 'Cognionics Quick-20r':
                 return this.CgxDeviceController()
+            case 'Muse S Athena':
             case 'Muse S Gen 2':
-                return this.MuseDeviceController(this.spec.options)
+            case 'Muse S Gen 1':
+            case 'Muse 2':
+            case 'Muse 1 Gen 2':
+                return this.MuseDeviceController(deviceName, options)
+            case 'OpenBCI Cyton':
+                return this.CytonDeviceController(options)
             case 'Zephyr BioHarness 3':
                 return this.ZephyrDeviceController()
             default:
@@ -82,7 +105,8 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
     }
 
     private get invalidNameErrorMessage() {
-        return `\n\n Invalid device name: ${this.spec.deviceName}! \n\n Please choose from: \n\n - Cognionics Quick-20r \n - Muse S Gen 2 \n - Zephyr BioHarness 3 \n\n`
+        const names = DEVICE_NAMES.map((name) => ` - ${name} `).join('\n')
+        return `\n\n Invalid device name: ${this.spec.deviceName}! \n\n Please choose from: \n\n${names}\n\n`
     }
 
     public async createDevices(
@@ -143,14 +167,18 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         return CgxDeviceController.Create()
     }
 
-    private async MuseDeviceController(options?: MuseControllerOptions) {
-        const muse = await MuseDeviceController.Create({
-            ...options,
-            model: 'Muse S Gen 2',
-        })
+    private async MuseDeviceController(
+        model: MuseDeviceModel,
+        options?: MuseControllerOptions
+    ) {
+        const muse = await MuseDeviceController.Create({ ...options, model })
         await muse.connect()
 
         return muse
+    }
+
+    private CytonDeviceController(options?: CytonControllerOptions) {
+        return CytonDeviceController.Create(options)
     }
 
     private ZephyrDeviceController() {
@@ -223,14 +251,21 @@ export type DeviceControllerBleConstructor = new (
 
 export type PerDeviceOptions = PerDeviceOptionsMap[DeviceName]
 
-export interface PerDeviceOptionsMap {
+export type DeviceName = (typeof DEVICE_NAMES)[number]
+
+export interface PerDeviceOptionsMap extends Record<
+    DeviceName,
+    DeviceControllerOptions
+> {
     'Cognionics Quick-20r': DeviceControllerOptions
+    'Muse S Athena': MuseControllerOptions
     'Muse S Gen 2': MuseControllerOptions
+    'Muse S Gen 1': MuseControllerOptions
+    'Muse 2': MuseControllerOptions
+    'Muse 1 Gen 2': MuseControllerOptions
+    'OpenBCI Cyton': CytonControllerOptions
     'Zephyr BioHarness 3': DeviceControllerOptions
 }
-
-export type DeviceName =
-    'Cognionics Quick-20r' | 'Muse S Gen 2' | 'Zephyr BioHarness 3'
 
 export interface DeviceSpecification {
     deviceName: DeviceName

@@ -14,6 +14,7 @@ import {
 } from '../../impl/BiosensorDeviceFactory.js'
 import BiosensorDeviceFactory, {
     DeviceFactory,
+    DeviceName,
     DeviceSpecification,
 } from '../../impl/BiosensorDeviceFactory.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
@@ -72,12 +73,50 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async createsDeviceForCytonController() {
+        const { device } = await this.createCytonController()
+        this.assertDeviceIsTruthy(device)
+    }
+
+    @test('creates Muse S Athena', 'Muse S Athena', [
+        'v6',
+        's',
+        'h',
+        'p1041',
+        'dc001',
+        'dc001',
+        'L1',
+    ])
+    @test('creates Muse S Gen 2', 'Muse S Gen 2', ['h', 'p50', 's', 'd'])
+    @test('creates Muse S Gen 1', 'Muse S Gen 1', ['h', 'p50', 's', 'd'])
+    @test('creates Muse 2', 'Muse 2', ['h', 'p51', 's', 'd'])
+    @test('creates Muse 1 Gen 2', 'Muse 1 Gen 2', ['h', 'p21', 's', 'd'])
+    protected static async createsDeviceForEachMuseModel(
+        deviceName: DeviceName,
+        expectedStartCommands: string[]
+    ) {
+        const { device } = await this.instance.createDevice(deviceName, {
+            bleUuid: this.museBleUuid,
+        })
+
+        this.assertDeviceIsTruthy(device)
+
+        const { variant } = FakeMuseController.callsToConstructor[0]!
+
+        assert.isEqualDeep(
+            variant.startCommands,
+            expectedStartCommands,
+            `Did not create the ${deviceName} variant!`
+        )
+    }
+
+    @test()
     protected static async throwsWithInvalidDeviceName() {
         const invalidName = generateId() as any
 
         await assert.doesThrowAsync(
             async () => await this.instance.createDevice(invalidName),
-            `\n\n Invalid device name: ${invalidName}! \n\n Please choose from: \n\n - Cognionics Quick-20r \n - Muse S Gen 2 \n - Zephyr BioHarness 3 \n\n`
+            `\n\n Invalid device name: ${invalidName}! \n\n Please choose from: \n\n - Cognionics Quick-20r \n - Muse S Athena \n - Muse S Gen 2 \n - Muse S Gen 1 \n - Muse 2 \n - Muse 1 Gen 2 \n - OpenBCI Cyton \n - Zephyr BioHarness 3 \n\n`
         )
     }
 
@@ -311,6 +350,12 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
             bleUuid: this.museBleUuid,
             ...options,
         })
+    }
+
+    private static async createCytonController(
+        options?: DeviceControllerOptions
+    ) {
+        return this.instance.createDevice('OpenBCI Cyton', options)
     }
 
     private static async createZephyrController(

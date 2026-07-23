@@ -46,6 +46,8 @@ import FakeWebSocketGateway from '../testDoubles/WebSocketGateway/FakeWebSocketG
 import MuseDeviceController from '../impl/muse/MuseDeviceController.js'
 import FakeMuseController from '../testDoubles/MuseController/FakeMuseController.js'
 import MuseModelDetector from '../impl/muse/MuseModelDetector.js'
+import CytonDeviceController from '../impl/openbci/CytonDeviceController.js'
+import FakeCytonController from '../testDoubles/CytonController/FakeCytonController.js'
 import FakeMuseDetector from '../testDoubles/MuseDetector/FakeMuseDetector.js'
 
 export default class AbstractPackageTest extends AbstractModuleTest {
@@ -121,6 +123,7 @@ export default class AbstractPackageTest extends AbstractModuleTest {
 
     protected static setFakeDevices() {
         this.setFakeCgxController()
+        this.setFakeCytonController()
         this.setFakeMuseController()
         this.setFakeZephyrController()
 
@@ -135,6 +138,11 @@ export default class AbstractPackageTest extends AbstractModuleTest {
     protected static setFakeCgxController() {
         CgxDeviceController.Class = FakeCgxController
         FakeCgxController.resetTestDouble()
+    }
+
+    protected static setFakeCytonController() {
+        CytonDeviceController.Class = FakeCytonController
+        FakeCytonController.resetTestDouble()
     }
 
     protected static setFakeClockRegressor() {
