@@ -11,7 +11,7 @@ import MuseDeviceController, {
 import SpyMuseController from '../testDoubles/MuseController/SpyMuseController.js'
 import AbstractDeviceControllerBleTest from './AbstractDeviceControllerBleTest.js'
 
-export default abstract class Muse2FamilyTest extends AbstractDeviceControllerBleTest {
+export default abstract class MuseBleVariantTest extends AbstractDeviceControllerBleTest {
     protected static instance: SpyMuseController
 
     protected static readonly model: MuseDeviceModel

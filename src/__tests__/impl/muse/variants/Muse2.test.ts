@@ -1,9 +1,9 @@
 import { test } from '@neurodevs/node-tdd'
 
-import Muse2FamilyTest from '../../../Muse2FamilyTest.js'
+import MuseBleVariantTest from '../../../MuseBlevVariantTest.js'
 import { MuseDeviceModel } from '../../../../impl/muse/MuseDeviceController.js'
 
-export default class Muse2Test extends Muse2FamilyTest {
+export default class Muse2Test extends MuseBleVariantTest {
     protected static readonly model: MuseDeviceModel = 'Muse 2'
     protected static readonly charUuids = this.charUuids4ChEeg
     protected static readonly eegCharNames = [
