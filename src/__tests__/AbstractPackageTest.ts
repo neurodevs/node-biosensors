@@ -57,6 +57,9 @@ export default class AbstractPackageTest extends AbstractModuleTest {
 
     private static readonly realSetTimeout = globalThis.setTimeout
 
+    private static readonly realBleSetTimeout = BleDeviceController.setTimeout
+    private static readonly realOutletSetTimeout = LslStreamOutlet.setTimeout
+
     protected static async beforeEach() {
         await super.beforeEach()
 
@@ -77,6 +80,8 @@ export default class AbstractPackageTest extends AbstractModuleTest {
 
     protected static async afterEach() {
         globalThis.setTimeout = this.realSetTimeout
+        BleDeviceController.setTimeout = this.realBleSetTimeout
+        LslStreamOutlet.setTimeout = this.realOutletSetTimeout
 
         await super.afterEach()
     }
@@ -111,15 +116,25 @@ export default class AbstractPackageTest extends AbstractModuleTest {
     }
 
     protected static setImmediateTimeouts() {
-        globalThis.setTimeout = ((
+        globalThis.setTimeout = this.immediateSetTimeout
+
+        LslStreamOutlet.setTimeout = this.immediateSetTimeout
+
+        BleDeviceController.setTimeout = ((
             callback: (...args: unknown[]) => void,
             _delayMs?: number,
             ...args: unknown[]
-        ) => {
-            callback(...args)
-            return 0
-        }) as unknown as typeof setTimeout
+        ) => this.realSetTimeout(callback, 0, ...args)) as typeof setTimeout
     }
+
+    private static readonly immediateSetTimeout = ((
+        callback: (...args: unknown[]) => void,
+        _delayMs?: number,
+        ...args: unknown[]
+    ) => {
+        callback(...args)
+        return 0
+    }) as unknown as typeof setTimeout
 
     protected static setFakeDevices() {
         this.setFakeCgxController()
