@@ -1,7 +1,7 @@
 import { randomInt } from 'node:crypto'
 
 import { assert } from '@neurodevs/node-tdd'
-import { FakeBleController, FakeStreamOutlet } from '@neurodevs/node-lsl'
+import { FakeBleController, FakeLslOutlet } from '@neurodevs/node-lsl'
 
 import MuseDeviceController, {
     CONTROL_UUID,
@@ -154,7 +154,7 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
         )
 
         assert.isEqualDeep(
-            FakeStreamOutlet.callsToPushSample,
+            FakeLslOutlet.callsToPushSample,
             expected,
             'Should push each EEG sample of chunk!'
         )
@@ -170,7 +170,7 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
 
         this.simulateEegOnDataWithValues(charValues)
 
-        const pushedValues = FakeStreamOutlet.callsToPushSample.map(
+        const pushedValues = FakeLslOutlet.callsToPushSample.map(
             ({ sample }) => sample[0]
         )
 
@@ -225,7 +225,7 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
         )
 
         assert.isEqualDeep(
-            FakeStreamOutlet.callsToPushSample,
+            FakeLslOutlet.callsToPushSample,
             expected,
             'Should push each PPG sample of chunk!'
         )
@@ -274,7 +274,7 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
         }))
 
         assert.isEqualDeep(
-            FakeStreamOutlet.callsToPushSample,
+            FakeLslOutlet.callsToPushSample,
             expected,
             'Should push each gyro sample from packet!'
         )
@@ -291,7 +291,7 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
 
         this.simulateImuOnDataWithSamples('GYROSCOPE', samples)
 
-        const pushedValues = FakeStreamOutlet.callsToPushSample.map(
+        const pushedValues = FakeLslOutlet.callsToPushSample.map(
             ({ sample }) => sample[0]
         )
 
@@ -371,7 +371,7 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
         }))
 
         assert.isEqualDeep(
-            FakeStreamOutlet.callsToPushSample,
+            FakeLslOutlet.callsToPushSample,
             expected,
             'Should push each accel sample from packet!'
         )
@@ -388,7 +388,7 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
 
         this.simulateImuOnDataWithSamples('ACCELEROMETER', samples)
 
-        const pushedValues = FakeStreamOutlet.callsToPushSample.map(
+        const pushedValues = FakeLslOutlet.callsToPushSample.map(
             ({ sample }) => sample[0]
         )
 
@@ -456,7 +456,7 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
     }
 
     protected static async assertCreatesEegLslOutlet() {
-        const firstCall = FakeStreamOutlet.callsToConstructor[0]
+        const firstCall = FakeLslOutlet.callsToConstructor[0]
 
         assert.isEqualDeep(firstCall, {
             name: `Muse EEG (${this.shortUuid})`,
@@ -472,12 +472,12 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
     }
 
     protected static async assertDoesNotCreateEegLslOutletWithFlag() {
-        FakeStreamOutlet.callsToConstructor.length = 0
+        FakeLslOutlet.callsToConstructor.length = 0
 
         await this.MuseDeviceController({ disableEeg: true })
 
         assert.isEqual(
-            FakeStreamOutlet.callsToConstructor.filter(
+            FakeLslOutlet.callsToConstructor.filter(
                 (call) => call?.name === `Muse EEG (${this.shortUuid})`
             ).length,
             0,
@@ -486,7 +486,7 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
     }
 
     protected static async assertCreatesPpgLslOutlet() {
-        const secondCall = FakeStreamOutlet.callsToConstructor[1]
+        const secondCall = FakeLslOutlet.callsToConstructor[1]
 
         assert.isEqualDeep(secondCall, {
             name: `Muse PPG (${this.shortUuid})`,
@@ -502,12 +502,12 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
     }
 
     protected static async assertDoesNotCreatePpgLslOutletWithFlag() {
-        FakeStreamOutlet.callsToConstructor.length = 0
+        FakeLslOutlet.callsToConstructor.length = 0
 
         await this.MuseDeviceController({ disablePpg: true })
 
         assert.isEqual(
-            FakeStreamOutlet.callsToConstructor.filter(
+            FakeLslOutlet.callsToConstructor.filter(
                 (call) => call?.name === `Muse PPG (${this.shortUuid})`
             ).length,
             0,
@@ -516,7 +516,7 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
     }
 
     protected static async assertCreatesGyroscopeLslOutlet() {
-        const call = FakeStreamOutlet.callsToConstructor[2]
+        const call = FakeLslOutlet.callsToConstructor[2]
 
         assert.isEqualDeep(call, {
             name: `Muse Gyroscope (${this.shortUuid})`,
@@ -532,12 +532,12 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
     }
 
     protected static async assertDoesNotCreateGyroscopeLslOutletWithFlag() {
-        FakeStreamOutlet.callsToConstructor.length = 0
+        FakeLslOutlet.callsToConstructor.length = 0
 
         await this.MuseDeviceController({ disableGyro: true })
 
         assert.isEqual(
-            FakeStreamOutlet.callsToConstructor.filter(
+            FakeLslOutlet.callsToConstructor.filter(
                 (call) => call?.name === `Muse Gyroscope (${this.shortUuid})`
             ).length,
             0,
@@ -546,7 +546,7 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
     }
 
     protected static async assertCreatesAccelerometerLslOutlet() {
-        const call = FakeStreamOutlet.callsToConstructor[3]
+        const call = FakeLslOutlet.callsToConstructor[3]
 
         assert.isEqualDeep(call, {
             name: `Muse Accelerometer (${this.shortUuid})`,
@@ -562,12 +562,12 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
     }
 
     protected static async assertDoesNotCreateAccelerometerLslOutletWithFlag() {
-        FakeStreamOutlet.callsToConstructor.length = 0
+        FakeLslOutlet.callsToConstructor.length = 0
 
         await this.MuseDeviceController({ disableAccel: true })
 
         assert.isEqual(
-            FakeStreamOutlet.callsToConstructor.filter(
+            FakeLslOutlet.callsToConstructor.filter(
                 (call) =>
                     call?.name === `Muse Accelerometer (${this.shortUuid})`
             ).length,
@@ -661,7 +661,7 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
             'Should not write any EEG data to stream!'
         )
         assert.isEqualDeep(
-            FakeStreamOutlet.callsToPushSample,
+            FakeLslOutlet.callsToPushSample,
             [],
             'Should not push any EEG samples to outlet!'
         )
@@ -690,7 +690,7 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
             'Should not write any PPG data to stream!'
         )
         assert.isEqualDeep(
-            FakeStreamOutlet.callsToPushSample,
+            FakeLslOutlet.callsToPushSample,
             [],
             'Should not push any PPG samples to outlet!'
         )
@@ -717,7 +717,7 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
             'Should not write any gyro data to stream!'
         )
         assert.isEqualDeep(
-            FakeStreamOutlet.callsToPushSample,
+            FakeLslOutlet.callsToPushSample,
             [],
             'Should not push any gyro samples to outlet!'
         )
@@ -744,7 +744,7 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
             'Should not write any accel data to stream!'
         )
         assert.isEqualDeep(
-            FakeStreamOutlet.callsToPushSample,
+            FakeLslOutlet.callsToPushSample,
             [],
             'Should not push any accel samples to outlet!'
         )

@@ -1,4 +1,4 @@
-import { BleController, FakeStreamOutlet } from '@neurodevs/node-lsl'
+import { BleController, FakeLslOutlet } from '@neurodevs/node-lsl'
 import { XdfRecorder } from '@neurodevs/node-xdf'
 import { DeviceControllerBle } from '../../impl/BiosensorDeviceFactory.js'
 import { MuseVariant } from '../../impl/muse/MuseDeviceController.js'
@@ -59,7 +59,7 @@ export default class FakeMuseController implements DeviceControllerBle {
     }
 
     public get outlets() {
-        return [new FakeStreamOutlet(), new FakeStreamOutlet()]
+        return [new FakeLslOutlet(), new FakeLslOutlet()]
     }
 
     public get streamQueries() {

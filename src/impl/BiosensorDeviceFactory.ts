@@ -1,8 +1,8 @@
 import {
     BleController,
-    EventMarkerEmitter,
+    LslEmitter,
     LslEventMarkerEmitter,
-    StreamOutlet,
+    LslOutlet,
 } from '@neurodevs/node-lsl'
 import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 
@@ -222,7 +222,7 @@ export interface DeviceController {
     startStreaming(): Promise<void>
     stopStreaming(): Promise<void>
     disconnect(): Promise<void>
-    readonly outlets: StreamOutlet[]
+    readonly outlets: LslOutlet[]
     readonly streamQueries: string[]
 }
 
@@ -289,12 +289,12 @@ export interface SingleDeviceBundle {
     device: DeviceController
     recorder?: XdfRecorder
     gateway?: WebSocketGateway
-    emitter?: EventMarkerEmitter
+    emitter?: LslEmitter
 }
 
 export interface MultipleDeviceBundle {
     devices: DeviceController[]
     recorder?: XdfRecorder
     gateway?: WebSocketGateway
-    emitter?: EventMarkerEmitter
+    emitter?: LslEmitter
 }

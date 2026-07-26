@@ -1,6 +1,6 @@
 import { randomInt } from 'node:crypto'
 
-import { FakeUsbController, FakeStreamOutlet } from '@neurodevs/node-lsl'
+import { FakeUsbController, FakeLslOutlet } from '@neurodevs/node-lsl'
 import { test, assert } from '@neurodevs/node-tdd'
 import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 
@@ -344,7 +344,7 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
 
     @test()
     protected static async createsExgLslOutlet() {
-        assert.isEqualDeep(FakeStreamOutlet.callsToConstructor[0], {
+        assert.isEqualDeep(FakeLslOutlet.callsToConstructor[0], {
             name: `Cyton ExG (${this.serialNumber})`,
             type: 'ExG',
             channelNames: [
@@ -368,7 +368,7 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
 
     @test()
     protected static async createsAccelLslOutlet() {
-        assert.isEqualDeep(FakeStreamOutlet.callsToConstructor[1], {
+        assert.isEqualDeep(FakeLslOutlet.callsToConstructor[1], {
             name: `Cyton Accelerometer (${this.serialNumber})`,
             type: 'ACCEL',
             channelNames: ['X', 'Y', 'Z'],
@@ -397,12 +397,12 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
         exgType: string | undefined,
         expected: string
     ) {
-        FakeStreamOutlet.resetTestDouble()
+        FakeLslOutlet.resetTestDouble()
 
         await this.CytonDeviceController({ exgType })
 
         assert.isEqual(
-            FakeStreamOutlet.callsToConstructor[0]?.type,
+            FakeLslOutlet.callsToConstructor[0]?.type,
             expected,
             'Did not set the ExG outlet type from exgType!'
         )

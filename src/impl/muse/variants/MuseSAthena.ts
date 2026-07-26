@@ -1,6 +1,6 @@
 import { WriteStream } from 'node:fs'
 
-import { ClockRegressor, StreamOutlet } from '@neurodevs/node-lsl'
+import { ClockRegressor, LslOutlet } from '@neurodevs/node-lsl'
 
 import { type MuseControllerOptions } from '../MuseDeviceController.js'
 import MuseBleVariant from '../MuseBleVariant.js'
@@ -328,7 +328,7 @@ export default class MuseSAthena extends MuseBleVariant {
         samples: number[][],
         deviceTime: number,
         earliestLslTime: number,
-        outlet?: StreamOutlet,
+        outlet?: LslOutlet,
         regressor?: ClockRegressor,
         log?: (...data: any[]) => void,
         stream?: WriteStream
@@ -611,9 +611,9 @@ export default class MuseSAthena extends MuseBleVariant {
 }
 
 interface AthenaOutlets {
-    EEG?: StreamOutlet
-    IMU?: StreamOutlet
-    OPTICS?: StreamOutlet
+    EEG?: LslOutlet
+    IMU?: LslOutlet
+    OPTICS?: LslOutlet
 }
 
 interface AthenaClockRegressors {

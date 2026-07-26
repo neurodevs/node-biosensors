@@ -1,4 +1,4 @@
-import { FakeStreamOutlet, StreamOutlet } from '@neurodevs/node-lsl'
+import { FakeLslOutlet, LslOutlet } from '@neurodevs/node-lsl'
 
 import { DeviceController } from '../../impl/BiosensorDeviceFactory.js'
 import CgxDeviceController, {
@@ -32,8 +32,8 @@ export default class FakeCgxController implements DeviceController {
         FakeCgxController.numCallsToDisconnect++
     }
 
-    public fakeEegOutlet = new FakeStreamOutlet()
-    public fakeAccelOutlet = new FakeStreamOutlet()
+    public fakeEegOutlet = new FakeLslOutlet()
+    public fakeAccelOutlet = new FakeLslOutlet()
 
     public get outlets() {
         return [this.fakeEegOutlet, this.fakeAccelOutlet]
@@ -51,7 +51,7 @@ export default class FakeCgxController implements DeviceController {
 
 export type CallToCgxConstructor =
     | {
-          eegOutlet?: StreamOutlet
-          accelOutlet?: StreamOutlet
+          eegOutlet?: LslOutlet
+          accelOutlet?: LslOutlet
       }
     | undefined

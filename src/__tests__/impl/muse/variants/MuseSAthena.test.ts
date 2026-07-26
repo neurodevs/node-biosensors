@@ -1,7 +1,7 @@
 import { randomInt } from 'node:crypto'
 
 import { test, assert } from '@neurodevs/node-tdd'
-import { FakeBleController, FakeStreamOutlet } from '@neurodevs/node-lsl'
+import { FakeBleController, FakeLslOutlet } from '@neurodevs/node-lsl'
 
 import MuseDeviceController, {
     CONTROL_UUID,
@@ -302,7 +302,7 @@ export default class MuseSAthenaTest extends AbstractDeviceControllerBleTest {
         }))
 
         assert.isEqualDeep(
-            FakeStreamOutlet.callsToPushSample,
+            FakeLslOutlet.callsToPushSample,
             expected,
             'Should decode 14-bit EEG into scaled microvolt samples!'
         )
@@ -331,7 +331,7 @@ export default class MuseSAthenaTest extends AbstractDeviceControllerBleTest {
         }))
 
         assert.isEqualDeep(
-            FakeStreamOutlet.callsToPushSample,
+            FakeLslOutlet.callsToPushSample,
             expected,
             'Should scale accel positive and gyro negative in one IMU stream!'
         )
@@ -344,7 +344,7 @@ export default class MuseSAthenaTest extends AbstractDeviceControllerBleTest {
         this.simulateData('OTHER', this.opticsPacket([sample]))
 
         assert.isEqualDeep(
-            FakeStreamOutlet.callsToPushSample,
+            FakeLslOutlet.callsToPushSample,
             [
                 {
                     sample: sample.map((v) => OPTICS_SCALE * v),
@@ -392,7 +392,7 @@ export default class MuseSAthenaTest extends AbstractDeviceControllerBleTest {
         }))
 
         assert.isEqualDeep(
-            FakeStreamOutlet.callsToPushSample,
+            FakeLslOutlet.callsToPushSample,
             expected,
             'Should decode every packet in a multi-packet message!'
         )
@@ -419,7 +419,7 @@ export default class MuseSAthenaTest extends AbstractDeviceControllerBleTest {
         )
 
         assert.isEqualDeep(
-            FakeStreamOutlet.callsToPushSample,
+            FakeLslOutlet.callsToPushSample,
             [],
             'Should skip packets whose channel count does not match the outlet!'
         )
@@ -433,7 +433,7 @@ export default class MuseSAthenaTest extends AbstractDeviceControllerBleTest {
         )
 
         assert.isEqualDeep(
-            FakeStreamOutlet.callsToPushSample,
+            FakeLslOutlet.callsToPushSample,
             [],
             'Should not push samples for an unknown sensor tag!'
         )
@@ -447,7 +447,7 @@ export default class MuseSAthenaTest extends AbstractDeviceControllerBleTest {
     }
 
     private static outletByName(name: string) {
-        return FakeStreamOutlet.callsToConstructor.find(
+        return FakeLslOutlet.callsToConstructor.find(
             (call) => call?.name === name
         )
     }

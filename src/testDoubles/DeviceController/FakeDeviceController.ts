@@ -1,6 +1,6 @@
 import generateId from '@neurodevs/generate-id'
 import { ChannelFormat } from '@neurodevs/ndx-native'
-import { FakeStreamOutlet } from '@neurodevs/node-lsl'
+import { FakeLslOutlet } from '@neurodevs/node-lsl'
 
 import {
     DeviceController,
@@ -52,7 +52,7 @@ export default class FakeDeviceController implements DeviceController {
 
     public outlets = this.streamQueries.map(
         () =>
-            new FakeStreamOutlet({
+            new FakeLslOutlet({
                 sourceId: FakeDeviceController.fakeSourceId,
                 type: FakeDeviceController.fakeType,
                 name: FakeDeviceController.fakeName,

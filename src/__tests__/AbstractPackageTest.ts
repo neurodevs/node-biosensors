@@ -4,16 +4,16 @@ import { Server } from 'ws'
 import { FakeLiblsl, LiblslAdapter } from '@neurodevs/ndx-native'
 import {
     LslStreamOutlet,
-    FakeStreamOutlet,
+    FakeLslOutlet,
     LslStreamInfo,
-    FakeStreamInfo,
+    FakeLslInfo,
     LslStreamInlet,
-    FakeStreamInlet,
+    FakeLslInlet,
     LslWebSocketBridge,
-    FakeWebSocketBridge,
+    FakeLslWsBridge,
     FakeWebSocketServer,
     LslEventMarkerEmitter,
-    FakeEventMarkerEmitter,
+    FakeLslEmitter,
     BleDeviceController,
     FakeBleController,
     WindowedClockRegressor,
@@ -65,11 +65,11 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         this.setFakeBleController()
         this.setFakeFTDI()
         this.setFakeLiblsl()
-        this.setFakeEventMarkerEmitter()
-        this.setFakeStreamInlet()
-        this.setFakeStreamOutlet()
-        this.setFakeStreamInfo()
-        this.setFakeWebSocketBridge()
+        this.setFakeLslEmitter()
+        this.setFakeLslInlet()
+        this.setFakeLslOutlet()
+        this.setFakeLslInfo()
+        this.setFakeLslWsBridge()
         this.setFakeXdfLoader()
         this.setFakeXdfRecorder()
         this.setFakeClockRegressor()
@@ -170,9 +170,9 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         LiblslAdapter.setInstance(this.fakeLiblsl)
     }
 
-    protected static setFakeEventMarkerEmitter() {
-        LslEventMarkerEmitter.Class = FakeEventMarkerEmitter
-        FakeEventMarkerEmitter.resetTestDouble()
+    protected static setFakeLslEmitter() {
+        LslEventMarkerEmitter.Class = FakeLslEmitter
+        FakeLslEmitter.resetTestDouble()
     }
 
     protected static setFakeMuseDetector() {
@@ -180,14 +180,14 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         FakeMuseDetector.resetTestDouble()
     }
 
-    protected static setFakeStreamInlet() {
-        LslStreamInlet.Class = FakeStreamInlet
-        FakeStreamInlet.resetTestDouble()
+    protected static setFakeLslInlet() {
+        LslStreamInlet.Class = FakeLslInlet
+        FakeLslInlet.resetTestDouble()
     }
 
-    protected static setFakeStreamOutlet() {
-        LslStreamOutlet.Class = FakeStreamOutlet
-        FakeStreamOutlet.resetTestDouble()
+    protected static setFakeLslOutlet() {
+        LslStreamOutlet.Class = FakeLslOutlet
+        FakeLslOutlet.resetTestDouble()
     }
 
     protected static setFakeMuseController() {
@@ -195,9 +195,9 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         FakeMuseController.resetTestDouble()
     }
 
-    protected static setFakeStreamInfo() {
-        LslStreamInfo.Class = FakeStreamInfo
-        FakeStreamInfo.resetTestDouble()
+    protected static setFakeLslInfo() {
+        LslStreamInfo.Class = FakeLslInfo
+        FakeLslInfo.resetTestDouble()
     }
 
     protected static setFakeUsbController() {
@@ -205,9 +205,9 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         FakeUsbController.resetTestDouble()
     }
 
-    protected static setFakeWebSocketBridge() {
-        LslWebSocketBridge.Class = FakeWebSocketBridge
-        FakeWebSocketBridge.resetTestDouble()
+    protected static setFakeLslWsBridge() {
+        LslWebSocketBridge.Class = FakeLslWsBridge
+        FakeLslWsBridge.resetTestDouble()
 
         LslWebSocketBridge.WSS = FakeWebSocketServer as unknown as typeof Server
         FakeWebSocketServer.resetTestDouble()

@@ -1,4 +1,4 @@
-import { StreamOutlet } from '@neurodevs/node-lsl'
+import { LslOutlet } from '@neurodevs/node-lsl'
 import { CytonController } from '../../impl/openbci/CytonDeviceController.js'
 
 export default class FakeCytonController implements CytonController {
@@ -8,7 +8,7 @@ export default class FakeCytonController implements CytonController {
     public static numCallsToStopStreaming = 0
     public static numCallsToDisconenct = 0
 
-    public static fakeOutlets: StreamOutlet[] = []
+    public static fakeOutlets: LslOutlet[] = []
     public static fakeStreamQueries: string[] = []
 
     public constructor() {

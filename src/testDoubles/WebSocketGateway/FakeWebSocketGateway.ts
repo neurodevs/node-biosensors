@@ -1,14 +1,14 @@
-import { WebSocketBridge } from '@neurodevs/node-lsl'
+import { LslWsBridge } from '@neurodevs/node-lsl'
 import { WebSocketGateway } from '../../impl/BiosensorWebSocketGateway.js'
 
 export default class FakeWebSocketGateway implements WebSocketGateway {
-    public static callsToConstructor: (WebSocketBridge[] | undefined)[] = []
+    public static callsToConstructor: (LslWsBridge[] | undefined)[] = []
 
     public static numCallsToOpen = 0
     public static numCallsToClose = 0
     public static numCallsToDestroy = 0
 
-    public constructor(bridges?: WebSocketBridge[] | undefined) {
+    public constructor(bridges?: LslWsBridge[] | undefined) {
         FakeWebSocketGateway.callsToConstructor.push(bridges ?? [])
     }
 

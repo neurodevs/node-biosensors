@@ -1,5 +1,5 @@
 import { test, assert } from '@neurodevs/node-tdd'
-import { FakeBleController, FakeStreamOutlet } from '@neurodevs/node-lsl'
+import { FakeBleController, FakeLslOutlet } from '@neurodevs/node-lsl'
 
 import MuseDeviceController, {
     CONTROL_UUID,
@@ -190,7 +190,7 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
         await MuseDeviceController.Create({ model: 'Muse S Gen 2' })
         await MuseDeviceController.Create({ model: 'Muse S Athena' })
 
-        const eegNames = FakeStreamOutlet.callsToConstructor.filter((call) =>
+        const eegNames = FakeLslOutlet.callsToConstructor.filter((call) =>
             call?.name?.startsWith('Muse EEG')
         )
 

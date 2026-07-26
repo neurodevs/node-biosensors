@@ -8,7 +8,7 @@
 // 76-77: Trigger (value: 0–255)
 
 import { ChannelFormat } from '@neurodevs/ndx-native'
-import { StreamOutlet, LslStreamOutlet } from '@neurodevs/node-lsl'
+import { LslOutlet, LslStreamOutlet } from '@neurodevs/node-lsl'
 import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 import FTDI from 'ftdi-d2xx'
 
@@ -23,8 +23,8 @@ export default class CgxDeviceController implements DeviceController {
     public isRunning = false
     protected numPacketsDropped = 0
 
-    private eegOutlet: StreamOutlet
-    private accelOutlet: StreamOutlet
+    private eegOutlet: LslOutlet
+    private accelOutlet: LslOutlet
     private xdfRecorder?: XdfRecorder
 
     private infos!: FTDI.FTDI_DeviceInfo[]
@@ -378,8 +378,8 @@ export type CgxControllerConstructor = new (
 ) => DeviceController
 
 export interface CgxControllerConstructorOptions {
-    eegOutlet: StreamOutlet
-    accelOutlet: StreamOutlet
+    eegOutlet: LslOutlet
+    accelOutlet: LslOutlet
     xdfRecorder?: XdfRecorder
     xdfRecordPath?: string
 }

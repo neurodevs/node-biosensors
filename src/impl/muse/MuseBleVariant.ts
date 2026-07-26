@@ -5,7 +5,7 @@ import {
     CharacteristicCallbacks,
     ClockRegressor,
     LslStreamOutlet,
-    StreamOutlet,
+    LslOutlet,
     WindowedClockRegressor,
 } from '@neurodevs/node-lsl'
 
@@ -137,10 +137,10 @@ export default class MuseBleVariant implements MuseVariant {
 
     private static generateCharCallbacks(
         options?: MuseControllerOptions,
-        eegOutlet?: StreamOutlet,
-        ppgOutlet?: StreamOutlet,
-        gyroOutlet?: StreamOutlet,
-        accelOutlet?: StreamOutlet,
+        eegOutlet?: LslOutlet,
+        ppgOutlet?: LslOutlet,
+        gyroOutlet?: LslOutlet,
+        accelOutlet?: LslOutlet,
         eegRegressor?: ClockRegressor,
         ppgRegressor?: ClockRegressor,
         gyroRegressor?: ClockRegressor,
@@ -255,7 +255,7 @@ export default class MuseBleVariant implements MuseVariant {
     private static createEegHandler(
         log?: (...data: any[]) => void,
         stream?: WriteStream,
-        outlet?: StreamOutlet,
+        outlet?: LslOutlet,
         regressor?: ClockRegressor
     ) {
         const charChunks: number[][] = []
@@ -333,7 +333,7 @@ export default class MuseBleVariant implements MuseVariant {
     private static createPpgHandler(
         log?: (...data: any[]) => void,
         stream?: WriteStream,
-        outlet?: StreamOutlet,
+        outlet?: LslOutlet,
         regressor?: ClockRegressor
     ) {
         const charChunks: number[][] = []
@@ -387,7 +387,7 @@ export default class MuseBleVariant implements MuseVariant {
     private static createAccelHandler(
         log?: (...data: any[]) => void,
         stream?: fs.WriteStream,
-        outlet?: StreamOutlet,
+        outlet?: LslOutlet,
         regressor?: ClockRegressor
     ) {
         return this.createImuHandler(
@@ -403,7 +403,7 @@ export default class MuseBleVariant implements MuseVariant {
     private static createGyroHandler(
         log?: (...data: any[]) => void,
         stream?: fs.WriteStream,
-        outlet?: StreamOutlet,
+        outlet?: LslOutlet,
         regressor?: ClockRegressor
     ) {
         return this.createImuHandler(
@@ -421,7 +421,7 @@ export default class MuseBleVariant implements MuseVariant {
         scale: number,
         log?: (...data: any[]) => void,
         stream?: WriteStream,
-        outlet?: StreamOutlet,
+        outlet?: LslOutlet,
         regressor?: ClockRegressor
     ) {
         return (bytes: number[], timestampSec: number) => {

@@ -1,5 +1,5 @@
 import generateId from '@neurodevs/generate-id'
-import { FakeStreamOutlet } from '@neurodevs/node-lsl'
+import { FakeLslOutlet } from '@neurodevs/node-lsl'
 import { test, assert } from '@neurodevs/node-tdd'
 import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 import FTDI from 'ftdi-d2xx'
@@ -194,7 +194,7 @@ export default class CgxDeviceControllerTest extends AbstractPackageTest {
     @test()
     protected static async createConstructsLslOutletforEEG() {
         assert.isEqualDeep(
-            FakeStreamOutlet.callsToConstructor[0],
+            FakeLslOutlet.callsToConstructor[0],
             {
                 sourceId: 'cgx-eeg',
                 name: 'CGX Quick-20r (Cognionics) EEG',
@@ -243,8 +243,8 @@ export default class CgxDeviceControllerTest extends AbstractPackageTest {
 
         assert.isEqualDeep(
             [
-                FakeStreamOutlet.callsToPushSample[0].sample,
-                FakeStreamOutlet.callsToPushSample[2].sample,
+                FakeLslOutlet.callsToPushSample[0].sample,
+                FakeLslOutlet.callsToPushSample[2].sample,
             ],
             [eegData, eegData],
             'Should push EEG data to LSL outlet!'
@@ -254,7 +254,7 @@ export default class CgxDeviceControllerTest extends AbstractPackageTest {
     @test()
     protected static async createConstructsLslOutletforAccelerometer() {
         assert.isEqualDeep(
-            FakeStreamOutlet.callsToConstructor[1],
+            FakeLslOutlet.callsToConstructor[1],
             {
                 sourceId: 'cgx-accel',
                 name: 'CGX Quick-20r (Cognionics) Accelerometer',
@@ -304,8 +304,8 @@ export default class CgxDeviceControllerTest extends AbstractPackageTest {
 
         assert.isEqualDeep(
             [
-                FakeStreamOutlet.callsToPushSample[1].sample,
-                FakeStreamOutlet.callsToPushSample[3].sample,
+                FakeLslOutlet.callsToPushSample[1].sample,
+                FakeLslOutlet.callsToPushSample[3].sample,
             ],
             [accelData, accelData],
             'Should push EEG data to LSL outlet!'
