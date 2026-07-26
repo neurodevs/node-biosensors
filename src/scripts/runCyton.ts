@@ -26,4 +26,8 @@ console.info('Waiting for 10 seconds...')
 
 await new Promise((resolve) => setTimeout(resolve, 10000))
 
+console.info('Disconnecting...')
+
+await cyton.disconnect()
+
 console.info('Done!\n')
