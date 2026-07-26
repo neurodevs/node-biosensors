@@ -1,11 +1,12 @@
+import { BleController, BleDeviceController } from '@neurodevs/node-lsl'
+import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
+
 import {
     DeviceControllerBle,
     DeviceControllerBleConstructor,
     DeviceControllerBleOptions,
 } from '../BiosensorDeviceFactory.js'
-import { BleController, BleDeviceController } from '@neurodevs/node-lsl'
 import AbstractDeviceControllerBle from '../abstract/AbstractDeviceControllerBle.js'
-import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 
 export default class ZephyrDeviceController
     extends AbstractDeviceControllerBle
