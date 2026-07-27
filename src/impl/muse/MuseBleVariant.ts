@@ -259,6 +259,7 @@ export default class MuseBleVariant implements MuseVariant {
         regressor?: ClockRegressor
     ) {
         const charChunks: number[][] = []
+        const charCounters: number[] = []
         let t0 = 0
         let packetCounter = 0
 
@@ -271,8 +272,12 @@ export default class MuseBleVariant implements MuseVariant {
             }
 
             charChunks[charIdx] = this.decodeEegCharChunk(bytes.slice(2))
+            charCounters[charIdx] = this.readUInt16BE(bytes, 0)
 
-            if (charIdx === this.eegCharNames.length - 1) {
+            if (
+                charIdx === this.eegCharNames.length - 1 &&
+                this.isCompletePacket(charCounters, this.eegCharNames.length)
+            ) {
                 const pushTimestamps = this.derivePushTimestamps(
                     regressor,
                     (packetCounter * this.eegChunkSize) / this.eegSampleRateHz,
@@ -296,6 +301,13 @@ export default class MuseBleVariant implements MuseVariant {
 
     private static readUInt16BE(bytes: number[], offset: number) {
         return (bytes[offset]! << 8) | bytes[offset + 1]!
+    }
+
+    private static isCompletePacket(charCounters: number[], numChars: number) {
+        return (
+            charCounters.length === numChars &&
+            charCounters.every((counter) => counter === charCounters[0])
+        )
     }
 
     private static derivePushTimestamps(

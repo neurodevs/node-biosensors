@@ -1,7 +1,11 @@
 import { randomInt } from 'node:crypto'
 
 import { assert } from '@neurodevs/node-tdd'
-import { FakeBleController, FakeLslOutlet } from '@neurodevs/node-lsl'
+import {
+    FakeBleController,
+    FakeClockRegressor,
+    FakeLslOutlet,
+} from '@neurodevs/node-lsl'
 
 import MuseDeviceController, {
     CONTROL_UUID,
@@ -210,6 +214,27 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
             this.eegWriteStreamCalls,
             expected,
             'Should write each EEG sample to the write stream once the chunk is formed!'
+        )
+    }
+
+    protected static async assertIgnoresEegPacketMissingChars() {
+        const charValues = this.eegCharNames.map(() =>
+            this.generateEegCharValues()
+        )
+
+        const { packetCounter } = this.simulateEegOnDataWithValues(charValues)
+
+        const lastCharName = this.eegCharNames[this.eegCharNames.length - 1]!
+
+        this.simulateEegOnDataWithValues(charValues, {
+            packetCounter: packetCounter + 2,
+            charOrder: [lastCharName],
+        })
+
+        assert.isEqualDeep(
+            this.eegDeriveCalls.map(({ deviceTime }) => deviceTime),
+            [this.expectedEegDeviceTime(packetCounter)],
+            'Should not derive timestamps for a packet missing chars!'
         )
     }
 
@@ -750,6 +775,16 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
         )
     }
 
+    protected static get eegDeriveCalls() {
+        return FakeClockRegressor.callsToDeriveTimestamps.filter(
+            ({ chunkSize }) => chunkSize === this.eegChunkSize
+        )
+    }
+
+    protected static expectedEegDeviceTime(packetCounter: number) {
+        return (packetCounter * this.eegChunkSize) / this.eegSampleRateHz
+    }
+
     protected static get expectedStartCommands() {
         return [
             this.generateCmd('h'),
@@ -811,29 +846,47 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
         return { timestampSec, charValues, packetCounter }
     }
 
-    protected static simulateEegOnDataWithValues(charValues: number[][]) {
-        const calls = FakeBleController.callsToConstructor
-        const { charCallbacks } = calls[calls.length - 1]!
+    protected static simulateEegOnDataWithValues(
+        charValues: number[][],
+        options?: SimulatePacketOptions
+    ) {
+        const {
+            packetCounter = this.generatePacketCounter(),
+            charOrder = this.eegCharNames,
+            timestampSec = randomInt(1, 100),
+        } = options ?? {}
 
-        const timestampSec = randomInt(1, 100)
-        let packetCounter = 0
+        charOrder.forEach((charName) => {
+            const charIdx = this.eegCharNames.indexOf(charName)
 
-        this.eegCharNames.forEach((charName, charIdx) => {
-            const { onData } = charCallbacks!.find(
-                (callback) => callback.charName === charName
-            )!
+            const fakeBytes = this.generateEegBytes(
+                charValues[charIdx],
+                packetCounter
+            )
 
-            const fakeBytes = this.generateEegBytes(charValues[charIdx])
-            const fakeBuffer = Buffer.from(fakeBytes)
-
-            if (charIdx === 0) {
-                packetCounter = this.readUInt16BE(fakeBytes, 0)
-            }
-
-            onData(fakeBuffer, fakeBytes.length, timestampSec)
+            this.simulateOnData(charName, fakeBytes, timestampSec)
         })
 
         return { timestampSec, packetCounter }
+    }
+
+    protected static simulateOnData(
+        charName: string,
+        fakeBytes: number[],
+        timestampSec: number
+    ) {
+        const calls = FakeBleController.callsToConstructor
+        const { charCallbacks } = calls[calls.length - 1]!
+
+        const { onData } = charCallbacks!.find(
+            (callback) => callback.charName === charName
+        )!
+
+        onData(Buffer.from(fakeBytes), fakeBytes.length, timestampSec)
+    }
+
+    protected static generatePacketCounter() {
+        return randomInt(1, 1000)
     }
 
     protected static readUInt16BE(bytes: number[], offset: number) {
@@ -847,8 +900,8 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
         )
     }
 
-    protected static generateEegBytes(values: number[]) {
-        const bytes = [this.generateRandomByte(), this.generateRandomByte()]
+    protected static generateEegBytes(values: number[], packetCounter: number) {
+        const bytes = this.generateCounterBytes(packetCounter)
 
         for (let i = 0; i < values.length; i += 2) {
             bytes.push(...this.encode12BitPair(values[i]!, values[i + 1]!))
@@ -861,30 +914,25 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
         return randomInt(0, 255)
     }
 
+    protected static generateCounterBytes(packetCounter: number) {
+        return [(packetCounter >> 8) & 0xff, packetCounter & 0xff]
+    }
+
     protected static simulatePpgOnData() {
-        const calls = FakeBleController.callsToConstructor
-        const { charCallbacks } = calls[calls.length - 1]!
-
-        const timestampSec = randomInt(1, 100)
-        let packetCounter = 0
-
         const charValues = this.ppgCharNames.map(() =>
             this.generatePpgCharValues()
         )
 
+        const timestampSec = randomInt(1, 100)
+        const packetCounter = this.generatePacketCounter()
+
         this.ppgCharNames.forEach((charName, charIdx) => {
-            const { onData } = charCallbacks!.find(
-                (callback) => callback.charName === charName
-            )!
+            const fakeBytes = this.generatePpgBytes(
+                charValues[charIdx]!,
+                packetCounter
+            )
 
-            const fakeBytes = this.generatePpgBytes(charValues[charIdx]!)
-            const fakeBuffer = Buffer.from(fakeBytes)
-
-            if (charIdx === 0) {
-                packetCounter = this.readUInt16BE(fakeBytes, 0)
-            }
-
-            onData(fakeBuffer, fakeBytes.length, timestampSec)
+            this.simulateOnData(charName, fakeBytes, timestampSec)
         })
 
         return { timestampSec, charValues, packetCounter }
@@ -897,8 +945,8 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
         )
     }
 
-    protected static generatePpgBytes(values: number[]) {
-        const bytes = [this.generateRandomByte(), this.generateRandomByte()]
+    protected static generatePpgBytes(values: number[], packetCounter: number) {
+        const bytes = this.generateCounterBytes(packetCounter)
 
         for (const value of values) {
             bytes.push((value >> 16) & 0xff, (value >> 8) & 0xff, value & 0xff)
@@ -1039,4 +1087,10 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
             ...options,
         })) as SpyMuseController
     }
+}
+
+export interface SimulatePacketOptions {
+    packetCounter?: number
+    charOrder?: string[]
+    timestampSec?: number
 }

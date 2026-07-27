@@ -41,6 +41,11 @@ export default class MuseSGen1Test extends MuseBleVariantTest {
     }
 
     @test()
+    protected static async onDataIgnoresEegPacketMissingChars() {
+        await this.assertIgnoresEegPacketMissingChars()
+    }
+
+    @test()
     protected static async onDataScalesEegSamplesToMicrovolts() {
         await this.assertScalesEegSamplesToMicrovolts()
     }

@@ -40,6 +40,11 @@ export default class Muse1Gen2Test extends MuseBleVariantTest {
     }
 
     @test()
+    protected static async onDataIgnoresEegPacketMissingChars() {
+        await this.assertIgnoresEegPacketMissingChars()
+    }
+
+    @test()
     protected static async onDataScalesEegSamplesToMicrovolts() {
         await this.assertScalesEegSamplesToMicrovolts()
     }
