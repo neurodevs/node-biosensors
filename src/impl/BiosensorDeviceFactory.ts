@@ -167,6 +167,10 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         return CgxDeviceController.Create()
     }
 
+    private CytonDeviceController(options?: CytonControllerOptions) {
+        return CytonDeviceController.Create(options)
+    }
+
     private async MuseDeviceController(
         model: MuseDeviceModel,
         options?: MuseControllerOptions
@@ -175,10 +179,6 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         await muse.connect()
 
         return muse
-    }
-
-    private CytonDeviceController(options?: CytonControllerOptions) {
-        return CytonDeviceController.Create(options)
     }
 
     private ZephyrDeviceController() {
