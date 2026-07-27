@@ -4,7 +4,10 @@ import { FakeLslEmitter } from '@neurodevs/node-lsl'
 import { test, assert } from '@neurodevs/node-tdd'
 import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 
-import { DeviceName } from '../../impl/BiosensorDeviceFactory.js'
+import {
+    DeviceName,
+    DeviceSpecification,
+} from '../../impl/BiosensorDeviceFactory.js'
 import BiosensorStreamingOrchestrator, {
     StreamingOrchestrator,
     StreamingOrchestratorConstructorOptions,
@@ -49,9 +52,7 @@ export default class BiosensorStreamingOrchestratorTest extends AbstractPackageT
         assert.isEqualDeep(
             FakeDeviceFactory.callsToCreateDevices[0],
             {
-                deviceSpecifications: this.deviceNames.map((deviceName) => ({
-                    deviceName,
-                })),
+                deviceSpecifications: this.expectedDeviceSpecifications,
                 sessionOptions: {
                     xdfRecordPath: this.xdfRecordPath,
                     webSocketPortStart: this.webSocketPortStart,
@@ -90,7 +91,7 @@ export default class BiosensorStreamingOrchestratorTest extends AbstractPackageT
 
         assert.isEqual(
             FakeDeviceController.numCallsToStartStreaming,
-            this.deviceNames.length,
+            this.devices.length,
             'Did not start streaming on all devices!'
         )
     }
@@ -118,7 +119,7 @@ export default class BiosensorStreamingOrchestratorTest extends AbstractPackageT
 
         assert.isEqual(
             FakeDeviceController.numCallsToDisconnect,
-            this.deviceNames.length,
+            this.devices.length,
             'Did not disconnect all devices!'
         )
     }
@@ -189,11 +190,23 @@ export default class BiosensorStreamingOrchestratorTest extends AbstractPackageT
     private static readonly xdfRecordPath = this.generateId()
     private static readonly webSocketPortStart = randomInt(1000, 5000)
 
-    private static readonly deviceNames: DeviceName[] = [
+    private static readonly museBleUuid = this.generateId()
+
+    private static readonly devices: (DeviceName | DeviceSpecification)[] = [
         'Cognionics Quick-20r',
-        'Muse S Gen 2',
+        { deviceName: 'Muse S Gen 2', options: { bleUuid: this.museBleUuid } },
         'Zephyr BioHarness 3',
     ]
+
+    private static readonly expectedDeviceSpecifications: DeviceSpecification[] =
+        [
+            { deviceName: 'Cognionics Quick-20r' },
+            {
+                deviceName: 'Muse S Gen 2',
+                options: { bleUuid: this.museBleUuid },
+            },
+            { deviceName: 'Zephyr BioHarness 3' },
+        ]
 
     private static async createWithEventMarkerEmitter() {
         return await this.BiosensorStreamingOrchestrator({
@@ -205,7 +218,7 @@ export default class BiosensorStreamingOrchestratorTest extends AbstractPackageT
         options?: Partial<StreamingOrchestratorConstructorOptions>
     ) {
         return await BiosensorStreamingOrchestrator.Create({
-            deviceNames: this.deviceNames,
+            devices: this.devices,
             xdfRecordPath: this.xdfRecordPath,
             webSocketPortStart: this.webSocketPortStart,
             ...options,

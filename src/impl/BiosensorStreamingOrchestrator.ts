@@ -4,6 +4,7 @@ import { XdfRecorder } from '@neurodevs/node-xdf'
 import BiosensorDeviceFactory, {
     DeviceFactory,
     DeviceName,
+    DeviceSpecification,
     DeviceController,
 } from './BiosensorDeviceFactory.js'
 import { WebSocketGateway } from './BiosensorWebSocketGateway.js'
@@ -11,27 +12,28 @@ import { WebSocketGateway } from './BiosensorWebSocketGateway.js'
 export default class BiosensorStreamingOrchestrator implements StreamingOrchestrator {
     public static Class?: StreamingOrchestratorConstructor
 
-    private deviceNames: DeviceName[]
+    private devices: (DeviceName | DeviceSpecification)[]
     private xdfRecordPath?: string
     private webSocketPortStart?: number
     private eventMarkers?: TimedEventMarker[]
 
     private factory: DeviceFactory
-    private devices!: DeviceController[]
     private recorder?: XdfRecorder
     private gateway?: WebSocketGateway
     private emitter?: LslEmitter
 
+    private controllers!: DeviceController[]
+
     protected constructor(options: StreamingOrchestratorConstructorOptions) {
         const {
-            deviceNames,
+            devices,
             xdfRecordPath,
             webSocketPortStart,
             eventMarkers,
             factory,
         } = options
 
-        this.deviceNames = deviceNames
+        this.devices = devices
         this.xdfRecordPath = xdfRecordPath
         this.webSocketPortStart = webSocketPortStart
         this.eventMarkers = eventMarkers
@@ -57,7 +59,7 @@ export default class BiosensorStreamingOrchestrator implements StreamingOrchestr
         const { devices, recorder, gateway, emitter } =
             await this.createDeviceBundle()
 
-        this.devices = devices
+        this.controllers = devices
         this.recorder = recorder
         this.gateway = gateway
         this.emitter = emitter
@@ -71,10 +73,10 @@ export default class BiosensorStreamingOrchestrator implements StreamingOrchestr
         })
     }
 
-    private get deviceSpecifications() {
-        return this.deviceNames.map((deviceName) => ({
-            deviceName,
-        }))
+    private get deviceSpecifications(): DeviceSpecification[] {
+        return this.devices.map((device) =>
+            typeof device === 'string' ? { deviceName: device } : device
+        )
     }
 
     private startXdfRecorderIfExists() {
@@ -87,7 +89,7 @@ export default class BiosensorStreamingOrchestrator implements StreamingOrchestr
 
     private startStreamingDevices() {
         return Promise.all(
-            this.devices.map((device) => device.startStreaming())
+            this.controllers.map((device) => device.startStreaming())
         )
     }
 
@@ -100,7 +102,9 @@ export default class BiosensorStreamingOrchestrator implements StreamingOrchestr
     }
 
     private async disconnectDevices() {
-        return Promise.all(this.devices.map((device) => device.disconnect()))
+        return Promise.all(
+            this.controllers.map((device) => device.disconnect())
+        )
     }
 
     private destroyEmitterIfExists() {
@@ -130,7 +134,7 @@ export type StreamingOrchestratorConstructor = new (
 ) => StreamingOrchestrator
 
 export interface StreamingOrchestratorOptions {
-    deviceNames: DeviceName[]
+    devices: (DeviceName | DeviceSpecification)[]
     xdfRecordPath?: string
     webSocketPortStart?: number
     eventMarkers?: TimedEventMarker[]

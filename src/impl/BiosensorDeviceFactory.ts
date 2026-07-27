@@ -267,10 +267,12 @@ export interface PerDeviceOptionsMap extends Record<
     'Zephyr BioHarness 3': DeviceControllerOptions
 }
 
-export interface DeviceSpecification {
-    deviceName: DeviceName
-    options?: PerDeviceOptionsMap[DeviceName]
-}
+export type DeviceSpecification = {
+    [K in DeviceName]: {
+        deviceName: K
+        options?: PerDeviceOptionsMap[K]
+    }
+}[DeviceName]
 
 export type CreateDeviceSpec = {
     [K in DeviceName]: {
