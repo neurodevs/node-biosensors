@@ -16,7 +16,7 @@ const devices: DeviceSpecification[] = [
     },
     {
         deviceName: 'Muse S Gen 1',
-        bleUuid: 'PLACEHOLDER-MUSE-S-GEN-1-BLE-UUID',
+        // bleUuid: 'PLACEHOLDER-MUSE-S-GEN-1-BLE-UUID',
     },
     {
         deviceName: 'Muse 2',
@@ -24,7 +24,7 @@ const devices: DeviceSpecification[] = [
     },
     {
         deviceName: 'Muse 1 Gen 2',
-        bleUuid: 'PLACEHOLDER-MUSE-1-GEN-2-BLE-UUID',
+        // bleUuid: 'PLACEHOLDER-MUSE-1-GEN-2-BLE-UUID',
     },
 ]
 
@@ -33,28 +33,33 @@ const orchestrator = await BiosensorStreamingOrchestrator.Create({
     xdfRecordPath,
 })
 
-await orchestrator.start()
+try {
+    console.info('Starting orchestrator...')
+    await orchestrator.start()
 
-console.info('Streaming for 10 seconds...')
+    console.info('Waiting for 10 seconds...')
+    await new Promise((resolve) => setTimeout(resolve, 10000))
 
-await new Promise((resolve) => setTimeout(resolve, 10000))
+    console.info('Stopping all devices...')
+    await orchestrator.stop()
 
-console.info('Stopping all devices...')
+    console.info('Waiting for 5 seconds...')
+    await new Promise((resolve) => setTimeout(resolve, 5000))
 
-await orchestrator.stop()
+    const grapher = await TimestampJitterGrapher.Create(
+        xdfRecordPath,
+        './artifacts',
+        {
+            totalSecs: 1,
+            ignoreInterpolatedTimestamps: false,
+            showIdealIntervalMs: true,
+            xAxisUnits: 'milliseconds',
+        }
+    )
+    await grapher.run()
 
-await new Promise((resolve) => setTimeout(resolve, 5000))
-
-const grapher = await TimestampJitterGrapher.Create(
-    xdfRecordPath,
-    './artifacts',
-    {
-        totalSecs: 1,
-        ignoreInterpolatedTimestamps: false,
-        showIdealIntervalMs: true,
-        xAxisUnits: 'milliseconds',
-    }
-)
-await grapher.run()
-
-console.info('Done!\n')
+    console.info('Done!\n')
+} catch (err) {
+    console.error('Orchestrator failed:', err)
+    await orchestrator.stop()
+}

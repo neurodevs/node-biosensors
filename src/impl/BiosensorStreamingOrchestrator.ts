@@ -22,7 +22,7 @@ export default class BiosensorStreamingOrchestrator implements StreamingOrchestr
     private gateway?: WebSocketGateway
     private emitter?: LslEmitter
 
-    private controllers!: DeviceController[]
+    private controllers: DeviceController[] = []
 
     protected constructor(options: StreamingOrchestratorConstructorOptions) {
         const {

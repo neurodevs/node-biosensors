@@ -174,6 +174,17 @@ export default class BiosensorStreamingOrchestratorTest extends AbstractPackageT
         )
     }
 
+    @test()
+    protected static async stopDoesNotThrowIfStartWasNeverCalled() {
+        await this.stop()
+
+        assert.isEqual(
+            FakeDeviceController.numCallsToDisconnect,
+            0,
+            'Should not have disconnected any devices!'
+        )
+    }
+
     private static async startThenStop() {
         await this.start()
         await this.stop()
