@@ -34,7 +34,7 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
 
     private static readonly deviceSpecifications: DeviceSpecification[] = [
         { deviceName: 'Cognionics Quick-20r' },
-        { deviceName: 'Muse S Gen 2', options: { bleUuid: this.museBleUuid } },
+        { deviceName: 'Muse S Gen 2', bleUuid: this.museBleUuid },
     ]
 
     protected static async beforeEach() {

@@ -194,17 +194,14 @@ export default class BiosensorStreamingOrchestratorTest extends AbstractPackageT
 
     private static readonly devices: (DeviceName | DeviceSpecification)[] = [
         'Cognionics Quick-20r',
-        { deviceName: 'Muse S Gen 2', options: { bleUuid: this.museBleUuid } },
+        { deviceName: 'Muse S Gen 2', bleUuid: this.museBleUuid },
         'Zephyr BioHarness 3',
     ]
 
     private static readonly expectedDeviceSpecifications: DeviceSpecification[] =
         [
             { deviceName: 'Cognionics Quick-20r' },
-            {
-                deviceName: 'Muse S Gen 2',
-                options: { bleUuid: this.museBleUuid },
-            },
+            { deviceName: 'Muse S Gen 2', bleUuid: this.museBleUuid },
             { deviceName: 'Zephyr BioHarness 3' },
         ]
 

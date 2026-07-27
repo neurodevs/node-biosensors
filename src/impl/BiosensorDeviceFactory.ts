@@ -145,7 +145,7 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
     private async createAllDevices() {
         return await Promise.all(
             this.deviceSpecs.map((device) => {
-                const { deviceName, options } = device
+                const { deviceName, ...options } = device
                 return this.createDevice(deviceName, options)
             })
         )
@@ -268,10 +268,7 @@ export interface PerDeviceOptionsMap extends Record<
 }
 
 export type DeviceSpecification = {
-    [K in DeviceName]: {
-        deviceName: K
-        options?: PerDeviceOptionsMap[K]
-    }
+    [K in DeviceName]: { deviceName: K } & PerDeviceOptionsMap[K]
 }[DeviceName]
 
 export type CreateDeviceSpec = {
