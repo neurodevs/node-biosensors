@@ -25,6 +25,7 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
     private static readonly webSocketPortStart = randomInt(1000, 5000)
     private static readonly museBleUuid = this.generateId()
     private static readonly cgxStreamQueries = ['type="EEG"', 'type="ACCEL"']
+
     private static readonly museSGen2StreamQueries = [
         'type="EEG"',
         'type="PPG"',
@@ -35,6 +36,12 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
     private static readonly deviceSpecifications: DeviceSpecification[] = [
         { deviceName: 'Cognionics Quick-20r' },
         { deviceName: 'Muse S Gen 2', bleUuid: this.museBleUuid },
+    ]
+
+    private static readonly threeMuseSpecifications: DeviceSpecification[] = [
+        { deviceName: 'Muse S Gen 2', bleUuid: this.generateId() },
+        { deviceName: 'Muse S Gen 1', bleUuid: this.generateId() },
+        { deviceName: 'Muse 2', bleUuid: this.generateId() },
     ]
 
     protected static async beforeEach() {
@@ -145,8 +152,26 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
 
         assert.isEqualDeep(
             FakeXdfRecorder.callsToConstructor[0]?.streamQueries,
-            [...this.cgxStreamQueries, ...this.museSGen2StreamQueries],
+            [
+                ...new Set([
+                    ...this.cgxStreamQueries,
+                    ...this.museSGen2StreamQueries,
+                ]),
+            ],
             'Stream queries do not match!'
+        )
+    }
+
+    @test()
+    protected static async doesNotDuplicateStreamQueriesForXdfRecorderAcrossDevices() {
+        await this.instance.createDevices(this.threeMuseSpecifications, {
+            xdfRecordPath: this.xdfRecordPath,
+        })
+
+        assert.isEqualDeep(
+            FakeXdfRecorder.callsToConstructor[0]?.streamQueries,
+            this.museSGen2StreamQueries,
+            'Should have passed each stream query exactly once!'
         )
     }
 

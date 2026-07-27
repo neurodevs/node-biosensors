@@ -160,7 +160,13 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
     }
 
     private get allStreamQueries() {
-        return this.createdBundles.flatMap(({ device }) => device.streamQueries)
+        return [
+            ...new Set(
+                this.createdBundles.flatMap(
+                    ({ device }) => device.streamQueries
+                )
+            ),
+        ]
     }
 
     private async CgxDeviceController() {
