@@ -16,7 +16,7 @@ const devices: DeviceSpecification[] = [
     },
     {
         deviceName: 'Muse S Gen 1',
-        // bleUuid: 'PLACEHOLDER-MUSE-S-GEN-1-BLE-UUID',
+        bleUuid: 'FB2C339B-276C-6A03-827E-AAF88325B4D7',
     },
     {
         deviceName: 'Muse 2',
@@ -24,7 +24,7 @@ const devices: DeviceSpecification[] = [
     },
     {
         deviceName: 'Muse 1 Gen 2',
-        // bleUuid: 'PLACEHOLDER-MUSE-1-GEN-2-BLE-UUID',
+        bleUuid: '332F67AB-75B3-0E8F-1B02-B0DBB10417B8',
     },
 ]
 
