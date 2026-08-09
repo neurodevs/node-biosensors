@@ -6,25 +6,6 @@ export * from './impl/BiosensorDeviceFactory.js'
 export { default as FakeDeviceFactory } from './testDoubles/DeviceFactory/FakeDeviceFactory.js'
 export * from './testDoubles/DeviceFactory/FakeDeviceFactory.js'
 
-// CytonController
-
-export { default as CytonDeviceController } from './impl/openbci/CytonDeviceController.js'
-export * from './impl/openbci/CytonDeviceController.js'
-
-export { default as FakeCytonController } from './testDoubles/CytonController/FakeCytonController.js'
-export * from './testDoubles/CytonController/FakeCytonController.js'
-
-// MuseDetector
-
-export { default as MuseModelDetector } from './impl/muse/MuseModelDetector.js'
-export * from './impl/muse/MuseModelDetector.js'
-
-export { default as FakeMuseDetector } from './testDoubles/MuseDetector/FakeMuseDetector.js'
-export * from './testDoubles/MuseDetector/FakeMuseDetector.js'
-
-export { default as SpyMuseDetector } from './testDoubles/MuseDetector/SpyMuseDetector.js'
-export * from './testDoubles/MuseDetector/SpyMuseDetector.js'
-
 // StreamingOrchestrator
 
 export { default as BiosensorStreamingOrchestrator } from './impl/BiosensorStreamingOrchestrator.js'
@@ -59,7 +40,15 @@ export * from './testDoubles/CgxController/FakeCgxController.js'
 export { default as SpyCgxController } from './testDoubles/CgxController/SpyCgxController.js'
 export * from './testDoubles/CgxController/SpyCgxController.js'
 
-// Muse Headsets (supports Muse 2, Muse S Athena, and Muse S Gen 2)
+// Govee Thermohygrometer (H5075)
+
+export { default as GoveeDeviceController } from './impl/govee/GoveeDeviceController.js'
+export * from './impl/govee/GoveeDeviceController.js'
+
+export { default as FakeGoveeController } from './testDoubles/GoveeController/FakeGoveeController.js'
+export * from './testDoubles/GoveeController/FakeGoveeController.js'
+
+// Muse Headsets (supports all Muse models except Muse 1)
 
 export { default as MuseDeviceController } from './impl/muse/MuseDeviceController.js'
 export * from './impl/muse/MuseDeviceController.js'
@@ -69,6 +58,25 @@ export * from './testDoubles/MuseController/FakeMuseController.js'
 
 export { default as SpyMuseController } from './testDoubles/MuseController/SpyMuseController.js'
 export * from './testDoubles/MuseController/SpyMuseController.js'
+
+// MuseDetector (auto-detects Muse model when not specified)
+
+export { default as MuseModelDetector } from './impl/muse/MuseModelDetector.js'
+export * from './impl/muse/MuseModelDetector.js'
+
+export { default as FakeMuseDetector } from './testDoubles/MuseDetector/FakeMuseDetector.js'
+export * from './testDoubles/MuseDetector/FakeMuseDetector.js'
+
+export { default as SpyMuseDetector } from './testDoubles/MuseDetector/SpyMuseDetector.js'
+export * from './testDoubles/MuseDetector/SpyMuseDetector.js'
+
+// OpenBCI Cyton Board
+
+export { default as CytonDeviceController } from './impl/openbci/CytonDeviceController.js'
+export * from './impl/openbci/CytonDeviceController.js'
+
+export { default as FakeCytonController } from './testDoubles/CytonController/FakeCytonController.js'
+export * from './testDoubles/CytonController/FakeCytonController.js'
 
 // Zephyr BioHarness 3.0
 
