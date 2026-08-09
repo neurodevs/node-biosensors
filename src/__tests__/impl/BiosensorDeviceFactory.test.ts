@@ -1,7 +1,7 @@
 import { randomInt } from 'node:crypto'
 
 import generateId from '@neurodevs/generate-id'
-import { FakeLslEmitter, FakeWebSocketServer } from '@neurodevs/node-lsl'
+import { FakeEventMarkerOutlet, FakeWebSocketServer } from '@neurodevs/node-lsl'
 import { test, assert } from '@neurodevs/node-tdd'
 import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 
@@ -264,7 +264,7 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
         })
 
         assert.isEqualDeep(
-            FakeLslEmitter.numCallsToConstructor,
+            FakeEventMarkerOutlet.numCallsToConstructor,
             1,
             'Did not create marker outlet!'
         )
@@ -281,7 +281,7 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
         await this.createDevicesWithEmitter()
 
         assert.isEqualDeep(
-            FakeLslEmitter.numCallsToConstructor,
+            FakeEventMarkerOutlet.numCallsToConstructor,
             1,
             'Did not create marker emitter!'
         )

@@ -1,12 +1,12 @@
-import { UsbController } from '@neurodevs/node-lsl'
+import { UsbDevice } from '@neurodevs/node-lsl'
 import { XdfRecorder } from '@neurodevs/node-xdf'
 
 import AbstractDeviceController from './AbstractDeviceController.js'
 
 export default abstract class AbstractDeviceControllerUsb extends AbstractDeviceController {
-    protected readonly usb: UsbController
+    protected readonly usb: UsbDevice
 
-    protected constructor(usb: UsbController, recorder?: XdfRecorder) {
+    protected constructor(usb: UsbDevice, recorder?: XdfRecorder) {
         super(recorder)
 
         this.usb = usb

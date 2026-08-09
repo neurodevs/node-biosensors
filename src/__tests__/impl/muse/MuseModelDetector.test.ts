@@ -1,5 +1,5 @@
 import { test, assert } from '@neurodevs/node-tdd'
-import { FakeBleController } from '@neurodevs/node-lsl'
+import { FakeBleGatt } from '@neurodevs/node-lsl'
 
 import MuseModelDetector, {
     detectMuseModel,
@@ -77,7 +77,7 @@ export default class MuseModelDetectorTest extends AbstractPackageTest {
         await this.instance.detectModel()
 
         assert.isEqual(
-            FakeBleController.numCallsToConnect,
+            FakeBleGatt.numCallsToConnect,
             1,
             'Did not connect the BLE device once!'
         )
@@ -90,7 +90,7 @@ export default class MuseModelDetectorTest extends AbstractPackageTest {
 
         await instance.detectModel()
 
-        const calls = FakeBleController.callsToConstructor
+        const calls = FakeBleGatt.callsToConstructor
         const call = calls[calls.length - 1]
 
         assert.isEqualDeep(
@@ -119,7 +119,7 @@ export default class MuseModelDetectorTest extends AbstractPackageTest {
         )
 
         assert.isEqualDeep(
-            FakeBleController.callsToWriteCharacteristic.find(
+            FakeBleGatt.callsToWriteCharacteristic.find(
                 (c) => c.value === 'v6'
             ),
             this.generateCmd('v6'),
@@ -129,7 +129,7 @@ export default class MuseModelDetectorTest extends AbstractPackageTest {
 
     @test()
     protected static async readControlResponseResendsV6UntilReplyArrives() {
-        const ble = this.instance.getBle() as FakeBleController
+        const ble = this.instance.getBle() as FakeBleGatt
         const controlBuffer = this.instance.getControlBuffer()
 
         let v6Writes = 0
@@ -159,7 +159,7 @@ export default class MuseModelDetectorTest extends AbstractPackageTest {
 
     @test()
     protected static async readControlResponseGivesUpWhenDeviceNeverReplies() {
-        const ble = this.instance.getBle() as FakeBleController
+        const ble = this.instance.getBle() as FakeBleGatt
 
         let v6Writes = 0
         ble.writeCharacteristic = async (_charUuid: string, value: string) => {
@@ -190,7 +190,7 @@ export default class MuseModelDetectorTest extends AbstractPackageTest {
         await this.instance.detectModel()
 
         assert.isEqual(
-            FakeBleController.numCallsToDisconnect,
+            FakeBleGatt.numCallsToDisconnect,
             1,
             'Did not disconnect the BLE device once!'
         )

@@ -2,7 +2,7 @@ import { randomInt } from 'node:crypto'
 
 import { assert } from '@neurodevs/node-tdd'
 import {
-    FakeBleController,
+    FakeBleGatt,
     FakeClockRegressor,
     FakeLslOutlet,
 } from '@neurodevs/node-lsl'
@@ -91,7 +91,7 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
     }
 
     protected static async assertCreatesBleController() {
-        const call = FakeBleController.callsToConstructor[0]
+        const call = FakeBleGatt.callsToConstructor[0]
 
         const expectedCharCallbacks = Object.entries(this.charUuids).map(
             ([charName, charUuid]) => ({ charUuid, charName })
@@ -127,7 +127,7 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
         await this.startStreaming()
 
         assert.isEqualDeep(
-            FakeBleController.callsToWriteCharacteristic,
+            FakeBleGatt.callsToWriteCharacteristic,
             this.expectedStartCommands,
             'Did not write the expected start commands to control char!'
         )
@@ -138,7 +138,7 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
         await this.startStreaming()
 
         assert.isEqualDeep(
-            FakeBleController.callsToWriteCharacteristic,
+            FakeBleGatt.callsToWriteCharacteristic,
             this.expectedStartCommands,
             'Should not write any commands to control char when already streaming!'
         )
@@ -875,7 +875,7 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
         fakeBytes: number[],
         timestampSec: number
     ) {
-        const calls = FakeBleController.callsToConstructor
+        const calls = FakeBleGatt.callsToConstructor
         const { charCallbacks } = calls[calls.length - 1]!
 
         const { onData } = charCallbacks!.find(
@@ -983,7 +983,7 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
         charName: 'GYROSCOPE' | 'ACCELEROMETER',
         samples: [number, number, number][]
     ) {
-        const calls = FakeBleController.callsToConstructor
+        const calls = FakeBleGatt.callsToConstructor
         const { charCallbacks } = calls[calls.length - 1]!
         const { onData } = charCallbacks!.find(
             (cb) => cb.charName === charName

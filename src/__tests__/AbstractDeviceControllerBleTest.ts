@@ -1,7 +1,7 @@
 import { randomInt } from 'node:crypto'
 
 import { assert } from '@neurodevs/node-tdd'
-import { FakeBleController } from '@neurodevs/node-lsl'
+import { FakeBleGatt } from '@neurodevs/node-lsl'
 
 import AbstractDeviceControllerTest from './AbstractDeviceControllerTest.js'
 import { DeviceControllerBle } from '../impl/BiosensorDeviceFactory.js'
@@ -23,14 +23,14 @@ export default abstract class AbstractDeviceControllerBleTest extends AbstractDe
     protected static async beforeEach() {
         await super.beforeEach()
 
-        FakeBleController.fakeName = this.deviceName
+        FakeBleGatt.fakeName = this.deviceName
     }
 
     protected static async assertConnectCallsBleControllerConnect() {
         await this.connect()
 
         assert.isEqual(
-            FakeBleController.numCallsToConnect,
+            FakeBleGatt.numCallsToConnect,
             1,
             'Did not connect to BLE device!'
         )
@@ -41,7 +41,7 @@ export default abstract class AbstractDeviceControllerBleTest extends AbstractDe
         await this.connect()
 
         assert.isEqual(
-            FakeBleController.numCallsToConnect,
+            FakeBleGatt.numCallsToConnect,
             1,
             'Should only connect to BLE device once!'
         )
@@ -52,7 +52,7 @@ export default abstract class AbstractDeviceControllerBleTest extends AbstractDe
         await this.disconnect()
 
         assert.isEqual(
-            FakeBleController.numCallsToDisconnect,
+            FakeBleGatt.numCallsToDisconnect,
             1,
             'Did not disconnect from BLE device!'
         )
@@ -62,7 +62,7 @@ export default abstract class AbstractDeviceControllerBleTest extends AbstractDe
         await this.disconnect()
 
         assert.isEqual(
-            FakeBleController.numCallsToDisconnect,
+            FakeBleGatt.numCallsToDisconnect,
             0,
             'Should not disconnect from BLE device if not connected!'
         )
@@ -70,7 +70,7 @@ export default abstract class AbstractDeviceControllerBleTest extends AbstractDe
 
     protected static async assertPassesRssiIntervalMsToBleController() {
         assert.isEqual(
-            FakeBleController.callsToConstructor[0]?.rssiIntervalMs,
+            FakeBleGatt.callsToConstructor[0]?.rssiIntervalMs,
             this.rssiIntervalMs,
             'Did not pass rssiIntervalMs to BLE controller!'
         )

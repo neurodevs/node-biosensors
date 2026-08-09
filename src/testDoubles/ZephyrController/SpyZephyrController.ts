@@ -1,9 +1,9 @@
-import { BleController } from '@neurodevs/node-lsl'
+import { BleGatt } from '@neurodevs/node-lsl'
 import ZephyrDeviceController from '../../impl/zephyr/ZephyrDeviceController.js'
 import { XdfRecorder } from '@neurodevs/node-xdf'
 
 export default class SpyZephyrController extends ZephyrDeviceController {
-    public constructor(ble: BleController, recorder?: XdfRecorder) {
+    public constructor(ble: BleGatt, recorder?: XdfRecorder) {
         super(ble, recorder)
     }
 

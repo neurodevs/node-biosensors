@@ -1,4 +1,4 @@
-import { LslEmitter, TimedEventMarker } from '@neurodevs/node-lsl'
+import { EventMarkerOutlet, TimedEventMarker } from '@neurodevs/node-lsl'
 import { XdfRecorder } from '@neurodevs/node-xdf'
 
 import BiosensorDeviceFactory, {
@@ -20,7 +20,7 @@ export default class BiosensorStreamingOrchestrator implements StreamingOrchestr
     private factory: DeviceFactory
     private recorder?: XdfRecorder
     private gateway?: WebSocketGateway
-    private emitter?: LslEmitter
+    private emitter?: EventMarkerOutlet
 
     private controllers: DeviceController[] = []
 

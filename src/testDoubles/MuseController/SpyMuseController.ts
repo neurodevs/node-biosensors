@@ -1,4 +1,4 @@
-import { BleController } from '@neurodevs/node-lsl'
+import { BleGatt } from '@neurodevs/node-lsl'
 import { XdfRecorder } from '@neurodevs/node-xdf'
 import MuseDeviceController, {
     MuseVariant,
@@ -7,7 +7,7 @@ import MuseDeviceController, {
 export default class SpyMuseController extends MuseDeviceController {
     public constructor(
         variant: MuseVariant,
-        ble: BleController,
+        ble: BleGatt,
         recorder?: XdfRecorder
     ) {
         super(variant, ble, recorder)

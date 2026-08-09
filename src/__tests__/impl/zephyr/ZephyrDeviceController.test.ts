@@ -1,7 +1,7 @@
 import { test, assert } from '@neurodevs/node-tdd'
 
 import ZephyrDeviceController from '../../../impl/zephyr/ZephyrDeviceController.js'
-import { FakeBleController } from '@neurodevs/node-lsl'
+import { FakeBleGatt } from '@neurodevs/node-lsl'
 import SpyZephyrController from '../../../testDoubles/ZephyrController/SpyZephyrController.js'
 import AbstractDeviceControllerBleTest from '../../AbstractDeviceControllerBleTest.js'
 import { DeviceControllerBleOptions } from '../../../impl/BiosensorDeviceFactory.js'
@@ -132,7 +132,7 @@ export default class ZephyrDeviceControllerTest extends AbstractDeviceController
 
     @test()
     protected static async createsBleDeviceControllerWithUuid() {
-        const call = FakeBleController.callsToConstructor[0]
+        const call = FakeBleGatt.callsToConstructor[0]
 
         assert.isEqualDeep(
             {
@@ -157,7 +157,7 @@ export default class ZephyrDeviceControllerTest extends AbstractDeviceController
         await this.ZephyrDeviceController({ bleUuid: undefined })
 
         assert.isEqualDeep(
-            FakeBleController.callsToConstructor[1],
+            FakeBleGatt.callsToConstructor[1],
             {
                 charCallbacks: [],
                 deviceNamePrefix: 'BH BHT',

@@ -1,5 +1,5 @@
 import { test, assert } from '@neurodevs/node-tdd'
-import { FakeBleController, FakeLslOutlet } from '@neurodevs/node-lsl'
+import { FakeBleGatt, FakeLslOutlet } from '@neurodevs/node-lsl'
 
 import MuseDeviceController, {
     CONTROL_UUID,
@@ -170,7 +170,7 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
     protected static async createsBleControllerWithNamePrefixIfNoUuid() {
         await MuseDeviceController.Create({ model: 'Muse S Gen 2' })
 
-        const call = FakeBleController.callsToConstructor[1]
+        const call = FakeBleGatt.callsToConstructor[1]
 
         assert.isEqualDeep(
             {
@@ -213,7 +213,7 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
         await this.stopStreaming()
 
         assert.isEqualDeep(
-            FakeBleController.callsToWriteCharacteristic[0],
+            FakeBleGatt.callsToWriteCharacteristic[0],
             this.generateCmd('h'),
             'Did not write halt command to control char!'
         )
@@ -224,7 +224,7 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
         await this.stopStreaming()
 
         assert.isEqualDeep(
-            FakeBleController.callsToWriteCharacteristic,
+            FakeBleGatt.callsToWriteCharacteristic,
             [],
             'Should not have written to control char!'
         )
@@ -352,7 +352,7 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
     }
 
     private static simulateOnData() {
-        const calls = FakeBleController.callsToConstructor
+        const calls = FakeBleGatt.callsToConstructor
         const { charCallbacks } = calls[calls.length - 1]!
         const { onData, charName } = charCallbacks![0]!
 

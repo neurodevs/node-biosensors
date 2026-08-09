@@ -1,8 +1,8 @@
 import fs from 'node:fs'
 
 import {
-    BleController,
-    BleDeviceController,
+    BleGatt,
+    BleGattController,
     CharacteristicCallbacks,
 } from '@neurodevs/node-lsl'
 import { XdfRecorder } from '@neurodevs/node-xdf'
@@ -57,7 +57,7 @@ export default class MuseDeviceController
 
     protected constructor(
         variant: MuseVariant,
-        ble: BleController,
+        ble: BleGatt,
         recorder?: XdfRecorder
     ) {
         super(ble, recorder)
@@ -71,7 +71,7 @@ export default class MuseDeviceController
         const deviceModel = model ?? (await detectMuseModel(bleUuid))
         const variant = await this.createVariant(deviceModel, options)
 
-        const ble = await this.BleDeviceController(
+        const ble = await this.BleGattController(
             variant.charCallbacks,
             options
         )
@@ -121,13 +121,13 @@ export default class MuseDeviceController
         return await MuseVariant.Create({ ...(options ?? {}), model })
     }
 
-    private static async BleDeviceController(
+    private static async BleGattController(
         charCallbacks: CharacteristicCallbacks,
         options?: MuseControllerOptions
     ) {
         const { bleUuid, rssiIntervalMs } = options ?? {}
 
-        return await BleDeviceController.Create({
+        return await BleGattController.Create({
             charCallbacks,
             rssiIntervalMs,
             ...(bleUuid
@@ -139,7 +139,7 @@ export default class MuseDeviceController
 
 export type MuseDeviceControllerConstructor = new (
     variant: MuseVariant,
-    ble: BleController,
+    ble: BleGatt,
     recorder?: XdfRecorder
 ) => DeviceControllerBle
 

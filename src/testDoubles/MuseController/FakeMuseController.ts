@@ -1,4 +1,4 @@
-import { BleController, FakeLslOutlet } from '@neurodevs/node-lsl'
+import { BleGatt, FakeLslOutlet } from '@neurodevs/node-lsl'
 import { XdfRecorder } from '@neurodevs/node-xdf'
 import { DeviceControllerBle } from '../../impl/BiosensorDeviceFactory.js'
 import { MuseVariant } from '../../impl/muse/MuseDeviceController.js'
@@ -6,7 +6,7 @@ import { MuseVariant } from '../../impl/muse/MuseDeviceController.js'
 export default class FakeMuseController implements DeviceControllerBle {
     public static callsToConstructor: {
         variant: MuseVariant
-        ble: BleController
+        ble: BleGatt
         recorder?: XdfRecorder
     }[] = []
     public static numCallsToConnect = 0
@@ -15,12 +15,12 @@ export default class FakeMuseController implements DeviceControllerBle {
     public static numCallsToDisconnect = 0
 
     public variant: MuseVariant
-    public ble: BleController
+    public ble: BleGatt
     public recorder?: XdfRecorder
 
     public constructor(
         variant: MuseVariant,
-        ble: BleController,
+        ble: BleGatt,
         recorder?: XdfRecorder
     ) {
         FakeMuseController.callsToConstructor.push({

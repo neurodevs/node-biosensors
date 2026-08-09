@@ -1,7 +1,7 @@
 import { writeFileSync } from 'node:fs'
 
 import koffi from 'koffi'
-import { BleDeviceController } from '@neurodevs/node-lsl'
+import { BleGattController } from '@neurodevs/node-lsl'
 
 /*
  * Muse variant auto-detection probe.
@@ -113,7 +113,7 @@ async function probeDevice(device: {
 
     let ble
     try {
-        ble = await BleDeviceController.Create({
+        ble = await BleGattController.Create({
             deviceUuid: device.bleUuid,
             charCallbacks: [
                 {

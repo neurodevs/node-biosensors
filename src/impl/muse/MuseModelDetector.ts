@@ -1,5 +1,5 @@
 import koffi from 'koffi'
-import { BleController, BleDeviceController } from '@neurodevs/node-lsl'
+import { BleGatt, BleGattController } from '@neurodevs/node-lsl'
 
 import {
     CONTROL_UUID,
@@ -17,17 +17,17 @@ export default class MuseModelDetector implements MuseDetector {
     public static detectModelTimeoutMs = 5000
     public static detectModelWindowMs = 500
 
-    protected ble: BleController
+    protected ble: BleGatt
     protected controlBuffer: ControlBuffer
 
-    protected constructor(ble: BleController, controlBuffer: ControlBuffer) {
+    protected constructor(ble: BleGatt, controlBuffer: ControlBuffer) {
         this.ble = ble
         this.controlBuffer = controlBuffer
     }
 
     public static async Create(bleUuid?: string) {
         const controlBuffer = { text: '' }
-        const ble = await this.BleDeviceController(bleUuid, controlBuffer)
+        const ble = await this.BleGattController(bleUuid, controlBuffer)
 
         return new (this.Class ?? this)(ble, controlBuffer)
     }
@@ -110,11 +110,11 @@ export default class MuseModelDetector implements MuseDetector {
         return String.fromCharCode(...asciiBytes)
     }
 
-    private static async BleDeviceController(
+    private static async BleGattController(
         bleUuid: string | undefined,
         controlBuffer: ControlBuffer
     ) {
-        return await BleDeviceController.Create({
+        return await BleGattController.Create({
             charCallbacks: [this.genControlCharCallback(controlBuffer)],
             ...(bleUuid
                 ? { deviceUuid: bleUuid }
@@ -128,7 +128,7 @@ export interface MuseDetector {
 }
 
 export type MuseDetectorConstructor = new (
-    ble: BleController,
+    ble: BleGatt,
     controlBuffer: ControlBuffer
 ) => MuseDetector
 

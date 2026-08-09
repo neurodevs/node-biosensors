@@ -1,10 +1,10 @@
-import { BleController } from '@neurodevs/node-lsl'
+import { BleGatt } from '@neurodevs/node-lsl'
 import { DeviceControllerBle } from '../../impl/BiosensorDeviceFactory.js'
 import { XdfRecorder } from '@neurodevs/node-xdf'
 
 export default class FakeZephyrDeviceController implements DeviceControllerBle {
     public static callsToConstructor: {
-        ble: BleController
+        ble: BleGatt
         recorder?: XdfRecorder
     }[] = []
     public static numCallsToConnect = 0
@@ -12,7 +12,7 @@ export default class FakeZephyrDeviceController implements DeviceControllerBle {
     public static numCallsToStopStreaming = 0
     public static numCallsToDisconnect = 0
 
-    public constructor(ble: BleController, recorder?: XdfRecorder) {
+    public constructor(ble: BleGatt, recorder?: XdfRecorder) {
         FakeZephyrDeviceController.callsToConstructor.push({ ble, recorder })
     }
 

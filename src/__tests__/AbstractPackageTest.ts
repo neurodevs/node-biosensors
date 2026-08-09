@@ -1,7 +1,12 @@
 import { randomInt } from 'node:crypto'
 
 import { Server } from 'ws'
-import { FakeLiblsl, LiblslAdapter } from '@neurodevs/ndx-native'
+import {
+    FakeLiblsl,
+    FakeLibndx,
+    LiblslAdapter,
+    LibndxAdapter,
+} from '@neurodevs/ndx-native'
 import {
     LslStreamOutlet,
     FakeLslOutlet,
@@ -12,14 +17,14 @@ import {
     LslWebSocketBridge,
     FakeLslWsBridge,
     FakeWebSocketServer,
-    LslEventMarkerEmitter,
-    FakeLslEmitter,
-    BleDeviceController,
-    FakeBleController,
+    LslEventMarkerOutlet,
+    FakeEventMarkerOutlet,
+    BleGattController,
+    FakeBleGatt,
     WindowedClockRegressor,
     FakeClockRegressor,
     UsbDeviceController,
-    FakeUsbController,
+    FakeUsbDevice,
 } from '@neurodevs/node-lsl'
 import AbstractModuleTest, { assert } from '@neurodevs/node-tdd'
 import {
@@ -52,12 +57,13 @@ import FakeMuseDetector from '../testDoubles/MuseDetector/FakeMuseDetector.js'
 
 export default class AbstractPackageTest extends AbstractModuleTest {
     protected static fakeLiblsl: FakeLiblsl
+    protected static fakeLibndx: FakeLibndx
 
     protected static readonly fakeClockRegressorValue = randomInt(1, 10)
 
     private static readonly realSetTimeout = globalThis.setTimeout
 
-    private static readonly realBleSetTimeout = BleDeviceController.setTimeout
+    private static readonly realBleSetTimeout = BleGattController.setTimeout
     private static readonly realOutletSetTimeout = LslStreamOutlet.setTimeout
 
     protected static async beforeEach() {
@@ -68,6 +74,7 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         this.setFakeBleController()
         this.setFakeFTDI()
         this.setFakeLiblsl()
+        this.setFakeLibndx()
         this.setFakeLslEmitter()
         this.setFakeLslInlet()
         this.setFakeLslOutlet()
@@ -80,7 +87,7 @@ export default class AbstractPackageTest extends AbstractModuleTest {
 
     protected static async afterEach() {
         globalThis.setTimeout = this.realSetTimeout
-        BleDeviceController.setTimeout = this.realBleSetTimeout
+        BleGattController.setTimeout = this.realBleSetTimeout
         LslStreamOutlet.setTimeout = this.realOutletSetTimeout
 
         await super.afterEach()
@@ -120,7 +127,7 @@ export default class AbstractPackageTest extends AbstractModuleTest {
 
         LslStreamOutlet.setTimeout = this.immediateSetTimeout
 
-        BleDeviceController.setTimeout = ((
+        BleGattController.setTimeout = ((
             callback: (...args: unknown[]) => void,
             _delayMs?: number,
             ...args: unknown[]
@@ -146,8 +153,8 @@ export default class AbstractPackageTest extends AbstractModuleTest {
     }
 
     protected static setFakeBleController() {
-        BleDeviceController.Class = FakeBleController
-        FakeBleController.resetTestDouble()
+        BleGattController.Class = FakeBleGatt
+        FakeBleGatt.resetTestDouble()
     }
 
     protected static setFakeCgxController() {
@@ -185,9 +192,14 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         LiblslAdapter.setInstance(this.fakeLiblsl)
     }
 
+    protected static setFakeLibndx() {
+        this.fakeLibndx = new FakeLibndx()
+        LibndxAdapter.setInstance(this.fakeLibndx)
+    }
+
     protected static setFakeLslEmitter() {
-        LslEventMarkerEmitter.Class = FakeLslEmitter
-        FakeLslEmitter.resetTestDouble()
+        LslEventMarkerOutlet.Class = FakeEventMarkerOutlet
+        FakeEventMarkerOutlet.resetTestDouble()
     }
 
     protected static setFakeMuseDetector() {
@@ -216,8 +228,8 @@ export default class AbstractPackageTest extends AbstractModuleTest {
     }
 
     protected static setFakeUsbController() {
-        UsbDeviceController.Class = FakeUsbController
-        FakeUsbController.resetTestDouble()
+        UsbDeviceController.Class = FakeUsbDevice
+        FakeUsbDevice.resetTestDouble()
     }
 
     protected static setFakeLslWsBridge() {

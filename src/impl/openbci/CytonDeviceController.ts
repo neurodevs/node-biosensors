@@ -1,6 +1,6 @@
 import {
     LslStreamOutlet,
-    UsbController,
+    UsbDevice,
     UsbDeviceController,
 } from '@neurodevs/node-lsl'
 import { XdfRecorder } from '@neurodevs/node-xdf'
@@ -200,7 +200,7 @@ export interface CytonControllerOptions extends DeviceControllerOptions {
 }
 
 export interface CytonControllerConstructorOptions {
-    usb: UsbController
+    usb: UsbDevice
     waitAfterConnectMs: number
     onData: OnUsbData
     exgType: string

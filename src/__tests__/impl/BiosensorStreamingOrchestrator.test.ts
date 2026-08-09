@@ -1,6 +1,6 @@
 import { randomInt } from 'node:crypto'
 
-import { FakeLslEmitter } from '@neurodevs/node-lsl'
+import { FakeEventMarkerOutlet } from '@neurodevs/node-lsl'
 import { test, assert } from '@neurodevs/node-tdd'
 import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 
@@ -168,7 +168,7 @@ export default class BiosensorStreamingOrchestratorTest extends AbstractPackageT
         await instance.stop()
 
         assert.isEqual(
-            FakeLslEmitter.numCallsToDestroy,
+            FakeEventMarkerOutlet.numCallsToDestroy,
             1,
             'Did not destroy event marker emitter!'
         )

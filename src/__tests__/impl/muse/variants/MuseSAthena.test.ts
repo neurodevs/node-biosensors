@@ -1,7 +1,7 @@
 import { randomInt } from 'node:crypto'
 
 import { test, assert } from '@neurodevs/node-tdd'
-import { FakeBleController, FakeLslOutlet } from '@neurodevs/node-lsl'
+import { FakeBleGatt, FakeLslOutlet } from '@neurodevs/node-lsl'
 
 import MuseDeviceController, {
     CONTROL_UUID,
@@ -84,7 +84,7 @@ export default class MuseSAthenaTest extends AbstractDeviceControllerBleTest {
 
     @test()
     protected static async createsBleDeviceControllerWithThreeDataCharacteristics() {
-        const call = FakeBleController.callsToConstructor[0]
+        const call = FakeBleGatt.callsToConstructor[0]
 
         assert.isEqualDeep(
             {
@@ -119,7 +119,7 @@ export default class MuseSAthenaTest extends AbstractDeviceControllerBleTest {
         await this.startStreaming()
 
         assert.isEqualDeep(
-            FakeBleController.callsToWriteCharacteristic,
+            FakeBleGatt.callsToWriteCharacteristic,
             [
                 this.generateCmd('v6'),
                 this.generateCmd('s'),
@@ -453,7 +453,7 @@ export default class MuseSAthenaTest extends AbstractDeviceControllerBleTest {
     }
 
     private static simulateData(charName: 'EEG' | 'OTHER', bytes: number[]) {
-        const calls = FakeBleController.callsToConstructor
+        const calls = FakeBleGatt.callsToConstructor
         const { charCallbacks } = calls[calls.length - 1]!
         const { onData } = charCallbacks!.find(
             (cb) => cb.charName === charName

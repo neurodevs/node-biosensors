@@ -1,12 +1,12 @@
-import { BleController } from '@neurodevs/node-lsl'
+import { BleGatt } from '@neurodevs/node-lsl'
 import { XdfRecorder } from '@neurodevs/node-xdf'
 
 import AbstractDeviceController from './AbstractDeviceController.js'
 
 export default abstract class AbstractDeviceControllerBle extends AbstractDeviceController {
-    protected readonly ble: BleController
+    protected readonly ble: BleGatt
 
-    protected constructor(ble: BleController, recorder?: XdfRecorder) {
+    protected constructor(ble: BleGatt, recorder?: XdfRecorder) {
         super(recorder)
 
         this.ble = ble

@@ -1,4 +1,4 @@
-import { BleController, BleDeviceController } from '@neurodevs/node-lsl'
+import { BleGatt, BleGattController } from '@neurodevs/node-lsl'
 import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 
 import {
@@ -15,14 +15,14 @@ export default class ZephyrDeviceController
     public static Class?: DeviceControllerBleConstructor
     public static readonly streamQueries: string[] = []
 
-    protected constructor(ble: BleController, recorder?: XdfRecorder) {
+    protected constructor(ble: BleGatt, recorder?: XdfRecorder) {
         super(ble, recorder)
     }
 
     public static async Create(options?: DeviceControllerBleOptions) {
         const { xdfRecordPath } = options ?? {}
 
-        const ble = await this.BleDeviceController(options)
+        const ble = await this.BleGattController(options)
 
         const recorder = xdfRecordPath
             ? await this.XdfStreamRecorder(xdfRecordPath)
@@ -43,12 +43,12 @@ export default class ZephyrDeviceController
 
     protected async handleStopStreaming() {}
 
-    private static async BleDeviceController(
+    private static async BleGattController(
         options?: DeviceControllerBleOptions
     ) {
         const { bleUuid, rssiIntervalMs } = options ?? {}
 
-        return BleDeviceController.Create({
+        return BleGattController.Create({
             deviceUuid: bleUuid,
             deviceNamePrefix: 'BH BHT',
             charCallbacks: [],

@@ -1,6 +1,6 @@
 import { randomInt } from 'node:crypto'
 
-import { FakeUsbController, FakeLslOutlet } from '@neurodevs/node-lsl'
+import { FakeUsbDevice, FakeLslOutlet } from '@neurodevs/node-lsl'
 import { test, assert } from '@neurodevs/node-tdd'
 import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 
@@ -116,7 +116,7 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
 
     @test()
     protected static async createsUsbController() {
-        assert.isEqualDeep(FakeUsbController.callsToConstructor[0], {
+        assert.isEqualDeep(FakeUsbDevice.callsToConstructor[0], {
             onData: this.getOnData(),
             serialNumber: this.serialNumber,
         })
@@ -127,7 +127,7 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
         await this.connect()
 
         assert.isEqual(
-            FakeUsbController.numCallsToConnect,
+            FakeUsbDevice.numCallsToConnect,
             1,
             'Did not call connect!'
         )
@@ -164,7 +164,7 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
     protected static async resetsDeviceWithWriteUsbV() {
         await this.connect()
 
-        assert.isEqualDeep(FakeUsbController.callsToWriteUsb[0], 'v')
+        assert.isEqualDeep(FakeUsbDevice.callsToWriteUsb[0], 'v')
     }
 
     @test()
@@ -174,7 +174,7 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
         })
         await instance.connect()
 
-        assert.isEqualDeep(FakeUsbController.callsToWriteUsb[0], 'v')
+        assert.isEqualDeep(FakeUsbDevice.callsToWriteUsb[0], 'v')
     }
 
     @test()
@@ -185,8 +185,8 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
             order.push('wait')
         }
 
-        const originalWriteUsb = FakeUsbController.prototype.writeUsb
-        FakeUsbController.prototype.writeUsb = async function (value: string) {
+        const originalWriteUsb = FakeUsbDevice.prototype.writeUsb
+        FakeUsbDevice.prototype.writeUsb = async function (value: string) {
             order.push(`writeUsb:${value}`)
             return originalWriteUsb.call(this, value)
         }
@@ -194,7 +194,7 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
         try {
             await this.connect()
         } finally {
-            FakeUsbController.prototype.writeUsb = originalWriteUsb
+            FakeUsbDevice.prototype.writeUsb = originalWriteUsb
         }
 
         assert.isEqualDeep(
@@ -208,7 +208,7 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
     protected static async startsStreamingWithWriteUsbB() {
         await this.startStreaming()
 
-        assert.isEqualDeep(FakeUsbController.callsToWriteUsb[0], 'b')
+        assert.isEqualDeep(FakeUsbDevice.callsToWriteUsb[0], 'b')
     }
 
     @test()
@@ -216,7 +216,7 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
         await this.startStreaming()
         await this.stopStreaming()
 
-        const calls = FakeUsbController.callsToWriteUsb
+        const calls = FakeUsbDevice.callsToWriteUsb
         assert.isEqualDeep(calls[calls.length - 1], 's')
     }
 
@@ -336,7 +336,7 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
         await this.disconnect()
 
         assert.isEqual(
-            FakeUsbController.numCallsToDisconnect,
+            FakeUsbDevice.numCallsToDisconnect,
             1,
             'Did not call disconnect!'
         )

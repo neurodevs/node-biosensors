@@ -1,6 +1,6 @@
 import { test } from '@neurodevs/node-tdd'
 
-import MuseBleVariantTest from '../../../MuseBlevVariantTest.js'
+import MuseBleVariantTest from '../../../MuseBleVariantTest.js'
 import { MuseDeviceModel } from '../../../../impl/muse/MuseDeviceController.js'
 
 export default class Muse2Test extends MuseBleVariantTest {

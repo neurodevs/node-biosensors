@@ -1,7 +1,7 @@
 import {
-    BleController,
-    LslEmitter,
-    LslEventMarkerEmitter,
+    BleGatt,
+    EventMarkerOutlet,
+    LslEventMarkerOutlet,
     LslOutlet,
 } from '@neurodevs/node-lsl'
 import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
@@ -73,7 +73,7 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         }
 
         if (createEventMarkerEmitter) {
-            bundle.emitter = await this.LslEventMarkerEmitter()
+            bundle.emitter = await this.LslEventMarkerOutlet()
         }
 
         return bundle
@@ -136,7 +136,7 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         }
 
         if (createEventMarkerEmitter) {
-            bundle.emitter = await this.LslEventMarkerEmitter()
+            bundle.emitter = await this.LslEventMarkerOutlet()
         }
 
         return bundle
@@ -204,8 +204,8 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         })
     }
 
-    private async LslEventMarkerEmitter() {
-        return LslEventMarkerEmitter.Create()
+    private async LslEventMarkerOutlet() {
+        return LslEventMarkerOutlet.Create()
     }
 }
 
@@ -251,7 +251,7 @@ export type DeviceControllerConstructor = new (
 ) => DeviceController
 
 export type DeviceControllerBleConstructor = new (
-    ble: BleController,
+    ble: BleGatt,
     recorder?: XdfRecorder
 ) => DeviceControllerBle
 
@@ -294,12 +294,12 @@ export interface SingleDeviceBundle {
     device: DeviceController
     recorder?: XdfRecorder
     gateway?: WebSocketGateway
-    emitter?: LslEmitter
+    emitter?: EventMarkerOutlet
 }
 
 export interface MultipleDeviceBundle {
     devices: DeviceController[]
     recorder?: XdfRecorder
     gateway?: WebSocketGateway
-    emitter?: LslEmitter
+    emitter?: EventMarkerOutlet
 }

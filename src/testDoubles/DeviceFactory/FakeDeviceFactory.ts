@@ -1,4 +1,4 @@
-import { FakeLslEmitter } from '@neurodevs/node-lsl'
+import { FakeEventMarkerOutlet } from '@neurodevs/node-lsl'
 import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 
 import {
@@ -29,7 +29,7 @@ export default class FakeDeviceFactory implements DeviceFactory {
     public static fakeDevice = new FakeDeviceController()
     public static fakeRecorder = new FakeXdfRecorder()
     public static fakeGateway = new FakeWebSocketGateway()
-    public static fakeEmitter = new FakeLslEmitter()
+    public static fakeEmitter = new FakeEventMarkerOutlet()
 
     public constructor() {
         FakeDeviceFactory.numCallsToConstructor++
