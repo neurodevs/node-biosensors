@@ -25,6 +25,8 @@ import {
     FakeClockRegressor,
     UsbDeviceController,
     FakeUsbDevice,
+    BleObserverController,
+    FakeBleObserver,
 } from '@neurodevs/node-lsl'
 import AbstractModuleTest, { assert } from '@neurodevs/node-tdd'
 import {
@@ -71,7 +73,8 @@ export default class AbstractPackageTest extends AbstractModuleTest {
 
         this.setImmediateTimeouts()
 
-        this.setFakeBleController()
+        this.setFakeBleGatt()
+        this.setFakeBleObserver()
         this.setFakeFTDI()
         this.setFakeLiblsl()
         this.setFakeLibndx()
@@ -152,9 +155,14 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         FakeDeviceController.resetTestDouble()
     }
 
-    protected static setFakeBleController() {
+    protected static setFakeBleGatt() {
         BleGattController.Class = FakeBleGatt
         FakeBleGatt.resetTestDouble()
+    }
+
+    protected static setFakeBleObserver() {
+        BleObserverController.Class = FakeBleObserver
+        FakeBleObserver.resetTestDouble()
     }
 
     protected static setFakeCgxController() {

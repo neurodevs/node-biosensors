@@ -1,13 +1,16 @@
-import { GoveeController } from '../../impl/govee/GoveeDeviceController.js'
+import {
+    GoveeController,
+    GoveeControllerOptions,
+} from '../../impl/govee/GoveeDeviceController.js'
 
 export default class FakeGoveeController implements GoveeController {
-    public static numCallsToConstructor = 0
+    public static callsToConstructor: GoveeControllerOptions[] = []
 
-    public constructor() {
-        FakeGoveeController.numCallsToConstructor++
+    public constructor(options: GoveeControllerOptions) {
+        FakeGoveeController.callsToConstructor.push(options)
     }
 
     public static resetTestDouble() {
-        FakeGoveeController.numCallsToConstructor = 0
+        FakeGoveeController.callsToConstructor = []
     }
 }
