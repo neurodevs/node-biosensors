@@ -1,22 +1,59 @@
-import { BleObserverController } from '@neurodevs/node-lsl'
-import { DeviceControllerOptions } from '../BiosensorDeviceFactory.js'
+import { BleObserver, BleObserverController } from '@neurodevs/node-lsl'
 
-export default class GoveeDeviceController implements GoveeController {
+import {
+    DeviceControllerBle,
+    DeviceControllerOptions,
+} from '../BiosensorDeviceFactory.js'
+
+export default class GoveeDeviceController implements DeviceControllerBle {
     public static Class?: GoveeControllerConstructor
 
-    protected constructor(_options: GoveeControllerOptions) {}
+    protected readonly observer: BleObserver
+
+    protected constructor(observer: BleObserver) {
+        this.observer = observer
+    }
 
     public static Create(options: GoveeControllerOptions) {
-        BleObserverController.Create(options)
-        return new (this.Class ?? this)(options)
+        const observer = this.BleObserverController(options)
+        return new (this.Class ?? this)(observer)
+    }
+
+    public async connect() {
+        await this.observer.startObserving()
+    }
+
+    public async startStreaming() {}
+
+    public async stopStreaming() {}
+
+    public async disconnect() {}
+
+    public get outlets() {
+        return []
+    }
+
+    public get streamQueries() {
+        return []
+    }
+
+    public get bleUuid() {
+        return ''
+    }
+
+    public get bleName() {
+        return ''
+    }
+
+    private static BleObserverController(options: GoveeControllerOptions) {
+        const { deviceUuid } = options
+        return BleObserverController.Create({ deviceUuid })
     }
 }
 
-export interface GoveeController {}
-
 export type GoveeControllerConstructor = new (
-    options: GoveeControllerOptions
-) => GoveeController
+    observer: BleObserver
+) => DeviceControllerBle
 
 export interface GoveeControllerOptions extends DeviceControllerOptions {
     deviceUuid: string

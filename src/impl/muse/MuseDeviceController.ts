@@ -71,10 +71,7 @@ export default class MuseDeviceController
         const deviceModel = model ?? (await detectMuseModel(bleUuid))
         const variant = await this.createVariant(deviceModel, options)
 
-        const ble = await this.BleGattController(
-            variant.charCallbacks,
-            options
-        )
+        const ble = await this.BleGattController(variant.charCallbacks, options)
 
         const recorder = xdfRecordPath
             ? await this.XdfStreamRecorder(xdfRecordPath, variant.streamQueries)

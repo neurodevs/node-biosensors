@@ -1,13 +1,12 @@
 import { test, assert } from '@neurodevs/node-tdd'
 
-import GoveeDeviceController, {
-    GoveeController,
-} from '../../impl/govee/GoveeDeviceController.js'
+import GoveeDeviceController from '../../impl/govee/GoveeDeviceController.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 import { FakeBleObserver } from '@neurodevs/node-lsl'
+import { DeviceControllerBle } from '../../impl/BiosensorDeviceFactory.js'
 
 export default class GoveeDeviceControllerTest extends AbstractPackageTest {
-    private static instance: GoveeController
+    private static instance: DeviceControllerBle
 
     private static readonly goveeDeviceUuid = this.generateId()
 
@@ -27,6 +26,17 @@ export default class GoveeDeviceControllerTest extends AbstractPackageTest {
         assert.isEqualDeep(FakeBleObserver.callsToConstructor[0], {
             deviceUuid: this.goveeDeviceUuid,
         })
+    }
+
+    @test()
+    protected static async connectCallsStartObservingOnBleObserver() {
+        await this.instance.connect()
+
+        assert.isEqual(
+            FakeBleObserver.numCallsToStartObserving,
+            1,
+            'Did not call startObserving on the BleObserver!'
+        )
     }
 
     private static GoveeDeviceController() {
