@@ -39,6 +39,18 @@ export default class GoveeDeviceControllerTest extends AbstractPackageTest {
         )
     }
 
+    @test()
+    protected static async disconnectCallsStopObservingOnBleObserver() {
+        await this.instance.connect()
+        await this.instance.disconnect()
+
+        assert.isEqual(
+            FakeBleObserver.numCallsToStopObserving,
+            1,
+            'Did not call stopObserving on the BleObserver!'
+        )
+    }
+
     private static GoveeDeviceController() {
         return GoveeDeviceController.Create({
             deviceUuid: this.goveeDeviceUuid,

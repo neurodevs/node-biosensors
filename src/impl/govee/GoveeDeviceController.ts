@@ -27,7 +27,9 @@ export default class GoveeDeviceController implements DeviceControllerBle {
 
     public async stopStreaming() {}
 
-    public async disconnect() {}
+    public async disconnect() {
+        await this.observer.stopObserving()
+    }
 
     public get outlets() {
         return []
