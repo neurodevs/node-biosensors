@@ -48,6 +48,9 @@ export * from './impl/govee/GoveeDeviceController.js'
 export { default as FakeGoveeController } from './testDoubles/GoveeController/FakeGoveeController.js'
 export * from './testDoubles/GoveeController/FakeGoveeController.js'
 
+export { default as SpyGoveeController } from './testDoubles/GoveeController/SpyGoveeController.js'
+export * from './testDoubles/GoveeController/SpyGoveeController.js'
+
 // Muse Headsets (supports all Muse models except Muse 1)
 
 export { default as MuseDeviceController } from './impl/muse/MuseDeviceController.js'

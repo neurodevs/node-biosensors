@@ -1,15 +1,13 @@
 import { test, assert } from '@neurodevs/node-tdd'
+import { FakeBleObserver } from '@neurodevs/node-lsl'
 
 import GoveeDeviceController from '../../impl/govee/GoveeDeviceController.js'
-import AbstractPackageTest from '../AbstractPackageTest.js'
-import { FakeBleObserver } from '@neurodevs/node-lsl'
-import { DeviceControllerBle } from '../../impl/BiosensorDeviceFactory.js'
+import SpyGoveeController from '../../testDoubles/GoveeController/SpyGoveeController.js'
+import AbstractDeviceControllerTest from '../AbstractDeviceControllerTest.js'
 
-export default class GoveeDeviceControllerTest extends AbstractPackageTest {
-    private static instance: DeviceControllerBle
+export default class GoveeDeviceControllerTest extends AbstractDeviceControllerTest {
+    protected static instance: SpyGoveeController
     private static lastLog: string
-
-    private static readonly goveeDeviceUuid = this.generateId()
 
     private static readonly advertisement = Buffer.from(
         '88ec00ee08f4176402',
@@ -22,12 +20,63 @@ export default class GoveeDeviceControllerTest extends AbstractPackageTest {
 
         this.setFakeLog()
 
+        GoveeDeviceController.Class = SpyGoveeController
+
         this.instance = this.GoveeDeviceController()
     }
 
     @test()
     protected static async createsInstance() {
-        assert.isTruthy(this.instance, 'Failed to create instance!')
+        await this.assertCreatesInstance()
+    }
+
+    @test()
+    protected static async startsWithIsConnectedFalse() {
+        await this.assertStartsWithIsConnectedFalse()
+    }
+
+    @test()
+    protected static async startsWithIsStreamingFalse() {
+        await this.assertStartsWithIsStreamingFalse()
+    }
+
+    @test()
+    protected static async connectSetsIsConnectedTrue() {
+        await this.assertConnectSetsIsConnectedTrue()
+    }
+
+    @test()
+    protected static async startStreamingSetsIsStreamingTrue() {
+        await this.assertStartStreamingSetsIsStreamingTrue()
+    }
+
+    @test()
+    protected static async stopStreamingSetsIsStreamingFalse() {
+        await this.assertStopStreamingSetsIsStreamingFalse()
+    }
+
+    @test()
+    protected static async disconnectSetsIsConnectedFalse() {
+        await this.assertDisconnectSetsIsConnectedFalse()
+    }
+
+    @test()
+    protected static async disconnectCallsStopStreaming() {
+        await this.assertDisconnectCallsStopStreaming()
+    }
+
+    @test()
+    protected static async disconnectDoesNotCallStopStreamingIfNotStreaming() {
+        await this.assertDisconnectDoesNotCallStopStreamingIfNotStreaming()
+    }
+
+    @test()
+    protected static async exposesLslOutlets() {
+        assert.isEqual(
+            this.instance.outlets.length,
+            0,
+            'Did not expose outlets!'
+        )
     }
 
     @test()
@@ -36,41 +85,16 @@ export default class GoveeDeviceControllerTest extends AbstractPackageTest {
 
         assert.isEqualDeep(
             { deviceUuid },
-            { deviceUuid: this.goveeDeviceUuid },
+            { deviceUuid: this.deviceId },
             'Did not create a BleObserverController with the device uuid!'
         )
     }
 
     @test()
     protected static async passesOnAdvertisementToBleObserver() {
-        const { onAdvertisement } = FakeBleObserver.callsToConstructor[0] ?? {}
-
         assert.isFunction(
-            onAdvertisement,
+            this.onAdvertisement,
             'Did not pass an onAdvertisement callback to the BleObserver!'
-        )
-    }
-
-    @test()
-    protected static async connectCallsStartObservingOnBleObserver() {
-        await this.instance.connect()
-
-        assert.isEqual(
-            FakeBleObserver.numCallsToStartObserving,
-            1,
-            'Did not call startObserving on the BleObserver!'
-        )
-    }
-
-    @test()
-    protected static async disconnectCallsStopObservingOnBleObserver() {
-        await this.instance.connect()
-        await this.instance.disconnect()
-
-        assert.isEqual(
-            FakeBleObserver.numCallsToStopObserving,
-            1,
-            'Did not call stopObserving on the BleObserver!'
         )
     }
 
@@ -89,6 +113,52 @@ export default class GoveeDeviceControllerTest extends AbstractPackageTest {
         )
     }
 
+    @test()
+    protected static async connectCallsStartObservingOnBleObserver() {
+        await this.connect()
+
+        assert.isEqual(
+            FakeBleObserver.numCallsToStartObserving,
+            1,
+            'Did not call startObserving on the BleObserver!'
+        )
+    }
+
+    @test()
+    protected static async connectDoesNotStartObservingIfAlreadyConnected() {
+        await this.connect()
+        await this.connect()
+
+        assert.isEqual(
+            FakeBleObserver.numCallsToStartObserving,
+            1,
+            'Should not call startObserving if already connected!'
+        )
+    }
+
+    @test()
+    protected static async disconnectCallsStopObservingOnBleObserver() {
+        await this.connect()
+        await this.disconnect()
+
+        assert.isEqual(
+            FakeBleObserver.numCallsToStopObserving,
+            1,
+            'Did not call stopObserving on the BleObserver!'
+        )
+    }
+
+    @test()
+    protected static async disconnectDoesNotStopObservingIfNotConnected() {
+        await this.disconnect()
+
+        assert.isEqual(
+            FakeBleObserver.numCallsToStopObserving,
+            0,
+            'Should not call stopObserving if not connected!'
+        )
+    }
+
     private static get onAdvertisement() {
         const { onAdvertisement } = FakeBleObserver.callsToConstructor[0] ?? {}
         return onAdvertisement!
@@ -104,7 +174,7 @@ export default class GoveeDeviceControllerTest extends AbstractPackageTest {
 
     private static GoveeDeviceController() {
         return GoveeDeviceController.Create({
-            deviceUuid: this.goveeDeviceUuid,
-        })
+            deviceUuid: this.deviceId,
+        }) as SpyGoveeController
     }
 }

@@ -8,14 +8,20 @@ import {
     DeviceControllerBle,
     DeviceControllerOptions,
 } from '../BiosensorDeviceFactory.js'
+import AbstractDeviceController from '../abstract/AbstractDeviceController.js'
 
-export default class GoveeDeviceController implements DeviceControllerBle {
+export default class GoveeDeviceController
+    extends AbstractDeviceController
+    implements DeviceControllerBle
+{
     public static Class?: GoveeControllerConstructor
     public static log = console
 
     protected readonly observer: BleObserver
 
     protected constructor(observer: BleObserver) {
+        super()
+
         this.observer = observer
     }
 
@@ -24,24 +30,24 @@ export default class GoveeDeviceController implements DeviceControllerBle {
         return new (this.Class ?? this)(observer)
     }
 
-    public async connect() {
+    protected async handleConnect() {
         await this.observer.startObserving()
     }
 
-    public async startStreaming() {}
-
-    public async stopStreaming() {}
-
-    public async disconnect() {
+    protected async handleDisconnect() {
         await this.observer.stopObserving()
     }
 
-    public get outlets() {
-        return []
-    }
+    protected async handleStartStreaming() {}
+
+    protected async handleStopStreaming() {}
 
     public get streamQueries() {
         return []
+    }
+
+    protected get deviceId() {
+        return ''
     }
 
     public get bleUuid() {
