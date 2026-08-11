@@ -22,7 +22,7 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
 
         GoveeDeviceController.Class = SpyGoveeController
 
-        this.instance = this.GoveeDeviceController()
+        this.instance = await this.GoveeDeviceController()
     }
 
     @test()
@@ -68,6 +68,50 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
     @test()
     protected static async disconnectDoesNotCallStopStreamingIfNotStreaming() {
         await this.assertDisconnectDoesNotCallStopStreamingIfNotStreaming()
+    }
+
+    @test()
+    protected static async connectWarnsWithDeviceId() {
+        await this.assertConnectWarnsWithDeviceId()
+    }
+
+    @test()
+    protected static async startStreamingWarnsWithDeviceId() {
+        await this.assertStartStreamingWarnsWithDeviceId()
+    }
+
+    @test()
+    protected static async stopStreamingWarnsWithDeviceId() {
+        await this.assertStopStreamingWarnsWithDeviceId()
+    }
+
+    @test()
+    protected static async disconnectWarnsWithDeviceId() {
+        await this.assertDisconnectWarnsWithDeviceId()
+    }
+
+    @test()
+    protected static async createsXdfRecorderIfPassedPath() {
+        await this.assertCreatesXdfRecorderIfPassedPath()
+    }
+
+    @test()
+    protected static async connectStartsXdfRecorder() {
+        await this.assertConnectStartsXdfRecorder()
+    }
+
+    @test()
+    protected static async disconnectFinishesXdfRecorder() {
+        await this.assertDisconnectFinishesXdfRecorder()
+    }
+
+    @test()
+    protected static async exposesUuidFromDeviceUuid() {
+        assert.isEqual(
+            this.instance.bleUuid,
+            this.deviceId,
+            'Did not expose the device uuid!'
+        )
     }
 
     @test()
@@ -172,9 +216,11 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
         } as Console
     }
 
-    private static GoveeDeviceController() {
-        return GoveeDeviceController.Create({
+    private static async GoveeDeviceController() {
+        const govee = await GoveeDeviceController.Create({
             deviceUuid: this.deviceId,
-        }) as SpyGoveeController
+            xdfRecordPath: this.xdfRecordPath,
+        })
+        return govee as SpyGoveeController
     }
 }

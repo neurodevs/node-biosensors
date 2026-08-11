@@ -1,6 +1,6 @@
 import GoveeDeviceController from '../impl/govee/GoveeDeviceController.js'
 
-const govee = GoveeDeviceController.Create({
+const govee = await GoveeDeviceController.Create({
     deviceUuid: '179F4A82-A2DF-C241-DB2A-1DF990779106',
 })
 
@@ -10,7 +10,7 @@ await govee.connect()
 
 console.info('Connected to Govee device! Waiting...')
 
-await new Promise((resolve) => setTimeout(resolve, 30000))
+await new Promise((resolve) => setTimeout(resolve, 300000))
 
 console.info('Disconnecting from Govee device...')
 

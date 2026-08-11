@@ -3,6 +3,7 @@ import {
     BleObserverController,
     BleObserverOptions,
 } from '@neurodevs/node-lsl'
+import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 
 import {
     DeviceControllerBle,
@@ -18,16 +19,29 @@ export default class GoveeDeviceController
     public static log = console
 
     protected readonly observer: BleObserver
+    protected readonly deviceUuid: string
 
-    protected constructor(observer: BleObserver) {
-        super()
+    protected constructor(
+        observer: BleObserver,
+        deviceUuid: string,
+        recorder?: XdfRecorder
+    ) {
+        super(recorder)
 
         this.observer = observer
+        this.deviceUuid = deviceUuid
     }
 
-    public static Create(options: GoveeControllerOptions) {
+    public static async Create(options: GoveeControllerOptions) {
+        const { deviceUuid, xdfRecordPath } = options
+
         const observer = this.BleObserverController(options)
-        return new (this.Class ?? this)(observer)
+
+        const recorder = xdfRecordPath
+            ? await this.XdfStreamRecorder(xdfRecordPath)
+            : undefined
+
+        return new (this.Class ?? this)(observer, deviceUuid, recorder)
     }
 
     protected async handleConnect() {
@@ -47,11 +61,11 @@ export default class GoveeDeviceController
     }
 
     protected get deviceId() {
-        return ''
+        return this.deviceUuid
     }
 
     public get bleUuid() {
-        return ''
+        return this.deviceUuid
     }
 
     public get bleName() {
@@ -73,10 +87,16 @@ export default class GoveeDeviceController
             },
         })
     }
+
+    public static async XdfStreamRecorder(xdfRecordPath: string) {
+        return await XdfStreamRecorder.Create(xdfRecordPath, [])
+    }
 }
 
 export type GoveeControllerConstructor = new (
-    observer: BleObserver
+    observer: BleObserver,
+    deviceUuid: string,
+    recorder?: XdfRecorder
 ) => DeviceControllerBle
 
 export interface GoveeControllerOptions extends DeviceControllerOptions {
