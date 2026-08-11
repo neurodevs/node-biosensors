@@ -1,4 +1,8 @@
-import { BleObserver, BleObserverController } from '@neurodevs/node-lsl'
+import {
+    BleObserver,
+    BleObserverController,
+    BleObserverOptions,
+} from '@neurodevs/node-lsl'
 
 import {
     DeviceControllerBle,
@@ -7,6 +11,7 @@ import {
 
 export default class GoveeDeviceController implements DeviceControllerBle {
     public static Class?: GoveeControllerConstructor
+    public static log = console
 
     protected readonly observer: BleObserver
 
@@ -47,9 +52,20 @@ export default class GoveeDeviceController implements DeviceControllerBle {
         return ''
     }
 
-    private static BleObserverController(options: GoveeControllerOptions) {
+    private static BleObserverController(options: BleObserverOptions) {
         const { deviceUuid } = options
-        return BleObserverController.Create({ deviceUuid })
+        return BleObserverController.Create({
+            deviceUuid,
+            onAdvertisement: (
+                data: Buffer,
+                length: number,
+                timestampSec: number
+            ) => {
+                this.log.info(
+                    `[${timestampSec}] ${data.toString('hex')} ${length}`
+                )
+            },
+        })
     }
 }
 
