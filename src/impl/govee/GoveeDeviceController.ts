@@ -1,8 +1,4 @@
-import {
-    BleObserver,
-    BleObserverController,
-    BleObserverOptions,
-} from '@neurodevs/node-lsl'
+import { BleObserver, BleObserverController } from '@neurodevs/node-lsl'
 import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 
 import {
@@ -21,27 +17,21 @@ export default class GoveeDeviceController
     protected readonly observer: BleObserver
     protected readonly deviceUuid: string
 
-    protected constructor(
-        observer: BleObserver,
-        deviceUuid: string,
-        recorder?: XdfRecorder
-    ) {
+    protected constructor(deviceUuid: string, recorder?: XdfRecorder) {
         super(recorder)
 
-        this.observer = observer
         this.deviceUuid = deviceUuid
+        this.observer = this.BleObserverController()
     }
 
     public static async Create(options: GoveeControllerOptions) {
         const { deviceUuid, xdfRecordPath } = options
 
-        const observer = this.BleObserverController(options)
-
         const recorder = xdfRecordPath
             ? await this.XdfStreamRecorder(xdfRecordPath)
             : undefined
 
-        return new (this.Class ?? this)(observer, deviceUuid, recorder)
+        return new (this.Class ?? this)(deviceUuid, recorder)
     }
 
     protected async handleConnect() {
@@ -72,20 +62,33 @@ export default class GoveeDeviceController
         return ''
     }
 
-    private static BleObserverController(options: BleObserverOptions) {
-        const { deviceUuid } = options
+    private BleObserverController() {
         return BleObserverController.Create({
-            deviceUuid,
+            deviceUuid: this.deviceUuid,
             onAdvertisement: (
                 data: Buffer,
                 length: number,
                 timestampSec: number
             ) => {
-                this.log.info(
-                    `[${timestampSec}] ${data.toString('hex')} ${length}`
-                )
+                this.handleAdvertisement(data, length, timestampSec)
             },
         })
+    }
+
+    protected handleAdvertisement(
+        data: Buffer,
+        length: number,
+        timestampSec: number
+    ) {
+        if (!this.isStreaming) {
+            return
+        }
+
+        this.log.info(`[${timestampSec}] ${data.toString('hex')} ${length}`)
+    }
+
+    private get log() {
+        return GoveeDeviceController.log
     }
 
     public static async XdfStreamRecorder(xdfRecordPath: string) {
@@ -94,7 +97,6 @@ export default class GoveeDeviceController
 }
 
 export type GoveeControllerConstructor = new (
-    observer: BleObserver,
     deviceUuid: string,
     recorder?: XdfRecorder
 ) => DeviceControllerBle

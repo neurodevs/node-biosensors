@@ -7,7 +7,7 @@ import AbstractDeviceControllerTest from '../AbstractDeviceControllerTest.js'
 
 export default class GoveeDeviceControllerTest extends AbstractDeviceControllerTest {
     protected static instance: SpyGoveeController
-    private static lastLog: string
+    private static lastLog?: string
 
     private static readonly advertisement = Buffer.from(
         '88ec00ee08f4176402',
@@ -143,17 +143,36 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
     }
 
     @test()
-    protected static async onAdvertisementLogsPacket() {
-        this.onAdvertisement(
-            this.advertisement,
-            this.advertisement.length,
-            this.timestampSec
-        )
+    protected static async onAdvertisementLogsPacketWhenStreaming() {
+        await this.connect()
+        await this.startStreaming()
+
+        this.receiveAdvertisement()
 
         assert.isEqual(
             this.lastLog,
             `[${this.timestampSec}] 88ec00ee08f4176402 ${this.advertisement.length}`,
             'Did not log the advertisement as expected!'
+        )
+    }
+
+    @test()
+    protected static async doesNotLogAdvertisementIfNotStreaming() {
+        await this.connect()
+
+        this.receiveAdvertisement()
+
+        assert.isUndefined(
+            this.lastLog,
+            'Should not log advertisements when connected but not streaming!'
+        )
+    }
+
+    private static receiveAdvertisement() {
+        this.onAdvertisement(
+            this.advertisement,
+            this.advertisement.length,
+            this.timestampSec
         )
     }
 
@@ -209,6 +228,8 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
     }
 
     private static setFakeLog() {
+        this.lastLog = undefined
+
         GoveeDeviceController.log = {
             info: (msg: string) => {
                 this.lastLog = msg
