@@ -1,4 +1,8 @@
-import { BleObserver, BleObserverController } from '@neurodevs/node-lsl'
+import {
+    BleAdvertisement,
+    BleObserver,
+    BleObserverController,
+} from '@neurodevs/node-lsl'
 import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 
 import {
@@ -65,26 +69,20 @@ export default class GoveeDeviceController
     private BleObserverController() {
         return BleObserverController.Create({
             deviceUuid: this.deviceUuid,
-            onAdvertisement: (
-                data: Buffer,
-                length: number,
-                timestampSec: number
-            ) => {
-                this.handleAdvertisement(data, length, timestampSec)
+            onAdvertisement: (advertisement: BleAdvertisement) => {
+                this.handleAdvertisement(advertisement)
             },
         })
     }
 
-    protected handleAdvertisement(
-        data: Buffer,
-        length: number,
-        timestampSec: number
-    ) {
+    protected handleAdvertisement(advertisement: BleAdvertisement) {
         if (!this.isStreaming) {
             return
         }
 
-        this.log.info(`[${timestampSec}] ${data.toString('hex')} ${length}`)
+        const { manufacturerData, timestampSec } = advertisement
+
+        this.log.info(`[${timestampSec}] ${manufacturerData}`)
     }
 
     private get log() {

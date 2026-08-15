@@ -1,5 +1,5 @@
 import { test, assert } from '@neurodevs/node-tdd'
-import { FakeBleObserver } from '@neurodevs/node-lsl'
+import { BleAdvertisement, FakeBleObserver } from '@neurodevs/node-lsl'
 
 import GoveeDeviceController from '../../impl/govee/GoveeDeviceController.js'
 import SpyGoveeController from '../../testDoubles/GoveeController/SpyGoveeController.js'
@@ -9,11 +9,20 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
     protected static instance: SpyGoveeController
     private static lastLog?: string
 
-    private static readonly advertisement = Buffer.from(
-        '88ec00ee08f4176402',
-        'hex'
-    )
     private static readonly timestampSec = 2650540.252988708
+    private static readonly manufacturerData = '88ec00ee08f4176402'
+
+    private static readonly advertisement: BleAdvertisement = {
+        localName: 'GVH5179_9106',
+        companyId: 0xec88,
+        manufacturerData: this.manufacturerData,
+        serviceUuids: [],
+        serviceData: {},
+        rssi: -55,
+        txPowerLevel: null,
+        isConnectable: false,
+        timestampSec: this.timestampSec,
+    }
 
     protected static async beforeEach() {
         await super.beforeEach()
@@ -151,7 +160,7 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
 
         assert.isEqual(
             this.lastLog,
-            `[${this.timestampSec}] 88ec00ee08f4176402 ${this.advertisement.length}`,
+            `[${this.timestampSec}] ${this.manufacturerData}`,
             'Did not log the advertisement as expected!'
         )
     }
@@ -169,11 +178,7 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
     }
 
     private static receiveAdvertisement() {
-        this.onAdvertisement(
-            this.advertisement,
-            this.advertisement.length,
-            this.timestampSec
-        )
+        this.onAdvertisement(this.advertisement)
     }
 
     @test()

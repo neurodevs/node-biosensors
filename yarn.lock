@@ -829,78 +829,153 @@
 
 "@koromix/koffi-darwin-arm64@3.1.1":
   version "3.1.1"
-  resolved "https://registry.npmjs.org/@koromix/koffi-darwin-arm64/-/koffi-darwin-arm64-3.1.1.tgz"
+  resolved "https://registry.yarnpkg.com/@koromix/koffi-darwin-arm64/-/koffi-darwin-arm64-3.1.1.tgz#7ee213131fa29c7f3e16b376fe68591bfc006610"
   integrity sha512-+Dl0zQDh1Wb55AWOn9hp7K30qgkODvrvN+ZNkFOh81Q0oFX/rpJQtocgjAuYk2zFAcajSeVDumkcHMPwnKSXzA==
+
+"@koromix/koffi-darwin-arm64@3.1.5":
+  version "3.1.5"
+  resolved "https://registry.yarnpkg.com/@koromix/koffi-darwin-arm64/-/koffi-darwin-arm64-3.1.5.tgz#7554fbf05956ce1bf2ffa3fc5ac03cdfef58a9f4"
+  integrity sha512-IpqITl2fJi3QN9bTtNnygWPdK7ScSjw3xtGu8e6feYGvimCysu+spgI5KyeslY2jTnqxGS9xr8pLAbLhGJ8edA==
 
 "@koromix/koffi-darwin-x64@3.1.1":
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/@koromix/koffi-darwin-x64/-/koffi-darwin-x64-3.1.1.tgz#080f69b5167afd4608a20d84ff740b1c7bbd7e18"
   integrity sha512-cDFAKn1qdZBFLrp7dAc9QUDw3l4xAhTJbOdPWWb0LxssVicUdHcRCLZGrDsmPW2tpH6LGNNeLgqRpAoD2Mo8iA==
 
+"@koromix/koffi-darwin-x64@3.1.5":
+  version "3.1.5"
+  resolved "https://registry.yarnpkg.com/@koromix/koffi-darwin-x64/-/koffi-darwin-x64-3.1.5.tgz#3d9a45bc4757d48afd9f6d9de60462f4fd7a78f7"
+  integrity sha512-4Tia4BS5EV/+vN9eIrdToanVe+U/2VqTZCBgOzoUbPKjgky51eqM+3J4qdRUvmYJohcJNPob5/hsxeItUZrl1g==
+
 "@koromix/koffi-freebsd-arm64@3.1.1":
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/@koromix/koffi-freebsd-arm64/-/koffi-freebsd-arm64-3.1.1.tgz#790c950d7c4539e7774be0e530dfa7fb426b2944"
   integrity sha512-zaP7FJISI/scQW9Wa5QicY3a09WmtKBWSbmC+5nfCqPzwWe7Hx2so74Er7mPsDfCiMMR0Ya+evKbJQDkfyXicg==
+
+"@koromix/koffi-freebsd-arm64@3.1.5":
+  version "3.1.5"
+  resolved "https://registry.yarnpkg.com/@koromix/koffi-freebsd-arm64/-/koffi-freebsd-arm64-3.1.5.tgz#7f3cd52f921e6fa6b5218ae29bb611b895f7aa3e"
+  integrity sha512-bP94uzseFO79NG3flpU3WxfyvltD+jzC/kN8FDZLi8J0VUZNW1Wmu8yq87KEzjX1qT9KyX4Y+elVbGqHXHTv2Q==
 
 "@koromix/koffi-freebsd-ia32@3.1.1":
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/@koromix/koffi-freebsd-ia32/-/koffi-freebsd-ia32-3.1.1.tgz#6a8a488572dab4351aa9dda0a193f2494a715a29"
   integrity sha512-7GejVb688TLM8rbjfc0oezJrATxZc0dn801xWEDJekN2DgmRXu7HquGqWQ6z3NeSq7ZxEggz4T3xtlbCysQapA==
 
+"@koromix/koffi-freebsd-ia32@3.1.5":
+  version "3.1.5"
+  resolved "https://registry.yarnpkg.com/@koromix/koffi-freebsd-ia32/-/koffi-freebsd-ia32-3.1.5.tgz#879afb0d8304520232451d67deb25cd980d5e224"
+  integrity sha512-raFXXAPHzvCQWhaoMUF+Cc2ZWgg2UBU0RVoowHZhaw9nQYPC1pERcPRH+JA+SNIN6g4d2GFW6uPFc+QbUhsagA==
+
 "@koromix/koffi-freebsd-x64@3.1.1":
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/@koromix/koffi-freebsd-x64/-/koffi-freebsd-x64-3.1.1.tgz#8eac9c6b47d65a7a5bdd203a2b17ca4f53615d3a"
   integrity sha512-XLiCFP9OFCyOoGTjAimtDKLhzhfo34WcP1ShVWxRzNCWDGjfz8BYjwd69cp/cDSUXZbxamqs4+/6vmkePq9wxA==
+
+"@koromix/koffi-freebsd-x64@3.1.5":
+  version "3.1.5"
+  resolved "https://registry.yarnpkg.com/@koromix/koffi-freebsd-x64/-/koffi-freebsd-x64-3.1.5.tgz#099b62158678a386f396b3794d4d2f290ad83f96"
+  integrity sha512-h6RyBZmPMBIDWTABkJIhzDdYwSnYAJvTacHpEjbT55Arkmw1H15Rl7CFtXuEuBrqh+uivoCrRgA6vszl9CsJ9g==
 
 "@koromix/koffi-linux-arm64@3.1.1":
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/@koromix/koffi-linux-arm64/-/koffi-linux-arm64-3.1.1.tgz#e08a8552a36b8c265771d868c3dc4e35ef77f9ee"
   integrity sha512-HA9xINK7G4dRAkpfnBWD9VfuyIBgW1SuK+KPHjksUwRMOnhgqP8J/JqgrAzdzcDiefGBkqEacIP776OUwz7knQ==
 
+"@koromix/koffi-linux-arm64@3.1.5":
+  version "3.1.5"
+  resolved "https://registry.yarnpkg.com/@koromix/koffi-linux-arm64/-/koffi-linux-arm64-3.1.5.tgz#1098276bdffcb8a1f5eb2f46095fbd4201fd985c"
+  integrity sha512-u0vCmKPu4yQDhl/ri1J6U3vDnvYtYjoZaIWb+oMbRXhVZeiqdE53MGPb+q2A7Dj2n9IbYloAfEICQbL6l0pmiQ==
+
 "@koromix/koffi-linux-ia32@3.1.1":
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/@koromix/koffi-linux-ia32/-/koffi-linux-ia32-3.1.1.tgz#afe65a15773648db2c869f3ecf1115f37e8999d0"
   integrity sha512-jG7IFytmP8K5Qtbx0ro0ZeuX3JjSsLxmYhq+nmXDdrtOAlxIsWGynuiDLS6Jk3vOchVii2m6Y2f/L3GLG2fG5A==
+
+"@koromix/koffi-linux-ia32@3.1.5":
+  version "3.1.5"
+  resolved "https://registry.yarnpkg.com/@koromix/koffi-linux-ia32/-/koffi-linux-ia32-3.1.5.tgz#f8be601f480957714cbda29fd26cbaceb93be565"
+  integrity sha512-Xa5JbumWglwPVZgrJcLhqyC1wCWlfm7+C00p3FuOTNGp0qoYuf2/tOoAh0/q7+taVm30cMopu/6lRHwdmF6I/w==
 
 "@koromix/koffi-linux-loong64@3.1.1":
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/@koromix/koffi-linux-loong64/-/koffi-linux-loong64-3.1.1.tgz#60ec8d779704ad6ff27e3f9851f6852b925bd7c8"
   integrity sha512-CIsT1cNnih8FuU52Me/IVlJBpH28SQfoDeYPctJswgJzaARktusF7m4MUbtR1PBDjuquCVM4/vFyNdOzfPonvA==
 
+"@koromix/koffi-linux-loong64@3.1.5":
+  version "3.1.5"
+  resolved "https://registry.yarnpkg.com/@koromix/koffi-linux-loong64/-/koffi-linux-loong64-3.1.5.tgz#756df112f87b9957d7af02436c203c778ffd4860"
+  integrity sha512-F3i2CeTcqVBUQiSRUBSEzX1VgtXmLLiZb/ouZtXHkWpTLhJNd9TH7s3CizTofci0VRqlKdexGUYhK5vzPDAAHA==
+
 "@koromix/koffi-linux-riscv64@3.1.1":
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/@koromix/koffi-linux-riscv64/-/koffi-linux-riscv64-3.1.1.tgz#6fbd8e649333487968dc10273739a7dac4d181b7"
   integrity sha512-9D6RmqeKsSvs3U6jILJU9PcAjMwKKyn7yLxNBb5k6z9PCoUoGJ3/BrhXAX0qjrLLwEiIpP/hS/40RuXvH8Lc3Q==
+
+"@koromix/koffi-linux-riscv64@3.1.5":
+  version "3.1.5"
+  resolved "https://registry.yarnpkg.com/@koromix/koffi-linux-riscv64/-/koffi-linux-riscv64-3.1.5.tgz#2107bf1a74ef9927bc5a430759317c393da2b2d9"
+  integrity sha512-2TgQuzy+4PfDg+rw3kOmN6lywEWdzKT3eaLPbOp0b/9DaN7CLBJ/QIR5GhGsMNpeI30zU0YzFeYFxoVoJ/LqFw==
 
 "@koromix/koffi-linux-x64@3.1.1":
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/@koromix/koffi-linux-x64/-/koffi-linux-x64-3.1.1.tgz#d666aaad73e5561255f75e71c938399f0a571145"
   integrity sha512-pyTcX5fePeYbt7TZAwRby69wdlRx3PT+g15ra5IYdat/Pgh3qAKEYeZ+uu7WpPGOy43p/oSRqqZoa2kORzozlA==
 
+"@koromix/koffi-linux-x64@3.1.5":
+  version "3.1.5"
+  resolved "https://registry.yarnpkg.com/@koromix/koffi-linux-x64/-/koffi-linux-x64-3.1.5.tgz#fe40229341a71e1814516dd13dea672df68294c3"
+  integrity sha512-2yaIg/1V0m4CiAUMzG4CIlWmq1WJ+QBMlFfaGr9su+OH5fuIqC7V3BbMiB03IwIl1VofIZO5JA4Db4lID8tpbw==
+
 "@koromix/koffi-openbsd-ia32@3.1.1":
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/@koromix/koffi-openbsd-ia32/-/koffi-openbsd-ia32-3.1.1.tgz#b12758d5b41e152763a32423058034f576b36790"
   integrity sha512-iPnPzvG2HOfdzaiG1drdkt86sAqmTPDv9mAf+5gL7mRzkeeQC88EVGboRy7eXwdXn7R+v0ntA3iQxdHrBn6yXw==
+
+"@koromix/koffi-openbsd-ia32@3.1.5":
+  version "3.1.5"
+  resolved "https://registry.yarnpkg.com/@koromix/koffi-openbsd-ia32/-/koffi-openbsd-ia32-3.1.5.tgz#bbac96ebe6a2d3c25e1489e39d3904c93ae53240"
+  integrity sha512-8/OXd+u9omMooykhvdJPEP7u6FFzzrrFo9gOmSHc9/DPt3XkVYOtSsE97PDk6zYaAzwIYHSKjHvIXsfFwFc7sg==
 
 "@koromix/koffi-openbsd-x64@3.1.1":
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/@koromix/koffi-openbsd-x64/-/koffi-openbsd-x64-3.1.1.tgz#75fac03b0c6bca11da42a23c1b983cba9871414a"
   integrity sha512-/Xqc3R0SVoMCYjMPZnJ9bULtRo364+dKmnQhfDrI83tSpxUHRw7HRNf12vBeL+hPgKxSBjtMpWfQ/ZIyVyLFag==
 
+"@koromix/koffi-openbsd-x64@3.1.5":
+  version "3.1.5"
+  resolved "https://registry.yarnpkg.com/@koromix/koffi-openbsd-x64/-/koffi-openbsd-x64-3.1.5.tgz#1e190725c6e9c5b52c2c0c125d57da948689ced3"
+  integrity sha512-SpeqldKkuDk2aTj5PVWumy7eq6Tr2GtBPAOI1NiDHhg8xe433KraxrA9V9UjEd+1+kSGJQGR04nQByN3MPA9PQ==
+
 "@koromix/koffi-win32-arm64@3.1.1":
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/@koromix/koffi-win32-arm64/-/koffi-win32-arm64-3.1.1.tgz#a4708681a4a2ef085e3ab664a6aac9aebdc288c4"
   integrity sha512-JhqHauEwQvdcWUERxrV5HH/DT9W7hY1A1eU6/o8tB+yck+D3kt5elpRDBt9KjpW6h+vHPy3V0sjDvO0CXyabTA==
+
+"@koromix/koffi-win32-arm64@3.1.5":
+  version "3.1.5"
+  resolved "https://registry.yarnpkg.com/@koromix/koffi-win32-arm64/-/koffi-win32-arm64-3.1.5.tgz#35692c94e64f34ef231a43b2b6879beb306d6c92"
+  integrity sha512-uej3YAEKAhlfVPoIo5sOwtxhTLRVJ01LgtWrKGpnnAQU3C+Ilmaxdh+Oc2xc1G3NK30N5eCVJpyO9r3pjKC6Vw==
 
 "@koromix/koffi-win32-ia32@3.1.1":
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/@koromix/koffi-win32-ia32/-/koffi-win32-ia32-3.1.1.tgz#9dc1aacf78293495f753cf7ccd5cc087270e76d1"
   integrity sha512-ZRuyYmlGS/rCc966qqs0qREXDW4FRdul7rDF1VgSWHbVmdc196PUgUT+blq/GjZgTwqzeEXtMRgM+cU8krHjvA==
 
+"@koromix/koffi-win32-ia32@3.1.5":
+  version "3.1.5"
+  resolved "https://registry.yarnpkg.com/@koromix/koffi-win32-ia32/-/koffi-win32-ia32-3.1.5.tgz#2742b27dc49eeeb4c1542b1cb1ba099663c2d07a"
+  integrity sha512-d42jv2f4PwtJGNJS19Xfn/BRtGsBNNVkw0O0K5tkIGI+yNq4MnPTSUsaGbDIkCLNsCgk/LFqAaE8BExyCdrujA==
+
 "@koromix/koffi-win32-x64@3.1.1":
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/@koromix/koffi-win32-x64/-/koffi-win32-x64-3.1.1.tgz#584455952106e264aab69a0720511dce818ae9cb"
   integrity sha512-KqHPmvj6QILhNyI/To8QSihHsijeVGIYYPBOUnXEpcnH2LuLbargY4Hd6dDeTN3Z90uUUxN+1FWz1UnhVzFOiA==
+
+"@koromix/koffi-win32-x64@3.1.5":
+  version "3.1.5"
+  resolved "https://registry.yarnpkg.com/@koromix/koffi-win32-x64/-/koffi-win32-x64-3.1.5.tgz#5b9e2507fb14823dd5ba6068e3bdd41385ec6681"
+  integrity sha512-Pyo1WEHEP6Ek2NEn2pquwJzSPLOdY4vymoPSz0an1DgvFWSkOyBYYkGVoxL1ajfj5I1pPdXysYqixtVTzAtOfQ==
 
 "@mapbox/node-pre-gyp@^1.0.0":
   version "1.0.11"
@@ -970,6 +1045,15 @@
     ffi-rs "^1.3.2"
     koffi "^3.0.1"
 
+"@neurodevs/ndx-native@^9.0.0":
+  version "9.0.0"
+  resolved "https://registry.yarnpkg.com/@neurodevs/ndx-native/-/ndx-native-9.0.0.tgz#2bb5d4dc26ff6ad488358f5b0641925c033c7add"
+  integrity sha512-1EfYh6wTQcdA+yHGLD+vyGkYTyU0yemp/wsff7UJLGrBSCg+ra/+4lf2L6r4S2YEGl7pbgDXhhxXMRB/YYSc9Q==
+  dependencies:
+    "@neurodevs/node-mangled-names" "^1.0.1"
+    ffi-rs "^1.3.2"
+    koffi "^3.0.1"
+
 "@neurodevs/node-biosignal-processing@^1.2.2":
   version "1.2.2"
   resolved "https://registry.npmjs.org/@neurodevs/node-biosignal-processing/-/node-biosignal-processing-1.2.2.tgz"
@@ -1006,9 +1090,19 @@
     ffi-rs "^1.3.1"
     ws "^8.18.3"
 
+"@neurodevs/node-lsl@^23.1.0":
+  version "23.1.0"
+  resolved "https://registry.yarnpkg.com/@neurodevs/node-lsl/-/node-lsl-23.1.0.tgz#52dcba1ea8d0a7eafeeb2bb2ab0fb2750ca83135"
+  integrity sha512-7kqDz7DJZitW2kcu808bxism1wp7OlyJ5yNJBhR3LylZNi5EaCyiEe/2MunzHG79zGmYY4YNcCCaEUa/oL7ZRA==
+  dependencies:
+    "@neurodevs/generate-id" "^1.1.3"
+    "@neurodevs/ndx-native" "^9.0.0"
+    ffi-rs "^1.3.1"
+    ws "^8.18.3"
+
 "@neurodevs/node-mangled-names@^1.0.1":
   version "1.0.1"
-  resolved "https://registry.npmjs.org/@neurodevs/node-mangled-names/-/node-mangled-names-1.0.1.tgz"
+  resolved "https://registry.yarnpkg.com/@neurodevs/node-mangled-names/-/node-mangled-names-1.0.1.tgz#165a4ee32879b7ab2019fd7f48c7ca1459332966"
   integrity sha512-tVx8EeO1NWCgo+R5fCuw+CO8r2+HrqFOWuRwJETtianrWFclDNUre4vb5sIryp0o+lyNi96tZ68EigfbftYbYw==
 
 "@neurodevs/node-server-plots@^0.4.3":
@@ -1477,55 +1571,110 @@
   resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-android-arm64/-/ffi-rs-android-arm64-1.3.2.tgz#3c7124ea1e1edc445d26fd734f43ef58eb9cf975"
   integrity sha512-eDYLT0kVBkp7e2BwdRDmt6N1rkeDPUHDefk3ZX0/nok+GLsqfy1WBoSL3Yg7HVXN1EyW8OBVc2uK8Zq8HbmaSA==
 
+"@yuuang/ffi-rs-android-arm64@1.3.7":
+  version "1.3.7"
+  resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-android-arm64/-/ffi-rs-android-arm64-1.3.7.tgz#260988684838f2989b22aae17f8924db90d20721"
+  integrity sha512-t6Wx3Xll6c07Nuk0k3xnZsxKFxlshm92i0U/BiTHc6kQbvu+fMJF+gKsj4yEj886jH51CM3EqZT9Xdhq9CdUVw==
+
 "@yuuang/ffi-rs-darwin-arm64@1.3.2":
   version "1.3.2"
-  resolved "https://registry.npmjs.org/@yuuang/ffi-rs-darwin-arm64/-/ffi-rs-darwin-arm64-1.3.2.tgz"
+  resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-darwin-arm64/-/ffi-rs-darwin-arm64-1.3.2.tgz#ee8db40f4bf6373532bd510fadd77cb67ad588bc"
   integrity sha512-kRdgPaOM6TfuC5wHUwstlatk4HNie2lwSLJWQL2LiAUIJ7+96CoiWUNVhwBcFrhdfxhnWenYS6F668CV0vit8Q==
+
+"@yuuang/ffi-rs-darwin-arm64@1.3.7":
+  version "1.3.7"
+  resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-darwin-arm64/-/ffi-rs-darwin-arm64-1.3.7.tgz#6ff1952579954580f4930b745384751a0ee86642"
+  integrity sha512-OueBlUFBT9IwD9pQnoYs0UszRBEySskfrEPXXfvKfGjL/DXnfn6kUheQ3oIP6sSmshVGNQUwrTCPo6feAa4QjA==
 
 "@yuuang/ffi-rs-darwin-x64@1.3.2":
   version "1.3.2"
   resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-darwin-x64/-/ffi-rs-darwin-x64-1.3.2.tgz#0046852436e947eb8db6059bae58d2d9d51a3fa4"
   integrity sha512-O3AlVgre8FQcZRJe44Xs7A6iDLumoPXqbw40+eJCa2gyXaXyLPdHoWrS1W9rBCa1QZRRnG7zRulPVFw8C5uo8g==
 
+"@yuuang/ffi-rs-darwin-x64@1.3.7":
+  version "1.3.7"
+  resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-darwin-x64/-/ffi-rs-darwin-x64-1.3.7.tgz#9a936da24393150269b0366126c3346c1cc73430"
+  integrity sha512-x4mxXOKwSgwYx6OBAKrW+Ocp8um2KoPpUwaD0Z2tmR6EekoRvFGN7s/eEK1avqCxcsLN7/MzGOnCCFyGpOVfPA==
+
 "@yuuang/ffi-rs-linux-arm-gnueabihf@1.3.2":
   version "1.3.2"
   resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-linux-arm-gnueabihf/-/ffi-rs-linux-arm-gnueabihf-1.3.2.tgz#29e59c82e4c720e0a0c6287197f23ce7f47f3e37"
   integrity sha512-IXiNdTbIcTCPny5eeElijFWYeKSJjQWSjt9ZyJNdLHYiB1Np+XD6K7wNZS6EOMgMelhW1kQE62T654skGkVDIA==
+
+"@yuuang/ffi-rs-linux-arm-gnueabihf@1.3.7":
+  version "1.3.7"
+  resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-linux-arm-gnueabihf/-/ffi-rs-linux-arm-gnueabihf-1.3.7.tgz#23789259e24ab7a1093f3dc95e8648b446e6c3fd"
+  integrity sha512-9r//Z022QYVoIAY458Dpk8HWkisk/y4NJC3d52RlkdsLD+9p0zn0cKKSoMF/xUsOWDFSmOf+cwU/Xadi/wxFMQ==
 
 "@yuuang/ffi-rs-linux-arm64-gnu@1.3.2":
   version "1.3.2"
   resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-linux-arm64-gnu/-/ffi-rs-linux-arm64-gnu-1.3.2.tgz#3c776a4bcbe6cb7f597e4829c1ae861e866be447"
   integrity sha512-gWFO6xufUK9lPYUqDvKa6IR243dPqdetgl9Q7HrZWaDu7wLo06QQrosw8QTzndafQnOcBKm6LoLujmGCfTgJOA==
 
+"@yuuang/ffi-rs-linux-arm64-gnu@1.3.7":
+  version "1.3.7"
+  resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-linux-arm64-gnu/-/ffi-rs-linux-arm64-gnu-1.3.7.tgz#8327de583f929b158d90caa56982c4478ef1e920"
+  integrity sha512-nrW4MlFlyQInfxTsI5wtcIpbV4KlHLWo2BCk4CHIETlUT+PUspNFqDg+Byy7My3hpCZlXp0WsMVP/3N0LlybNw==
+
 "@yuuang/ffi-rs-linux-arm64-musl@1.3.2":
   version "1.3.2"
   resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-linux-arm64-musl/-/ffi-rs-linux-arm64-musl-1.3.2.tgz#26f719759617762f82bf073aac03b2e6af617462"
   integrity sha512-lejvOSqypPziQH5rzfkDlJ6e92qhWbDutE9ttOO6z5I2k83zoh9iZhZWhaXSU5VqgQpcshRkrbtXb9gy1ft5dA==
+
+"@yuuang/ffi-rs-linux-arm64-musl@1.3.7":
+  version "1.3.7"
+  resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-linux-arm64-musl/-/ffi-rs-linux-arm64-musl-1.3.7.tgz#477e8bd6fe68b640b6c1c1c5851f0dd3f66d3089"
+  integrity sha512-eLLx4P8DzNnuPif19nAvKPaf88lSf6KFbDetH3nAIRZvI495h0jigN835Ayr7uAADssohGfO9MPMH33DXmFErA==
 
 "@yuuang/ffi-rs-linux-x64-gnu@1.3.2":
   version "1.3.2"
   resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-linux-x64-gnu/-/ffi-rs-linux-x64-gnu-1.3.2.tgz#9969c6c865674f7cdc22e03d9896dbbf643c726f"
   integrity sha512-s8VCFazaJKmgY2hgMTpWk4TtBY/zy5ovbaGgwyY0FvBD0YvyhcET4IrMsDJpHhFVTPCYfKZ1dN45clD/YiFp6g==
 
+"@yuuang/ffi-rs-linux-x64-gnu@1.3.7":
+  version "1.3.7"
+  resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-linux-x64-gnu/-/ffi-rs-linux-x64-gnu-1.3.7.tgz#b0b63ce478917610a5b7b4dc1600ee3e4cdc078c"
+  integrity sha512-upEz1Q98T51x2In872fsjgHCJbE3e8r9JxhJD+5NvSMk6BpieYWRodTbsMxV6oKWmfl12loKwF2j4OBSWKl0lA==
+
 "@yuuang/ffi-rs-linux-x64-musl@1.3.2":
   version "1.3.2"
   resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-linux-x64-musl/-/ffi-rs-linux-x64-musl-1.3.2.tgz#35c3767b9e123232d6aa2c91d7bcc88e2e8796eb"
   integrity sha512-Ahr5chfKZKWUik20bEZRug+be57LZ2yYrtolyjSRoo7A4ZniBUHBZUNWm6TD6i0CJayqyxWeVk/XiaABD8bY0w==
+
+"@yuuang/ffi-rs-linux-x64-musl@1.3.7":
+  version "1.3.7"
+  resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-linux-x64-musl/-/ffi-rs-linux-x64-musl-1.3.7.tgz#d4d73b9fcd8d0b72864e993ae70cc306921e2aad"
+  integrity sha512-YOcOkIwVvIhpwuGJ428h15vpE0KnT3teFG0g2J31FrBxrVh9IH4HeTGXjelI3l9SI5gyiZDnD4PQnQ1U6oqTcA==
 
 "@yuuang/ffi-rs-win32-arm64-msvc@1.3.2":
   version "1.3.2"
   resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-win32-arm64-msvc/-/ffi-rs-win32-arm64-msvc-1.3.2.tgz#bfd246e225d705b041c41b604d6a3e42df0f4af9"
   integrity sha512-yhpLcj0qel5VNlpzxPZfNmi7+rEX8444QHjUP6WWLxdRfqPllROu/Cp3OpkBpw3BLdxfcDhWkjWMD5QsJN0Pvg==
 
+"@yuuang/ffi-rs-win32-arm64-msvc@1.3.7":
+  version "1.3.7"
+  resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-win32-arm64-msvc/-/ffi-rs-win32-arm64-msvc-1.3.7.tgz#2318d9288c31943ded4616dc29c42f00047c6338"
+  integrity sha512-ZfYzLV1w7Mhzh9XRScEMpw9oazIEiwO+0+TYHHRL882d5oD0Q99YikmRhdifsoHCCQefKmWF/4BXCeFkzg8NFA==
+
 "@yuuang/ffi-rs-win32-ia32-msvc@1.3.2":
   version "1.3.2"
   resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-win32-ia32-msvc/-/ffi-rs-win32-ia32-msvc-1.3.2.tgz#29a03b9dcd678a6a42bff9b46961a7844b3480a4"
   integrity sha512-BFVSbdtg/7mJBw5kQFOPKFiA+SF7z3240HpzHN81Umm4Bp4dWkyx0msYn8+Q7/BBJiLQ4F6bi3Nftk58YA9r9w==
 
+"@yuuang/ffi-rs-win32-ia32-msvc@1.3.7":
+  version "1.3.7"
+  resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-win32-ia32-msvc/-/ffi-rs-win32-ia32-msvc-1.3.7.tgz#ebca95a5d697305a9138d9592fde8fe0e1bf26fc"
+  integrity sha512-ifYz+f+giKpT39lKWDru+om6QnA9J7J953ns60xHgB46ESZvPd/Y2W5+PesRNC9U+vnFEiLZ9CNC+R3fBWC1pg==
+
 "@yuuang/ffi-rs-win32-x64-msvc@1.3.2":
   version "1.3.2"
   resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-win32-x64-msvc/-/ffi-rs-win32-x64-msvc-1.3.2.tgz#7dfdd68e66d80a7e65e72ef672eb87a21001bc25"
   integrity sha512-ZL5MJ76n2rjwGo26kCWW7wK6QT/cee00Rx8pfW79pz6vM6jqfhoE7zTnwFiw4aOQUes9+HUc5DeeJ3z+Vb9oLg==
+
+"@yuuang/ffi-rs-win32-x64-msvc@1.3.7":
+  version "1.3.7"
+  resolved "https://registry.yarnpkg.com/@yuuang/ffi-rs-win32-x64-msvc/-/ffi-rs-win32-x64-msvc-1.3.7.tgz#7c2de43fd22aefb4a4b467ab0cf408897a8a79e5"
+  integrity sha512-H3s4wOLtZtKtmuPjUNE+bhnSKxxpXcuxG70jRC8dUMHqIm5iCvdoZ4XYDeq7/uUYlySerXFmRL4dAVCX/TUNTg==
 
 abbrev@1:
   version "1.1.1"
@@ -3096,7 +3245,7 @@ fdir@^6.5.0:
   resolved "https://registry.npmjs.org/fdir/-/fdir-6.5.0.tgz"
   integrity sha512-tIbYtZbucOs0BRGqPJkshJUYdL+SDH7dVM8gjy+ERp3WAUjLEFJE+02kanyHtwjWOnwrKYBiwAmM0p4kLJAnXg==
 
-ffi-rs@^1.0.98, ffi-rs@^1.3.1, ffi-rs@^1.3.2:
+ffi-rs@^1.0.98:
   version "1.3.2"
   resolved "https://registry.npmjs.org/ffi-rs/-/ffi-rs-1.3.2.tgz"
   integrity sha512-4s8dX9VbBw/jd5NOuE3EJRqXaIVdjMyiumeeDzrOhtjQRwp6Bz2za7iksWXTnvTQKV/tTdm1s1w7mObe92zPjQ==
@@ -3112,6 +3261,23 @@ ffi-rs@^1.0.98, ffi-rs@^1.3.1, ffi-rs@^1.3.2:
     "@yuuang/ffi-rs-win32-arm64-msvc" "1.3.2"
     "@yuuang/ffi-rs-win32-ia32-msvc" "1.3.2"
     "@yuuang/ffi-rs-win32-x64-msvc" "1.3.2"
+
+ffi-rs@^1.3.1, ffi-rs@^1.3.2:
+  version "1.3.7"
+  resolved "https://registry.yarnpkg.com/ffi-rs/-/ffi-rs-1.3.7.tgz#96d56a217b5dd44a24aad54d7ece71a150ff42fc"
+  integrity sha512-5MMZQS2t/6f/ec3sx0f51gBcKGZPGfolPAW04lvLOSYnr7gmOKs8YzH1Rh+34WGO+VtcgcTuxaUUoJLcR4Tirg==
+  optionalDependencies:
+    "@yuuang/ffi-rs-android-arm64" "1.3.7"
+    "@yuuang/ffi-rs-darwin-arm64" "1.3.7"
+    "@yuuang/ffi-rs-darwin-x64" "1.3.7"
+    "@yuuang/ffi-rs-linux-arm-gnueabihf" "1.3.7"
+    "@yuuang/ffi-rs-linux-arm64-gnu" "1.3.7"
+    "@yuuang/ffi-rs-linux-arm64-musl" "1.3.7"
+    "@yuuang/ffi-rs-linux-x64-gnu" "1.3.7"
+    "@yuuang/ffi-rs-linux-x64-musl" "1.3.7"
+    "@yuuang/ffi-rs-win32-arm64-msvc" "1.3.7"
+    "@yuuang/ffi-rs-win32-ia32-msvc" "1.3.7"
+    "@yuuang/ffi-rs-win32-x64-msvc" "1.3.7"
 
 file-entry-cache@^8.0.0:
   version "8.0.0"
@@ -4344,7 +4510,28 @@ keyv@^4.5.4:
   dependencies:
     json-buffer "3.0.1"
 
-koffi@^3.0.1, koffi@^3.0.2:
+koffi@^3.0.1:
+  version "3.1.5"
+  resolved "https://registry.yarnpkg.com/koffi/-/koffi-3.1.5.tgz#3682736bfd0871e14b2246410bca21d968cedc56"
+  integrity sha512-XVwwrxg0Ca6IEUQF4YtGIU4XN0LSselFYpYvgfhh8wafCunhEEx5hPr7LZhp5QyeFA/LcRsKHTqncCdjWjWAlg==
+  optionalDependencies:
+    "@koromix/koffi-darwin-arm64" "3.1.5"
+    "@koromix/koffi-darwin-x64" "3.1.5"
+    "@koromix/koffi-freebsd-arm64" "3.1.5"
+    "@koromix/koffi-freebsd-ia32" "3.1.5"
+    "@koromix/koffi-freebsd-x64" "3.1.5"
+    "@koromix/koffi-linux-arm64" "3.1.5"
+    "@koromix/koffi-linux-ia32" "3.1.5"
+    "@koromix/koffi-linux-loong64" "3.1.5"
+    "@koromix/koffi-linux-riscv64" "3.1.5"
+    "@koromix/koffi-linux-x64" "3.1.5"
+    "@koromix/koffi-openbsd-ia32" "3.1.5"
+    "@koromix/koffi-openbsd-x64" "3.1.5"
+    "@koromix/koffi-win32-arm64" "3.1.5"
+    "@koromix/koffi-win32-ia32" "3.1.5"
+    "@koromix/koffi-win32-x64" "3.1.5"
+
+koffi@^3.0.2:
   version "3.1.1"
   resolved "https://registry.npmjs.org/koffi/-/koffi-3.1.1.tgz"
   integrity sha512-mRX6AMeeKCxSOeOopqAcLAl5jcNvge7NAG8l7rF/8gGJATI0tdHFYjteIdE0mGOtWdsrJOij+PjnP8Q9c1gwgA==
@@ -6698,9 +6885,9 @@ write-file-atomic@^5.0.1:
     signal-exit "^4.0.1"
 
 ws@^8.18.3:
-  version "8.21.0"
-  resolved "https://registry.npmjs.org/ws/-/ws-8.21.0.tgz"
-  integrity sha512-Vsp28b7DRcimFQvrqu2Wek3z1iYxDCWqHYB8Qsnk/S4RfaCQzPGPyBNuVjJV3cd6UiKtUtp6sNM77gWvzcCH+g==
+  version "8.21.3"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-8.21.3.tgz#660b4faddb6a3e575c86e078126919961f4de4fc"
+  integrity sha512-201TZ/kPWxoPr/OKWjquZR1SWKXcvxdH+e1xrx89b3YbmzLMFCLfnaG1HFIgWzJOEWZ7MvpK++odZufgYR50Rw==
 
 y18n@^5.0.5:
   version "5.0.8"
