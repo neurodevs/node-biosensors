@@ -1,10 +1,16 @@
 import { XdfRecorder } from '@neurodevs/node-xdf'
 
-import GoveeDeviceController from '../../impl/govee/GoveeDeviceController.js'
+import GoveeDeviceController, {
+    temperatureUnits,
+} from '../../impl/govee/GoveeDeviceController.js'
 
 export default class SpyGoveeController extends GoveeDeviceController {
-    public constructor(deviceUuid: string, recorder?: XdfRecorder) {
-        super(deviceUuid, recorder)
+    public constructor(
+        deviceUuid: string,
+        recorder?: XdfRecorder,
+        temperatureUnits?: temperatureUnits
+    ) {
+        super(deviceUuid, recorder, temperatureUnits)
     }
 
     public getDeviceId() {

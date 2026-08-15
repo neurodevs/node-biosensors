@@ -22,22 +22,28 @@ export default class GoveeDeviceController
 
     protected readonly observer: BleObserver
     protected readonly deviceUuid: string
+    protected readonly temperatureUnits: temperatureUnits
 
-    protected constructor(deviceUuid: string, recorder?: XdfRecorder) {
+    protected constructor(
+        deviceUuid: string,
+        recorder?: XdfRecorder,
+        temperatureUnits?: temperatureUnits
+    ) {
         super(recorder)
 
         this.deviceUuid = deviceUuid
+        this.temperatureUnits = temperatureUnits ?? 'Celsius'
         this.observer = this.BleObserverController()
     }
 
     public static async Create(options: GoveeControllerOptions) {
-        const { deviceUuid, xdfRecordPath } = options
+        const { deviceUuid, xdfRecordPath, temperatureUnits } = options
 
         const recorder = xdfRecordPath
             ? await this.XdfStreamRecorder(xdfRecordPath)
             : undefined
 
-        return new (this.Class ?? this)(deviceUuid, recorder)
+        return new (this.Class ?? this)(deviceUuid, recorder, temperatureUnits)
     }
 
     protected async handleConnect() {
@@ -91,7 +97,7 @@ export default class GoveeDeviceController
         const { temperature, humidity, battery } = this.decode(manufacturerData)
 
         this.log.info(
-            `[${timestampSec}] temperature: ${temperature}°C, humidity: ${humidity}%, battery: ${battery}%`
+            `[${timestampSec}] temperature: ${temperature}${this.degreesSymbol}, humidity: ${humidity}%, battery: ${battery}%`
         )
     }
 
@@ -99,10 +105,21 @@ export default class GoveeDeviceController
         const bytes = Buffer.from(manufacturerData, 'hex')
 
         return {
-            temperature: bytes.readInt16LE(3) / 100,
+            temperature: this.toTemperatureUnits(bytes.readInt16LE(3) / 100),
             humidity: bytes.readUInt16LE(5) / 100,
             battery: bytes.readUInt8(7),
         }
+    }
+
+    private toTemperatureUnits(celsius: number) {
+        if (this.temperatureUnits === 'Celsius') {
+            return celsius
+        }
+        return Math.round((celsius * (9 / 5) + 32) * 100) / 100
+    }
+
+    private get degreesSymbol() {
+        return this.temperatureUnits === 'Celsius' ? '°C' : '°F'
     }
 
     private get log() {
@@ -116,9 +133,13 @@ export default class GoveeDeviceController
 
 export type GoveeControllerConstructor = new (
     deviceUuid: string,
-    recorder?: XdfRecorder
+    recorder?: XdfRecorder,
+    temperatureUnits?: temperatureUnits
 ) => DeviceControllerBle
 
 export interface GoveeControllerOptions extends DeviceControllerOptions {
     deviceUuid: string
+    temperatureUnits?: temperatureUnits
 }
+
+export type temperatureUnits = 'Celsius' | 'Fahrenheit'

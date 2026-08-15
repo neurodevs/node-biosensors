@@ -1,7 +1,9 @@
 import { test, assert } from '@neurodevs/node-tdd'
 import { BleAdvertisement, FakeBleObserver } from '@neurodevs/node-lsl'
 
-import GoveeDeviceController from '../../impl/govee/GoveeDeviceController.js'
+import GoveeDeviceController, {
+    temperatureUnits,
+} from '../../impl/govee/GoveeDeviceController.js'
 import SpyGoveeController from '../../testDoubles/GoveeController/SpyGoveeController.js'
 import AbstractDeviceControllerTest from '../AbstractDeviceControllerTest.js'
 
@@ -197,6 +199,22 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
         )
     }
 
+    @test()
+    protected static async logsTemperatureInFahrenheitIfPassedTemperatureUnits() {
+        this.instance = await this.GoveeDeviceController('Fahrenheit')
+
+        await this.connect()
+        await this.startStreaming()
+
+        this.receiveAdvertisement()
+
+        assert.isEqual(
+            this.lastLog,
+            `[${this.timestampSec}] temperature: 71.71°F, humidity: 64.79%, battery: 100%`,
+            'Did not log the temperature in Fahrenheit!'
+        )
+    }
+
     private static receiveAdvertisement() {
         this.onAdvertisement(this.advertisement)
     }
@@ -248,7 +266,7 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
     }
 
     private static get onAdvertisement() {
-        const { onAdvertisement } = FakeBleObserver.callsToConstructor[0] ?? {}
+        const { onAdvertisement } = FakeBleObserver.callsToConstructor.at(-1)!
         return onAdvertisement!
     }
 
@@ -262,10 +280,13 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
         } as Console
     }
 
-    private static async GoveeDeviceController() {
+    private static async GoveeDeviceController(
+        temperatureUnits?: temperatureUnits
+    ) {
         const govee = await GoveeDeviceController.Create({
             deviceUuid: this.deviceId,
             xdfRecordPath: this.xdfRecordPath,
+            temperatureUnits,
         })
         return govee as SpyGoveeController
     }
