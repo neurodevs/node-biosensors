@@ -49,7 +49,7 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         deviceName: K,
         options?: PerDeviceOptionsMap[K] & SessionOptions
     ) {
-        this.spec = { deviceName, options } as CreateDeviceSpec
+        this.spec = { deviceName, options } satisfies CreateDeviceSpec
 
         const { xdfRecordPath, webSocketPortStart, createEventMarkerEmitter } =
             options ?? {}

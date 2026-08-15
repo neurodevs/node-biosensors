@@ -24,6 +24,13 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
         timestampSec: this.timestampSec,
     }
 
+    private static readonly nonGoveeAdvertisement: BleAdvertisement = {
+        ...this.advertisement,
+        localName: '',
+        companyId: null,
+        manufacturerData: '',
+    }
+
     protected static async beforeEach() {
         await super.beforeEach()
 
@@ -174,6 +181,19 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
         assert.isUndefined(
             this.lastLog,
             'Should not log advertisements when connected but not streaming!'
+        )
+    }
+
+    @test()
+    protected static async doesNotLogAdvertisementIfNotGoveeCompanyId() {
+        await this.connect()
+        await this.startStreaming()
+
+        this.onAdvertisement(this.nonGoveeAdvertisement)
+
+        assert.isUndefined(
+            this.lastLog,
+            'Should not log advertisements that are not from the Govee device!'
         )
     }
 

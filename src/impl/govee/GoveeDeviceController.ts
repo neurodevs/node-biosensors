@@ -18,6 +18,8 @@ export default class GoveeDeviceController
     public static Class?: GoveeControllerConstructor
     public static log = console
 
+    private readonly goveeCompanyId = 60552
+
     protected readonly observer: BleObserver
     protected readonly deviceUuid: string
 
@@ -80,7 +82,12 @@ export default class GoveeDeviceController
             return
         }
 
-        const { manufacturerData, timestampSec } = advertisement
+        const { companyId, manufacturerData, timestampSec } = advertisement
+
+        if (companyId !== this.goveeCompanyId) {
+            return
+        }
+
         const { temperature, humidity, battery } = this.decode(manufacturerData)
 
         this.log.info(
