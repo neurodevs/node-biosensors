@@ -8,7 +8,11 @@ console.info('Connecting to Govee device...')
 
 await govee.connect()
 
-console.info('Connected to Govee device! Waiting...')
+console.info('Connected to Govee device! Streaming...')
+
+await govee.startStreaming()
+
+console.info('Waiting...')
 
 await new Promise((resolve) => setTimeout(resolve, 300000))
 
