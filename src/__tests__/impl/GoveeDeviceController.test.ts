@@ -215,6 +215,22 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
         )
     }
 
+    @test()
+    protected static async logsTemperatureInKelvinIfPassedtemperatureUnits() {
+        this.instance = await this.GoveeDeviceController('Kelvin')
+
+        await this.connect()
+        await this.startStreaming()
+
+        this.receiveAdvertisement()
+
+        assert.isEqual(
+            this.lastLog,
+            `[${this.timestampSec}] temperature: 295.21K, humidity: 64.79%, battery: 100%`,
+            'Did not log the temperature in Kelvin!'
+        )
+    }
+
     private static receiveAdvertisement() {
         this.onAdvertisement(this.advertisement)
     }

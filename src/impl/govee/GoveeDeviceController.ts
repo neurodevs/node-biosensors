@@ -18,11 +18,17 @@ export default class GoveeDeviceController
     public static Class?: GoveeControllerConstructor
     public static log = console
 
-    private readonly goveeCompanyId = 60552
-
     protected readonly observer: BleObserver
     protected readonly deviceUuid: string
     protected readonly temperatureUnits: temperatureUnits
+
+    private readonly goveeCompanyId = 60552
+
+    private readonly degreesSymbols: Record<temperatureUnits, string> = {
+        Celsius: '°C',
+        Fahrenheit: '°F',
+        Kelvin: 'K',
+    }
 
     protected constructor(
         deviceUuid: string,
@@ -111,15 +117,22 @@ export default class GoveeDeviceController
         }
     }
 
-    private toTemperatureUnits(celsius: number) {
-        if (this.temperatureUnits === 'Celsius') {
-            return celsius
+    private toTemperatureUnits(celsius: number): number {
+        if (this.temperatureUnits === 'Fahrenheit') {
+            return this.round(celsius * (9 / 5) + 32)
         }
-        return Math.round((celsius * (9 / 5) + 32) * 100) / 100
+        if (this.temperatureUnits === 'Kelvin') {
+            return this.round(celsius + 273.15)
+        }
+        return celsius
+    }
+
+    private round(temperature: number) {
+        return Math.round(temperature * 100) / 100
     }
 
     private get degreesSymbol() {
-        return this.temperatureUnits === 'Celsius' ? '°C' : '°F'
+        return this.degreesSymbols[this.temperatureUnits]
     }
 
     private get log() {
@@ -142,4 +155,4 @@ export interface GoveeControllerOptions extends DeviceControllerOptions {
     temperatureUnits?: temperatureUnits
 }
 
-export type temperatureUnits = 'Celsius' | 'Fahrenheit'
+export type temperatureUnits = 'Celsius' | 'Fahrenheit' | 'Kelvin'

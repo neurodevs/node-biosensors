@@ -2,7 +2,7 @@ import GoveeDeviceController from '../impl/govee/GoveeDeviceController.js'
 
 const govee = await GoveeDeviceController.Create({
     deviceUuid: '179F4A82-A2DF-C241-DB2A-1DF990779106',
-    temperatureUnits: 'Fahrenheit',
+    temperatureUnits: 'Kelvin',
 })
 
 console.info('Connecting to Govee device...')
