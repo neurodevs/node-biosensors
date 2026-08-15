@@ -9,8 +9,8 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
     protected static instance: SpyGoveeController
     private static lastLog?: string
 
-    private static readonly timestampSec = 2650540.252988708
-    private static readonly manufacturerData = '88ec00ee08f4176402'
+    private static readonly timestampSec = 303175.794964291
+    private static readonly manufacturerData = '88ec009e084f196402'
 
     private static readonly advertisement: BleAdvertisement = {
         localName: 'GVH5179_9106',
@@ -160,7 +160,7 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
 
         assert.isEqual(
             this.lastLog,
-            `[${this.timestampSec}] ${this.manufacturerData}`,
+            `[${this.timestampSec}] temperature: 22.06°C, humidity: 64.79%, battery: 100%`,
             'Did not log the advertisement as expected!'
         )
     }

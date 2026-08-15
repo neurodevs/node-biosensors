@@ -81,8 +81,21 @@ export default class GoveeDeviceController
         }
 
         const { manufacturerData, timestampSec } = advertisement
+        const { temperature, humidity, battery } = this.decode(manufacturerData)
 
-        this.log.info(`[${timestampSec}] ${manufacturerData}`)
+        this.log.info(
+            `[${timestampSec}] temperature: ${temperature}°C, humidity: ${humidity}%, battery: ${battery}%`
+        )
+    }
+
+    private decode(manufacturerData: string) {
+        const bytes = Buffer.from(manufacturerData, 'hex')
+
+        return {
+            temperature: bytes.readInt16LE(3) / 100,
+            humidity: bytes.readUInt16LE(5) / 100,
+            battery: bytes.readUInt8(7),
+        }
     }
 
     private get log() {
