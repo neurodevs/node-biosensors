@@ -6,7 +6,7 @@ import {
     LslOutlet,
     LslStreamOutlet,
 } from '@neurodevs/node-lsl'
-import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
+import { XdfRecorder } from '@neurodevs/node-xdf'
 
 import {
     DeviceControllerBle,
@@ -42,6 +42,13 @@ export default class GoveeDeviceController
         'type="Battery"',
     ]
 
+    private static readonly sharedOutletOptions = {
+        sampleRateHz: 0,
+        channelFormat: 'float32' as ChannelFormat,
+        manufacturer: 'Govee',
+        chunkSize: 1,
+    }
+
     private localName?: string
 
     protected constructor(options: GoveeControllerConstructorOptions) {
@@ -73,7 +80,7 @@ export default class GoveeDeviceController
         const batteryOutlet = await this.BatteryOutlet()
 
         const recorder = xdfRecordPath
-            ? await this.XdfStreamRecorder(xdfRecordPath)
+            ? await this.XdfStreamRecorder(xdfRecordPath, this.streamQueries)
             : undefined
 
         return new (this.Class ?? this)({
@@ -215,17 +222,6 @@ export default class GoveeDeviceController
             channelNames: ['Battery'],
             units: 'percent',
         })
-    }
-
-    private static readonly sharedOutletOptions = {
-        sampleRateHz: 0,
-        channelFormat: 'float32' as ChannelFormat,
-        manufacturer: 'Govee',
-        chunkSize: 1,
-    }
-
-    public static async XdfStreamRecorder(xdfRecordPath: string) {
-        return await XdfStreamRecorder.Create(xdfRecordPath, this.streamQueries)
     }
 }
 
