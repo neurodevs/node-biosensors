@@ -7,7 +7,7 @@ import {
 } from '@neurodevs/node-lsl'
 
 import GoveeDeviceController, {
-    TemperatureUnits,
+    GoveeControllerOptions,
 } from '../../impl/govee/GoveeDeviceController.js'
 import SpyGoveeController from '../../testDoubles/GoveeController/SpyGoveeController.js'
 import AbstractDeviceControllerTest from '../AbstractDeviceControllerTest.js'
@@ -173,6 +173,21 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
             ['govee-temperature', 'govee-humidity', 'govee-battery'],
             'Did not expose outlets!'
         )
+    }
+
+    @test()
+    protected static async createsWriteStreamIfPassedTxtRecordPath() {
+        await this.assertCreatesWriteStreamIfPassedTxtRecordPath()
+    }
+
+    @test()
+    protected static async doesNotCreateWriteStreamByDefault() {
+        await this.assertDoesNotCreateWriteStreamByDefault()
+    }
+
+    @test()
+    protected static async writesNewlineTerminatedLinesToTxtRecord() {
+        await this.assertWritesNewlineTerminatedLinesToTxtRecord()
     }
 
     @test()
@@ -342,7 +357,9 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
 
     @test()
     protected static async logsTemperatureInFahrenheitIfPassedTemperatureUnits() {
-        this.instance = await this.GoveeDeviceController('Fahrenheit')
+        this.instance = await this.GoveeDeviceController({
+            temperatureUnits: 'Fahrenheit',
+        })
 
         await this.simulateAdvertisementWhileStreaming()
 
@@ -355,7 +372,9 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
 
     @test()
     protected static async logsTemperatureInKelvinIfPassedTemperatureUnits() {
-        this.instance = await this.GoveeDeviceController('Kelvin')
+        this.instance = await this.GoveeDeviceController({
+            temperatureUnits: 'Kelvin',
+        })
 
         await this.simulateAdvertisementWhileStreaming()
 
@@ -412,6 +431,18 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
         )
     }
 
+    protected static async simulateDataWithTxtRecordPath() {
+        this.instance = await this.GoveeDeviceController({
+            txtRecordPath: this.txtRecordPath,
+        })
+
+        await this.simulateAdvertisementWhileStreaming()
+    }
+
+    protected static async simulateDataWithoutTxtRecordPath() {
+        await this.simulateAdvertisementWhileStreaming()
+    }
+
     private static async simulateAdvertisementWhileStreaming() {
         await this.connect()
         await this.startStreaming()
@@ -439,12 +470,12 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
     }
 
     private static async GoveeDeviceController(
-        temperatureUnits?: TemperatureUnits
+        options?: Partial<GoveeControllerOptions>
     ) {
         const govee = await GoveeDeviceController.Create({
             deviceUuid: this.deviceId,
             xdfRecordPath: this.xdfRecordPath,
-            temperatureUnits,
+            ...options,
         })
         return govee as SpyGoveeController
     }

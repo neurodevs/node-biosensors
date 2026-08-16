@@ -1,3 +1,5 @@
+import { WriteStream } from 'node:fs'
+
 import { BleGatt } from '@neurodevs/node-lsl'
 import { XdfRecorder } from '@neurodevs/node-xdf'
 
@@ -6,8 +8,12 @@ import AbstractDeviceController from './AbstractDeviceController.js'
 export default abstract class AbstractDeviceControllerBle extends AbstractDeviceController {
     protected readonly ble: BleGatt
 
-    protected constructor(ble: BleGatt, recorder?: XdfRecorder) {
-        super(recorder)
+    protected constructor(
+        ble: BleGatt,
+        recorder?: XdfRecorder,
+        txtStream?: WriteStream
+    ) {
+        super(recorder, txtStream)
 
         this.ble = ble
     }

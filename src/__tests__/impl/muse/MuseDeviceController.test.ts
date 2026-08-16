@@ -12,28 +12,12 @@ import FakeMuseDetector from '../../../testDoubles/MuseDetector/FakeMuseDetector
 export default class MuseDeviceControllerTest extends AbstractDeviceControllerBleTest {
     protected static instance: SpyMuseController
 
-    private static readonly txtRecordPath = this.generateId()
-
-    private static readonly callsToCreateWriteStream: unknown[] = []
-    private static readonly callsToWriteStream: unknown[] = []
     private static readonly logCalls: unknown[][] = []
 
     protected static async beforeEach() {
         await super.beforeEach()
 
         this.setFakeMuseDetector()
-
-        MuseDeviceController.createWriteStream = (path: any, options?: any) => {
-            this.callsToCreateWriteStream.push({ path, options })
-            return {
-                write: (chunk: any) => {
-                    this.callsToWriteStream.push(chunk)
-                },
-            } as any
-        }
-
-        this.callsToCreateWriteStream.length = 0
-        this.callsToWriteStream.length = 0
 
         MuseDeviceController.log = (...args: unknown[]) => {
             this.logCalls.push(args)
@@ -164,6 +148,21 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
     @test()
     protected static async exposesNameFromBleController() {
         await this.assertExposesNameFromBleController()
+    }
+
+    @test()
+    protected static async createsWriteStreamIfPassedTxtRecordPath() {
+        await this.assertCreatesWriteStreamIfPassedTxtRecordPath()
+    }
+
+    @test()
+    protected static async doesNotCreateWriteStreamByDefault() {
+        await this.assertDoesNotCreateWriteStreamByDefault()
+    }
+
+    @test()
+    protected static async writesNewlineTerminatedLinesToTxtRecord() {
+        await this.assertWritesNewlineTerminatedLinesToTxtRecord()
     }
 
     @test()
@@ -349,6 +348,20 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
             characteristicUuid: CONTROL_UUID,
             value,
         }
+    }
+
+    protected static async simulateDataWithTxtRecordPath() {
+        await this.MuseDeviceController({
+            txtRecordPath: this.txtRecordPath,
+        })
+
+        this.simulateOnData()
+    }
+
+    protected static async simulateDataWithoutTxtRecordPath() {
+        await this.MuseDeviceController()
+
+        this.simulateOnData()
     }
 
     private static simulateOnData() {

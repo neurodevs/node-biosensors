@@ -10,8 +10,8 @@ import {
 } from '@neurodevs/node-lsl'
 
 import MuseDeviceController, {
-    MuseControllerOptions,
     MuseVariant,
+    MuseVariantOptions,
 } from './MuseDeviceController.js'
 
 export default class MuseBleVariant implements MuseVariant {
@@ -85,7 +85,7 @@ export default class MuseBleVariant implements MuseVariant {
         this.streamQueries = streamQueries
     }
 
-    public static async Create(options?: MuseControllerOptions) {
+    public static async Create(options?: MuseVariantOptions) {
         const {
             disableEeg,
             disablePpg,
@@ -136,7 +136,7 @@ export default class MuseBleVariant implements MuseVariant {
     }
 
     private static generateCharCallbacks(
-        options?: MuseControllerOptions,
+        options?: MuseVariantOptions,
         eegOutlet?: LslOutlet,
         ppgOutlet?: LslOutlet,
         gyroOutlet?: LslOutlet,
@@ -149,7 +149,7 @@ export default class MuseBleVariant implements MuseVariant {
         const { disableEeg, disablePpg, disableGyro, disableAccel } =
             options ?? {}
 
-        const { log, stream } = this.resolveLogAndStream(options)
+        const { log, txtStream } = this.resolveLogAndStream(options)
 
         const disabledChars = new Set<string>([
             ...(disableEeg ? this.eegCharNames : []),
@@ -160,25 +160,25 @@ export default class MuseBleVariant implements MuseVariant {
 
         const handleEeg = this.createEegHandler(
             log,
-            stream,
+            txtStream,
             eegOutlet,
             eegRegressor
         )
         const handlePpg = this.createPpgHandler(
             log,
-            stream,
+            txtStream,
             ppgOutlet,
             ppgRegressor
         )
         const handleGyro = this.createGyroHandler(
             log,
-            stream,
+            txtStream,
             gyroOutlet,
             gyroRegressor
         )
         const handleAccel = this.createAccelHandler(
             log,
-            stream,
+            txtStream,
             accelOutlet,
             accelRegressor
         )
@@ -215,7 +215,7 @@ export default class MuseBleVariant implements MuseVariant {
                 const bytes = this.decodeBytes(data, length)
 
                 const msg = this.formatMessage(name, timestampSec, bytes)
-                stream?.write(`${msg}\n`)
+                txtStream?.write(`${msg}\n`)
                 log?.(msg)
 
                 handleData(name, bytes, timestampSec)
@@ -223,21 +223,12 @@ export default class MuseBleVariant implements MuseVariant {
         }))
     }
 
-    protected static resolveLogAndStream(options?: MuseControllerOptions): {
-        log?: (...data: any[]) => void
-        stream?: WriteStream
-    } {
-        const { enableLogs, txtRecordPath } = options ?? {}
+    protected static resolveLogAndStream(options?: MuseVariantOptions) {
+        const { enableLogs, txtStream } = options ?? {}
 
         const log = enableLogs ? MuseDeviceController.log : undefined
 
-        const stream = txtRecordPath
-            ? MuseDeviceController.createWriteStream(txtRecordPath, {
-                  flags: 'a',
-              })
-            : undefined
-
-        return { log, stream }
+        return { log, txtStream }
     }
 
     protected static decodeBytes(data: Buffer, length: number) {

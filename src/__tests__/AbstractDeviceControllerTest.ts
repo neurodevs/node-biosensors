@@ -17,6 +17,10 @@ export default abstract class AbstractDeviceControllerTest extends AbstractPacka
 
     protected static readonly deviceId = this.generateId()
     protected static readonly xdfRecordPath = `${this.generateId()}.xdf`
+    protected static readonly txtRecordPath = `${this.generateId()}.txt`
+
+    protected static readonly callsToCreateWriteStream: unknown[] = []
+    protected static readonly callsToWriteStream: unknown[] = []
 
     protected static async beforeEach() {
         await super.beforeEach()
@@ -24,6 +28,8 @@ export default abstract class AbstractDeviceControllerTest extends AbstractPacka
         AbstractDeviceController.warn = (msg: string) => {
             this.lastWarn = msg
         }
+
+        this.setFakeWriteStream()
     }
 
     protected static async assertCreatesInstance() {
@@ -165,6 +171,54 @@ export default abstract class AbstractDeviceControllerTest extends AbstractPacka
         )
     }
 
+    protected static async assertCreatesWriteStreamIfPassedTxtRecordPath() {
+        await this.simulateDataWithTxtRecordPath()
+
+        assert.isEqualDeep(
+            this.callsToCreateWriteStream,
+            [{ path: this.txtRecordPath, options: { flags: 'a' } }],
+            'Did not create write stream with expected options!'
+        )
+    }
+
+    protected static async assertDoesNotCreateWriteStreamByDefault() {
+        await this.simulateDataWithoutTxtRecordPath()
+
+        assert.isEqualDeep(
+            this.callsToCreateWriteStream,
+            [],
+            'Should not create a write stream without a txtRecordPath!'
+        )
+    }
+
+    protected static async assertWritesNewlineTerminatedLinesToTxtRecord() {
+        await this.simulateDataWithTxtRecordPath()
+
+        assert.isTrue(
+            this.callsToWriteStream.length > 0,
+            'Did not write anything to the txt record!'
+        )
+
+        assert.isTrue(
+            this.callsToWriteStream.every(
+                (chunk) => typeof chunk === 'string' && chunk.endsWith('\n')
+            ),
+            'Did not write newline-terminated lines to the txt record!'
+        )
+    }
+
+    protected static async simulateDataWithTxtRecordPath() {
+        throw new Error(
+            'Subclasses must implement simulateDataWithTxtRecordPath!'
+        )
+    }
+
+    protected static async simulateDataWithoutTxtRecordPath() {
+        throw new Error(
+            'Subclasses must implement simulateDataWithoutTxtRecordPath!'
+        )
+    }
+
     protected static async connect() {
         await this.instance.connect()
     }
@@ -187,5 +241,23 @@ export default abstract class AbstractDeviceControllerTest extends AbstractPacka
 
     protected static get isStreaming() {
         return this.instance.getIsStreaming()
+    }
+
+    protected static setFakeWriteStream() {
+        AbstractDeviceController.createWriteStream = ((
+            path: any,
+            options?: any
+        ) => {
+            this.callsToCreateWriteStream.push({ path, options })
+
+            return {
+                write: (chunk: any) => {
+                    this.callsToWriteStream.push(chunk)
+                },
+            }
+        }) as typeof AbstractDeviceController.createWriteStream
+
+        this.callsToCreateWriteStream.length = 0
+        this.callsToWriteStream.length = 0
     }
 }

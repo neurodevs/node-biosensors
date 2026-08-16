@@ -1,4 +1,4 @@
-import fs from 'node:fs'
+import { WriteStream } from 'node:fs'
 
 import {
     BleGatt,
@@ -45,7 +45,6 @@ export default class MuseDeviceController
     implements DeviceControllerBle
 {
     public static Class?: MuseDeviceControllerConstructor
-    public static createWriteStream = fs.createWriteStream
     public static log = console.info
     public static detectModelTimeoutMs = 5000
     public static detectModelWindowMs = 500
@@ -66,10 +65,16 @@ export default class MuseDeviceController
     }
 
     public static async Create(options?: MuseControllerOptions) {
-        const { xdfRecordPath, model, bleUuid } = options ?? {}
+        const { xdfRecordPath, txtRecordPath, model, bleUuid } = options ?? {}
+
+        const txtStream = this.TxtRecordStream(txtRecordPath)
 
         const deviceModel = model ?? (await detectMuseModel(bleUuid))
-        const variant = await this.createVariant(deviceModel, options)
+
+        const variant = await this.createVariant(deviceModel, {
+            ...options,
+            txtStream,
+        })
 
         const ble = await this.BleGattController(variant.charCallbacks, options)
 
@@ -112,7 +117,7 @@ export default class MuseDeviceController
 
     private static async createVariant(
         model: MuseDeviceModel,
-        options?: MuseControllerOptions
+        options?: MuseVariantOptions
     ) {
         const MuseVariant = MUSE_VARIANTS[model]
         return await MuseVariant.Create({ ...(options ?? {}), model })
@@ -148,6 +153,10 @@ export interface MuseControllerOptions extends DeviceControllerBleOptions {
     disablePpg?: boolean
     disableGyro?: boolean
     disableAccel?: boolean
+}
+
+export interface MuseVariantOptions extends MuseControllerOptions {
+    txtStream?: WriteStream
 }
 
 export interface MuseVariant {

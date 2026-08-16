@@ -2,7 +2,7 @@ import { WriteStream } from 'node:fs'
 
 import { ClockRegressor, LslOutlet } from '@neurodevs/node-lsl'
 
-import { type MuseControllerOptions } from '../MuseDeviceController.js'
+import { type MuseVariantOptions } from '../MuseDeviceController.js'
 import MuseBleVariant from '../MuseBleVariant.js'
 
 export default class MuseSAthena extends MuseBleVariant {
@@ -149,7 +149,7 @@ export default class MuseSAthena extends MuseBleVariant {
         'L1',
     ]
 
-    public static async Create(options?: MuseControllerOptions) {
+    public static async Create(options?: MuseVariantOptions) {
         const {
             disableEeg,
             disablePpg,
@@ -180,10 +180,10 @@ export default class MuseSAthena extends MuseBleVariant {
     }
 
     private static createCharCallbacks(
-        options: MuseControllerOptions | undefined,
+        options: MuseVariantOptions | undefined,
         outlets: AthenaOutlets
     ) {
-        const { log, stream } = this.resolveLogAndStream(options)
+        const { log, txtStream } = this.resolveLogAndStream(options)
 
         const regressors = {
             EEG: this.WindowedClockRegressor(this.sampleRatesHz.EEG!),
@@ -193,7 +193,7 @@ export default class MuseSAthena extends MuseBleVariant {
 
         const handleMessage = this.createMessageHandler(
             log,
-            stream,
+            txtStream,
             outlets,
             regressors
         )

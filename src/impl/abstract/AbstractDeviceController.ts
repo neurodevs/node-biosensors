@@ -1,3 +1,5 @@
+import fs, { WriteStream } from 'node:fs'
+
 import { LslOutlet } from '@neurodevs/node-lsl'
 import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 
@@ -5,14 +7,21 @@ import { DeviceController } from '../BiosensorDeviceFactory.js'
 
 export default abstract class AbstractDeviceController implements DeviceController {
     public static warn = console.warn
+    public static createWriteStream = fs.createWriteStream
 
     protected readonly recorder?: XdfRecorder
+    protected readonly txtStream?: WriteStream
 
     protected isConnected = false
     protected isStreaming = false
 
-    protected constructor(recorder?: XdfRecorder) {
+    protected constructor(recorder?: XdfRecorder, txtStream?: WriteStream) {
         this.recorder = recorder
+        this.txtStream = txtStream
+    }
+
+    protected writeToTxtRecord(message: string) {
+        this.txtStream?.write(`${message}\n`)
     }
 
     public async connect() {
@@ -78,6 +87,12 @@ export default abstract class AbstractDeviceController implements DeviceControll
 
     private get warn() {
         return AbstractDeviceController.warn
+    }
+
+    protected static TxtRecordStream(txtRecordPath?: string) {
+        return txtRecordPath
+            ? this.createWriteStream(txtRecordPath, { flags: 'a' })
+            : undefined
     }
 
     protected static async XdfStreamRecorder(

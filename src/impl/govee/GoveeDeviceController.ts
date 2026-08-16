@@ -6,6 +6,8 @@ import {
     LslOutlet,
     LslStreamOutlet,
 } from '@neurodevs/node-lsl'
+import { WriteStream } from 'node:fs'
+
 import { XdfRecorder } from '@neurodevs/node-xdf'
 
 import {
@@ -55,13 +57,14 @@ export default class GoveeDeviceController
         const {
             deviceUuid,
             recorder,
+            txtStream,
             temperatureUnits,
             temperatureOutlet,
             humidityOutlet,
             batteryOutlet,
         } = options
 
-        super(recorder)
+        super(recorder, txtStream)
 
         this.deviceUuid = deviceUuid
         this.temperatureUnits = temperatureUnits ?? 'Celsius'
@@ -73,7 +76,8 @@ export default class GoveeDeviceController
     }
 
     public static async Create(options: GoveeControllerOptions) {
-        const { deviceUuid, xdfRecordPath, temperatureUnits } = options
+        const { deviceUuid, xdfRecordPath, txtRecordPath, temperatureUnits } =
+            options
 
         const temperatureOutlet = await this.TemperatureOutlet(temperatureUnits)
         const humidityOutlet = await this.HumidityOutlet()
@@ -83,9 +87,12 @@ export default class GoveeDeviceController
             ? await this.XdfStreamRecorder(xdfRecordPath, this.streamQueries)
             : undefined
 
+        const txtStream = this.TxtRecordStream(txtRecordPath)
+
         return new (this.Class ?? this)({
             deviceUuid,
             recorder,
+            txtStream,
             temperatureUnits,
             temperatureOutlet,
             humidityOutlet,
@@ -145,9 +152,10 @@ export default class GoveeDeviceController
         this.humidityOutlet.pushSample([humidity], timestampSec)
         this.batteryOutlet.pushSample([battery], timestampSec)
 
-        this.log.info(
-            `[${timestampSec}] temperature: ${temperature}${this.degreesSymbol}, humidity: ${humidity}%, battery: ${battery}%`
-        )
+        const message = `[${timestampSec}] temperature: ${temperature}${this.degreesSymbol}, humidity: ${humidity}%, battery: ${battery}%`
+
+        this.writeToTxtRecord(message)
+        this.log.info(message)
     }
 
     private decode(manufacturerData: string) {
@@ -227,6 +235,7 @@ export default class GoveeDeviceController
 
 export interface GoveeControllerOptions extends DeviceControllerOptions {
     deviceUuid: string
+    txtRecordPath?: string
     temperatureUnits?: TemperatureUnits
 }
 
@@ -236,11 +245,12 @@ export type GoveeControllerConstructor = new (
 
 export interface GoveeControllerConstructorOptions {
     deviceUuid: string
-    recorder?: XdfRecorder
-    temperatureUnits?: TemperatureUnits
     temperatureOutlet: LslOutlet
     humidityOutlet: LslOutlet
     batteryOutlet: LslOutlet
+    recorder?: XdfRecorder
+    txtStream?: WriteStream
+    temperatureUnits?: TemperatureUnits
 }
 
 export type TemperatureUnits = 'Celsius' | 'Fahrenheit' | 'Kelvin'
