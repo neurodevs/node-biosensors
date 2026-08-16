@@ -10,6 +10,9 @@ import BiosensorWebSocketGateway, {
     WebSocketGateway,
 } from './BiosensorWebSocketGateway.js'
 import CgxDeviceController from './cognionics/CgxDeviceController.js'
+import GoveeDeviceController, {
+    GoveeControllerOptions,
+} from './govee/GoveeDeviceController.js'
 import ZephyrDeviceController from './zephyr/ZephyrDeviceController.js'
 import MuseDeviceController, {
     MuseControllerOptions,
@@ -21,6 +24,7 @@ import CytonDeviceController, {
 
 export const DEVICE_NAMES = [
     'Cognionics Quick-20r',
+    'Govee Thermohygrometer H5074',
     'Muse S Athena',
     'Muse S Gen 2',
     'Muse S Gen 1',
@@ -85,6 +89,8 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         switch (deviceName) {
             case 'Cognionics Quick-20r':
                 return this.CgxDeviceController()
+            case 'Govee Thermohygrometer H5074':
+                return this.GoveeDeviceController(options)
             case 'Muse S Athena':
             case 'Muse S Gen 2':
             case 'Muse S Gen 1':
@@ -171,6 +177,13 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
 
     private async CgxDeviceController() {
         return CgxDeviceController.Create()
+    }
+
+    private async GoveeDeviceController(
+        options?: Partial<GoveeControllerOptions>
+    ) {
+        const { deviceUuid = '' } = options ?? {}
+        return GoveeDeviceController.Create({ ...options, deviceUuid })
     }
 
     private CytonDeviceController(options?: CytonControllerOptions) {
@@ -264,6 +277,7 @@ export interface PerDeviceOptionsMap extends Record<
     DeviceControllerOptions
 > {
     'Cognionics Quick-20r': DeviceControllerOptions
+    'Govee Thermohygrometer H5074': Partial<GoveeControllerOptions>
     'Muse S Athena': MuseControllerOptions
     'Muse S Gen 2': MuseControllerOptions
     'Muse S Gen 1': MuseControllerOptions

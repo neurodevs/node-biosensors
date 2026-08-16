@@ -214,6 +214,11 @@ export default class GoveeDeviceController
     }
 }
 
+export interface GoveeControllerOptions extends DeviceControllerOptions {
+    deviceUuid: string
+    temperatureUnits?: TemperatureUnits
+}
+
 export type GoveeControllerConstructor = new (
     options: GoveeControllerConstructorOptions
 ) => DeviceControllerBle
@@ -225,11 +230,6 @@ export interface GoveeControllerConstructorOptions {
     temperatureOutlet: LslOutlet
     humidityOutlet: LslOutlet
     batteryOutlet: LslOutlet
-}
-
-export interface GoveeControllerOptions extends DeviceControllerOptions {
-    deviceUuid: string
-    temperatureUnits?: TemperatureUnits
 }
 
 export type TemperatureUnits = 'Celsius' | 'Fahrenheit' | 'Kelvin'

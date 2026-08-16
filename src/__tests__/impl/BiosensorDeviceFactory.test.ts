@@ -17,6 +17,7 @@ import BiosensorDeviceFactory, {
 import AbstractPackageTest from '../AbstractPackageTest.js'
 import { MuseControllerOptions } from '../../impl/muse/MuseDeviceController.js'
 import FakeMuseController from '../../testDoubles/MuseController/FakeMuseController.js'
+import { GoveeControllerOptions } from '../../impl/govee/GoveeDeviceController.js'
 
 export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
     private static instance: DeviceFactory
@@ -24,6 +25,7 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
     private static readonly xdfRecordPath = generateId()
     private static readonly webSocketPortStart = randomInt(1000, 5000)
     private static readonly museBleUuid = this.generateId()
+    private static readonly goveeDeviceUuid = this.generateId()
     private static readonly cgxStreamQueries = ['type="EEG"', 'type="ACCEL"']
 
     private static readonly museSGen2StreamQueries = [
@@ -67,6 +69,12 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
     @test()
     protected static async createsDeviceForMuseController() {
         const { device } = await this.createMuseController()
+        this.assertDeviceIsTruthy(device)
+    }
+
+    @test()
+    protected static async createsDeviceForGoveeController() {
+        const { device } = await this.createGoveeController()
         this.assertDeviceIsTruthy(device)
     }
 
@@ -120,7 +128,7 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
 
         await assert.doesThrowAsync(
             async () => await this.instance.createDevice(invalidName),
-            `\n\n Invalid device name: ${invalidName}! \n\n Please choose from: \n\n - Cognionics Quick-20r \n - Muse S Athena \n - Muse S Gen 2 \n - Muse S Gen 1 \n - Muse 2 \n - Muse 1 Gen 2 \n - OpenBCI Cyton \n - Zephyr BioHarness 3 \n\n`
+            `\n\n Invalid device name: ${invalidName}! \n\n Please choose from: \n\n - Cognionics Quick-20r \n - Govee Thermohygrometer H5074 \n - Muse S Athena \n - Muse S Gen 2 \n - Muse S Gen 1 \n - Muse 2 \n - Muse 1 Gen 2 \n - OpenBCI Cyton \n - Zephyr BioHarness 3 \n\n`
         )
     }
 
@@ -378,6 +386,15 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
         options?: DeviceControllerOptions
     ) {
         return this.instance.createDevice('OpenBCI Cyton', options)
+    }
+
+    private static async createGoveeController(
+        options?: GoveeControllerOptions
+    ) {
+        return this.instance.createDevice('Govee Thermohygrometer H5074', {
+            deviceUuid: this.goveeDeviceUuid,
+            ...options,
+        })
     }
 
     private static async createZephyrController(

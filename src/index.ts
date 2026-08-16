@@ -40,7 +40,7 @@ export * from './testDoubles/CgxController/FakeCgxController.js'
 export { default as SpyCgxController } from './testDoubles/CgxController/SpyCgxController.js'
 export * from './testDoubles/CgxController/SpyCgxController.js'
 
-// Govee Thermohygrometer (H5075)
+// Govee Thermohygrometer (H5074)
 
 export { default as GoveeDeviceController } from './impl/govee/GoveeDeviceController.js'
 export * from './impl/govee/GoveeDeviceController.js'

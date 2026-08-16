@@ -41,9 +41,11 @@ import BiosensorDeviceFactory, {
 } from '../impl/BiosensorDeviceFactory.js'
 import BiosensorWebSocketGateway from '../impl/BiosensorWebSocketGateway.js'
 import CgxDeviceController from '../impl/cognionics/CgxDeviceController.js'
+import GoveeDeviceController from '../impl/govee/GoveeDeviceController.js'
 import ZephyrDeviceController from '../impl/zephyr/ZephyrDeviceController.js'
 import FakeDeviceFactory from '../testDoubles/DeviceFactory/FakeDeviceFactory.js'
 import FakeCgxController from '../testDoubles/CgxController/FakeCgxController.js'
+import FakeGoveeController from '../testDoubles/GoveeController/FakeGoveeController.js'
 import SpyCgxController from '../testDoubles/CgxController/SpyCgxController.js'
 import FakeDeviceController from '../testDoubles/DeviceController/FakeDeviceController.js'
 import FakeZephyrController from '../testDoubles/ZephyrController/FakeZephyrController.js'
@@ -149,6 +151,7 @@ export default class AbstractPackageTest extends AbstractModuleTest {
     protected static setFakeDevices() {
         this.setFakeCgxController()
         this.setFakeCytonController()
+        this.setFakeGoveeController()
         this.setFakeMuseController()
         this.setFakeZephyrController()
 
@@ -168,6 +171,11 @@ export default class AbstractPackageTest extends AbstractModuleTest {
     protected static setFakeCgxController() {
         CgxDeviceController.Class = FakeCgxController
         FakeCgxController.resetTestDouble()
+    }
+
+    protected static setFakeGoveeController() {
+        GoveeDeviceController.Class = FakeGoveeController
+        FakeGoveeController.resetTestDouble()
     }
 
     protected static setFakeCytonController() {
