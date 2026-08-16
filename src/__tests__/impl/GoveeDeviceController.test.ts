@@ -1,4 +1,5 @@
 import { test, assert } from '@neurodevs/node-tdd'
+import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 import {
     BleAdvertisement,
     FakeBleObserver,
@@ -17,6 +18,12 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
 
     private static readonly timestampSec = 303175.794964291
     private static readonly manufacturerData = '88ec009e084f196402'
+
+    private static readonly streamQueries = [
+        'type="Temperature"',
+        'type="Humidity"',
+        'type="Battery"',
+    ]
 
     private static readonly advertisement: BleAdvertisement = {
         localName: 'GVH5179_9106',
@@ -138,14 +145,32 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
 
     @test()
     protected static async exposesLslOutlets() {
-        const sourceIds = this.instance.outlets.map(
-            (outlet) => outlet.sourceId
-        )
+        const sourceIds = this.instance.outlets.map((outlet) => outlet.sourceId)
 
         assert.isEqualDeep(
             sourceIds,
             ['govee-temperature', 'govee-humidity', 'govee-battery'],
             'Did not expose outlets!'
+        )
+    }
+
+    @test()
+    protected static async exposesStreamQueries() {
+        assert.isEqualDeep(
+            this.instance.streamQueries,
+            this.streamQueries,
+            'Did not expose stream queries!'
+        )
+    }
+
+    @test()
+    protected static async passesStreamQueriesToXdfRecorder() {
+        const { streamQueries } = FakeXdfRecorder.callsToConstructor[0] ?? {}
+
+        assert.isEqualDeep(
+            streamQueries,
+            this.streamQueries,
+            'Did not pass the stream queries to the XdfRecorder!'
         )
     }
 

@@ -36,6 +36,12 @@ export default class GoveeDeviceController
         Kelvin: 'K',
     }
 
+    private static readonly streamQueries = [
+        'type="Temperature"',
+        'type="Humidity"',
+        'type="Battery"',
+    ]
+
     protected constructor(options: GoveeControllerConstructorOptions) {
         const {
             deviceUuid,
@@ -91,15 +97,11 @@ export default class GoveeDeviceController
     protected async handleStopStreaming() {}
 
     public get outlets() {
-        return [
-            this.temperatureOutlet,
-            this.humidityOutlet,
-            this.batteryOutlet,
-        ]
+        return [this.temperatureOutlet, this.humidityOutlet, this.batteryOutlet]
     }
 
     public get streamQueries() {
-        return []
+        return GoveeDeviceController.streamQueries
     }
 
     protected get deviceId() {
@@ -218,7 +220,7 @@ export default class GoveeDeviceController
     }
 
     public static async XdfStreamRecorder(xdfRecordPath: string) {
-        return await XdfStreamRecorder.Create(xdfRecordPath, [])
+        return await XdfStreamRecorder.Create(xdfRecordPath, this.streamQueries)
     }
 }
 
