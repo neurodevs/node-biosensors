@@ -90,6 +90,14 @@ export default class GoveeDeviceController
 
     protected async handleStopStreaming() {}
 
+    public get outlets() {
+        return [
+            this.temperatureOutlet,
+            this.humidityOutlet,
+            this.batteryOutlet,
+        ]
+    }
+
     public get streamQueries() {
         return []
     }

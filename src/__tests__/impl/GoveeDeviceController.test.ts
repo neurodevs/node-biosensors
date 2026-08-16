@@ -138,9 +138,13 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
 
     @test()
     protected static async exposesLslOutlets() {
-        assert.isEqual(
-            this.instance.outlets.length,
-            0,
+        const sourceIds = this.instance.outlets.map(
+            (outlet) => outlet.sourceId
+        )
+
+        assert.isEqualDeep(
+            sourceIds,
+            ['govee-temperature', 'govee-humidity', 'govee-battery'],
             'Did not expose outlets!'
         )
     }

@@ -1,3 +1,4 @@
+import { LslOutlet } from '@neurodevs/node-lsl'
 import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 
 import { DeviceController } from '../BiosensorDeviceFactory.js'
@@ -59,7 +60,7 @@ export default abstract class AbstractDeviceController implements DeviceControll
         this.recorder?.finish()
     }
 
-    public get outlets() {
+    public get outlets(): LslOutlet[] {
         return []
     }
 
