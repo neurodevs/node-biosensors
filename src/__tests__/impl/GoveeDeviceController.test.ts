@@ -16,6 +16,7 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
     protected static instance: SpyGoveeController
     private static lastLog?: string
 
+    private static readonly localName = this.generateId()
     private static readonly timestampSec = 303175.794964291
     private static readonly manufacturerData = '88ec009e084f196402'
 
@@ -26,7 +27,7 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
     ]
 
     private static readonly advertisement: BleAdvertisement = {
-        localName: 'GVH5179_9106',
+        localName: this.localName,
         companyId: 0xec88,
         manufacturerData: this.manufacturerData,
         serviceUuids: [],
@@ -140,6 +141,26 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
             this.instance.bleUuid,
             this.deviceId,
             'Did not expose the device uuid!'
+        )
+    }
+
+    @test()
+    protected static async startsWithNotAvailableBleName() {
+        assert.isEqual(
+            this.instance.bleName,
+            'N/A',
+            'Should not have a bleName before receiving an advertisement!'
+        )
+    }
+
+    @test()
+    protected static async exposesBleNameFromAdvertisement() {
+        await this.simulateAdvertisementWhileStreaming()
+
+        assert.isEqual(
+            this.instance.bleName,
+            this.localName,
+            'Did not expose the bleName from the advertisement!'
         )
     }
 

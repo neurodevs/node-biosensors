@@ -42,6 +42,8 @@ export default class GoveeDeviceController
         'type="Battery"',
     ]
 
+    private localName?: string
+
     protected constructor(options: GoveeControllerConstructorOptions) {
         const {
             deviceUuid,
@@ -113,16 +115,7 @@ export default class GoveeDeviceController
     }
 
     public get bleName() {
-        return ''
-    }
-
-    private BleObserverController() {
-        return BleObserverController.Create({
-            deviceUuid: this.deviceUuid,
-            onAdvertisement: (advertisement: BleAdvertisement) => {
-                this.handleAdvertisement(advertisement)
-            },
-        })
+        return this.localName ?? 'N/A'
     }
 
     protected handleAdvertisement(advertisement: BleAdvertisement) {
@@ -130,13 +123,16 @@ export default class GoveeDeviceController
             return
         }
 
-        const { companyId, manufacturerData, timestampSec } = advertisement
+        const { companyId } = advertisement
 
         if (companyId !== this.goveeCompanyId) {
             return
         }
 
+        const { manufacturerData, timestampSec, localName } = advertisement
         const { temperature, humidity, battery } = this.decode(manufacturerData)
+
+        this.localName ??= localName
 
         this.temperatureOutlet.pushSample([temperature], timestampSec)
         this.humidityOutlet.pushSample([humidity], timestampSec)
@@ -177,6 +173,15 @@ export default class GoveeDeviceController
 
     private get log() {
         return GoveeDeviceController.log
+    }
+
+    private BleObserverController() {
+        return BleObserverController.Create({
+            deviceUuid: this.deviceUuid,
+            onAdvertisement: (advertisement: BleAdvertisement) => {
+                this.handleAdvertisement(advertisement)
+            },
+        })
     }
 
     private static async TemperatureOutlet(units?: TemperatureUnits) {
