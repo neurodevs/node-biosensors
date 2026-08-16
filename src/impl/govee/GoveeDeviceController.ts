@@ -128,6 +128,10 @@ export default class GoveeDeviceController
 
         const { temperature, humidity, battery } = this.decode(manufacturerData)
 
+        this.temperatureOutlet.pushSample([temperature], timestampSec)
+        this.humidityOutlet.pushSample([humidity], timestampSec)
+        this.batteryOutlet.pushSample([battery], timestampSec)
+
         this.log.info(
             `[${timestampSec}] temperature: ${temperature}${this.degreesSymbol}, humidity: ${humidity}%, battery: ${battery}%`
         )

@@ -223,10 +223,7 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
 
     @test()
     protected static async onAdvertisementLogsPacketWhenStreaming() {
-        await this.connect()
-        await this.startStreaming()
-
-        this.receiveAdvertisement()
+        await this.simulateAdvertisementWhileStreaming()
 
         assert.isEqual(
             this.lastLog,
@@ -236,10 +233,43 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
     }
 
     @test()
+    protected static async onAdvertisementPushesTemperatureToOutlet() {
+        await this.simulateAdvertisementWhileStreaming()
+
+        assert.isEqualDeep(
+            FakeLslOutlet.callsToPushSample[0],
+            { sample: [22.06], timestampSec: this.timestampSec },
+            'Did not push the temperature to its LslOutlet!'
+        )
+    }
+
+    @test()
+    protected static async onAdvertisementPushesHumidityToOutlet() {
+        await this.simulateAdvertisementWhileStreaming()
+
+        assert.isEqualDeep(
+            FakeLslOutlet.callsToPushSample[1],
+            { sample: [64.79], timestampSec: this.timestampSec },
+            'Did not push the humidity to its LslOutlet!'
+        )
+    }
+
+    @test()
+    protected static async onAdvertisementPushesBatteryToOutlet() {
+        await this.simulateAdvertisementWhileStreaming()
+
+        assert.isEqualDeep(
+            FakeLslOutlet.callsToPushSample[2],
+            { sample: [100], timestampSec: this.timestampSec },
+            'Did not push the battery to its LslOutlet!'
+        )
+    }
+
+    @test()
     protected static async doesNotLogAdvertisementIfNotStreaming() {
         await this.connect()
 
-        this.receiveAdvertisement()
+        this.simulateAdvertisement()
 
         assert.isUndefined(
             this.lastLog,
@@ -264,10 +294,7 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
     protected static async logsTemperatureInFahrenheitIfPassedTemperatureUnits() {
         this.instance = await this.GoveeDeviceController('Fahrenheit')
 
-        await this.connect()
-        await this.startStreaming()
-
-        this.receiveAdvertisement()
+        await this.simulateAdvertisementWhileStreaming()
 
         assert.isEqual(
             this.lastLog,
@@ -280,20 +307,13 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
     protected static async logsTemperatureInKelvinIfPassedtemperatureUnits() {
         this.instance = await this.GoveeDeviceController('Kelvin')
 
-        await this.connect()
-        await this.startStreaming()
-
-        this.receiveAdvertisement()
+        await this.simulateAdvertisementWhileStreaming()
 
         assert.isEqual(
             this.lastLog,
             `[${this.timestampSec}] temperature: 295.21K, humidity: 64.79%, battery: 100%`,
             'Did not log the temperature in Kelvin!'
         )
-    }
-
-    private static receiveAdvertisement() {
-        this.onAdvertisement(this.advertisement)
     }
 
     @test()
@@ -340,6 +360,17 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
             0,
             'Should not call stopObserving if not connected!'
         )
+    }
+
+    private static async simulateAdvertisementWhileStreaming() {
+        await this.connect()
+        await this.startStreaming()
+
+        this.simulateAdvertisement()
+    }
+
+    private static simulateAdvertisement() {
+        this.onAdvertisement(this.advertisement)
     }
 
     private static get onAdvertisement() {
