@@ -1,3 +1,5 @@
+import { FakeLslOutlet } from '@neurodevs/node-lsl'
+
 import { DeviceControllerBle } from '../../impl/BiosensorDeviceFactory.js'
 import { GoveeControllerConstructorOptions } from '../../impl/govee/GoveeDeviceController.js'
 
@@ -8,7 +10,13 @@ export default class FakeGoveeController implements DeviceControllerBle {
     public static numCallsToStopStreaming = 0
     public static numCallsToDisconnect = 0
 
+    private readonly deviceUuid: string
+
     public constructor(options: GoveeControllerConstructorOptions) {
+        const { deviceUuid } = options
+
+        this.deviceUuid = deviceUuid
+
         FakeGoveeController.callsToConstructor.push(options)
     }
 
@@ -28,14 +36,22 @@ export default class FakeGoveeController implements DeviceControllerBle {
         FakeGoveeController.numCallsToDisconnect++
     }
 
+    public fakeTemperatureOutlet = new FakeLslOutlet()
+    public fakeHumidityOutlet = new FakeLslOutlet()
+    public fakeBatteryOutlet = new FakeLslOutlet()
+
     public get outlets() {
-        return []
+        return [
+            this.fakeTemperatureOutlet,
+            this.fakeHumidityOutlet,
+            this.fakeBatteryOutlet,
+        ]
     }
 
     public streamQueries = []
 
     public get bleUuid() {
-        return ''
+        return this.deviceUuid
     }
 
     public get bleName() {
