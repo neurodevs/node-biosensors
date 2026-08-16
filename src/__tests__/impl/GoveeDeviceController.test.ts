@@ -6,7 +6,7 @@ import {
 } from '@neurodevs/node-lsl'
 
 import GoveeDeviceController, {
-    temperatureUnits,
+    TemperatureUnits,
 } from '../../impl/govee/GoveeDeviceController.js'
 import SpyGoveeController from '../../testDoubles/GoveeController/SpyGoveeController.js'
 import AbstractDeviceControllerTest from '../AbstractDeviceControllerTest.js'
@@ -304,7 +304,7 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
     }
 
     @test()
-    protected static async logsTemperatureInKelvinIfPassedtemperatureUnits() {
+    protected static async logsTemperatureInKelvinIfPassedTemperatureUnits() {
         this.instance = await this.GoveeDeviceController('Kelvin')
 
         await this.simulateAdvertisementWhileStreaming()
@@ -389,7 +389,7 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
     }
 
     private static async GoveeDeviceController(
-        temperatureUnits?: temperatureUnits
+        temperatureUnits?: TemperatureUnits
     ) {
         const govee = await GoveeDeviceController.Create({
             deviceUuid: this.deviceId,

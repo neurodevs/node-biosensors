@@ -23,14 +23,14 @@ export default class GoveeDeviceController
 
     protected readonly observer: BleObserver
     protected readonly deviceUuid: string
-    protected readonly temperatureUnits: temperatureUnits
+    protected readonly temperatureUnits: TemperatureUnits
     protected readonly temperatureOutlet: LslOutlet
     protected readonly humidityOutlet: LslOutlet
     protected readonly batteryOutlet: LslOutlet
 
     private readonly goveeCompanyId = 60552
 
-    private readonly degreesSymbols: Record<temperatureUnits, string> = {
+    private readonly degreesSymbols: Record<TemperatureUnits, string> = {
         Celsius: '°C',
         Fahrenheit: '°F',
         Kelvin: 'K',
@@ -169,7 +169,7 @@ export default class GoveeDeviceController
         return GoveeDeviceController.log
     }
 
-    private static async TemperatureOutlet(units?: temperatureUnits) {
+    private static async TemperatureOutlet(units?: TemperatureUnits) {
         return await LslStreamOutlet.Create({
             ...this.sharedOutletOptions,
             sourceId: 'govee-temperature',
@@ -221,7 +221,7 @@ export type GoveeControllerConstructor = new (
 export interface GoveeControllerConstructorOptions {
     deviceUuid: string
     recorder?: XdfRecorder
-    temperatureUnits?: temperatureUnits
+    temperatureUnits?: TemperatureUnits
     temperatureOutlet: LslOutlet
     humidityOutlet: LslOutlet
     batteryOutlet: LslOutlet
@@ -229,7 +229,7 @@ export interface GoveeControllerConstructorOptions {
 
 export interface GoveeControllerOptions extends DeviceControllerOptions {
     deviceUuid: string
-    temperatureUnits?: temperatureUnits
+    temperatureUnits?: TemperatureUnits
 }
 
-export type temperatureUnits = 'Celsius' | 'Fahrenheit' | 'Kelvin'
+export type TemperatureUnits = 'Celsius' | 'Fahrenheit' | 'Kelvin'
