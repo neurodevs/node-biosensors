@@ -1,7 +1,10 @@
+import { ChannelFormat } from '@neurodevs/ndx-native'
 import {
     BleAdvertisement,
     BleObserver,
     BleObserverController,
+    LslOutlet,
+    LslStreamOutlet,
 } from '@neurodevs/node-lsl'
 import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 
@@ -21,6 +24,9 @@ export default class GoveeDeviceController
     protected readonly observer: BleObserver
     protected readonly deviceUuid: string
     protected readonly temperatureUnits: temperatureUnits
+    protected readonly temperatureOutlet: LslOutlet
+    protected readonly humidityOutlet: LslOutlet
+    protected readonly batteryOutlet: LslOutlet
 
     private readonly goveeCompanyId = 60552
 
@@ -30,26 +36,46 @@ export default class GoveeDeviceController
         Kelvin: 'K',
     }
 
-    protected constructor(
-        deviceUuid: string,
-        recorder?: XdfRecorder,
-        temperatureUnits?: temperatureUnits
-    ) {
+    protected constructor(options: GoveeControllerConstructorOptions) {
+        const {
+            deviceUuid,
+            recorder,
+            temperatureUnits,
+            temperatureOutlet,
+            humidityOutlet,
+            batteryOutlet,
+        } = options
+
         super(recorder)
 
         this.deviceUuid = deviceUuid
         this.temperatureUnits = temperatureUnits ?? 'Celsius'
+        this.temperatureOutlet = temperatureOutlet
+        this.humidityOutlet = humidityOutlet
+        this.batteryOutlet = batteryOutlet
+
         this.observer = this.BleObserverController()
     }
 
     public static async Create(options: GoveeControllerOptions) {
         const { deviceUuid, xdfRecordPath, temperatureUnits } = options
 
+        const temperatureOutlet = await this.TemperatureOutlet(temperatureUnits)
+        const humidityOutlet = await this.HumidityOutlet()
+        const batteryOutlet = await this.BatteryOutlet()
+
         const recorder = xdfRecordPath
             ? await this.XdfStreamRecorder(xdfRecordPath)
             : undefined
 
-        return new (this.Class ?? this)(deviceUuid, recorder, temperatureUnits)
+        return new (this.Class ?? this)({
+            deviceUuid,
+            recorder,
+            temperatureUnits,
+            temperatureOutlet,
+            humidityOutlet,
+            batteryOutlet,
+        })
     }
 
     protected async handleConnect() {
@@ -139,16 +165,63 @@ export default class GoveeDeviceController
         return GoveeDeviceController.log
     }
 
+    private static async TemperatureOutlet(units?: temperatureUnits) {
+        return await LslStreamOutlet.Create({
+            ...this.sharedOutletOptions,
+            sourceId: 'govee-temperature',
+            name: 'Govee Temperature',
+            type: 'Temperature',
+            channelNames: ['Temperature'],
+            units: units ?? 'Celsius',
+        })
+    }
+
+    private static async HumidityOutlet() {
+        return await LslStreamOutlet.Create({
+            ...this.sharedOutletOptions,
+            sourceId: 'govee-humidity',
+            name: 'Govee Humidity',
+            type: 'Humidity',
+            channelNames: ['Humidity'],
+            units: 'percent',
+        })
+    }
+
+    private static async BatteryOutlet() {
+        return await LslStreamOutlet.Create({
+            ...this.sharedOutletOptions,
+            sourceId: 'govee-battery',
+            name: 'Govee Battery',
+            type: 'Battery',
+            channelNames: ['Battery'],
+            units: 'percent',
+        })
+    }
+
+    private static readonly sharedOutletOptions = {
+        sampleRateHz: 0,
+        channelFormat: 'float32' as ChannelFormat,
+        manufacturer: 'Govee',
+        chunkSize: 1,
+    }
+
     public static async XdfStreamRecorder(xdfRecordPath: string) {
         return await XdfStreamRecorder.Create(xdfRecordPath, [])
     }
 }
 
 export type GoveeControllerConstructor = new (
-    deviceUuid: string,
-    recorder?: XdfRecorder,
-    temperatureUnits?: temperatureUnits
+    options: GoveeControllerConstructorOptions
 ) => DeviceControllerBle
+
+export interface GoveeControllerConstructorOptions {
+    deviceUuid: string
+    recorder?: XdfRecorder
+    temperatureUnits?: temperatureUnits
+    temperatureOutlet: LslOutlet
+    humidityOutlet: LslOutlet
+    batteryOutlet: LslOutlet
+}
 
 export interface GoveeControllerOptions extends DeviceControllerOptions {
     deviceUuid: string

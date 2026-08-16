@@ -1,5 +1,9 @@
 import { test, assert } from '@neurodevs/node-tdd'
-import { BleAdvertisement, FakeBleObserver } from '@neurodevs/node-lsl'
+import {
+    BleAdvertisement,
+    FakeBleObserver,
+    FakeLslOutlet,
+} from '@neurodevs/node-lsl'
 
 import GoveeDeviceController, {
     temperatureUnits,
@@ -138,6 +142,63 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
             this.instance.outlets.length,
             0,
             'Did not expose outlets!'
+        )
+    }
+
+    @test()
+    protected static async createsLslOutletForTemperature() {
+        assert.isEqualDeep(
+            FakeLslOutlet.callsToConstructor[0],
+            {
+                sourceId: 'govee-temperature',
+                name: 'Govee Temperature',
+                type: 'Temperature',
+                channelNames: ['Temperature'],
+                sampleRateHz: 0,
+                channelFormat: 'float32',
+                manufacturer: 'Govee',
+                units: 'Celsius',
+                chunkSize: 1,
+            },
+            'Did not create an LslOutlet for temperature!'
+        )
+    }
+
+    @test()
+    protected static async createsLslOutletForHumidity() {
+        assert.isEqualDeep(
+            FakeLslOutlet.callsToConstructor[1],
+            {
+                sourceId: 'govee-humidity',
+                name: 'Govee Humidity',
+                type: 'Humidity',
+                channelNames: ['Humidity'],
+                sampleRateHz: 0,
+                channelFormat: 'float32',
+                manufacturer: 'Govee',
+                units: 'percent',
+                chunkSize: 1,
+            },
+            'Did not create an LslOutlet for humidity!'
+        )
+    }
+
+    @test()
+    protected static async createsLslOutletForBattery() {
+        assert.isEqualDeep(
+            FakeLslOutlet.callsToConstructor[2],
+            {
+                sourceId: 'govee-battery',
+                name: 'Govee Battery',
+                type: 'Battery',
+                channelNames: ['Battery'],
+                sampleRateHz: 0,
+                channelFormat: 'float32',
+                manufacturer: 'Govee',
+                units: 'percent',
+                chunkSize: 1,
+            },
+            'Did not create an LslOutlet for battery!'
         )
     }
 

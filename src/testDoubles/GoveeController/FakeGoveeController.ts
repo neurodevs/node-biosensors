@@ -1,19 +1,15 @@
-import { XdfRecorder } from '@neurodevs/node-xdf'
-
 import { DeviceControllerBle } from '../../impl/BiosensorDeviceFactory.js'
+import { GoveeControllerConstructorOptions } from '../../impl/govee/GoveeDeviceController.js'
 
 export default class FakeGoveeController implements DeviceControllerBle {
-    public static callsToConstructor: {
-        deviceUuid: string
-        recorder?: XdfRecorder
-    }[] = []
+    public static callsToConstructor: GoveeControllerConstructorOptions[] = []
     public static numCallsToConnect = 0
     public static numCallsToStartStreaming = 0
     public static numCallsToStopStreaming = 0
     public static numCallsToDisconnect = 0
 
-    public constructor(deviceUuid: string, recorder?: XdfRecorder) {
-        FakeGoveeController.callsToConstructor.push({ deviceUuid, recorder })
+    public constructor(options: GoveeControllerConstructorOptions) {
+        FakeGoveeController.callsToConstructor.push(options)
     }
 
     public async connect() {
