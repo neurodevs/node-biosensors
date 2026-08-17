@@ -68,7 +68,7 @@ export default class GoveeDeviceController
         super(recorder, txtStream, logLevel)
 
         this.deviceUuid = deviceUuid
-        this.temperatureUnits = temperatureUnits ?? 'Celsius'
+        this.temperatureUnits = temperatureUnits
         this.temperatureOutlet = temperatureOutlet
         this.humidityOutlet = humidityOutlet
         this.batteryOutlet = batteryOutlet
@@ -82,7 +82,7 @@ export default class GoveeDeviceController
             xdfRecordPath,
             txtRecordPath,
             logLevel,
-            temperatureUnits,
+            temperatureUnits = 'Celsius',
         } = options
 
         const temperatureOutlet = await this.TemperatureOutlet(temperatureUnits)
@@ -203,14 +203,14 @@ export default class GoveeDeviceController
         })
     }
 
-    private static async TemperatureOutlet(units?: TemperatureUnits) {
+    private static async TemperatureOutlet(units: TemperatureUnits) {
         return await LslStreamOutlet.Create({
             ...this.sharedOutletOptions,
             sourceId: 'govee-temperature',
             name: 'Govee Temperature',
             type: 'Temperature',
             channelNames: ['Temperature'],
-            units: units ?? 'Celsius',
+            units,
         })
     }
 
@@ -248,13 +248,13 @@ export type GoveeControllerConstructor = new (
 
 export interface GoveeControllerConstructorOptions {
     deviceUuid: string
+    temperatureUnits: TemperatureUnits
     temperatureOutlet: LslOutlet
     humidityOutlet: LslOutlet
     batteryOutlet: LslOutlet
     recorder?: XdfRecorder
     logLevel?: LogLevel
     txtStream?: WriteStream
-    temperatureUnits?: TemperatureUnits
 }
 
 export type TemperatureUnits = 'Celsius' | 'Fahrenheit' | 'Kelvin'
