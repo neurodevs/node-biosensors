@@ -238,7 +238,6 @@ export default class GoveeDeviceController
 
 export interface GoveeControllerOptions extends DeviceControllerOptions {
     deviceUuid: string
-    txtRecordPath?: string
     temperatureUnits?: TemperatureUnits
 }
 

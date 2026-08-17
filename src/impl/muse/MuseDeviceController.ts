@@ -156,7 +156,6 @@ export type MuseDeviceControllerConstructor = new (
 
 export interface MuseControllerOptions extends DeviceControllerBleOptions {
     model?: MuseDeviceModel
-    txtRecordPath?: string
     disableEeg?: boolean
     disablePpg?: boolean
     disableGyro?: boolean

@@ -254,6 +254,7 @@ export interface DeviceControllerBle extends DeviceController {
 
 export interface DeviceControllerOptions {
     xdfRecordPath?: string
+    txtRecordPath?: string
     logLevel?: LogLevel
 }
 
