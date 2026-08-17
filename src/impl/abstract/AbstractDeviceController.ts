@@ -114,9 +114,11 @@ export default abstract class AbstractDeviceController implements DeviceControll
     }
 
     protected static async XdfStreamRecorder(
-        xdfRecordPath: string,
-        streamQueries: string[]
+        xdfRecordPath?: string,
+        streamQueries: string[] = []
     ) {
-        return await XdfStreamRecorder.Create(xdfRecordPath, streamQueries)
+        return xdfRecordPath
+            ? await XdfStreamRecorder.Create(xdfRecordPath, streamQueries)
+            : undefined
     }
 }

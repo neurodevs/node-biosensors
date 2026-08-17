@@ -89,9 +89,10 @@ export default class GoveeDeviceController
         const humidityOutlet = await this.HumidityOutlet()
         const batteryOutlet = await this.BatteryOutlet()
 
-        const recorder = xdfRecordPath
-            ? await this.XdfStreamRecorder(xdfRecordPath, this.streamQueries)
-            : undefined
+        const recorder = await this.XdfStreamRecorder(
+            xdfRecordPath,
+            this.streamQueries
+        )
 
         const txtStream = this.TxtRecordStream(txtRecordPath)
 

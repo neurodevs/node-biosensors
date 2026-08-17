@@ -60,12 +60,10 @@ export default class CytonDeviceController
         const onData = this.createOnData(logDeviceInfo, logLevel)
         const usb = this.UsbDeviceController(serialNumber, onData)
 
-        const recorder = xdfRecordPath
-            ? await this.XdfStreamRecorder(
-                  xdfRecordPath,
-                  this.generateStreamQueries(exgType)
-              )
-            : undefined
+        const recorder = await this.XdfStreamRecorder(
+            xdfRecordPath,
+            this.generateStreamQueries(exgType)
+        )
 
         return new (this.Class ?? this)({
             usb,

@@ -81,9 +81,10 @@ export default class MuseDeviceController
 
         const ble = await this.BleGattController(variant.charCallbacks, options)
 
-        const recorder = xdfRecordPath
-            ? await this.XdfStreamRecorder(xdfRecordPath, variant.streamQueries)
-            : undefined
+        const recorder = await this.XdfStreamRecorder(
+            xdfRecordPath,
+            variant.streamQueries
+        )
 
         return new (this.Class ?? this)(
             variant,

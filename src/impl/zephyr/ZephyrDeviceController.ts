@@ -1,7 +1,7 @@
 import { WriteStream } from 'node:fs'
 
 import { BleGatt, BleGattController } from '@neurodevs/node-lsl'
-import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
+import { XdfRecorder } from '@neurodevs/node-xdf'
 
 import {
     DeviceControllerBle,
@@ -32,9 +32,10 @@ export default class ZephyrDeviceController
 
         const ble = await this.BleGattController(options)
 
-        const recorder = xdfRecordPath
-            ? await this.XdfStreamRecorder(xdfRecordPath)
-            : undefined
+        const recorder = await this.XdfStreamRecorder(
+            xdfRecordPath,
+            this.streamQueries
+        )
 
         return new (this.Class ?? this)(ble, recorder, undefined, logLevel)
     }
@@ -62,9 +63,5 @@ export default class ZephyrDeviceController
             charCallbacks: [],
             rssiIntervalMs,
         })
-    }
-
-    public static async XdfStreamRecorder(xdfRecordPath: string) {
-        return XdfStreamRecorder.Create(xdfRecordPath, [])
     }
 }
