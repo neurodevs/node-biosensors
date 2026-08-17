@@ -1,13 +1,19 @@
 import { UsbDevice } from '@neurodevs/node-lsl'
 import { XdfRecorder } from '@neurodevs/node-xdf'
 
+import { LogLevel } from '../BiosensorDeviceFactory.js'
+
 import AbstractDeviceController from './AbstractDeviceController.js'
 
 export default abstract class AbstractDeviceControllerUsb extends AbstractDeviceController {
     protected readonly usb: UsbDevice
 
-    protected constructor(usb: UsbDevice, recorder?: XdfRecorder) {
-        super(recorder)
+    protected constructor(
+        usb: UsbDevice,
+        recorder?: XdfRecorder,
+        logLevel?: LogLevel
+    ) {
+        super(recorder, undefined, logLevel)
 
         this.usb = usb
     }

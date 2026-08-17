@@ -1,3 +1,5 @@
+import { WriteStream } from 'node:fs'
+
 import { BleGatt, BleGattController } from '@neurodevs/node-lsl'
 import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 
@@ -6,6 +8,7 @@ import {
     DeviceControllerBleConstructor,
     DeviceControllerBleOptions,
 } from '../BiosensorDeviceFactory.js'
+import { LogLevel } from '../BiosensorDeviceFactory.js'
 import AbstractDeviceControllerBle from '../abstract/AbstractDeviceControllerBle.js'
 
 export default class ZephyrDeviceController
@@ -15,12 +18,17 @@ export default class ZephyrDeviceController
     public static Class?: DeviceControllerBleConstructor
     public static readonly streamQueries: string[] = []
 
-    protected constructor(ble: BleGatt, recorder?: XdfRecorder) {
-        super(ble, recorder)
+    protected constructor(
+        ble: BleGatt,
+        recorder?: XdfRecorder,
+        txtStream?: WriteStream,
+        logLevel?: LogLevel
+    ) {
+        super(ble, recorder, txtStream, logLevel)
     }
 
     public static async Create(options?: DeviceControllerBleOptions) {
-        const { xdfRecordPath } = options ?? {}
+        const { xdfRecordPath, logLevel } = options ?? {}
 
         const ble = await this.BleGattController(options)
 
@@ -28,7 +36,7 @@ export default class ZephyrDeviceController
             ? await this.XdfStreamRecorder(xdfRecordPath)
             : undefined
 
-        return new (this.Class ?? this)(ble, recorder)
+        return new (this.Class ?? this)(ble, recorder, undefined, logLevel)
     }
 
     public get streamQueries() {

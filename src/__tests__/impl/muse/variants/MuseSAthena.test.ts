@@ -77,7 +77,6 @@ export default class MuseSAthenaTest extends AbstractDeviceControllerBleTest {
         await super.beforeEach()
 
         MuseDeviceController.Class = SpyMuseController
-        MuseDeviceController.log = () => {}
 
         this.instance = await this.MuseDeviceController()
     }

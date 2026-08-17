@@ -15,13 +15,13 @@ import {
     DeviceControllerOptions,
 } from '../BiosensorDeviceFactory.js'
 import AbstractDeviceController from '../abstract/AbstractDeviceController.js'
+import { LogLevel } from '../BiosensorDeviceFactory.js'
 
 export default class GoveeDeviceController
     extends AbstractDeviceController
     implements DeviceControllerBle
 {
     public static Class?: GoveeControllerConstructor
-    public static log = console
 
     protected readonly observer: BleObserver
     protected readonly deviceUuid: string
@@ -58,13 +58,14 @@ export default class GoveeDeviceController
             deviceUuid,
             recorder,
             txtStream,
+            logLevel,
             temperatureUnits,
             temperatureOutlet,
             humidityOutlet,
             batteryOutlet,
         } = options
 
-        super(recorder, txtStream)
+        super(recorder, txtStream, logLevel)
 
         this.deviceUuid = deviceUuid
         this.temperatureUnits = temperatureUnits ?? 'Celsius'
@@ -76,8 +77,13 @@ export default class GoveeDeviceController
     }
 
     public static async Create(options: GoveeControllerOptions) {
-        const { deviceUuid, xdfRecordPath, txtRecordPath, temperatureUnits } =
-            options
+        const {
+            deviceUuid,
+            xdfRecordPath,
+            txtRecordPath,
+            logLevel,
+            temperatureUnits,
+        } = options
 
         const temperatureOutlet = await this.TemperatureOutlet(temperatureUnits)
         const humidityOutlet = await this.HumidityOutlet()
@@ -93,6 +99,7 @@ export default class GoveeDeviceController
             deviceUuid,
             recorder,
             txtStream,
+            logLevel,
             temperatureUnits,
             temperatureOutlet,
             humidityOutlet,
@@ -154,8 +161,8 @@ export default class GoveeDeviceController
 
         const message = `[${timestampSec}] temperature: ${temperature}${this.degreesSymbol}, humidity: ${humidity}%, battery: ${battery}%`
 
-        this.writeToTxtRecord(message)
-        this.log.info(message)
+        this.writeTxt(message)
+        this.logInfo(message)
     }
 
     private decode(manufacturerData: string) {
@@ -184,10 +191,6 @@ export default class GoveeDeviceController
 
     private get degreesSymbol() {
         return this.degreesSymbols[this.temperatureUnits]
-    }
-
-    private get log() {
-        return GoveeDeviceController.log
     }
 
     private BleObserverController() {
@@ -235,6 +238,7 @@ export default class GoveeDeviceController
 
 export interface GoveeControllerOptions extends DeviceControllerOptions {
     deviceUuid: string
+    logLevel?: LogLevel
     txtRecordPath?: string
     temperatureUnits?: TemperatureUnits
 }
@@ -249,6 +253,7 @@ export interface GoveeControllerConstructorOptions {
     humidityOutlet: LslOutlet
     batteryOutlet: LslOutlet
     recorder?: XdfRecorder
+    logLevel?: LogLevel
     txtStream?: WriteStream
     temperatureUnits?: TemperatureUnits
 }

@@ -4,6 +4,7 @@ import { BleGatt } from '@neurodevs/node-lsl'
 import { XdfRecorder } from '@neurodevs/node-xdf'
 
 import AbstractDeviceController from './AbstractDeviceController.js'
+import { LogLevel } from '../BiosensorDeviceFactory.js'
 
 export default abstract class AbstractDeviceControllerBle extends AbstractDeviceController {
     protected readonly ble: BleGatt
@@ -11,9 +12,10 @@ export default abstract class AbstractDeviceControllerBle extends AbstractDevice
     protected constructor(
         ble: BleGatt,
         recorder?: XdfRecorder,
-        txtStream?: WriteStream
+        txtStream?: WriteStream,
+        logLevel?: LogLevel
     ) {
-        super(recorder, txtStream)
+        super(recorder, txtStream, logLevel)
 
         this.ble = ble
     }

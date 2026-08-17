@@ -10,7 +10,7 @@ const muse = await MuseDeviceController.Create({
     rssiIntervalMs: undefined,
     xdfRecordPath,
     txtRecordPath: undefined,
-    enableLogs: true,
+    logLevel: 'info',
     disableEeg: false,
     disablePpg: false,
     disableAccel: false,

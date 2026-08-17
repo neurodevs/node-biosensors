@@ -224,9 +224,11 @@ export default class MuseBleVariant implements MuseVariant {
     }
 
     protected static resolveLogAndStream(options?: MuseVariantOptions) {
-        const { enableLogs, txtStream } = options ?? {}
+        const { logLevel, txtStream } = options ?? {}
 
-        const log = enableLogs ? MuseDeviceController.log : undefined
+        const log = logLevel === 'info'
+            ? (...args: any[]) => MuseDeviceController.log.info(...args)
+            : undefined
 
         return { log, txtStream }
     }

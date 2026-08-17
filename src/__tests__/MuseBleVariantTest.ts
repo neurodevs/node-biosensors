@@ -62,7 +62,6 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
 
     protected static readonly callsToCreateWriteStream: unknown[] = []
     protected static readonly callsToWriteStream: unknown[] = []
-    protected static readonly logCalls: unknown[][] = []
 
     protected static async beforeEach() {
         await super.beforeEach()
@@ -80,12 +79,6 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
         this.callsToWriteStream.length = 0
 
         MuseDeviceController.Class = SpyMuseController
-
-        MuseDeviceController.log = (...args: unknown[]) => {
-            this.logCalls.push(args)
-        }
-
-        this.logCalls.length = 0
 
         this.instance = await this.MuseDeviceController()
     }
@@ -665,14 +658,14 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
 
     protected static async assertDisableEegIgnoresAllEegData() {
         await this.MuseDeviceController({
-            enableLogs: true,
+            logLevel: 'info',
             txtRecordPath: this.txtRecordPath,
             disableEeg: true,
         })
 
         this.simulateEegOnData()
 
-        const eegLogCalls = this.logCalls.filter(([msg]) =>
+        const eegLogCalls = this.callsToInfo.filter(([msg]) =>
             (msg as string).startsWith('EEG')
         )
         const eegWriteCalls = this.callsToWriteStream.filter((chunk) =>
@@ -694,14 +687,14 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
 
     protected static async assertDisablePpgIgnoresAllPpgData() {
         await this.MuseDeviceController({
-            enableLogs: true,
+            logLevel: 'info',
             txtRecordPath: this.txtRecordPath,
             disablePpg: true,
         })
 
         this.simulatePpgOnData()
 
-        const ppgLogCalls = this.logCalls.filter(([msg]) =>
+        const ppgLogCalls = this.callsToInfo.filter(([msg]) =>
             (msg as string).startsWith('PPG')
         )
         const ppgWriteCalls = this.callsToWriteStream.filter((chunk) =>
@@ -723,7 +716,7 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
 
     protected static async assertDisableGyroIgnoresAllGyroData() {
         await this.MuseDeviceController({
-            enableLogs: true,
+            logLevel: 'info',
             txtRecordPath: this.txtRecordPath,
             disableGyro: true,
         })
@@ -750,7 +743,7 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
 
     protected static async assertDisableAccelIgnoresAllAccelData() {
         await this.MuseDeviceController({
-            enableLogs: true,
+            logLevel: 'info',
             txtRecordPath: this.txtRecordPath,
             disableAccel: true,
         })
@@ -824,7 +817,7 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
     }
 
     protected static get eegLogCalls() {
-        return this.logCalls.filter(([msg]) =>
+        return this.callsToInfo.filter(([msg]) =>
             (msg as string).startsWith('EEG ')
         )
     }
@@ -968,7 +961,7 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
     }
 
     protected static get ppgLogCalls() {
-        return this.logCalls.filter(([msg]) =>
+        return this.callsToInfo.filter(([msg]) =>
             (msg as string).startsWith('PPG ')
         )
     }
@@ -1044,13 +1037,13 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
     }
 
     protected static get gyroLogCalls() {
-        return this.logCalls.filter(([msg]) =>
+        return this.callsToInfo.filter(([msg]) =>
             (msg as string).startsWith('GYROSCOPE ')
         )
     }
 
     protected static get accelLogCalls() {
-        return this.logCalls.filter(([msg]) =>
+        return this.callsToInfo.filter(([msg]) =>
             (msg as string).startsWith('ACCELEROMETER ')
         )
     }
@@ -1083,7 +1076,7 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
             bleUuid: this.deviceUuid,
             xdfRecordPath: this.xdfRecordPath,
             rssiIntervalMs: this.rssiIntervalMs,
-            enableLogs: true,
+            logLevel: 'info',
             ...options,
         })) as SpyMuseController
     }

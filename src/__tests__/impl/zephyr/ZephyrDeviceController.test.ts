@@ -3,6 +3,7 @@ import { test, assert } from '@neurodevs/node-tdd'
 import ZephyrDeviceController from '../../../impl/zephyr/ZephyrDeviceController.js'
 import { FakeBleGatt } from '@neurodevs/node-lsl'
 import SpyZephyrController from '../../../testDoubles/ZephyrController/SpyZephyrController.js'
+import { LogLevel } from '../../../impl/BiosensorDeviceFactory.js'
 import AbstractDeviceControllerBleTest from '../../AbstractDeviceControllerBleTest.js'
 import { DeviceControllerBleOptions } from '../../../impl/BiosensorDeviceFactory.js'
 
@@ -131,6 +132,16 @@ export default class ZephyrDeviceControllerTest extends AbstractDeviceController
     }
 
     @test()
+    protected static async warnsIfLogLevelInfo() {
+        await this.assertWarnsIfLogLevelInfo()
+    }
+
+    @test()
+    protected static async doesNotWarnIfLogLevelSilent() {
+        await this.assertDoesNotWarnIfLogLevelSilent()
+    }
+
+    @test()
     protected static async createsBleDeviceControllerWithUuid() {
         const call = FakeBleGatt.callsToConstructor[0]
 
@@ -175,6 +186,10 @@ export default class ZephyrDeviceControllerTest extends AbstractDeviceController
             0,
             'Did not expose outlets!'
         )
+    }
+
+    protected static async ControllerWithLogLevel(logLevel: LogLevel) {
+        return await this.ZephyrDeviceController({ logLevel })
     }
 
     private static async ZephyrDeviceController(

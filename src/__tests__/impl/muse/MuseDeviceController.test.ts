@@ -6,24 +6,17 @@ import MuseDeviceController, {
     MuseControllerOptions,
 } from '../../../impl/muse/MuseDeviceController.js'
 import SpyMuseController from '../../../testDoubles/MuseController/SpyMuseController.js'
+import { LogLevel } from '../../../impl/BiosensorDeviceFactory.js'
 import AbstractDeviceControllerBleTest from '../../AbstractDeviceControllerBleTest.js'
 import FakeMuseDetector from '../../../testDoubles/MuseDetector/FakeMuseDetector.js'
 
 export default class MuseDeviceControllerTest extends AbstractDeviceControllerBleTest {
     protected static instance: SpyMuseController
 
-    private static readonly logCalls: unknown[][] = []
-
     protected static async beforeEach() {
         await super.beforeEach()
 
         this.setFakeMuseDetector()
-
-        MuseDeviceController.log = (...args: unknown[]) => {
-            this.logCalls.push(args)
-        }
-
-        this.logCalls.length = 0
 
         MuseDeviceController.fallbackDeviceCounter = 1
 
@@ -151,6 +144,31 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
     }
 
     @test()
+    protected static async logsIfPassedLogLevelInfo() {
+        await this.assertLogsIfPassedLogLevelInfo()
+    }
+
+    @test()
+    protected static async doesNotLogInfoIfLogLevelSilent() {
+        await this.assertDoesNotLogInfoIfLogLevelSilent()
+    }
+
+    @test()
+    protected static async doesNotLogByDefault() {
+        await this.assertDoesNotLogByDefault()
+    }
+
+    @test()
+    protected static async warnsIfLogLevelInfo() {
+        await this.assertWarnsIfLogLevelInfo()
+    }
+
+    @test()
+    protected static async doesNotWarnIfLogLevelSilent() {
+        await this.assertDoesNotWarnIfLogLevelSilent()
+    }
+
+    @test()
     protected static async createsWriteStreamIfPassedTxtRecordPath() {
         await this.assertCreatesWriteStreamIfPassedTxtRecordPath()
     }
@@ -234,46 +252,24 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
         const { timestampSec, fakeBytes, name } = this.simulateOnData()
 
         assert.isEqualDeep(
-            this.logCalls,
-            [
-                [
-                    this.generateExpectedOnDataMessage(
-                        name,
-                        timestampSec,
-                        fakeBytes
-                    ),
-                ],
-            ],
+            this.callsToInfo[0][0],
+
+            this.generateExpectedOnDataMessage(name, timestampSec, fakeBytes),
+
             'Did not log expected data to console!'
         )
     }
 
     @test()
     protected static async doesNotLogIfPassedOption() {
-        await this.MuseDeviceController({ enableLogs: false })
+        await this.MuseDeviceController({ logLevel: 'silent' })
 
         this.simulateOnData()
 
-        assert.isEqualDeep(
-            this.logCalls,
-            [],
+        assert.isLength(
+            this.callsToInfo,
+            0,
             'Should not log any data to console!'
-        )
-    }
-
-    @test()
-    protected static async doesNotLogByDefault() {
-        await MuseDeviceController.Create({
-            model: 'Muse S Gen 2',
-            bleUuid: this.deviceUuid,
-        })
-
-        this.simulateOnData()
-
-        assert.isEqualDeep(
-            this.logCalls,
-            [],
-            'Should not log any data to console by default!'
         )
     }
 
@@ -350,6 +346,12 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
         }
     }
 
+    protected static async simulateDataWithLogLevel(logLevel?: LogLevel) {
+        await this.MuseDeviceController({ logLevel })
+
+        this.simulateOnData()
+    }
+
     protected static async simulateDataWithTxtRecordPath() {
         await this.MuseDeviceController({
             txtRecordPath: this.txtRecordPath,
@@ -392,6 +394,10 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
         })
     }
 
+    protected static async ControllerWithLogLevel(logLevel: LogLevel) {
+        return await this.MuseDeviceController({ logLevel })
+    }
+
     private static async MuseDeviceController(
         options?: Partial<MuseControllerOptions>
     ) {
@@ -400,7 +406,7 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
             bleUuid: this.deviceUuid,
             xdfRecordPath: this.xdfRecordPath,
             rssiIntervalMs: this.rssiIntervalMs,
-            enableLogs: true,
+            logLevel: 'info',
             ...options,
         })) as SpyMuseController
     }

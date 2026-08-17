@@ -3,30 +3,32 @@ import fs, { WriteStream } from 'node:fs'
 import { LslOutlet } from '@neurodevs/node-lsl'
 import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 
-import { DeviceController } from '../BiosensorDeviceFactory.js'
+import { DeviceController, LogLevel } from '../BiosensorDeviceFactory.js'
 
 export default abstract class AbstractDeviceController implements DeviceController {
-    public static warn = console.warn
+    public static log = console
     public static createWriteStream = fs.createWriteStream
 
     protected readonly recorder?: XdfRecorder
     protected readonly txtStream?: WriteStream
+    protected readonly logLevel: LogLevel
 
     protected isConnected = false
     protected isStreaming = false
 
-    protected constructor(recorder?: XdfRecorder, txtStream?: WriteStream) {
+    protected constructor(
+        recorder?: XdfRecorder,
+        txtStream?: WriteStream,
+        logLevel: LogLevel = 'warn'
+    ) {
         this.recorder = recorder
         this.txtStream = txtStream
-    }
-
-    protected writeToTxtRecord(message: string) {
-        this.txtStream?.write(`${message}\n`)
+        this.logLevel = logLevel
     }
 
     public async connect() {
         if (this.isConnected) {
-            this.warn(`Already connected to ${this.deviceId}.`)
+            this.logWarn(`Already connected to ${this.deviceId}.`)
             return
         }
         this.isConnected = true
@@ -37,7 +39,7 @@ export default abstract class AbstractDeviceController implements DeviceControll
 
     public async startStreaming() {
         if (this.isStreaming) {
-            this.warn(`Already streaming from ${this.deviceId}.`)
+            this.logWarn(`Already streaming from ${this.deviceId}.`)
             return
         }
         this.isStreaming = true
@@ -47,7 +49,7 @@ export default abstract class AbstractDeviceController implements DeviceControll
 
     public async stopStreaming() {
         if (!this.isStreaming) {
-            this.warn(`Already not streaming from ${this.deviceId}.`)
+            this.logWarn(`Already not streaming from ${this.deviceId}.`)
             return
         }
         this.isStreaming = false
@@ -57,7 +59,7 @@ export default abstract class AbstractDeviceController implements DeviceControll
 
     public async disconnect() {
         if (!this.isConnected) {
-            this.warn(`Already disconnected from ${this.deviceId}.`)
+            this.logWarn(`Already disconnected from ${this.deviceId}.`)
             return
         }
         if (this.isStreaming) {
@@ -85,8 +87,24 @@ export default abstract class AbstractDeviceController implements DeviceControll
 
     protected abstract handleDisconnect(): Promise<void>
 
-    private get warn() {
-        return AbstractDeviceController.warn
+    protected logInfo(message: string) {
+        if (this.logLevel === 'info') {
+            this.log.info(message)
+        }
+    }
+
+    protected logWarn(message: string) {
+        if (this.logLevel !== 'silent') {
+            this.log.warn(message)
+        }
+    }
+
+    protected get log() {
+        return AbstractDeviceController.log
+    }
+
+    protected writeTxt(message: string) {
+        this.txtStream?.write(`${message}\n`)
     }
 
     protected static TxtRecordStream(txtRecordPath?: string) {

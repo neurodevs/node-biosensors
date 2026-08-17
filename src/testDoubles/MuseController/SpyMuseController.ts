@@ -1,3 +1,7 @@
+import { WriteStream } from 'node:fs'
+
+import { LogLevel } from '../../impl/BiosensorDeviceFactory.js'
+
 import { BleGatt } from '@neurodevs/node-lsl'
 import { XdfRecorder } from '@neurodevs/node-xdf'
 import MuseDeviceController, {
@@ -8,9 +12,11 @@ export default class SpyMuseController extends MuseDeviceController {
     public constructor(
         variant: MuseVariant,
         ble: BleGatt,
-        recorder?: XdfRecorder
+        recorder?: XdfRecorder,
+        txtStream?: WriteStream,
+        logLevel?: LogLevel
     ) {
-        super(variant, ble, recorder)
+        super(variant, ble, recorder, txtStream, logLevel)
     }
 
     public getDeviceId() {

@@ -1,3 +1,5 @@
+import { WriteStream } from 'node:fs'
+
 import {
     BleGatt,
     EventMarkerOutlet,
@@ -252,6 +254,7 @@ export interface DeviceControllerBle extends DeviceController {
 
 export interface DeviceControllerOptions {
     xdfRecordPath?: string
+    logLevel?: LogLevel
 }
 
 export interface DeviceControllerBleOptions extends DeviceControllerOptions {
@@ -265,7 +268,9 @@ export type DeviceControllerConstructor = new (
 
 export type DeviceControllerBleConstructor = new (
     ble: BleGatt,
-    recorder?: XdfRecorder
+    recorder?: XdfRecorder,
+    txtStream?: WriteStream,
+    logLevel?: LogLevel
 ) => DeviceControllerBle
 
 export type PerDeviceOptions = PerDeviceOptionsMap[DeviceName]
@@ -317,3 +322,6 @@ export interface MultipleDeviceBundle {
     gateway?: WebSocketGateway
     emitter?: EventMarkerOutlet
 }
+
+/** Log verbosity, from least to most verbose. Defaults to 'warn'. */
+export type LogLevel = 'silent' | 'warn' | 'info'

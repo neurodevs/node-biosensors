@@ -11,6 +11,7 @@ import {
     DeviceControllerBle,
     DeviceControllerBleOptions,
 } from '../BiosensorDeviceFactory.js'
+import { LogLevel } from '../BiosensorDeviceFactory.js'
 import AbstractDeviceControllerBle from '../abstract/AbstractDeviceControllerBle.js'
 import MuseSAthena from './variants/MuseSAthena.js'
 import MuseSGen2 from './variants/MuseSGen2.js'
@@ -45,7 +46,6 @@ export default class MuseDeviceController
     implements DeviceControllerBle
 {
     public static Class?: MuseDeviceControllerConstructor
-    public static log = console.info
     public static detectModelTimeoutMs = 5000
     public static detectModelWindowMs = 500
 
@@ -57,15 +57,18 @@ export default class MuseDeviceController
     protected constructor(
         variant: MuseVariant,
         ble: BleGatt,
-        recorder?: XdfRecorder
+        recorder?: XdfRecorder,
+        txtStream?: WriteStream,
+        logLevel?: LogLevel
     ) {
-        super(ble, recorder)
+        super(ble, recorder, txtStream, logLevel)
 
         this.variant = variant
     }
 
     public static async Create(options?: MuseControllerOptions) {
-        const { xdfRecordPath, txtRecordPath, model, bleUuid } = options ?? {}
+        const { xdfRecordPath, txtRecordPath, logLevel, model, bleUuid } =
+            options ?? {}
 
         const txtStream = this.TxtRecordStream(txtRecordPath)
 
@@ -82,7 +85,13 @@ export default class MuseDeviceController
             ? await this.XdfStreamRecorder(xdfRecordPath, variant.streamQueries)
             : undefined
 
-        return new (this.Class ?? this)(variant, ble, recorder)
+        return new (this.Class ?? this)(
+            variant,
+            ble,
+            recorder,
+            txtStream,
+            logLevel
+        )
     }
 
     protected async handleConnect() {
@@ -148,7 +157,6 @@ export type MuseDeviceControllerConstructor = new (
 export interface MuseControllerOptions extends DeviceControllerBleOptions {
     model?: MuseDeviceModel
     txtRecordPath?: string
-    enableLogs?: boolean
     disableEeg?: boolean
     disablePpg?: boolean
     disableGyro?: boolean

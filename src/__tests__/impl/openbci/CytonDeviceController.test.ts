@@ -7,6 +7,7 @@ import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 import CytonDeviceController, {
     CytonControllerOptions,
 } from '../../../impl/openbci/CytonDeviceController.js'
+import { LogLevel } from '../../../impl/BiosensorDeviceFactory.js'
 import AbstractDeviceControllerTest from '../../AbstractDeviceControllerTest.js'
 import SpyCytonController from '../../../testDoubles/CytonController/SpyCytonController.js'
 
@@ -222,12 +223,6 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
 
     @test()
     protected static async logsDeviceInfoAccumulatedAcrossMultipleOnDataCalls() {
-        let loggedDeviceInfo: string | undefined
-
-        CytonDeviceController.log = (msg: string) => {
-            loggedDeviceInfo = msg
-        }
-
         const onData = await this.getLogEnabledOnData()
 
         const chunks = [
@@ -237,8 +232,9 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
         ]
 
         for (const chunk of chunks) {
-            assert.isFalsy(
-                loggedDeviceInfo,
+            assert.isLength(
+                this.callsToInfo,
+                0,
                 'Should not log device info before "$$$" is fully received!'
             )
 
@@ -247,7 +243,7 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
         }
 
         assert.isEqual(
-            loggedDeviceInfo,
+            this.callsToInfo[0][0],
             `\n${this.realDeviceInfo}\n`,
             'Did not log device info!'
         )
@@ -255,21 +251,13 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
 
     @test()
     protected static async stopsLoggingDeviceInfoAfterFirstReceipt() {
-        const deviceInfoLogs: string[] = []
-
-        CytonDeviceController.log = (msg: unknown) => {
-            if (typeof msg === 'string') {
-                deviceInfoLogs.push(msg)
-            }
-        }
-
         const onData = await this.getLogEnabledOnData()
 
         onData(this.realBuffer, this.realBuffer.length, 0)
         onData(this.realBuffer, this.realBuffer.length, 0)
 
         assert.isLength(
-            deviceInfoLogs,
+            this.deviceInfoLogs,
             1,
             'Should not keep logging device info text after the first time it is received!'
         )
@@ -277,12 +265,6 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
 
     @test()
     protected static async stripsInvalidBytesFromLoggedDeviceInfo() {
-        let loggedDeviceInfo: string | undefined
-
-        CytonDeviceController.log = (msg: string) => {
-            loggedDeviceInfo = msg
-        }
-
         const onData = await this.getLogEnabledOnData()
 
         const strayByte = Buffer.from([0xff])
@@ -290,7 +272,7 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
         onData(this.realBuffer, this.realBuffer.length, 0)
 
         assert.isEqual(
-            loggedDeviceInfo,
+            this.deviceInfoLogs[0]?.[0],
             `\n${this.realDeviceInfo}\n`,
             'Should strip invalid bytes from logged device info!'
         )
@@ -298,34 +280,23 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
 
     @test()
     protected static async doesNotLogDeviceInfoByDefault() {
-        let wasCalled = false
-
-        CytonDeviceController.log = () => {
-            wasCalled = true
-        }
-
         const onData = this.getOnData()
 
         onData(this.realBuffer, this.realBuffer.length, 0)
 
-        assert.isFalse(wasCalled, 'Should not have logged!')
+        assert.isLength(this.callsToInfo, 0, 'Should not have logged!')
     }
 
     @test()
     protected static async doesNotLogPacketsBeforeDeviceInfoReceived() {
-        let wasCalled = false
-
-        CytonDeviceController.log = () => {
-            wasCalled = true
-        }
-
         const onData = await this.getLogEnabledOnData()
 
         const noise = Buffer.from([0xff])
         onData(noise, noise.length, 0)
 
-        assert.isFalse(
-            wasCalled,
+        assert.isLength(
+            this.callsToInfo,
+            0,
             'Should not log packets before device info has been received!'
         )
     }
@@ -379,6 +350,31 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
             units: 'g',
             chunkSize: 1,
         })
+    }
+
+    @test()
+    protected static async logsIfPassedLogLevelInfo() {
+        await this.assertLogsIfPassedLogLevelInfo()
+    }
+
+    @test()
+    protected static async doesNotLogInfoIfLogLevelSilent() {
+        await this.assertDoesNotLogInfoIfLogLevelSilent()
+    }
+
+    @test()
+    protected static async doesNotLogByDefault() {
+        await this.assertDoesNotLogByDefault()
+    }
+
+    @test()
+    protected static async warnsIfLogLevelInfo() {
+        await this.assertWarnsIfLogLevelInfo()
+    }
+
+    @test()
+    protected static async doesNotWarnIfLogLevelSilent() {
+        await this.assertDoesNotWarnIfLogLevelSilent()
     }
 
     @test()
@@ -438,13 +434,34 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
         )
     }
 
+    protected static async simulateDataWithLogLevel(logLevel?: LogLevel) {
+        const instance = await this.CytonDeviceController({ logLevel })
+
+        const onData = instance.getOnData()
+
+        onData(this.realBuffer, this.realBuffer.length, 0)
+
+        const packet = Buffer.from([0xa0, 0x01, 0x02])
+        onData(packet, packet.length, 0)
+    }
+
     private static getOnData() {
         return this.instance.getOnData()
+    }
+
+    private static get deviceInfoLogs() {
+        return this.callsToInfo.filter(
+            ([msg]) => typeof msg === 'string' && msg.includes('$$$')
+        )
     }
 
     private static async getLogEnabledOnData() {
         const instance = await this.LogEnabledCyton()
         return instance.getOnData()
+    }
+
+    protected static async ControllerWithLogLevel(logLevel: LogLevel) {
+        return await this.CytonDeviceController({ logLevel })
     }
 
     private static async CytonDeviceController(

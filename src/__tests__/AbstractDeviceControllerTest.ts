@@ -2,7 +2,7 @@ import { assert } from '@neurodevs/node-tdd'
 
 import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 import AbstractPackageTest from './AbstractPackageTest.js'
-import { DeviceController } from '../impl/BiosensorDeviceFactory.js'
+import { DeviceController, LogLevel } from '../impl/BiosensorDeviceFactory.js'
 import AbstractDeviceController from '../impl/abstract/AbstractDeviceController.js'
 
 export interface SpyDeviceController extends DeviceController {
@@ -13,22 +13,20 @@ export interface SpyDeviceController extends DeviceController {
 
 export default abstract class AbstractDeviceControllerTest extends AbstractPackageTest {
     protected static instance: SpyDeviceController | any
-    protected static lastWarn: string
 
     protected static readonly deviceId = this.generateId()
     protected static readonly xdfRecordPath = `${this.generateId()}.xdf`
     protected static readonly txtRecordPath = `${this.generateId()}.txt`
 
+    protected static readonly callsToWarn: unknown[][] = []
+    protected static readonly callsToInfo: unknown[][] = []
     protected static readonly callsToCreateWriteStream: unknown[] = []
     protected static readonly callsToWriteStream: unknown[] = []
 
     protected static async beforeEach() {
         await super.beforeEach()
 
-        AbstractDeviceController.warn = (msg: string) => {
-            this.lastWarn = msg
-        }
-
+        this.setFakeLog()
         this.setFakeWriteStream()
     }
 
@@ -105,7 +103,7 @@ export default abstract class AbstractDeviceControllerTest extends AbstractPacka
         await this.connect()
 
         assert.isEqual(
-            this.lastWarn,
+            this.callsToWarn[0][0],
             `Already connected to ${this.deviceId}.`,
             'Did not warn with deviceId!'
         )
@@ -116,7 +114,7 @@ export default abstract class AbstractDeviceControllerTest extends AbstractPacka
         await this.startStreaming()
 
         assert.isEqual(
-            this.lastWarn,
+            this.callsToWarn[0][0],
             `Already streaming from ${this.deviceId}.`,
             'Did not warn with deviceId!'
         )
@@ -126,7 +124,7 @@ export default abstract class AbstractDeviceControllerTest extends AbstractPacka
         await this.stopStreaming()
 
         assert.isEqual(
-            this.lastWarn,
+            this.callsToWarn[0][0],
             `Already not streaming from ${this.deviceId}.`,
             'Did not warn with deviceId!'
         )
@@ -136,7 +134,7 @@ export default abstract class AbstractDeviceControllerTest extends AbstractPacka
         await this.disconnect()
 
         assert.isEqual(
-            this.lastWarn,
+            this.callsToWarn[0][0],
             `Already disconnected from ${this.deviceId}.`,
             'Did not warn with deviceId!'
         )
@@ -207,6 +205,68 @@ export default abstract class AbstractDeviceControllerTest extends AbstractPacka
         )
     }
 
+    protected static async assertLogsIfPassedLogLevelInfo() {
+        await this.simulateDataWithLogLevel('info')
+
+        assert.isLength(this.callsToInfo, 1, 'Did not log to console!')
+    }
+
+    protected static async assertDoesNotLogByDefault() {
+        await this.simulateDataWithLogLevel()
+
+        assert.isEqualDeep(
+            this.callsToInfo,
+            [],
+            'Should not log to console by default!'
+        )
+    }
+
+    protected static async assertDoesNotLogInfoIfLogLevelSilent() {
+        await this.simulateDataWithLogLevel('silent')
+
+        assert.isEqualDeep(
+            this.callsToInfo,
+            [],
+            'Should not log any data to console when logLevel is silent!'
+        )
+    }
+
+    protected static async assertWarnsIfLogLevelInfo() {
+        this.instance = await this.ControllerWithLogLevel('info')
+
+        await this.connect()
+        await this.connect()
+
+        assert.isEqual(
+            this.callsToWarn[0][0],
+            `Already connected to ${this.deviceId}.`,
+            'Should still warn when logLevel is info!'
+        )
+    }
+
+    protected static async assertDoesNotWarnIfLogLevelSilent() {
+        this.instance = await this.ControllerWithLogLevel('silent')
+
+        await this.connect()
+        await this.connect()
+
+        assert.isEqualDeep(
+            this.callsToWarn,
+            [],
+            'Should not warn when logLevel is silent!'
+        )
+    }
+
+    protected static async ControllerWithLogLevel(
+        _logLevel: LogLevel
+    ): Promise<SpyDeviceController | any> {
+        throw new Error('Subclasses must implement ControllerWithLogLevel!')
+    }
+
+    protected static async simulateDataWithLogLevel(_logLevel?: LogLevel) {
+        throw new Error('Subclasses must implement simulateDataWithLogLevel!')
+    }
+
     protected static async simulateDataWithTxtRecordPath() {
         throw new Error(
             'Subclasses must implement simulateDataWithTxtRecordPath!'
@@ -241,6 +301,20 @@ export default abstract class AbstractDeviceControllerTest extends AbstractPacka
 
     protected static get isStreaming() {
         return this.instance.getIsStreaming()
+    }
+
+    protected static setFakeLog() {
+        AbstractDeviceController.log = {
+            info: (...args: unknown[]) => {
+                this.callsToInfo.push(args)
+            },
+            warn: (...args: unknown[]) => {
+                this.callsToWarn.push(args)
+            },
+        } as unknown as Console
+
+        this.callsToInfo.length = 0
+        this.callsToWarn.length = 0
     }
 
     protected static setFakeWriteStream() {

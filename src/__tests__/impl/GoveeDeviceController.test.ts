@@ -10,11 +10,11 @@ import GoveeDeviceController, {
     GoveeControllerOptions,
 } from '../../impl/govee/GoveeDeviceController.js'
 import SpyGoveeController from '../../testDoubles/GoveeController/SpyGoveeController.js'
+import { LogLevel } from '../../impl/BiosensorDeviceFactory.js'
 import AbstractDeviceControllerTest from '../AbstractDeviceControllerTest.js'
 
 export default class GoveeDeviceControllerTest extends AbstractDeviceControllerTest {
     protected static instance: SpyGoveeController
-    private static lastLog?: string
 
     private static readonly localName = this.generateId()
     private static readonly timestampSec = 303175.794964291
@@ -47,8 +47,6 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
 
     protected static async beforeEach() {
         await super.beforeEach()
-
-        this.setFakeLog()
 
         GoveeDeviceController.Class = SpyGoveeController
 
@@ -176,6 +174,31 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
     }
 
     @test()
+    protected static async logsIfPassedLogLevelInfo() {
+        await this.assertLogsIfPassedLogLevelInfo()
+    }
+
+    @test()
+    protected static async doesNotLogInfoIfLogLevelSilent() {
+        await this.assertDoesNotLogInfoIfLogLevelSilent()
+    }
+
+    @test()
+    protected static async doesNotLogByDefault() {
+        await this.assertDoesNotLogByDefault()
+    }
+
+    @test()
+    protected static async warnsIfLogLevelInfo() {
+        await this.assertWarnsIfLogLevelInfo()
+    }
+
+    @test()
+    protected static async doesNotWarnIfLogLevelSilent() {
+        await this.assertDoesNotWarnIfLogLevelSilent()
+    }
+
+    @test()
     protected static async createsWriteStreamIfPassedTxtRecordPath() {
         await this.assertCreatesWriteStreamIfPassedTxtRecordPath()
     }
@@ -288,10 +311,12 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
 
     @test()
     protected static async onAdvertisementLogsPacketWhenStreaming() {
+        this.instance = await this.GoveeDeviceController({ logLevel: 'info' })
+
         await this.simulateAdvertisementWhileStreaming()
 
         assert.isEqual(
-            this.lastLog,
+            this.callsToInfo[0][0],
             `[${this.timestampSec}] temperature: 22.06°C, humidity: 64.79%, battery: 100%`,
             'Did not log the advertisement as expected!'
         )
@@ -336,8 +361,9 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
 
         this.simulateAdvertisement()
 
-        assert.isUndefined(
-            this.lastLog,
+        assert.isLength(
+            this.callsToInfo,
+            0,
             'Should not log advertisements when connected but not streaming!'
         )
     }
@@ -349,8 +375,9 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
 
         this.onAdvertisement(this.nonGoveeAdvertisement)
 
-        assert.isUndefined(
-            this.lastLog,
+        assert.isLength(
+            this.callsToInfo,
+            0,
             'Should not log advertisements that are not from the Govee device!'
         )
     }
@@ -359,12 +386,13 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
     protected static async logsTemperatureInFahrenheitIfPassedTemperatureUnits() {
         this.instance = await this.GoveeDeviceController({
             temperatureUnits: 'Fahrenheit',
+            logLevel: 'info',
         })
 
         await this.simulateAdvertisementWhileStreaming()
 
         assert.isEqual(
-            this.lastLog,
+            this.callsToInfo[0][0],
             `[${this.timestampSec}] temperature: 71.71°F, humidity: 64.79%, battery: 100%`,
             'Did not log the temperature in Fahrenheit!'
         )
@@ -374,12 +402,13 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
     protected static async logsTemperatureInKelvinIfPassedTemperatureUnits() {
         this.instance = await this.GoveeDeviceController({
             temperatureUnits: 'Kelvin',
+            logLevel: 'info',
         })
 
         await this.simulateAdvertisementWhileStreaming()
 
         assert.isEqual(
-            this.lastLog,
+            this.callsToInfo[0][0],
             `[${this.timestampSec}] temperature: 295.21K, humidity: 64.79%, battery: 100%`,
             'Did not log the temperature in Kelvin!'
         )
@@ -431,6 +460,12 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
         )
     }
 
+    protected static async simulateDataWithLogLevel(logLevel?: LogLevel) {
+        this.instance = await this.GoveeDeviceController({ logLevel })
+
+        await this.simulateAdvertisementWhileStreaming()
+    }
+
     protected static async simulateDataWithTxtRecordPath() {
         this.instance = await this.GoveeDeviceController({
             txtRecordPath: this.txtRecordPath,
@@ -459,14 +494,8 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
         return onAdvertisement!
     }
 
-    private static setFakeLog() {
-        this.lastLog = undefined
-
-        GoveeDeviceController.log = {
-            info: (msg: string) => {
-                this.lastLog = msg
-            },
-        } as Console
+    protected static async ControllerWithLogLevel(logLevel: LogLevel) {
+        return await this.GoveeDeviceController({ logLevel })
     }
 
     private static async GoveeDeviceController(

@@ -8,6 +8,7 @@ import { XdfRecorder } from '@neurodevs/node-xdf'
 import {
     DeviceController,
     DeviceControllerOptions,
+    LogLevel,
 } from '../BiosensorDeviceFactory.js'
 import AbstractDeviceControllerUsb from '../abstract/AbstractDeviceControllerUsb.js'
 
@@ -17,7 +18,6 @@ export default class CytonDeviceController
 {
     public static Class?: CytonControllerConstructor
     public static wait = (ms: number) => new Promise((r) => setTimeout(r, ms))
-    public static log = console.info
 
     protected readonly onData: OnUsbData
 
@@ -33,9 +33,10 @@ export default class CytonDeviceController
             exgType,
             serialNumber,
             recorder,
+            logLevel,
         } = options
 
-        super(usb, recorder)
+        super(usb, recorder, logLevel)
 
         this.serialNumber = serialNumber
         this.waitAfterConnectMs = waitAfterConnectMs
@@ -50,12 +51,13 @@ export default class CytonDeviceController
             waitAfterConnectMs = 2000,
             logDeviceInfo = false,
             exgType = 'ExG',
+            logLevel,
         } = options ?? {}
 
         await this.ExgOutlet(serialNumber, exgType)
         await this.AccelOutlet(serialNumber)
 
-        const onData = this.createOnData(logDeviceInfo)
+        const onData = this.createOnData(logDeviceInfo, logLevel)
         const usb = this.UsbDeviceController(serialNumber, onData)
 
         const recorder = xdfRecordPath
@@ -71,6 +73,7 @@ export default class CytonDeviceController
             onData,
             serialNumber,
             recorder,
+            logLevel,
             exgType,
         })
     }
@@ -103,13 +106,16 @@ export default class CytonDeviceController
         this.usb.writeUsb('s')
     }
 
-    private static createOnData(logDeviceInfo: boolean): OnUsbData {
+    private static createOnData(
+        logDeviceInfo: boolean,
+        logLevel?: LogLevel
+    ): OnUsbData {
         let deviceInfoBuffer = Buffer.alloc(0)
         let hasReceivedDeviceInfo = false
 
         return (data, length, timestampSec) => {
             if (hasReceivedDeviceInfo) {
-                this.defaultOnData(data, length, timestampSec)
+                this.defaultOnData(data, length, timestampSec, logLevel)
                 return
             }
 
@@ -123,7 +129,7 @@ export default class CytonDeviceController
                         .toString('utf8')
                         .replace(/[^\x20-\x7E\n]/g, '')
 
-                    this.log(`\n${text}\n`)
+                    this.log.info(`\n${text}\n`)
                 }
 
                 deviceInfoBuffer = Buffer.alloc(0)
@@ -131,8 +137,17 @@ export default class CytonDeviceController
         }
     }
 
-    private static defaultOnData: OnUsbData = (data, length, timestampSec) => {
-        this.log(timestampSec, data, length)
+    private static defaultOnData(
+        data: Buffer,
+        length: number,
+        timestampSec: number,
+        logLevel?: LogLevel
+    ) {
+        if (logLevel !== 'info') {
+            return
+        }
+
+        this.log.info(timestampSec, data, length)
     }
 
     private static UsbDeviceController(
@@ -206,6 +221,7 @@ export interface CytonControllerConstructorOptions {
     exgType: string
     serialNumber?: string
     recorder?: XdfRecorder
+    logLevel?: LogLevel
 }
 
 export type OnUsbData = (
