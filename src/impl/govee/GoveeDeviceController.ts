@@ -23,6 +23,19 @@ export default class GoveeDeviceController
 {
     public static Class?: GoveeControllerConstructor
 
+    private static readonly streamQueries = [
+        'type="Temperature"',
+        'type="Humidity"',
+        'type="Battery"',
+    ]
+
+    private static readonly sharedOutletOptions = {
+        sampleRateHz: 0,
+        channelFormat: 'float32' as ChannelFormat,
+        manufacturer: 'Govee',
+        chunkSize: 1,
+    }
+
     protected readonly observer: BleObserver
     protected readonly deviceUuid: string
     protected readonly temperatureUnits: TemperatureUnits
@@ -36,19 +49,6 @@ export default class GoveeDeviceController
         Celsius: '°C',
         Fahrenheit: '°F',
         Kelvin: 'K',
-    }
-
-    private static readonly streamQueries = [
-        'type="Temperature"',
-        'type="Humidity"',
-        'type="Battery"',
-    ]
-
-    private static readonly sharedOutletOptions = {
-        sampleRateHz: 0,
-        channelFormat: 'float32' as ChannelFormat,
-        manufacturer: 'Govee',
-        chunkSize: 1,
     }
 
     private localName?: string
