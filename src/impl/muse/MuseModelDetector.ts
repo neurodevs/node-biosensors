@@ -114,7 +114,7 @@ export default class MuseModelDetector implements MuseDetector {
         bleUuid: string | undefined,
         controlBuffer: ControlBuffer
     ) {
-        return await BleGattController.Create({
+        return BleGattController.Create({
             charCallbacks: [this.genControlCharCallback(controlBuffer)],
             ...(bleUuid
                 ? { deviceUuid: bleUuid }

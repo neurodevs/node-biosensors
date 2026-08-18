@@ -139,7 +139,7 @@ export default class MuseDeviceController
     ) {
         const { bleUuid, rssiIntervalMs } = options ?? {}
 
-        return await BleGattController.Create({
+        return BleGattController.Create({
             charCallbacks,
             rssiIntervalMs,
             ...(bleUuid

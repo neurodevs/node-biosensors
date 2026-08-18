@@ -113,7 +113,7 @@ async function probeDevice(device: {
 
     let ble
     try {
-        ble = await BleGattController.Create({
+        ble = BleGattController.Create({
             deviceUuid: device.bleUuid,
             charCallbacks: [
                 {
