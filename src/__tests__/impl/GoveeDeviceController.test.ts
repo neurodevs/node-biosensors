@@ -291,7 +291,9 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
     }
 
     @test()
-    protected static async createsBleObserverController() {
+    protected static async createsBleObserverControllerOnConnect() {
+        await this.connect()
+
         const { deviceUuid } = FakeBleObserver.callsToConstructor[0] ?? {}
 
         assert.isEqualDeep(
@@ -302,7 +304,9 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
     }
 
     @test()
-    protected static async passesOnAdvertisementToBleObserver() {
+    protected static async passesOnAdvertisementToBleObserverOnConnect() {
+        await this.connect()
+
         assert.isFunction(
             this.onAdvertisement,
             'Did not pass an onAdvertisement callback to the BleObserver!'

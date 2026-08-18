@@ -36,7 +36,8 @@ export default class GoveeDeviceController
         chunkSize: 1,
     }
 
-    protected readonly observer: BleObserver
+    protected observer!: BleObserver
+
     protected readonly deviceUuid: string
     protected readonly temperatureUnits: TemperatureUnits
     protected readonly temperatureOutlet: LslOutlet
@@ -72,8 +73,6 @@ export default class GoveeDeviceController
         this.temperatureOutlet = temperatureOutlet
         this.humidityOutlet = humidityOutlet
         this.batteryOutlet = batteryOutlet
-
-        this.observer = this.BleObserverController()
     }
 
     public static async Create(options: GoveeControllerOptions) {
@@ -109,6 +108,7 @@ export default class GoveeDeviceController
     }
 
     protected async handleConnect() {
+        this.observer = this.BleObserverController()
         await this.observer.startObserving()
     }
 
