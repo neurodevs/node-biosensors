@@ -46,9 +46,6 @@ export default class MuseDeviceController
     implements DeviceControllerBle
 {
     public static Class?: MuseDeviceControllerConstructor
-    public static detectModelTimeoutMs = 5000
-    public static detectModelWindowMs = 500
-
     public static fallbackDeviceCounter = 1
 
     protected readonly variant: MuseVariant
@@ -79,7 +76,7 @@ export default class MuseDeviceController
             txtStream,
         })
 
-        const ble = await this.BleGattController(variant.charCallbacks, options)
+        const ble = this.BleGattController(variant.charCallbacks, options)
 
         const recorder = await this.XdfStreamRecorder(
             xdfRecordPath,
@@ -133,7 +130,7 @@ export default class MuseDeviceController
         return await MuseVariant.Create({ ...(options ?? {}), model })
     }
 
-    private static async BleGattController(
+    private static BleGattController(
         charCallbacks: CharacteristicCallbacks,
         options?: MuseControllerOptions
     ) {

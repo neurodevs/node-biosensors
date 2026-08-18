@@ -18,12 +18,8 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
 
         this.setFakeMuseDetector()
 
-        MuseDeviceController.fallbackDeviceCounter = 1
-
-        MuseDeviceController.detectModelWindowMs = 5
-        MuseDeviceController.detectModelTimeoutMs = 50
-
         MuseDeviceController.Class = SpyMuseController
+        MuseDeviceController.fallbackDeviceCounter = 1
 
         this.instance = await this.MuseDeviceController()
     }
