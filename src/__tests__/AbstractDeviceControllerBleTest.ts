@@ -1,15 +1,14 @@
 import { randomInt } from 'node:crypto'
 
 import { assert } from '@neurodevs/node-tdd'
-import { FakeBleGatt } from '@neurodevs/node-lsl'
+import { BleGatt, FakeBleGatt } from '@neurodevs/node-lsl'
 
 import AbstractDeviceControllerTest from './AbstractDeviceControllerTest.js'
 import { DeviceControllerBle } from '../impl/types.js'
 
 export interface SpyDeviceControllerBle extends DeviceControllerBle {
-    getIsConnected(): boolean
-    getIsStreaming(): boolean
     getDeviceId(): string
+    getBle(): BleGatt
 }
 
 export default abstract class AbstractDeviceControllerBleTest extends AbstractDeviceControllerTest {
@@ -77,21 +76,17 @@ export default abstract class AbstractDeviceControllerBleTest extends AbstractDe
     }
 
     protected static async assertExposesUuidFromBleController() {
-        await this.startStreaming()
-
         assert.isEqual(
             this.instance.bleUuid,
-            this.deviceUuid,
+            this.instance.getBle().uuid,
             'Did not expose uuid from BLE controller!'
         )
     }
 
     protected static async assertExposesNameFromBleController() {
-        await this.startStreaming()
-
         assert.isEqual(
             this.instance.bleName,
-            this.deviceName,
+            this.instance.getBle().name,
             'Did not expose name from BLE controller!'
         )
     }

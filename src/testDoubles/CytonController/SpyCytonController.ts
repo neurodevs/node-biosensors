@@ -7,12 +7,8 @@ export default class SpyCytonController extends CytonDeviceController {
         super(options)
     }
 
-    public getIsConnected() {
-        return this.isConnected
-    }
-
-    public getIsStreaming() {
-        return this.isStreaming
+    public getState() {
+        return this.state
     }
 
     public getOnData() {

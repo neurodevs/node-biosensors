@@ -61,6 +61,21 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
     }
 
     @test()
+    protected static async startStreamingDoesNotHandleIfNotConnected() {
+        await this.assertStartStreamingDoesNotHandleIfNotConnected()
+    }
+
+    @test()
+    protected static async startStreamingLeavesIsStreamingFalseIfNotConnected() {
+        await this.assertStartStreamingLeavesIsStreamingFalseIfNotConnected()
+    }
+
+    @test()
+    protected static async startStreamingWarnsIfNotConnected() {
+        await this.assertStartStreamingWarnsIfNotConnected()
+    }
+
+    @test()
     protected static async stopStreamingSetsIsStreamingFalse() {
         await this.assertStopStreamingSetsIsStreamingFalse()
     }
@@ -207,13 +222,16 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
 
     @test()
     protected static async startsStreamingWithWriteUsbB() {
+        await this.connect()
         await this.startStreaming()
 
-        assert.isEqualDeep(FakeUsbDevice.callsToWriteUsb[0], 'b')
+        const calls = FakeUsbDevice.callsToWriteUsb
+        assert.isEqualDeep(calls[calls.length - 1], 'b')
     }
 
     @test()
     protected static async stopsStreamingWithWriteUsbS() {
+        await this.connect()
         await this.startStreaming()
         await this.stopStreaming()
 

@@ -117,6 +117,7 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
     }
 
     protected static async assertStartStreamingWritesStartCommands() {
+        await this.connect()
         await this.startStreaming()
 
         assert.isEqualDeep(
@@ -127,6 +128,7 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
     }
 
     protected static async assertStartStreamingDoesNotWriteCharsIfStreaming() {
+        await this.connect()
         await this.startStreaming()
         await this.startStreaming()
 

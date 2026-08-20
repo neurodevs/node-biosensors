@@ -2,13 +2,12 @@ import { assert } from '@neurodevs/node-tdd'
 
 import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 import AbstractPackageTest from './AbstractPackageTest.js'
-import { DeviceController, LogLevel } from '../impl/types.js'
+import { DeviceController, DeviceState, LogLevel } from '../impl/types.js'
 import AbstractDeviceController from '../impl/abstract/AbstractDeviceController.js'
 
 export interface SpyDeviceController extends DeviceController {
-    getIsConnected(): boolean
-    getIsStreaming(): boolean
     getDeviceId(): string
+    getState(): DeviceState
 }
 
 export default abstract class AbstractDeviceControllerTest extends AbstractPackageTest {
@@ -49,12 +48,45 @@ export default abstract class AbstractDeviceControllerTest extends AbstractPacka
     }
 
     protected static async assertStartStreamingSetsIsStreamingTrue() {
+        await this.connect()
         await this.startStreaming()
 
         assert.isTrue(this.isStreaming, 'Did not set isStreaming true!')
     }
 
+    protected static async assertStartStreamingDoesNotHandleIfNotConnected() {
+        let wasHit = false
+
+        this.instance.handleStartStreaming = async () => {
+            wasHit = true
+        }
+
+        await this.startStreaming()
+
+        assert.isFalse(wasHit, 'Should not start streaming before connecting!')
+    }
+
+    protected static async assertStartStreamingLeavesIsStreamingFalseIfNotConnected() {
+        await this.startStreaming()
+
+        assert.isFalse(
+            this.isStreaming,
+            'Should not set isStreaming true before connecting!'
+        )
+    }
+
+    protected static async assertStartStreamingWarnsIfNotConnected() {
+        await this.startStreaming()
+
+        assert.isEqual(
+            this.callsToWarn[0][0],
+            `Cannot stream from ${this.deviceId} before connecting.`,
+            'Did not warn that connect is required!'
+        )
+    }
+
     protected static async assertStopStreamingSetsIsStreamingFalse() {
+        await this.connect()
         await this.startStreaming()
         await this.stopStreaming()
 
@@ -89,7 +121,7 @@ export default abstract class AbstractDeviceControllerTest extends AbstractPacka
             wasHit = true
         }
 
-        await this.startStreaming()
+        await this.connect()
         await this.disconnect()
 
         assert.isFalse(
@@ -110,6 +142,7 @@ export default abstract class AbstractDeviceControllerTest extends AbstractPacka
     }
 
     protected static async assertStartStreamingWarnsWithDeviceId() {
+        await this.connect()
         await this.startStreaming()
         await this.startStreaming()
 
@@ -296,11 +329,11 @@ export default abstract class AbstractDeviceControllerTest extends AbstractPacka
     }
 
     protected static get isConnected() {
-        return this.instance.getIsConnected()
+        return this.instance.getState() !== 'disconnected'
     }
 
     protected static get isStreaming() {
-        return this.instance.getIsStreaming()
+        return this.instance.getState() === 'streaming'
     }
 
     protected static setFakeLog() {

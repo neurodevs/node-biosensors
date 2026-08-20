@@ -11,11 +11,7 @@ export default class SpyGoveeController extends GoveeDeviceController {
         return this.deviceId
     }
 
-    public getIsConnected() {
-        return this.isConnected
-    }
-
-    public getIsStreaming() {
-        return this.isStreaming
+    public getState() {
+        return this.state
     }
 }

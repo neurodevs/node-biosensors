@@ -50,6 +50,21 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
     }
 
     @test()
+    protected static async startStreamingDoesNotHandleIfNotConnected() {
+        await this.assertStartStreamingDoesNotHandleIfNotConnected()
+    }
+
+    @test()
+    protected static async startStreamingLeavesIsStreamingFalseIfNotConnected() {
+        await this.assertStartStreamingLeavesIsStreamingFalseIfNotConnected()
+    }
+
+    @test()
+    protected static async startStreamingWarnsIfNotConnected() {
+        await this.assertStartStreamingWarnsIfNotConnected()
+    }
+
+    @test()
     protected static async stopStreamingSetsIsStreamingFalse() {
         await this.assertStopStreamingSetsIsStreamingFalse()
     }
@@ -222,6 +237,7 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
 
     @test()
     protected static async stopStreamingWritesHaltCommandToControlChar() {
+        await this.connect()
         await this.startStreaming()
         await this.stopStreaming()
 

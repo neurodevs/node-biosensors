@@ -42,6 +42,21 @@ export default class ZephyrDeviceControllerTest extends AbstractDeviceController
     }
 
     @test()
+    protected static async startStreamingDoesNotHandleIfNotConnected() {
+        await this.assertStartStreamingDoesNotHandleIfNotConnected()
+    }
+
+    @test()
+    protected static async startStreamingLeavesIsStreamingFalseIfNotConnected() {
+        await this.assertStartStreamingLeavesIsStreamingFalseIfNotConnected()
+    }
+
+    @test()
+    protected static async startStreamingWarnsIfNotConnected() {
+        await this.assertStartStreamingWarnsIfNotConnected()
+    }
+
+    @test()
     protected static async stopStreamingSetsIsStreamingFalse() {
         await this.assertStopStreamingSetsIsStreamingFalse()
     }

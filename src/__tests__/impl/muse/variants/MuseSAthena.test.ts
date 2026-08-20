@@ -115,6 +115,7 @@ export default class MuseSAthenaTest extends AbstractDeviceControllerBleTest {
 
     @test()
     protected static async startStreamingWritesAthenaCommandsToControlChar() {
+        await this.connect()
         await this.startStreaming()
 
         assert.isEqualDeep(

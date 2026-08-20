@@ -138,7 +138,7 @@ export default class GoveeDeviceController
     }
 
     protected handleAdvertisement(advertisement: BleAdvertisement) {
-        if (!this.isStreaming) {
+        if (this.state !== 'streaming') {
             return
         }
 
@@ -160,7 +160,7 @@ export default class GoveeDeviceController
         const message = `[${timestampSec}] temperature: ${temperature}${this.degreesSymbol}, humidity: ${humidity}%, battery: ${battery}%`
 
         this.writeTxt(message)
-        this.logInfo(message)
+        this.info(message)
     }
 
     private decode(manufacturerData: string) {

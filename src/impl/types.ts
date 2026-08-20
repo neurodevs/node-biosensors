@@ -53,5 +53,7 @@ export type DeviceControllerBleConstructor = new (
     logLevel?: LogLevel
 ) => DeviceControllerBle
 
-/** Log verbosity, from least to most verbose. Defaults to 'warn'. */
+export type DeviceState = 'disconnected' | 'connected' | 'streaming'
+
+/** Log verbosity, defaults to 'warn'. */
 export type LogLevel = 'silent' | 'warn' | 'info'
