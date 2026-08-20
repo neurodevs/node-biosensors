@@ -74,12 +74,12 @@ export default class MuseBleVariant implements MuseVariant {
     private static readonly imuChunkSize = 3
 
     public readonly charCallbacks: CharacteristicCallbacks
-    public readonly startCommands: string[] = []
-    public readonly streamQueries: string[]
+    public readonly startCommands: readonly string[] = []
+    public readonly streamQueries: readonly string[]
 
     protected constructor(
         charCallbacks: CharacteristicCallbacks,
-        streamQueries: string[]
+        streamQueries: readonly string[]
     ) {
         this.charCallbacks = charCallbacks
         this.streamQueries = streamQueries

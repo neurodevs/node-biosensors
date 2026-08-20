@@ -151,7 +151,7 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
     }
 
     private get deviceStreamQueries() {
-        return this.createdDevice.streamQueries
+        return [...this.createdDevice.streamQueries]
     }
 
     private get allStreamQueries() {

@@ -163,8 +163,8 @@ export interface MuseVariantOptions extends MuseControllerOptions {
 
 export interface MuseVariant {
     readonly charCallbacks: CharacteristicCallbacks
-    readonly streamQueries: string[]
-    readonly startCommands: string[]
+    readonly streamQueries: readonly string[]
+    readonly startCommands: readonly string[]
 }
 
 export type MuseDeviceModel =

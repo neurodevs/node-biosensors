@@ -22,8 +22,8 @@ export interface DeviceController {
     startStreaming(): Promise<void>
     stopStreaming(): Promise<void>
     disconnect(): Promise<void>
-    readonly outlets: LslOutlet[]
-    readonly streamQueries: string[]
+    readonly outlets: readonly LslOutlet[]
+    readonly streamQueries: readonly string[]
 }
 
 export interface DeviceControllerBle extends DeviceController {

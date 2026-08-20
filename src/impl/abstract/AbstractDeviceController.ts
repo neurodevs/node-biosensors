@@ -78,7 +78,7 @@ export default abstract class AbstractDeviceController implements DeviceControll
         return []
     }
 
-    public abstract get streamQueries(): string[]
+    public abstract get streamQueries(): readonly string[]
 
     protected abstract get deviceId(): string
 
@@ -118,10 +118,10 @@ export default abstract class AbstractDeviceController implements DeviceControll
 
     protected static async XdfStreamRecorder(
         xdfRecordPath?: string,
-        streamQueries: string[] = []
+        streamQueries: readonly string[] = []
     ) {
         return xdfRecordPath
-            ? await XdfStreamRecorder.Create(xdfRecordPath, streamQueries)
+            ? await XdfStreamRecorder.Create(xdfRecordPath, [...streamQueries])
             : undefined
     }
 }
