@@ -1054,6 +1054,15 @@
     ffi-rs "^1.3.2"
     koffi "^3.0.1"
 
+"@neurodevs/ndx-native@^9.0.1":
+  version "9.0.1"
+  resolved "https://registry.yarnpkg.com/@neurodevs/ndx-native/-/ndx-native-9.0.1.tgz#522b04d2662f7755e33382f95ac30693e5ca332d"
+  integrity sha512-alPBFAL7yXZLoHkcf0c+APQai3V66w2WCeCJEdxrlH3+rP9cWG7HiH0Km8KUSWNmNT4vbHBji8vQCck1NP1Bng==
+  dependencies:
+    "@neurodevs/node-mangled-names" "^1.0.1"
+    ffi-rs "^1.3.2"
+    koffi "^3.0.1"
+
 "@neurodevs/node-biosignal-processing@^1.2.2":
   version "1.2.2"
   resolved "https://registry.npmjs.org/@neurodevs/node-biosignal-processing/-/node-biosignal-processing-1.2.2.tgz"
@@ -1090,13 +1099,13 @@
     ffi-rs "^1.3.1"
     ws "^8.18.3"
 
-"@neurodevs/node-lsl@^23.1.0":
-  version "23.1.0"
-  resolved "https://registry.yarnpkg.com/@neurodevs/node-lsl/-/node-lsl-23.1.0.tgz#52dcba1ea8d0a7eafeeb2bb2ab0fb2750ca83135"
-  integrity sha512-7kqDz7DJZitW2kcu808bxism1wp7OlyJ5yNJBhR3LylZNi5EaCyiEe/2MunzHG79zGmYY4YNcCCaEUa/oL7ZRA==
+"@neurodevs/node-lsl@^23.1.1":
+  version "23.1.1"
+  resolved "https://registry.yarnpkg.com/@neurodevs/node-lsl/-/node-lsl-23.1.1.tgz#6da13d0d33fe6d7db849ad5cac0f99213dd01690"
+  integrity sha512-jGEx/K5/5lUiyCWRXHUWlDIDWRVsEoxVb9U/T3vYWc3cIgnK3mxysEGvqrw/KmmMA2rH2NOASjLP90J6sSmZiw==
   dependencies:
     "@neurodevs/generate-id" "^1.1.3"
-    "@neurodevs/ndx-native" "^9.0.0"
+    "@neurodevs/ndx-native" "^9.0.1"
     ffi-rs "^1.3.1"
     ws "^8.18.3"
 
