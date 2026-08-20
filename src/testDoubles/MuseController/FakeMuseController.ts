@@ -1,6 +1,6 @@
 import { BleGatt, FakeLslOutlet } from '@neurodevs/node-lsl'
 import { XdfRecorder } from '@neurodevs/node-xdf'
-import { DeviceControllerBle } from '../../impl/BiosensorDeviceFactory.js'
+import { DeviceControllerBle } from '../../impl/types.js'
 import { MuseVariant } from '../../impl/muse/MuseDeviceController.js'
 
 export default class FakeMuseController implements DeviceControllerBle {

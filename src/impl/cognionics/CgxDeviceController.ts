@@ -12,7 +12,7 @@ import { ChannelFormat } from '@neurodevs/ndx-native'
 import { LslOutlet, LslStreamOutlet } from '@neurodevs/node-lsl'
 import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 
-import { DeviceController } from '../BiosensorDeviceFactory.js'
+import { DeviceController } from '../types.js'
 
 export default class CgxDeviceController implements DeviceController {
     public static Class?: CgxControllerConstructor

@@ -4,7 +4,7 @@ import { BleGatt } from '@neurodevs/node-lsl'
 import { XdfRecorder } from '@neurodevs/node-xdf'
 
 import AbstractDeviceController from './AbstractDeviceController.js'
-import { LogLevel } from '../BiosensorDeviceFactory.js'
+import { LogLevel } from '../types.js'
 
 export default abstract class AbstractDeviceControllerBle extends AbstractDeviceController {
     protected readonly ble: BleGatt

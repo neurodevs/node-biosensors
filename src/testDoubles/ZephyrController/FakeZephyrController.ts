@@ -1,5 +1,5 @@
 import { BleGatt } from '@neurodevs/node-lsl'
-import { DeviceControllerBle } from '../../impl/BiosensorDeviceFactory.js'
+import { DeviceControllerBle } from '../../impl/types.js'
 import { XdfRecorder } from '@neurodevs/node-xdf'
 
 export default class FakeZephyrDeviceController implements DeviceControllerBle {

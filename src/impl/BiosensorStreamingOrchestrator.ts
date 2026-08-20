@@ -3,10 +3,9 @@ import { XdfRecorder } from '@neurodevs/node-xdf'
 
 import BiosensorDeviceFactory, {
     DeviceFactory,
-    DeviceName,
     DeviceSpecification,
-    DeviceController,
 } from './BiosensorDeviceFactory.js'
+import { DeviceName, DeviceController } from './types.js'
 import { WebSocketGateway } from './BiosensorWebSocketGateway.js'
 
 export default class BiosensorStreamingOrchestrator implements StreamingOrchestrator {

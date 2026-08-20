@@ -6,7 +6,7 @@ import MuseDeviceController, {
     MuseControllerOptions,
 } from '../../../impl/muse/MuseDeviceController.js'
 import SpyMuseController from '../../../testDoubles/MuseController/SpyMuseController.js'
-import { LogLevel } from '../../../impl/BiosensorDeviceFactory.js'
+import { LogLevel } from '../../../impl/types.js'
 import AbstractDeviceControllerBleTest from '../../AbstractDeviceControllerBleTest.js'
 import FakeMuseDetector from '../../../testDoubles/MuseDetector/FakeMuseDetector.js'
 

@@ -1,3 +1,5 @@
+export * from './impl/types.js'
+
 // BiosensorDeviceFactory
 
 export { default as BiosensorDeviceFactory } from './impl/BiosensorDeviceFactory.js'

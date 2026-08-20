@@ -4,7 +4,7 @@ import { assert } from '@neurodevs/node-tdd'
 import { FakeBleGatt } from '@neurodevs/node-lsl'
 
 import AbstractDeviceControllerTest from './AbstractDeviceControllerTest.js'
-import { DeviceControllerBle } from '../impl/BiosensorDeviceFactory.js'
+import { DeviceControllerBle } from '../impl/types.js'
 
 export interface SpyDeviceControllerBle extends DeviceControllerBle {
     getIsConnected(): boolean

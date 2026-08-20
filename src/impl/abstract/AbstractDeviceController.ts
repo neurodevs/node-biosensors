@@ -3,7 +3,7 @@ import fs, { WriteStream } from 'node:fs'
 import { LslOutlet } from '@neurodevs/node-lsl'
 import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 
-import { DeviceController, LogLevel } from '../BiosensorDeviceFactory.js'
+import { DeviceController, LogLevel } from '../types.js'
 
 export default abstract class AbstractDeviceController implements DeviceController {
     public static log = console

@@ -2,7 +2,7 @@ import { assert } from '@neurodevs/node-tdd'
 
 import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 import AbstractPackageTest from './AbstractPackageTest.js'
-import { DeviceController, LogLevel } from '../impl/BiosensorDeviceFactory.js'
+import { DeviceController, LogLevel } from '../impl/types.js'
 import AbstractDeviceController from '../impl/abstract/AbstractDeviceController.js'
 
 export interface SpyDeviceController extends DeviceController {

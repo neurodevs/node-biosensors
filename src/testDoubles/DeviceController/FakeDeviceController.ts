@@ -2,10 +2,7 @@ import generateId from '@neurodevs/generate-id'
 import { ChannelFormat } from '@neurodevs/ndx-native'
 import { FakeLslOutlet } from '@neurodevs/node-lsl'
 
-import {
-    DeviceController,
-    DeviceControllerOptions,
-} from '../../impl/BiosensorDeviceFactory.js'
+import { DeviceController, DeviceControllerOptions } from '../../impl/types.js'
 
 export default class FakeDeviceController implements DeviceController {
     public static callsToConstructor: (DeviceControllerOptions | undefined)[] =

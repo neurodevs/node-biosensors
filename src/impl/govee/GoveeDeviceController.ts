@@ -10,12 +10,9 @@ import { WriteStream } from 'node:fs'
 
 import { XdfRecorder } from '@neurodevs/node-xdf'
 
-import {
-    DeviceControllerBle,
-    DeviceControllerOptions,
-} from '../BiosensorDeviceFactory.js'
+import { DeviceControllerBle, DeviceControllerOptions } from '../types.js'
 import AbstractDeviceController from '../abstract/AbstractDeviceController.js'
-import { LogLevel } from '../BiosensorDeviceFactory.js'
+import { LogLevel } from '../types.js'
 
 export default class GoveeDeviceController
     extends AbstractDeviceController

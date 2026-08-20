@@ -3,13 +3,13 @@ import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 
 import {
     DeviceFactory,
-    DeviceName,
     PerDeviceOptions,
     DeviceSpecification,
     SessionOptions,
     SingleDeviceBundle,
     MultipleDeviceBundle,
 } from '../../impl/BiosensorDeviceFactory.js'
+import { DeviceName } from '../../impl/types.js'
 import FakeDeviceController from '../DeviceController/FakeDeviceController.js'
 import FakeWebSocketGateway from '../WebSocketGateway/FakeWebSocketGateway.js'
 

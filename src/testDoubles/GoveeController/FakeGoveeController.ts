@@ -1,6 +1,6 @@
 import { FakeLslOutlet } from '@neurodevs/node-lsl'
 
-import { DeviceControllerBle } from '../../impl/BiosensorDeviceFactory.js'
+import { DeviceControllerBle } from '../../impl/types.js'
 import { GoveeControllerConstructorOptions } from '../../impl/govee/GoveeDeviceController.js'
 
 export default class FakeGoveeController implements DeviceControllerBle {

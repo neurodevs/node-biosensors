@@ -1,6 +1,6 @@
 import { WriteStream } from 'node:fs'
 
-import { LogLevel } from '../../impl/BiosensorDeviceFactory.js'
+import { LogLevel } from '../../impl/types.js'
 
 import { BleGatt } from '@neurodevs/node-lsl'
 import { XdfRecorder } from '@neurodevs/node-xdf'

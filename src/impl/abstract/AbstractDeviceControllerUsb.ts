@@ -1,7 +1,7 @@
 import { UsbDevice } from '@neurodevs/node-lsl'
 import { XdfRecorder } from '@neurodevs/node-xdf'
 
-import { LogLevel } from '../BiosensorDeviceFactory.js'
+import { LogLevel } from '../types.js'
 
 import AbstractDeviceController from './AbstractDeviceController.js'
 

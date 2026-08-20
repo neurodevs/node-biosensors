@@ -7,11 +7,8 @@ import {
 } from '@neurodevs/node-lsl'
 import { XdfRecorder } from '@neurodevs/node-xdf'
 
-import {
-    DeviceControllerBle,
-    DeviceControllerBleOptions,
-} from '../BiosensorDeviceFactory.js'
-import { LogLevel } from '../BiosensorDeviceFactory.js'
+import { DeviceControllerBle, DeviceControllerBleOptions } from '../types.js'
+import { LogLevel } from '../types.js'
 import AbstractDeviceControllerBle from '../abstract/AbstractDeviceControllerBle.js'
 import MuseSAthena from './variants/MuseSAthena.js'
 import MuseSGen2 from './variants/MuseSGen2.js'

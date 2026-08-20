@@ -3,9 +3,9 @@ import { test, assert } from '@neurodevs/node-tdd'
 import ZephyrDeviceController from '../../../impl/zephyr/ZephyrDeviceController.js'
 import { FakeBleGatt } from '@neurodevs/node-lsl'
 import SpyZephyrController from '../../../testDoubles/ZephyrController/SpyZephyrController.js'
-import { LogLevel } from '../../../impl/BiosensorDeviceFactory.js'
+import { LogLevel } from '../../../impl/types.js'
 import AbstractDeviceControllerBleTest from '../../AbstractDeviceControllerBleTest.js'
-import { DeviceControllerBleOptions } from '../../../impl/BiosensorDeviceFactory.js'
+import { DeviceControllerBleOptions } from '../../../impl/types.js'
 
 export default class ZephyrDeviceControllerTest extends AbstractDeviceControllerBleTest {
     protected static async beforeEach() {

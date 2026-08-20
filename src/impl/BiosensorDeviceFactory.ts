@@ -1,11 +1,4 @@
-import { WriteStream } from 'node:fs'
-
-import {
-    BleGatt,
-    EventMarkerOutlet,
-    LslEventMarkerOutlet,
-    LslOutlet,
-} from '@neurodevs/node-lsl'
+import { EventMarkerOutlet, LslEventMarkerOutlet } from '@neurodevs/node-lsl'
 import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 
 import BiosensorWebSocketGateway, {
@@ -23,18 +16,12 @@ import MuseDeviceController, {
 import CytonDeviceController, {
     CytonControllerOptions,
 } from './openbci/CytonDeviceController.js'
-
-export const DEVICE_NAMES = [
-    'Cognionics Quick-20r',
-    'Govee Thermohygrometer H5074',
-    'Muse S Athena',
-    'Muse S Gen 2',
-    'Muse S Gen 1',
-    'Muse 2',
-    'Muse 1 Gen 2',
-    'OpenBCI Cyton',
-    'Zephyr BioHarness 3',
-] as const
+import {
+    DEVICE_NAMES,
+    DeviceController,
+    DeviceControllerOptions,
+    DeviceName,
+} from './types.js'
 
 export default class BiosensorDeviceFactory implements DeviceFactory {
     public static Class?: DeviceFactoryConstructor
@@ -238,45 +225,7 @@ export interface DeviceFactory {
 
 export type DeviceFactoryConstructor = new () => DeviceFactory
 
-export interface DeviceController {
-    connect(): Promise<void>
-    startStreaming(): Promise<void>
-    stopStreaming(): Promise<void>
-    disconnect(): Promise<void>
-    readonly outlets: LslOutlet[]
-    readonly streamQueries: string[]
-}
-
-export interface DeviceControllerBle extends DeviceController {
-    readonly bleUuid: string
-    readonly bleName: string
-}
-
-export interface DeviceControllerOptions {
-    xdfRecordPath?: string
-    txtRecordPath?: string
-    logLevel?: LogLevel
-}
-
-export interface DeviceControllerBleOptions extends DeviceControllerOptions {
-    bleUuid?: string
-    rssiIntervalMs?: number
-}
-
-export type DeviceControllerConstructor = new (
-    options?: DeviceControllerOptions
-) => DeviceController
-
-export type DeviceControllerBleConstructor = new (
-    ble: BleGatt,
-    recorder?: XdfRecorder,
-    txtStream?: WriteStream,
-    logLevel?: LogLevel
-) => DeviceControllerBle
-
 export type PerDeviceOptions = PerDeviceOptionsMap[DeviceName]
-
-export type DeviceName = (typeof DEVICE_NAMES)[number]
 
 export interface PerDeviceOptionsMap extends Record<
     DeviceName,
@@ -323,6 +272,3 @@ export interface MultipleDeviceBundle {
     gateway?: WebSocketGateway
     emitter?: EventMarkerOutlet
 }
-
-/** Log verbosity, from least to most verbose. Defaults to 'warn'. */
-export type LogLevel = 'silent' | 'warn' | 'info'

@@ -9,7 +9,7 @@ import {
     DeviceController,
     DeviceControllerOptions,
     LogLevel,
-} from '../BiosensorDeviceFactory.js'
+} from '../types.js'
 import AbstractDeviceControllerUsb from '../abstract/AbstractDeviceControllerUsb.js'
 
 export default class CytonDeviceController

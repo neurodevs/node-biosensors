@@ -7,7 +7,7 @@ import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 import CytonDeviceController, {
     CytonControllerOptions,
 } from '../../../impl/openbci/CytonDeviceController.js'
-import { LogLevel } from '../../../impl/BiosensorDeviceFactory.js'
+import { LogLevel } from '../../../impl/types.js'
 import AbstractDeviceControllerTest from '../../AbstractDeviceControllerTest.js'
 import SpyCytonController from '../../../testDoubles/CytonController/SpyCytonController.js'
 
