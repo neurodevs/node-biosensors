@@ -55,5 +55,6 @@ export type DeviceControllerBleConstructor = new (
 
 export type DeviceState = 'disconnected' | 'connected' | 'streaming'
 
-/** Log verbosity, defaults to 'warn'. */
 export type LogLevel = 'silent' | 'warn' | 'info'
+
+export const DEFAULT_LOG_LEVEL = 'warn' satisfies LogLevel

@@ -3,7 +3,12 @@ import fs, { WriteStream } from 'node:fs'
 import { LslOutlet } from '@neurodevs/node-lsl'
 import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 
-import { DeviceState, DeviceController, LogLevel } from '../types.js'
+import {
+    DeviceState,
+    DeviceController,
+    LogLevel,
+    DEFAULT_LOG_LEVEL,
+} from '../types.js'
 
 export default abstract class AbstractDeviceController implements DeviceController {
     public static log = console
@@ -18,7 +23,7 @@ export default abstract class AbstractDeviceController implements DeviceControll
     protected constructor(
         recorder?: XdfRecorder,
         txtStream?: WriteStream,
-        logLevel: LogLevel = 'warn'
+        logLevel: LogLevel = DEFAULT_LOG_LEVEL
     ) {
         this.recorder = recorder
         this.txtStream = txtStream
