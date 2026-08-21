@@ -36,7 +36,7 @@ export default class CytonDeviceController
             logLevel,
         } = options
 
-        super(usb, recorder, logLevel)
+        super({ usb, recorder, logLevel })
 
         this.serialNumber = serialNumber
         this.waitAfterConnectMs = waitAfterConnectMs

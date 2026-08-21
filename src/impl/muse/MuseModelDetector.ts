@@ -20,7 +20,9 @@ export default class MuseModelDetector implements MuseDetector {
     protected ble: BleGatt
     protected controlBuffer: ControlBuffer
 
-    protected constructor(ble: BleGatt, controlBuffer: ControlBuffer) {
+    protected constructor(options: MuseDetectorConstructorOptions) {
+        const { ble, controlBuffer } = options
+
         this.ble = ble
         this.controlBuffer = controlBuffer
     }
@@ -29,7 +31,7 @@ export default class MuseModelDetector implements MuseDetector {
         const controlBuffer = { text: '' }
         const ble = await this.BleGattController(bleUuid, controlBuffer)
 
-        return new (this.Class ?? this)(ble, controlBuffer)
+        return new (this.Class ?? this)({ ble, controlBuffer })
     }
 
     public async detectModel() {
@@ -128,8 +130,12 @@ export interface MuseDetector {
 }
 
 export type MuseDetectorConstructor = new (
-    ble: BleGatt,
-    controlBuffer: ControlBuffer
+    options: MuseDetectorConstructorOptions
 ) => MuseDetector
+
+export interface MuseDetectorConstructorOptions {
+    ble: BleGatt
+    controlBuffer: ControlBuffer
+}
 
 export type ControlBuffer = { text: string }

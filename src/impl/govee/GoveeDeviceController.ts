@@ -1,3 +1,5 @@
+import { WriteStream } from 'node:fs'
+
 import { ChannelFormat } from '@neurodevs/ndx-native'
 import {
     BleAdvertisement,
@@ -6,13 +8,14 @@ import {
     LslOutlet,
     LslStreamOutlet,
 } from '@neurodevs/node-lsl'
-import { WriteStream } from 'node:fs'
-
 import { XdfRecorder } from '@neurodevs/node-xdf'
 
-import { DeviceControllerBle, DeviceControllerOptions } from '../types.js'
+import {
+    DeviceControllerBle,
+    DeviceControllerOptions,
+    LogLevel,
+} from '../types.js'
 import AbstractDeviceController from '../abstract/AbstractDeviceController.js'
-import { LogLevel } from '../types.js'
 
 export default class GoveeDeviceController
     extends AbstractDeviceController
@@ -63,7 +66,7 @@ export default class GoveeDeviceController
             batteryOutlet,
         } = options
 
-        super(recorder, txtStream, logLevel)
+        super({ recorder, txtStream, logLevel })
 
         this.deviceUuid = deviceUuid
         this.temperatureUnits = temperatureUnits

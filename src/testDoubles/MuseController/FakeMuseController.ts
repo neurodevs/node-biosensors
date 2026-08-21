@@ -1,14 +1,13 @@
 import { BleGatt, FakeLslOutlet } from '@neurodevs/node-lsl'
 import { XdfRecorder } from '@neurodevs/node-xdf'
 import { DeviceControllerBle } from '../../impl/types.js'
-import { MuseVariant } from '../../impl/muse/MuseDeviceController.js'
+import {
+    MuseControllerConstructorOptions,
+    MuseVariant,
+} from '../../impl/muse/MuseDeviceController.js'
 
 export default class FakeMuseController implements DeviceControllerBle {
-    public static callsToConstructor: {
-        variant: MuseVariant
-        ble: BleGatt
-        recorder?: XdfRecorder
-    }[] = []
+    public static callsToConstructor: MuseControllerConstructorOptions[] = []
     public static numCallsToConnect = 0
     public static numCallsToStartStreaming = 0
     public static numCallsToStopStreaming = 0
@@ -18,16 +17,10 @@ export default class FakeMuseController implements DeviceControllerBle {
     public ble: BleGatt
     public recorder?: XdfRecorder
 
-    public constructor(
-        variant: MuseVariant,
-        ble: BleGatt,
-        recorder?: XdfRecorder
-    ) {
-        FakeMuseController.callsToConstructor.push({
-            ble,
-            variant,
-            recorder,
-        })
+    public constructor(options: MuseControllerConstructorOptions) {
+        FakeMuseController.callsToConstructor.push(options)
+
+        const { variant, ble, recorder } = options
 
         this.ble = ble
         this.variant = variant

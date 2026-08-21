@@ -37,7 +37,7 @@ import {
 } from '@neurodevs/node-xdf'
 
 import BiosensorDeviceFactory from '../impl/BiosensorDeviceFactory.js'
-import { DeviceControllerOptions } from '../impl/types.js'
+import { DeviceControllerConstructorOptions } from '../impl/types.js'
 import BiosensorWebSocketGateway from '../impl/BiosensorWebSocketGateway.js'
 import CgxDeviceController from '../impl/cognionics/CgxDeviceController.js'
 import GoveeDeviceController from '../impl/govee/GoveeDeviceController.js'
@@ -279,7 +279,9 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         CgxDeviceController.Class = SpyCgxController
     }
 
-    protected static FakeDeviceController(options?: DeviceControllerOptions) {
+    protected static FakeDeviceController(
+        options?: DeviceControllerConstructorOptions
+    ) {
         return new FakeDeviceController(options)
     }
 }

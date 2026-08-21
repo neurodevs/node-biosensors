@@ -1,19 +1,18 @@
-import { BleGatt } from '@neurodevs/node-lsl'
-import { DeviceControllerBle } from '../../impl/types.js'
-import { XdfRecorder } from '@neurodevs/node-xdf'
+import {
+    DeviceControllerBle,
+    DeviceControllerBleConstructorOptions,
+} from '../../impl/types.js'
 
 export default class FakeZephyrDeviceController implements DeviceControllerBle {
-    public static callsToConstructor: {
-        ble: BleGatt
-        recorder?: XdfRecorder
-    }[] = []
+    public static callsToConstructor: DeviceControllerBleConstructorOptions[] =
+        []
     public static numCallsToConnect = 0
     public static numCallsToStartStreaming = 0
     public static numCallsToStopStreaming = 0
     public static numCallsToDisconnect = 0
 
-    public constructor(ble: BleGatt, recorder?: XdfRecorder) {
-        FakeZephyrDeviceController.callsToConstructor.push({ ble, recorder })
+    public constructor(options: DeviceControllerBleConstructorOptions) {
+        FakeZephyrDeviceController.callsToConstructor.push(options)
     }
 
     public async connect() {

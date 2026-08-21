@@ -1,22 +1,10 @@
-import { WriteStream } from 'node:fs'
-
-import { LogLevel } from '../../impl/types.js'
-
-import { BleGatt } from '@neurodevs/node-lsl'
-import { XdfRecorder } from '@neurodevs/node-xdf'
 import MuseDeviceController, {
-    MuseVariant,
+    MuseControllerConstructorOptions,
 } from '../../impl/muse/MuseDeviceController.js'
 
 export default class SpyMuseController extends MuseDeviceController {
-    public constructor(
-        variant: MuseVariant,
-        ble: BleGatt,
-        recorder?: XdfRecorder,
-        txtStream?: WriteStream,
-        logLevel?: LogLevel
-    ) {
-        super(variant, ble, recorder, txtStream, logLevel)
+    public constructor(options: MuseControllerConstructorOptions) {
+        super(options)
     }
 
     public getDeviceId() {

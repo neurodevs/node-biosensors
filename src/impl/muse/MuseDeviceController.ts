@@ -1,14 +1,15 @@
 import { WriteStream } from 'node:fs'
 
 import {
-    BleGatt,
     BleGattController,
     CharacteristicCallbacks,
 } from '@neurodevs/node-lsl'
-import { XdfRecorder } from '@neurodevs/node-xdf'
 
-import { DeviceControllerBle, DeviceControllerBleOptions } from '../types.js'
-import { LogLevel } from '../types.js'
+import {
+    DeviceControllerBle,
+    DeviceControllerBleConstructorOptions,
+    DeviceControllerBleOptions,
+} from '../types.js'
 import AbstractDeviceControllerBle from '../abstract/AbstractDeviceControllerBle.js'
 import MuseSAthena from './variants/MuseSAthena.js'
 import MuseSGen2 from './variants/MuseSGen2.js'
@@ -48,14 +49,9 @@ export default class MuseDeviceController
     protected readonly variant: MuseVariant
     protected preConnected = false
 
-    protected constructor(
-        variant: MuseVariant,
-        ble: BleGatt,
-        recorder?: XdfRecorder,
-        txtStream?: WriteStream,
-        logLevel?: LogLevel
-    ) {
-        super(ble, recorder, txtStream, logLevel)
+    protected constructor(options: MuseControllerConstructorOptions) {
+        const { variant, ...rest } = options
+        super(rest)
 
         this.variant = variant
     }
@@ -80,13 +76,13 @@ export default class MuseDeviceController
             variant.streamQueries
         )
 
-        return new (this.Class ?? this)(
+        return new (this.Class ?? this)({
             variant,
             ble,
             recorder,
             txtStream,
-            logLevel
-        )
+            logLevel,
+        })
     }
 
     protected async handleConnect() {
@@ -144,10 +140,13 @@ export default class MuseDeviceController
 }
 
 export type MuseDeviceControllerConstructor = new (
-    variant: MuseVariant,
-    ble: BleGatt,
-    recorder?: XdfRecorder
+    options: MuseControllerConstructorOptions
 ) => DeviceControllerBle
+
+export interface MuseControllerConstructorOptions
+    extends DeviceControllerBleConstructorOptions {
+    variant: MuseVariant
+}
 
 export interface MuseControllerOptions extends DeviceControllerBleOptions {
     model?: MuseDeviceModel
@@ -159,6 +158,11 @@ export interface MuseControllerOptions extends DeviceControllerBleOptions {
 
 export interface MuseVariantOptions extends MuseControllerOptions {
     txtStream?: WriteStream
+}
+
+export interface MuseVariantConstructorOptions {
+    charCallbacks: CharacteristicCallbacks
+    streamQueries: readonly string[]
 }
 
 export interface MuseVariant {

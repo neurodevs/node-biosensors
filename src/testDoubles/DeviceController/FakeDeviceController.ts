@@ -2,11 +2,15 @@ import generateId from '@neurodevs/generate-id'
 import { ChannelFormat } from '@neurodevs/ndx-native'
 import { FakeLslOutlet } from '@neurodevs/node-lsl'
 
-import { DeviceController, DeviceControllerOptions } from '../../impl/types.js'
+import {
+    DeviceController,
+    DeviceControllerConstructorOptions,
+} from '../../impl/types.js'
 
 export default class FakeDeviceController implements DeviceController {
-    public static callsToConstructor: (DeviceControllerOptions | undefined)[] =
-        []
+    public static callsToConstructor: (
+        DeviceControllerConstructorOptions | undefined
+    )[] = []
     public static numCallsToConnect = 0
     public static numCallsToStartStreaming = 0
     public static numCallsToStopStreaming = 0
@@ -25,7 +29,7 @@ export default class FakeDeviceController implements DeviceController {
 
     public fakeStreamQueries: string[] = [generateId(), generateId()]
 
-    public constructor(options?: DeviceControllerOptions) {
+    public constructor(options?: DeviceControllerConstructorOptions) {
         FakeDeviceController.callsToConstructor.push(options)
     }
 
@@ -69,6 +73,7 @@ export default class FakeDeviceController implements DeviceController {
 
     public static resetTestDouble() {
         this.callsToConstructor = []
+        this.numCallsToConnect = 0
         this.numCallsToStartStreaming = 0
         this.numCallsToStopStreaming = 0
         this.numCallsToDisconnect = 0

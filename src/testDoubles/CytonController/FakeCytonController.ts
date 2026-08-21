@@ -1,8 +1,11 @@
 import { LslOutlet } from '@neurodevs/node-lsl'
-import { CytonController } from '../../impl/openbci/CytonDeviceController.js'
+import {
+    CytonController,
+    CytonControllerConstructorOptions,
+} from '../../impl/openbci/CytonDeviceController.js'
 
 export default class FakeCytonController implements CytonController {
-    public static numCallsToConstructor = 0
+    public static callsToConstructor: CytonControllerConstructorOptions[] = []
     public static numCallsToConnect = 0
     public static numCallsToStartStreaming = 0
     public static numCallsToStopStreaming = 0
@@ -11,8 +14,8 @@ export default class FakeCytonController implements CytonController {
     public static fakeOutlets: LslOutlet[] = []
     public static fakeStreamQueries: string[] = []
 
-    public constructor() {
-        FakeCytonController.numCallsToConstructor++
+    public constructor(options: CytonControllerConstructorOptions) {
+        FakeCytonController.callsToConstructor.push(options)
     }
 
     public async connect() {
@@ -40,7 +43,7 @@ export default class FakeCytonController implements CytonController {
     }
 
     public static resetTestDouble() {
-        FakeCytonController.numCallsToConstructor = 0
+        FakeCytonController.callsToConstructor = []
         FakeCytonController.numCallsToConnect = 0
         FakeCytonController.numCallsToStartStreaming = 0
         FakeCytonController.numCallsToStopStreaming = 0

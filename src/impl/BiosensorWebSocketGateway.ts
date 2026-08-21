@@ -14,7 +14,9 @@ export default class BiosensorWebSocketGateway implements WebSocketGateway {
     private isOpen = false
     private isDestroyed = false
 
-    protected constructor(bridges: LslWsBridge[]) {
+    protected constructor(options: WebSocketGatewayConstructorOptions) {
+        const { bridges } = options
+
         this.bridges = bridges
     }
 
@@ -23,7 +25,7 @@ export default class BiosensorWebSocketGateway implements WebSocketGateway {
         options?: WebSocketGatewayOptions
     ) {
         const bridges = await this.createBridgesFrom(devices, options)
-        return new (this.Class ?? this)(bridges)
+        return new (this.Class ?? this)({ bridges })
     }
 
     public open() {
@@ -140,5 +142,9 @@ export interface WebSocketGatewayOptions {
 }
 
 export type WebSocketGatewayConstructor = new (
-    bridges: LslWsBridge[]
+    options: WebSocketGatewayConstructorOptions
 ) => WebSocketGateway
+
+export interface WebSocketGatewayConstructorOptions {
+    bridges: LslWsBridge[]
+}

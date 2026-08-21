@@ -6,6 +6,7 @@ import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 import {
     DeviceState,
     DeviceController,
+    DeviceControllerConstructorOptions,
     LogLevel,
     DEFAULT_LOG_LEVEL,
 } from '../types.js'
@@ -20,11 +21,13 @@ export default abstract class AbstractDeviceController implements DeviceControll
 
     protected state: DeviceState = 'disconnected'
 
-    protected constructor(
-        recorder?: XdfRecorder,
-        txtStream?: WriteStream,
-        logLevel: LogLevel = DEFAULT_LOG_LEVEL
-    ) {
+    protected constructor(options?: DeviceControllerConstructorOptions) {
+        const {
+            recorder,
+            txtStream,
+            logLevel = DEFAULT_LOG_LEVEL,
+        } = options ?? {}
+
         this.recorder = recorder
         this.txtStream = txtStream
         this.logLevel = logLevel

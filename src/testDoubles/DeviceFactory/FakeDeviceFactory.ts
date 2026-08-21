@@ -28,7 +28,7 @@ export default class FakeDeviceFactory implements DeviceFactory {
 
     public static fakeDevice = new FakeDeviceController()
     public static fakeRecorder = new FakeXdfRecorder()
-    public static fakeGateway = new FakeWebSocketGateway()
+    public static fakeGateway = new FakeWebSocketGateway({ bridges: [] })
     public static fakeEmitter = new FakeEventMarkerOutlet()
 
     public constructor() {

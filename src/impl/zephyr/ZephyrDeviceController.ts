@@ -1,14 +1,11 @@
-import { WriteStream } from 'node:fs'
-
-import { BleGatt, BleGattController } from '@neurodevs/node-lsl'
-import { XdfRecorder } from '@neurodevs/node-xdf'
+import { BleGattController } from '@neurodevs/node-lsl'
 
 import {
     DeviceControllerBle,
-    DeviceControllerBleConstructor,
     DeviceControllerBleOptions,
+    DeviceControllerBleConstructor,
+    DeviceControllerBleConstructorOptions,
 } from '../types.js'
-import { LogLevel } from '../types.js'
 import AbstractDeviceControllerBle from '../abstract/AbstractDeviceControllerBle.js'
 
 export default class ZephyrDeviceController
@@ -18,13 +15,8 @@ export default class ZephyrDeviceController
     public static Class?: DeviceControllerBleConstructor
     public static readonly streamQueries: string[] = []
 
-    protected constructor(
-        ble: BleGatt,
-        recorder?: XdfRecorder,
-        txtStream?: WriteStream,
-        logLevel?: LogLevel
-    ) {
-        super(ble, recorder, txtStream, logLevel)
+    protected constructor(options: DeviceControllerBleConstructorOptions) {
+        super(options)
     }
 
     public static async Create(options?: DeviceControllerBleOptions) {
@@ -37,7 +29,7 @@ export default class ZephyrDeviceController
             this.streamQueries
         )
 
-        return new (this.Class ?? this)(ble, recorder, undefined, logLevel)
+        return new (this.Class ?? this)({ ble, recorder, logLevel })
     }
 
     public get streamQueries() {

@@ -1,11 +1,10 @@
-import { BleGatt } from '@neurodevs/node-lsl'
 import MuseModelDetector, {
-    ControlBuffer,
+    MuseDetectorConstructorOptions,
 } from '../../impl/muse/MuseModelDetector.js'
 
 export default class SpyMuseDetector extends MuseModelDetector {
-    public constructor(ble: BleGatt, controlBuffer: ControlBuffer) {
-        super(ble, controlBuffer)
+    public constructor(options: MuseDetectorConstructorOptions) {
+        super(options)
     }
 
     public setReadControlResponse(

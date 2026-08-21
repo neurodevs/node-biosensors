@@ -1,21 +1,14 @@
-import { WriteStream } from 'node:fs'
-
 import { BleGatt } from '@neurodevs/node-lsl'
-import { XdfRecorder } from '@neurodevs/node-xdf'
 
 import AbstractDeviceController from './AbstractDeviceController.js'
-import { LogLevel } from '../types.js'
+import { DeviceControllerBleConstructorOptions } from '../types.js'
 
 export default abstract class AbstractDeviceControllerBle extends AbstractDeviceController {
     protected readonly ble: BleGatt
 
-    protected constructor(
-        ble: BleGatt,
-        recorder?: XdfRecorder,
-        txtStream?: WriteStream,
-        logLevel?: LogLevel
-    ) {
-        super(recorder, txtStream, logLevel)
+    protected constructor(options: DeviceControllerBleConstructorOptions) {
+        const { ble, ...rest } = options
+        super(rest)
 
         this.ble = ble
     }

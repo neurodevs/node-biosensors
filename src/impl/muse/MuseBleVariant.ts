@@ -12,6 +12,7 @@ import {
 import MuseDeviceController, {
     MuseVariant,
     MuseVariantOptions,
+    MuseVariantConstructorOptions,
 } from './MuseDeviceController.js'
 
 export default class MuseBleVariant implements MuseVariant {
@@ -77,10 +78,9 @@ export default class MuseBleVariant implements MuseVariant {
     public readonly startCommands: readonly string[] = []
     public readonly streamQueries: readonly string[]
 
-    protected constructor(
-        charCallbacks: CharacteristicCallbacks,
-        streamQueries: readonly string[]
-    ) {
+    protected constructor(options: MuseVariantConstructorOptions) {
+        const { charCallbacks, streamQueries } = options
+
         this.charCallbacks = charCallbacks
         this.streamQueries = streamQueries
     }
@@ -128,7 +128,7 @@ export default class MuseBleVariant implements MuseVariant {
             accelRegressor
         )
 
-        return new this(charCallbacks, this.streamQueries)
+        return new this({ charCallbacks, streamQueries: this.streamQueries })
     }
 
     protected static resolveIdentifier(bleUuid?: string) {

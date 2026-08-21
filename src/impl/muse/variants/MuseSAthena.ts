@@ -181,7 +181,7 @@ export default class MuseSAthena extends MuseBleVariant {
 
         const charCallbacks = this.createCharCallbacks(options, outlets)
 
-        return new this(charCallbacks, this.streamQueries)
+        return new this({ charCallbacks, streamQueries: this.streamQueries })
     }
 
     private static createCharCallbacks(
