@@ -40,9 +40,9 @@ export default class GoveeDeviceController
 
     protected readonly deviceUuid: string
     protected readonly temperatureUnits: TemperatureUnits
-    protected readonly temperatureOutlet: LslOutlet
-    protected readonly humidityOutlet: LslOutlet
-    protected readonly batteryOutlet: LslOutlet
+    protected readonly temperatureOutlet?: LslOutlet
+    protected readonly humidityOutlet?: LslOutlet
+    protected readonly batteryOutlet?: LslOutlet
 
     private readonly goveeCompanyId = 60552
 
@@ -84,9 +84,17 @@ export default class GoveeDeviceController
             temperatureUnits = 'Celsius',
         } = options
 
-        const temperatureOutlet = await this.TemperatureOutlet(temperatureUnits)
-        const humidityOutlet = await this.HumidityOutlet()
-        const batteryOutlet = await this.BatteryOutlet()
+        const disabled = this.resolveDisabledStreams(options)
+
+        const temperatureOutlet = !disabled.has('Temperature')
+            ? await this.TemperatureOutlet(temperatureUnits)
+            : undefined
+        const humidityOutlet = !disabled.has('Humidity')
+            ? await this.HumidityOutlet()
+            : undefined
+        const batteryOutlet = !disabled.has('Battery')
+            ? await this.BatteryOutlet()
+            : undefined
 
         const recorder = await this.XdfStreamRecorder(
             xdfRecordPath,
@@ -107,6 +115,11 @@ export default class GoveeDeviceController
         })
     }
 
+    protected static resolveDisabledStreams(options: GoveeControllerOptions) {
+        const { disableStreams } = options
+        return new Set(disableStreams ?? [])
+    }
+
     protected async handleConnect() {
         this.observer = this.BleObserverController()
         await this.observer.startObserving()
@@ -121,7 +134,11 @@ export default class GoveeDeviceController
     protected async handleStopStreaming() {}
 
     public get outlets() {
-        return [this.temperatureOutlet, this.humidityOutlet, this.batteryOutlet]
+        return [
+            this.temperatureOutlet,
+            this.humidityOutlet,
+            this.batteryOutlet,
+        ].filter((outlet) => outlet !== undefined)
     }
 
     public get streamQueries() {
@@ -156,9 +173,9 @@ export default class GoveeDeviceController
 
         this.localName ??= localName
 
-        this.temperatureOutlet.pushSample([temperature], timestampSec)
-        this.humidityOutlet.pushSample([humidity], timestampSec)
-        this.batteryOutlet.pushSample([battery], timestampSec)
+        this.temperatureOutlet?.pushSample([temperature], timestampSec)
+        this.humidityOutlet?.pushSample([humidity], timestampSec)
+        this.batteryOutlet?.pushSample([battery], timestampSec)
 
         const message = `[${timestampSec}] temperature: ${temperature}${this.degreesSymbol}, humidity: ${humidity}%, battery: ${battery}%`
 
@@ -237,7 +254,7 @@ export default class GoveeDeviceController
     }
 }
 
-export interface GoveeControllerOptions extends DeviceControllerOptions {
+export interface GoveeControllerOptions extends DeviceControllerOptions<GoveeStream> {
     deviceUuid: string
     temperatureUnits?: TemperatureUnits
 }
@@ -249,12 +266,14 @@ export type GoveeControllerConstructor = new (
 export interface GoveeControllerConstructorOptions {
     deviceUuid: string
     temperatureUnits: TemperatureUnits
-    temperatureOutlet: LslOutlet
-    humidityOutlet: LslOutlet
-    batteryOutlet: LslOutlet
+    temperatureOutlet?: LslOutlet
+    humidityOutlet?: LslOutlet
+    batteryOutlet?: LslOutlet
     recorder?: XdfRecorder
     logLevel?: LogLevel
     txtStream?: WriteStream
 }
+
+export type GoveeStream = 'Temperature' | 'Humidity' | 'Battery'
 
 export type TemperatureUnits = 'Celsius' | 'Fahrenheit' | 'Kelvin'

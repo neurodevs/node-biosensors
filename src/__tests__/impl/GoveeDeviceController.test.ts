@@ -306,6 +306,21 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
     }
 
     @test()
+    protected static async doesNotCreateOutletsForDisabledStreams() {
+        FakeLslOutlet.callsToConstructor.length = 0
+
+        await this.GoveeDeviceController({
+            disableStreams: ['Temperature', 'Humidity', 'Battery'],
+        })
+
+        assert.isEqual(
+            FakeLslOutlet.callsToConstructor.length,
+            0,
+            'Should not create outlets when passed disableStreams!'
+        )
+    }
+
+    @test()
     protected static async createsBleObserverControllerOnConnect() {
         await this.connect()
 

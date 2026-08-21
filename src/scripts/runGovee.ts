@@ -5,6 +5,7 @@ const govee = await GoveeDeviceController.Create({
     temperatureUnits: 'Fahrenheit',
     txtRecordPath: './artifacts/govee.txt',
     logLevel: 'info',
+    disableStreams: [],
 })
 
 console.info('Connecting to Govee device...')
