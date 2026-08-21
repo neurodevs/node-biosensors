@@ -115,11 +115,6 @@ export default class GoveeDeviceController
         })
     }
 
-    protected static resolveDisabledStreams(options: GoveeControllerOptions) {
-        const { disableStreams } = options
-        return new Set(disableStreams ?? [])
-    }
-
     protected async handleConnect() {
         this.observer = this.BleObserverController()
         await this.observer.startObserving()

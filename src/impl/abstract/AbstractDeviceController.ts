@@ -9,6 +9,7 @@ import {
     DeviceControllerConstructorOptions,
     LogLevel,
     DEFAULT_LOG_LEVEL,
+    DeviceControllerOptions,
 } from '../types.js'
 
 export default abstract class AbstractDeviceController implements DeviceController {
@@ -116,6 +117,13 @@ export default abstract class AbstractDeviceController implements DeviceControll
 
     protected writeTxt(message: string) {
         this.txtStream?.write(`${message}\n`)
+    }
+
+    protected static resolveDisabledStreams<Stream extends string>(
+        options: DeviceControllerOptions<Stream>
+    ) {
+        const { disableStreams } = options
+        return new Set(disableStreams)
     }
 
     protected static TxtRecordStream(txtRecordPath?: string) {
