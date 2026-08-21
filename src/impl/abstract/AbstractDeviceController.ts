@@ -123,7 +123,7 @@ export default abstract class AbstractDeviceController implements DeviceControll
         options: DeviceControllerOptions<Stream>
     ) {
         const { disableStreams } = options
-        return new Set(disableStreams)
+        return new Set(disableStreams ?? [])
     }
 
     protected static TxtRecordStream(txtRecordPath?: string) {
