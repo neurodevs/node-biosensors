@@ -57,13 +57,13 @@ export default class GoveeDeviceController
     protected constructor(options: GoveeControllerConstructorOptions) {
         const {
             deviceUuid,
-            recorder,
-            txtStream,
-            logLevel,
             temperatureUnits,
             temperatureOutlet,
             humidityOutlet,
             batteryOutlet,
+            recorder,
+            txtStream,
+            logLevel,
         } = options
 
         super({ recorder, txtStream, logLevel })
@@ -105,13 +105,13 @@ export default class GoveeDeviceController
 
         return new (this.Class ?? this)({
             deviceUuid,
-            recorder,
-            txtStream,
-            logLevel,
             temperatureUnits,
             temperatureOutlet,
             humidityOutlet,
             batteryOutlet,
+            recorder,
+            txtStream,
+            logLevel,
         })
     }
 
