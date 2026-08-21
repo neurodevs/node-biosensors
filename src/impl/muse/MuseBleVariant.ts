@@ -85,7 +85,9 @@ export default class MuseBleVariant implements MuseVariant {
         this.streamQueries = streamQueries
     }
 
-    public static async Create(options?: MuseVariantOptions) {
+    public static async Create(
+        options?: MuseVariantOptions
+    ): Promise<MuseVariant> {
         const {
             disableEeg,
             disablePpg,
