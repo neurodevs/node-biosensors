@@ -11,10 +11,7 @@ const muse = await MuseDeviceController.Create({
     xdfRecordPath,
     txtRecordPath: undefined,
     logLevel: 'info',
-    disableEeg: false,
-    disablePpg: false,
-    disableAccel: false,
-    disableGyro: false,
+    disableStreams: [],
 })
 
 console.info('Connecting...')

@@ -11,8 +11,8 @@ import {
 
 import MuseDeviceController, {
     MuseVariant,
-    MuseVariantOptions,
     MuseVariantConstructorOptions,
+    MuseVariantOptions,
 } from './MuseDeviceController.js'
 
 export default class MuseBleVariant implements MuseVariant {
@@ -88,26 +88,21 @@ export default class MuseBleVariant implements MuseVariant {
     public static async Create(
         options?: MuseVariantOptions
     ): Promise<MuseVariant> {
-        const {
-            disableEeg,
-            disablePpg,
-            disableGyro,
-            disableAccel,
-            bleUuid = '',
-        } = options ?? {}
+        const { bleUuid = '' } = options ?? {}
 
         const identifier = this.resolveIdentifier(bleUuid)
+        const disabled = this.resolveDisabledStreams(options)
 
-        const eegOutlet = !disableEeg
+        const eegOutlet = !disabled.has('EEG')
             ? await this.EegOutlet(identifier)
             : undefined
-        const ppgOutlet = !disablePpg
+        const ppgOutlet = !disabled.has('PPG')
             ? await this.PpgOutlet(identifier)
             : undefined
-        const gyroOutlet = !disableGyro
+        const gyroOutlet = !disabled.has('Gyroscope')
             ? await this.GyroOutlet(identifier)
             : undefined
-        const accelOutlet = !disableAccel
+        const accelOutlet = !disabled.has('Accelerometer')
             ? await this.AccelOutlet(identifier)
             : undefined
 
@@ -148,16 +143,15 @@ export default class MuseBleVariant implements MuseVariant {
         gyroRegressor?: ClockRegressor,
         accelRegressor?: ClockRegressor
     ) {
-        const { disableEeg, disablePpg, disableGyro, disableAccel } =
-            options ?? {}
-
         const { log, txtStream } = this.resolveLogAndStream(options)
 
+        const disabled = this.resolveDisabledStreams(options)
+
         const disabledChars = new Set<string>([
-            ...(disableEeg ? this.eegCharNames : []),
-            ...(disablePpg ? this.ppgCharNames : []),
-            ...(disableGyro ? ['GYROSCOPE'] : []),
-            ...(disableAccel ? ['ACCELEROMETER'] : []),
+            ...(disabled.has('EEG') ? this.eegCharNames : []),
+            ...(disabled.has('PPG') ? this.ppgCharNames : []),
+            ...(disabled.has('Gyroscope') ? ['GYROSCOPE'] : []),
+            ...(disabled.has('Accelerometer') ? ['ACCELEROMETER'] : []),
         ])
 
         const handleEeg = this.createEegHandler(
@@ -223,6 +217,11 @@ export default class MuseBleVariant implements MuseVariant {
                 handleData(name, bytes, timestampSec)
             },
         }))
+    }
+
+    protected static resolveDisabledStreams(options?: MuseVariantOptions) {
+        const { disableStreams } = options ?? {}
+        return new Set(disableStreams ?? [])
     }
 
     protected static resolveLogAndStream(options?: MuseVariantOptions) {

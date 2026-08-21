@@ -475,7 +475,7 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
         )
     }
 
-    protected static async assertCreatesEegLslOutlet() {
+    protected static async assertCreatesEegOutlet() {
         const firstCall = FakeLslOutlet.callsToConstructor[0]
 
         assert.isEqualDeep(firstCall, {
@@ -491,21 +491,7 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
         })
     }
 
-    protected static async assertDoesNotCreateEegLslOutletWithFlag() {
-        FakeLslOutlet.callsToConstructor.length = 0
-
-        await this.MuseDeviceController({ disableEeg: true })
-
-        assert.isEqual(
-            FakeLslOutlet.callsToConstructor.filter(
-                (call) => call?.name === `Muse EEG (${this.shortUuid})`
-            ).length,
-            0,
-            'Should not create any EEG outlets!'
-        )
-    }
-
-    protected static async assertCreatesPpgLslOutlet() {
+    protected static async assertCreatesPpgOutlet() {
         const secondCall = FakeLslOutlet.callsToConstructor[1]
 
         assert.isEqualDeep(secondCall, {
@@ -521,21 +507,7 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
         })
     }
 
-    protected static async assertDoesNotCreatePpgLslOutletWithFlag() {
-        FakeLslOutlet.callsToConstructor.length = 0
-
-        await this.MuseDeviceController({ disablePpg: true })
-
-        assert.isEqual(
-            FakeLslOutlet.callsToConstructor.filter(
-                (call) => call?.name === `Muse PPG (${this.shortUuid})`
-            ).length,
-            0,
-            'Should not create any PPG outlets!'
-        )
-    }
-
-    protected static async assertCreatesGyroscopeLslOutlet() {
+    protected static async assertCreatesGyroscopeOutlet() {
         const call = FakeLslOutlet.callsToConstructor[2]
 
         assert.isEqualDeep(call, {
@@ -551,21 +523,7 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
         })
     }
 
-    protected static async assertDoesNotCreateGyroscopeLslOutletWithFlag() {
-        FakeLslOutlet.callsToConstructor.length = 0
-
-        await this.MuseDeviceController({ disableGyro: true })
-
-        assert.isEqual(
-            FakeLslOutlet.callsToConstructor.filter(
-                (call) => call?.name === `Muse Gyroscope (${this.shortUuid})`
-            ).length,
-            0,
-            'Should not create any Gyroscope outlets!'
-        )
-    }
-
-    protected static async assertCreatesAccelerometerLslOutlet() {
+    protected static async assertCreatesAccelerometerOutlet() {
         const call = FakeLslOutlet.callsToConstructor[3]
 
         assert.isEqualDeep(call, {
@@ -581,18 +539,17 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
         })
     }
 
-    protected static async assertDoesNotCreateAccelerometerLslOutletWithFlag() {
+    protected static async assertDoesNotCreateOutletsForDisabledStreams() {
         FakeLslOutlet.callsToConstructor.length = 0
 
-        await this.MuseDeviceController({ disableAccel: true })
+        await this.MuseDeviceController({
+            disableStreams: ['EEG', 'PPG', 'Gyroscope', 'Accelerometer'],
+        })
 
         assert.isEqual(
-            FakeLslOutlet.callsToConstructor.filter(
-                (call) =>
-                    call?.name === `Muse Accelerometer (${this.shortUuid})`
-            ).length,
+            FakeLslOutlet.callsToConstructor.length,
             0,
-            'Should not create any Accelerometer outlets!'
+            'Should not create outlets when passed disabledStreams!'
         )
     }
 
@@ -662,7 +619,7 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
         await this.MuseDeviceController({
             logLevel: 'info',
             txtRecordPath: this.txtRecordPath,
-            disableEeg: true,
+            disableStreams: ['EEG'],
         })
 
         this.simulateEegOnData()
@@ -691,7 +648,7 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
         await this.MuseDeviceController({
             logLevel: 'info',
             txtRecordPath: this.txtRecordPath,
-            disablePpg: true,
+            disableStreams: ['PPG'],
         })
 
         this.simulatePpgOnData()
@@ -720,7 +677,7 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
         await this.MuseDeviceController({
             logLevel: 'info',
             txtRecordPath: this.txtRecordPath,
-            disableGyro: true,
+            disableStreams: ['Gyroscope'],
         })
 
         const samples = this.generateImuSamples()
@@ -747,7 +704,7 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
         await this.MuseDeviceController({
             logLevel: 'info',
             txtRecordPath: this.txtRecordPath,
-            disableAccel: true,
+            disableStreams: ['Accelerometer'],
         })
 
         const samples = this.generateImuSamples()

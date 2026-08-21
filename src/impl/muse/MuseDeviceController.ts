@@ -1,9 +1,6 @@
 import { WriteStream } from 'node:fs'
 
-import {
-    BleGattController,
-    CharacteristicCallbacks,
-} from '@neurodevs/node-lsl'
+import { BleGattController, CharacteristicCallbacks } from '@neurodevs/node-lsl'
 
 import {
     DeviceControllerBle,
@@ -139,6 +136,15 @@ export default class MuseDeviceController
     }
 }
 
+export interface MuseControllerOptions
+    extends DeviceControllerBleOptions<MuseStream> {
+    model?: MuseDeviceModel
+}
+
+export interface MuseVariantOptions extends MuseControllerOptions {
+    txtStream?: WriteStream
+}
+
 export type MuseDeviceControllerConstructor = new (
     options: MuseControllerConstructorOptions
 ) => DeviceControllerBle
@@ -146,18 +152,6 @@ export type MuseDeviceControllerConstructor = new (
 export interface MuseControllerConstructorOptions
     extends DeviceControllerBleConstructorOptions {
     variant: MuseVariant
-}
-
-export interface MuseControllerOptions extends DeviceControllerBleOptions {
-    model?: MuseDeviceModel
-    disableEeg?: boolean
-    disablePpg?: boolean
-    disableGyro?: boolean
-    disableAccel?: boolean
-}
-
-export interface MuseVariantOptions extends MuseControllerOptions {
-    txtStream?: WriteStream
 }
 
 export interface MuseVariantConstructorOptions {
@@ -177,3 +171,5 @@ export type MuseDeviceModel =
     | 'Muse S Gen 1'
     | 'Muse 2'
     | 'Muse 1 Gen 2'
+
+export type MuseStream = 'EEG' | 'PPG' | 'Gyroscope' | 'Accelerometer'

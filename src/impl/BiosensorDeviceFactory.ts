@@ -42,7 +42,8 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         deviceName: K,
         options?: PerDeviceOptionsMap[K] & SessionOptions
     ) {
-        this.spec = { deviceName, options } satisfies CreateDeviceSpec
+        const spec = { deviceName, options } satisfies CreateDeviceSpec<K>
+        this.spec = spec as CreateDeviceSpec
 
         const { xdfRecordPath, webSocketPortStart, createEventMarkerEmitter } =
             options ?? {}
@@ -229,7 +230,7 @@ export type PerDeviceOptions = PerDeviceOptionsMap[DeviceName]
 
 export interface PerDeviceOptionsMap extends Record<
     DeviceName,
-    DeviceControllerOptions
+    DeviceControllerOptions<string>
 > {
     'Cognionics Quick-20r': DeviceControllerOptions
     'Govee Thermohygrometer H5074': Partial<GoveeControllerOptions>
@@ -246,12 +247,12 @@ export type DeviceSpecification = {
     [K in DeviceName]: { deviceName: K } & PerDeviceOptionsMap[K]
 }[DeviceName]
 
-export type CreateDeviceSpec = {
-    [K in DeviceName]: {
+export type CreateDeviceSpec<Name extends DeviceName = DeviceName> = {
+    [K in Name]: {
         deviceName: K
         options?: PerDeviceOptionsMap[K] & SessionOptions
     }
-}[DeviceName]
+}[Name]
 
 export interface SessionOptions {
     xdfRecordPath?: string

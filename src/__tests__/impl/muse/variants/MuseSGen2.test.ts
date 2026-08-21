@@ -116,45 +116,29 @@ export default class MuseSGen2Test extends MuseBleVariantTest {
     }
 
     @test()
-    protected static async createsEegLslOutlet() {
-        await this.assertCreatesEegLslOutlet()
+    protected static async createsEegOutlet() {
+        await this.assertCreatesEegOutlet()
     }
 
     @test()
-    protected static async doesNotCreateEegLslOutletWithFlag() {
-        await this.assertDoesNotCreateEegLslOutletWithFlag()
+    protected static async createsPpgOutlet() {
+        await this.assertCreatesPpgOutlet()
     }
 
     @test()
-    protected static async createsPpgLslOutlet() {
-        await this.assertCreatesPpgLslOutlet()
+    protected static async createsGyroscopeOutlet() {
+        await this.assertCreatesGyroscopeOutlet()
     }
 
     @test()
-    protected static async doesNotCreatePpgLslOutletWithFlag() {
-        await this.assertDoesNotCreatePpgLslOutletWithFlag()
+    protected static async createsAccelerometerOutlet() {
+        await this.assertCreatesAccelerometerOutlet()
     }
 
     @test()
-    protected static async createsGyroscopeLslOutlet() {
-        await this.assertCreatesGyroscopeLslOutlet()
+    protected static async doesNotCreateOutletsForDisabledStreams() {
+        this.assertDoesNotCreateOutletsForDisabledStreams()
     }
-
-    @test()
-    protected static async doesNotCreateGyroscopeLslOutletWithFlag() {
-        await this.assertDoesNotCreateGyroscopeLslOutletWithFlag()
-    }
-
-    @test()
-    protected static async createsAccelerometerLslOutlet() {
-        await this.assertCreatesAccelerometerLslOutlet()
-    }
-
-    @test()
-    protected static async doesNotCreateAccelerometerLslOutletWithFlag() {
-        await this.assertDoesNotCreateAccelerometerLslOutletWithFlag()
-    }
-
     @test()
     protected static async createsEegClockRegressor() {
         await this.assertCreatesEegClockRegressor()

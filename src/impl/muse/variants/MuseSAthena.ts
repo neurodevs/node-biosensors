@@ -155,26 +155,22 @@ export default class MuseSAthena extends MuseBleVariant {
     public static async Create(
         options?: MuseVariantOptions
     ): Promise<MuseVariant> {
-        const {
-            disableEeg,
-            disablePpg,
-            disableGyro,
-            disableAccel,
-            bleUuid = '',
-        } = options ?? {}
+        const { bleUuid = '' } = options ?? {}
 
         const identifier = this.resolveIdentifier(bleUuid)
+        const disabled = this.resolveDisabledStreams(options)
 
-        const disableImu = disableGyro && disableAccel
+        const disableImu =
+            disabled.has('Gyroscope') && disabled.has('Accelerometer')
 
         const outlets: AthenaOutlets = {
-            EEG: !disableEeg
+            EEG: !disabled.has('EEG')
                 ? await this.createEegOutlet(identifier)
                 : undefined,
             IMU: !disableImu
                 ? await this.createImuOutlet(identifier)
                 : undefined,
-            OPTICS: !disablePpg
+            OPTICS: !disabled.has('PPG')
                 ? await this.createOpticsOutlet(identifier)
                 : undefined,
         }

@@ -31,13 +31,16 @@ export interface DeviceControllerBle extends DeviceController {
     readonly bleName: string
 }
 
-export interface DeviceControllerOptions {
+export interface DeviceControllerOptions<DeviceStream extends string = never> {
     xdfRecordPath?: string
     txtRecordPath?: string
     logLevel?: LogLevel
+    disableStreams?: readonly DeviceStream[]
 }
 
-export interface DeviceControllerBleOptions extends DeviceControllerOptions {
+export interface DeviceControllerBleOptions<
+    DeviceStream extends string = never,
+> extends DeviceControllerOptions<DeviceStream> {
     bleUuid?: string
     rssiIntervalMs?: number
 }
