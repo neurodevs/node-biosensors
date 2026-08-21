@@ -38,6 +38,8 @@ export default class GoveeDeviceController
 
     protected observer!: BleObserver
 
+    private localName?: string
+
     protected readonly deviceUuid: string
     protected readonly temperatureUnits: TemperatureUnits
     protected readonly temperatureOutlet?: LslOutlet
@@ -51,8 +53,6 @@ export default class GoveeDeviceController
         Fahrenheit: '°F',
         Kelvin: 'K',
     }
-
-    private localName?: string
 
     protected constructor(options: GoveeControllerConstructorOptions) {
         const {
