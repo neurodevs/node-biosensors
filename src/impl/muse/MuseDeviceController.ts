@@ -136,8 +136,7 @@ export default class MuseDeviceController
     }
 }
 
-export interface MuseControllerOptions
-    extends DeviceControllerBleOptions<MuseStream> {
+export interface MuseControllerOptions extends DeviceControllerBleOptions<MuseStream> {
     model?: MuseDeviceModel
 }
 
@@ -149,8 +148,7 @@ export type MuseDeviceControllerConstructor = new (
     options: MuseControllerConstructorOptions
 ) => DeviceControllerBle
 
-export interface MuseControllerConstructorOptions
-    extends DeviceControllerBleConstructorOptions {
+export interface MuseControllerConstructorOptions extends DeviceControllerBleConstructorOptions {
     variant: MuseVariant
 }
 
