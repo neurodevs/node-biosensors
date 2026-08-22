@@ -88,6 +88,16 @@ export default class MuseSAthena extends MuseBleVariant {
 
     private static readonly eegScale = 1450 / 16383
     private static readonly opticsScale = 1 / 32768
+
+    private static readonly bitWidths: Record<string, number> = {
+        EEG: 14,
+        OPTICS: 20,
+    }
+
+    private static readonly scales: Record<string, number> = {
+        EEG: this.eegScale,
+        OPTICS: this.opticsScale,
+    }
     private static readonly accScale = 0.0000610352
     private static readonly gyroScale = -0.0074768
 
@@ -226,6 +236,39 @@ export default class MuseSAthena extends MuseBleVariant {
             OPTICS: this.createDeviceClock(this.sampleRatesHz.OPTICS!),
         }
 
+        const pushSamples = (
+            type: keyof AthenaOutlets,
+            samples: number[][],
+            deviceTime: number,
+            earliestLslTime: number
+        ) => {
+            const rate = this.sampleRatesHz[type]!
+
+            if (samples.length === 0) {
+                return
+            }
+
+            const outlet = outlets[type]
+            const regressor = regressors[type]
+
+            const pushTimestamps = regressor
+                ? regressor.deriveTimestamps(
+                      deviceTime,
+                      earliestLslTime,
+                      samples.length
+                  )
+                : samples.map((_, i) => earliestLslTime + i / rate)
+
+            samples.forEach((sample, i) => {
+                const ts = earliestLslTime + i / rate
+                outlet?.pushSample(sample, pushTimestamps[i])
+
+                const msg = this.formatMessage(type, ts, sample)
+                stream?.write(`${msg}\n`)
+                log?.(msg)
+            })
+        }
+
         return (bytes: number[], timestampSec: number) => {
             const samplesByType: Record<string, number[][]> = {
                 EEG: [],
@@ -251,11 +294,7 @@ export default class MuseSAthena extends MuseBleVariant {
                 }
             }
 
-            for (const [type, outlet, regressor] of [
-                ['EEG', outlets.EEG, regressors.EEG],
-                ['IMU', outlets.IMU, regressors.IMU],
-                ['OPTICS', outlets.OPTICS, regressors.OPTICS],
-            ] as const) {
+            for (const type of ['EEG', 'IMU', 'OPTICS'] as const) {
                 const samples = samplesByType[type]!
                 const rawTick = rawTickByType[type]
 
@@ -265,16 +304,7 @@ export default class MuseSAthena extends MuseBleVariant {
 
                 const deviceTime = clocks[type]!(rawTick, samples.length)
 
-                this.pushSamples(
-                    type,
-                    samples,
-                    deviceTime,
-                    timestampSec,
-                    outlet,
-                    regressor,
-                    log,
-                    stream
-                )
+                pushSamples(type, samples, deviceTime, timestampSec)
             }
         }
     }
@@ -322,40 +352,6 @@ export default class MuseSAthena extends MuseBleVariant {
 
             return (sampleIndex + nSamples - 1) / rate
         }
-    }
-
-    private static pushSamples(
-        type: string,
-        samples: number[][],
-        deviceTime: number,
-        earliestLslTime: number,
-        outlet?: LslOutlet,
-        regressor?: ClockRegressor,
-        log?: (...data: any[]) => void,
-        stream?: WriteStream
-    ) {
-        const rate = this.sampleRatesHz[type]!
-
-        if (samples.length === 0) {
-            return
-        }
-
-        const pushTimestamps = regressor
-            ? regressor.deriveTimestamps(
-                  deviceTime,
-                  earliestLslTime,
-                  samples.length
-              )
-            : samples.map((_, i) => earliestLslTime + i / rate)
-
-        samples.forEach((sample, i) => {
-            const ts = earliestLslTime + i / rate
-            outlet?.pushSample(sample, pushTimestamps[i])
-
-            const msg = this.formatMessage(type, ts, sample)
-            stream?.write(`${msg}\n`)
-            log?.(msg)
-        })
     }
 
     private static parsePackets(payload: number[]) {
@@ -466,7 +462,7 @@ export default class MuseSAthena extends MuseBleVariant {
             return undefined
         }
 
-        const { type, nChannels, nSamples } = config
+        const { type, nChannels } = config
         const { dataBytes } = subpacket
 
         const expected = this.expectedChannels[type]
@@ -478,24 +474,12 @@ export default class MuseSAthena extends MuseBleVariant {
             case 'EEG':
                 return {
                     type: 'EEG',
-                    samples: this.decodePacked(
-                        dataBytes,
-                        nChannels,
-                        nSamples,
-                        14,
-                        this.eegScale
-                    ),
+                    samples: this.decodePacked(dataBytes, config),
                 }
             case 'OPTICS':
                 return {
                     type: 'OPTICS',
-                    samples: this.decodePacked(
-                        dataBytes,
-                        nChannels,
-                        nSamples,
-                        20,
-                        this.opticsScale
-                    ),
+                    samples: this.decodePacked(dataBytes, config),
                 }
             case 'IMU':
                 return { type: 'IMU', samples: this.decodeImu(dataBytes) }
@@ -504,13 +488,12 @@ export default class MuseSAthena extends MuseBleVariant {
         }
     }
 
-    private static decodePacked(
-        dataBytes: number[],
-        nChannels: number,
-        nSamples: number,
-        bitWidth: number,
-        scale: number
-    ) {
+    private static decodePacked(dataBytes: number[], config: SensorConfig) {
+        const { type, nChannels, nSamples } = config
+
+        const bitWidth = this.bitWidths[type]!
+        const scale = this.scales[type]!
+
         const bits = this.bytesToBits(dataBytes)
         const samples: number[][] = []
 

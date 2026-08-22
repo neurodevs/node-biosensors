@@ -10,6 +10,7 @@ import {
 } from '@neurodevs/node-lsl'
 
 import MuseDeviceController, {
+    MuseStream,
     MuseVariant,
     MuseVariantConstructorOptions,
     MuseVariantOptions,
@@ -74,6 +75,11 @@ export default class MuseBleVariant implements MuseVariant {
     private static readonly imuSampleRateHz = 52
     private static readonly imuChunkSize = 3
 
+    private static readonly imuScales: Record<string, number> = {
+        GYROSCOPE: 0.0074768,
+        ACCELEROMETER: 0.0000610352,
+    }
+
     public readonly charCallbacks: CharacteristicCallbacks
     public readonly startCommands: readonly string[] = []
     public readonly streamQueries: readonly string[]
@@ -106,21 +112,22 @@ export default class MuseBleVariant implements MuseVariant {
             ? await this.AccelOutlet(identifier)
             : undefined
 
-        const eegRegressor = this.WindowedClockRegressor(this.eegSampleRateHz)
-        const ppgRegressor = this.WindowedClockRegressor(this.ppgSampleRateHz)
-        const gyroRegressor = this.WindowedClockRegressor(this.imuSampleRateHz)
-        const accelRegressor = this.WindowedClockRegressor(this.imuSampleRateHz)
-
         const charCallbacks = this.generateCharCallbacks(
             options,
-            eegOutlet,
-            ppgOutlet,
-            gyroOutlet,
-            accelOutlet,
-            eegRegressor,
-            ppgRegressor,
-            gyroRegressor,
-            accelRegressor
+            {
+                EEG: eegOutlet,
+                PPG: ppgOutlet,
+                Gyroscope: gyroOutlet,
+                Accelerometer: accelOutlet,
+            },
+            {
+                EEG: this.WindowedClockRegressor(this.eegSampleRateHz),
+                PPG: this.WindowedClockRegressor(this.ppgSampleRateHz),
+                Gyroscope: this.WindowedClockRegressor(this.imuSampleRateHz),
+                Accelerometer: this.WindowedClockRegressor(
+                    this.imuSampleRateHz
+                ),
+            }
         )
 
         return new this({ charCallbacks, streamQueries: this.streamQueries })
@@ -133,15 +140,9 @@ export default class MuseBleVariant implements MuseVariant {
     }
 
     private static generateCharCallbacks(
-        options?: MuseVariantOptions,
-        eegOutlet?: LslOutlet,
-        ppgOutlet?: LslOutlet,
-        gyroOutlet?: LslOutlet,
-        accelOutlet?: LslOutlet,
-        eegRegressor?: ClockRegressor,
-        ppgRegressor?: ClockRegressor,
-        gyroRegressor?: ClockRegressor,
-        accelRegressor?: ClockRegressor
+        options: MuseVariantOptions | undefined,
+        outlets: Partial<Record<MuseStream, LslOutlet>>,
+        regressors: Partial<Record<MuseStream, ClockRegressor>>
     ) {
         const { log, txtStream } = this.resolveLogAndStream(options)
 
@@ -157,26 +158,26 @@ export default class MuseBleVariant implements MuseVariant {
         const handleEeg = this.createEegHandler(
             log,
             txtStream,
-            eegOutlet,
-            eegRegressor
+            outlets.EEG,
+            regressors.EEG
         )
         const handlePpg = this.createPpgHandler(
             log,
             txtStream,
-            ppgOutlet,
-            ppgRegressor
+            outlets.PPG,
+            regressors.PPG
         )
         const handleGyro = this.createGyroHandler(
             log,
             txtStream,
-            gyroOutlet,
-            gyroRegressor
+            outlets.Gyroscope,
+            regressors.Gyroscope
         )
         const handleAccel = this.createAccelHandler(
             log,
             txtStream,
-            accelOutlet,
-            accelRegressor
+            outlets.Accelerometer,
+            regressors.Accelerometer
         )
 
         const handleData = (
@@ -393,15 +394,13 @@ export default class MuseBleVariant implements MuseVariant {
 
     private static createAccelHandler(
         log?: (...data: any[]) => void,
-        stream?: fs.WriteStream,
+        txtStream?: fs.WriteStream,
         outlet?: LslOutlet,
         regressor?: ClockRegressor
     ) {
         return this.createImuHandler(
             'ACCELEROMETER',
-            0.0000610352,
-            log,
-            stream,
+            { log, txtStream },
             outlet,
             regressor
         )
@@ -409,15 +408,13 @@ export default class MuseBleVariant implements MuseVariant {
 
     private static createGyroHandler(
         log?: (...data: any[]) => void,
-        stream?: fs.WriteStream,
+        txtStream?: fs.WriteStream,
         outlet?: LslOutlet,
         regressor?: ClockRegressor
     ) {
         return this.createImuHandler(
             'GYROSCOPE',
-            0.0074768,
-            log,
-            stream,
+            { log, txtStream },
             outlet,
             regressor
         )
@@ -425,12 +422,13 @@ export default class MuseBleVariant implements MuseVariant {
 
     private static createImuHandler(
         name: string,
-        scale: number,
-        log?: (...data: any[]) => void,
-        stream?: WriteStream,
+        logAndStream: ReturnType<typeof MuseBleVariant.resolveLogAndStream>,
         outlet?: LslOutlet,
         regressor?: ClockRegressor
     ) {
+        const { log, txtStream: stream } = logAndStream
+        const scale = this.imuScales[name]!
+
         return (bytes: number[], timestampSec: number) => {
             const samples = this.decodeImuPacket(bytes, scale)
             const packetCounter = this.readUInt16BE(bytes, 0)
