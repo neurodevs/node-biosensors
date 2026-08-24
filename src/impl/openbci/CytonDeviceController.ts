@@ -54,8 +54,15 @@ export default class CytonDeviceController
             logLevel,
         } = options ?? {}
 
-        await this.ExgOutlet(serialNumber, exgType)
-        await this.AccelOutlet(serialNumber)
+        const disabled = this.resolveDisabledStreams(options ?? {})
+
+        if (!disabled.has('ExG')) {
+            await this.ExgOutlet(serialNumber, exgType)
+        }
+
+        if (!disabled.has('Accelerometer')) {
+            await this.AccelOutlet(serialNumber)
+        }
 
         const onData = this.createOnData(logDeviceInfo, logLevel)
         const usb = this.UsbDeviceController(serialNumber, onData)
@@ -205,7 +212,7 @@ export type CytonControllerConstructor = new (
     options: CytonControllerConstructorOptions
 ) => CytonController
 
-export interface CytonControllerOptions extends DeviceControllerOptions {
+export interface CytonControllerOptions extends DeviceControllerOptions<CytonStream> {
     serialNumber?: string
     exgType?: string
     waitAfterConnectMs?: number
@@ -227,3 +234,5 @@ export type OnUsbData = (
     length: number,
     timestampSec: number
 ) => void
+
+export type CytonStream = 'ExG' | 'Accelerometer'

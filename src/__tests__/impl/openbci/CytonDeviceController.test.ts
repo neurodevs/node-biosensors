@@ -371,6 +371,21 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
     }
 
     @test()
+    protected static async doesNotCreateOutletsForDisabledStreams() {
+        FakeLslOutlet.callsToConstructor.length = 0
+
+        await this.CytonDeviceController({
+            disableStreams: ['ExG', 'Accelerometer'],
+        })
+
+        assert.isEqual(
+            FakeLslOutlet.callsToConstructor.length,
+            0,
+            'Should not create outlets when passed disableStreams!'
+        )
+    }
+
+    @test()
     protected static async logsIfPassedLogLevelInfo() {
         await this.assertLogsIfPassedLogLevelInfo()
     }
