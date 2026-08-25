@@ -22,7 +22,7 @@ export default class FakeDeviceFactory implements DeviceFactory {
     }[] = []
 
     public static callsToCreateDevices: {
-        deviceSpecifications: DeviceSpecification[]
+        deviceSpecifications: readonly DeviceSpecification[]
         sessionOptions?: SessionOptions
     }[] = []
 
@@ -65,7 +65,7 @@ export default class FakeDeviceFactory implements DeviceFactory {
     }
 
     public async createDevices(
-        deviceSpecifications: DeviceSpecification[],
+        deviceSpecifications: readonly DeviceSpecification[],
         sessionOptions?: SessionOptions
     ) {
         FakeDeviceFactory.callsToCreateDevices.push({

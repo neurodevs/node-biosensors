@@ -182,7 +182,7 @@ export default class MuseBleVariant implements MuseVariant {
 
         const handleData = (
             charName: string,
-            bytes: number[],
+            bytes: readonly number[],
             timestampSec: number
         ) => {
             switch (true) {
@@ -259,7 +259,11 @@ export default class MuseBleVariant implements MuseVariant {
         let t0 = 0
         let packetCounter = 0
 
-        return (charName: string, bytes: number[], timestampSec: number) => {
+        return (
+            charName: string,
+            bytes: readonly number[],
+            timestampSec: number
+        ) => {
             const charIdx = this.eegCharNames.indexOf(charName)
 
             if (charIdx === 0) {
@@ -295,11 +299,14 @@ export default class MuseBleVariant implements MuseVariant {
         }
     }
 
-    private static readUInt16BE(bytes: number[], offset: number) {
+    private static readUInt16BE(bytes: readonly number[], offset: number) {
         return (bytes[offset]! << 8) | bytes[offset + 1]!
     }
 
-    private static isCompletePacket(charCounters: number[], numChars: number) {
+    private static isCompletePacket(
+        charCounters: readonly number[],
+        numChars: number
+    ) {
         return (
             charCounters.length === numChars &&
             charCounters.every((counter) => counter === charCounters[0])
@@ -321,7 +328,7 @@ export default class MuseBleVariant implements MuseVariant {
         )
     }
 
-    private static decodeEegCharChunk(bytes: number[]) {
+    private static decodeEegCharChunk(bytes: readonly number[]) {
         const decoded: number[] = []
 
         for (let i = 0; i < bytes.length; i += 3) {
@@ -348,7 +355,11 @@ export default class MuseBleVariant implements MuseVariant {
         let t0 = 0
         let packetCounter = 0
 
-        return (charName: string, bytes: number[], timestampSec: number) => {
+        return (
+            charName: string,
+            bytes: readonly number[],
+            timestampSec: number
+        ) => {
             const charIdx = this.ppgCharNames.indexOf(charName)
 
             if (charIdx === 0) {
@@ -380,7 +391,7 @@ export default class MuseBleVariant implements MuseVariant {
         }
     }
 
-    private static decodePpgCharChunk(bytes: number[]) {
+    private static decodePpgCharChunk(bytes: readonly number[]) {
         const charSamples: number[] = []
 
         for (let i = 0; i < bytes.length; i += 3) {
@@ -429,7 +440,7 @@ export default class MuseBleVariant implements MuseVariant {
         const { log, txtStream: stream } = logAndStream
         const scale = this.imuScales[name]!
 
-        return (bytes: number[], timestampSec: number) => {
+        return (bytes: readonly number[], timestampSec: number) => {
             const samples = this.decodeImuPacket(bytes, scale)
             const packetCounter = this.readUInt16BE(bytes, 0)
 
@@ -451,7 +462,7 @@ export default class MuseBleVariant implements MuseVariant {
         }
     }
 
-    private static decodeImuPacket(bytes: number[], scale: number) {
+    private static decodeImuPacket(bytes: readonly number[], scale: number) {
         const samples: number[][] = []
 
         for (let i = 0; i < this.imuChunkSize; i++) {
@@ -464,7 +475,7 @@ export default class MuseBleVariant implements MuseVariant {
         return samples
     }
 
-    private static readInt16BE(bytes: number[], offset: number) {
+    private static readInt16BE(bytes: readonly number[], offset: number) {
         const value = (bytes[offset]! << 8) | bytes[offset + 1]!
         return value >= 0x8000 ? value - 0x10000 : value
     }

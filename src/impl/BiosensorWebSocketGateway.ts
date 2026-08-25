@@ -10,7 +10,7 @@ import { DeviceController } from './types.js'
 export default class BiosensorWebSocketGateway implements WebSocketGateway {
     public static Class?: WebSocketGatewayConstructor
 
-    private bridges: LslWsBridge[]
+    private bridges: readonly LslWsBridge[]
     private isOpen = false
     private isDestroyed = false
 
@@ -21,7 +21,7 @@ export default class BiosensorWebSocketGateway implements WebSocketGateway {
     }
 
     public static async Create(
-        devices: DeviceController[],
+        devices: readonly DeviceController[],
         options?: WebSocketGatewayOptions
     ) {
         const bridges = await this.createBridgesFrom(devices, options)
@@ -92,7 +92,7 @@ export default class BiosensorWebSocketGateway implements WebSocketGateway {
     }
 
     private static async createBridgesFrom(
-        devices: DeviceController[],
+        devices: readonly DeviceController[],
         options?: WebSocketGatewayOptions
     ) {
         const { listenPortStart = 8080 } = options ?? {}
@@ -146,5 +146,5 @@ export type WebSocketGatewayConstructor = new (
 ) => WebSocketGateway
 
 export interface WebSocketGatewayConstructorOptions {
-    bridges: LslWsBridge[]
+    bridges: readonly LslWsBridge[]
 }

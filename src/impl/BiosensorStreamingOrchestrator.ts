@@ -11,10 +11,10 @@ import { WebSocketGateway } from './BiosensorWebSocketGateway.js'
 export default class BiosensorStreamingOrchestrator implements StreamingOrchestrator {
     public static Class?: StreamingOrchestratorConstructor
 
-    private devices: (DeviceName | DeviceSpecification)[]
+    private devices: readonly (DeviceName | DeviceSpecification)[]
     private xdfRecordPath?: string
     private webSocketPortStart?: number
-    private eventMarkers?: TimedEventMarker[]
+    private eventMarkers?: readonly TimedEventMarker[]
 
     private factory: DeviceFactory
     private recorder?: XdfRecorder
@@ -133,10 +133,10 @@ export type StreamingOrchestratorConstructor = new (
 ) => StreamingOrchestrator
 
 export interface StreamingOrchestratorOptions {
-    devices: (DeviceName | DeviceSpecification)[]
+    devices: readonly (DeviceName | DeviceSpecification)[]
     xdfRecordPath?: string
     webSocketPortStart?: number
-    eventMarkers?: TimedEventMarker[]
+    eventMarkers?: readonly TimedEventMarker[]
 }
 
 export interface StreamingOrchestratorConstructorOptions extends StreamingOrchestratorOptions {

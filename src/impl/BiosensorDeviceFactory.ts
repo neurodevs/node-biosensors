@@ -29,7 +29,7 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
     private spec!: CreateDeviceSpec
     private createdDevice!: DeviceController
 
-    private deviceSpecs!: DeviceSpecification[]
+    private deviceSpecs!: readonly DeviceSpecification[]
     private createdBundles!: SingleDeviceBundle[]
 
     protected constructor() {}
@@ -106,7 +106,7 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
     }
 
     public async createDevices(
-        deviceSpecifications: DeviceSpecification[],
+        deviceSpecifications: readonly DeviceSpecification[],
         options?: SessionOptions
     ) {
         const { xdfRecordPath, webSocketPortStart, createEventMarkerEmitter } =
@@ -199,7 +199,7 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
     }
 
     private async BiosensorWebSocketGateway(
-        devices: DeviceController[],
+        devices: readonly DeviceController[],
         webSocketPortStart: number
     ) {
         return BiosensorWebSocketGateway.Create(devices, {
@@ -219,7 +219,7 @@ export interface DeviceFactory {
     ): Promise<SingleDeviceBundle>
 
     createDevices(
-        deviceSpecifications: DeviceSpecification[],
+        deviceSpecifications: readonly DeviceSpecification[],
         options?: SessionOptions
     ): Promise<MultipleDeviceBundle>
 }

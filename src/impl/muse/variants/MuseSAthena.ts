@@ -238,7 +238,7 @@ export default class MuseSAthena extends MuseBleVariant {
 
         const pushSamples = (
             type: keyof AthenaOutlets,
-            samples: number[][],
+            samples: readonly number[][],
             deviceTime: number,
             earliestLslTime: number
         ) => {
@@ -269,7 +269,7 @@ export default class MuseSAthena extends MuseBleVariant {
             })
         }
 
-        return (bytes: number[], timestampSec: number) => {
+        return (bytes: readonly number[], timestampSec: number) => {
             const samplesByType: Record<string, number[][]> = {
                 EEG: [],
                 IMU: [],
@@ -354,7 +354,7 @@ export default class MuseSAthena extends MuseBleVariant {
         }
     }
 
-    private static parsePackets(payload: number[]) {
+    private static parsePackets(payload: readonly number[]) {
         const packets: {
             tag: number
             data: number[]
@@ -397,7 +397,7 @@ export default class MuseSAthena extends MuseBleVariant {
         return packets
     }
 
-    private static readUInt32LE(bytes: number[], offset: number) {
+    private static readUInt32LE(bytes: readonly number[], offset: number) {
         return (
             (bytes[offset]! |
                 (bytes[offset + 1]! << 8) |
@@ -488,7 +488,10 @@ export default class MuseSAthena extends MuseBleVariant {
         }
     }
 
-    private static decodePacked(dataBytes: number[], config: SensorConfig) {
+    private static decodePacked(
+        dataBytes: readonly number[],
+        config: SensorConfig
+    ) {
         const { type, nChannels, nSamples } = config
 
         const bitWidth = this.bitWidths[type]!
@@ -512,7 +515,7 @@ export default class MuseSAthena extends MuseBleVariant {
         return samples
     }
 
-    private static decodeImu(dataBytes: number[]) {
+    private static decodeImu(dataBytes: readonly number[]) {
         // One 0x47 subpacket holds 3 samples of [ACC_X,Y,Z, GYRO_X,Y,Z].
         const samples: number[][] = []
 
@@ -531,7 +534,7 @@ export default class MuseSAthena extends MuseBleVariant {
         return samples
     }
 
-    private static bytesToBits(bytes: number[]) {
+    private static bytesToBits(bytes: readonly number[]) {
         const bits: number[] = []
 
         for (const byte of bytes) {
@@ -543,7 +546,11 @@ export default class MuseSAthena extends MuseBleVariant {
         return bits
     }
 
-    private static extractInt(bits: number[], start: number, width: number) {
+    private static extractInt(
+        bits: readonly number[],
+        start: number,
+        width: number
+    ) {
         let value = 0
 
         for (let i = 0; i < width; i++) {
@@ -555,7 +562,7 @@ export default class MuseSAthena extends MuseBleVariant {
         return value
     }
 
-    private static readInt16LE(bytes: number[], offset: number) {
+    private static readInt16LE(bytes: readonly number[], offset: number) {
         const value = bytes[offset]! | (bytes[offset + 1]! << 8)
         return value >= 0x8000 ? value - 0x10000 : value
     }
@@ -608,7 +615,7 @@ interface AthenaClockRegressors {
 
 interface Subpacket {
     tag: number
-    dataBytes: number[]
+    dataBytes: readonly number[]
 }
 
 interface DecodedSubpacket {
