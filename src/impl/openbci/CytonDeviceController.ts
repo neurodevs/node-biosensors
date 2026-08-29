@@ -209,10 +209,6 @@ export default class CytonDeviceController
 
 export interface CytonController extends DeviceController {}
 
-export type CytonControllerConstructor = new (
-    options: CytonControllerConstructorOptions
-) => CytonController
-
 export type CytonControllerOptions = Resolve<
     DeviceControllerOptions<CytonStream> & {
         serialNumber?: string
@@ -221,6 +217,10 @@ export type CytonControllerOptions = Resolve<
         logDeviceInfo?: boolean
     }
 >
+
+export type CytonControllerConstructor = new (
+    options: CytonControllerConstructorOptions
+) => CytonController
 
 export interface CytonControllerConstructorOptions {
     usb: UsbDevice

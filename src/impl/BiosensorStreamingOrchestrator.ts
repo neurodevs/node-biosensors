@@ -128,16 +128,16 @@ export interface StreamingOrchestrator {
     stop(): Promise<void>
 }
 
-export type StreamingOrchestratorConstructor = new (
-    options: StreamingOrchestratorConstructorOptions
-) => StreamingOrchestrator
-
 export interface StreamingOrchestratorOptions {
     devices: readonly (DeviceName | DeviceSpecification)[]
     xdfRecordPath?: string
     webSocketPortStart?: number
     eventMarkers?: readonly TimedEventMarker[]
 }
+
+export type StreamingOrchestratorConstructor = new (
+    options: StreamingOrchestratorConstructorOptions
+) => StreamingOrchestrator
 
 export interface StreamingOrchestratorConstructorOptions extends StreamingOrchestratorOptions {
     factory: DeviceFactory

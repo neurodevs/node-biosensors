@@ -1,5 +1,3 @@
-import { WriteStream } from 'node:fs'
-
 import { BleGattController, CharacteristicCallbacks } from '@neurodevs/node-lsl'
 
 import {
@@ -15,6 +13,7 @@ import MuseSGen1 from './variants/MuseSGen1.js'
 import Muse2 from './variants/Muse2.js'
 import Muse1Gen2 from './variants/Muse1Gen2.js'
 import { detectMuseModel } from './MuseModelDetector.js'
+import { MuseVariant, MuseVariantOptions } from './MuseBleVariant.js'
 
 export const CONTROL_UUID = '273E0001-4C4D-454D-96BE-F03BAC821358'
 
@@ -143,29 +142,12 @@ export type MuseControllerOptions = Resolve<
     }
 >
 
-export type MuseVariantOptions = Resolve<
-    MuseControllerOptions & {
-        txtStream?: WriteStream
-    }
->
-
 export type MuseDeviceControllerConstructor = new (
     options: MuseControllerConstructorOptions
 ) => DeviceControllerBle
 
 export interface MuseControllerConstructorOptions extends DeviceControllerBleConstructorOptions {
     variant: MuseVariant
-}
-
-export interface MuseVariantConstructorOptions {
-    charCallbacks: CharacteristicCallbacks
-    streamQueries: readonly string[]
-}
-
-export interface MuseVariant {
-    readonly charCallbacks: CharacteristicCallbacks
-    readonly streamQueries: readonly string[]
-    readonly startCommands: readonly string[]
 }
 
 export type MuseDeviceModel =

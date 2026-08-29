@@ -2,10 +2,7 @@ import { WriteStream } from 'node:fs'
 
 import { ClockRegressor, LslOutlet } from '@neurodevs/node-lsl'
 
-import {
-    type MuseVariant,
-    type MuseVariantOptions,
-} from '../MuseDeviceController.js'
+import { type MuseVariant, type MuseVariantOptions } from '../MuseBleVariant.js'
 import MuseBleVariant from '../MuseBleVariant.js'
 
 export default class MuseSAthena extends MuseBleVariant {

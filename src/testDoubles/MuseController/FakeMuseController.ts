@@ -1,10 +1,8 @@
 import { BleGatt, FakeLslOutlet } from '@neurodevs/node-lsl'
 import { XdfRecorder } from '@neurodevs/node-xdf'
 import { DeviceControllerBle } from '../../impl/types.js'
-import {
-    MuseControllerConstructorOptions,
-    MuseVariant,
-} from '../../impl/muse/MuseDeviceController.js'
+import { MuseControllerConstructorOptions } from '../../impl/muse/MuseDeviceController.js'
+import { MuseVariant } from '../../impl/muse/MuseBleVariant.js'
 
 export default class FakeMuseController implements DeviceControllerBle {
     public static callsToConstructor: MuseControllerConstructorOptions[] = []

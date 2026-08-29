@@ -10,11 +10,10 @@ import {
 } from '@neurodevs/node-lsl'
 
 import MuseDeviceController, {
+    MuseControllerOptions,
     MuseStream,
-    MuseVariant,
-    MuseVariantConstructorOptions,
-    MuseVariantOptions,
 } from './MuseDeviceController.js'
+import { Resolve } from '../types.js'
 
 export default class MuseBleVariant implements MuseVariant {
     protected static readonly streamQueries = [
@@ -543,4 +542,21 @@ export default class MuseBleVariant implements MuseVariant {
             units: 'g',
         })
     }
+}
+
+export interface MuseVariant {
+    readonly charCallbacks: CharacteristicCallbacks
+    readonly streamQueries: readonly string[]
+    readonly startCommands: readonly string[]
+}
+
+export type MuseVariantOptions = Resolve<
+    MuseControllerOptions & {
+        txtStream?: WriteStream
+    }
+>
+
+export interface MuseVariantConstructorOptions {
+    charCallbacks: CharacteristicCallbacks
+    streamQueries: readonly string[]
 }
