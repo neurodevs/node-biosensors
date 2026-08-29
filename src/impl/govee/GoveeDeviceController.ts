@@ -14,6 +14,7 @@ import {
     DeviceControllerBle,
     DeviceControllerOptions,
     LogLevel,
+    Resolve,
 } from '../types.js'
 import AbstractDeviceController from '../abstract/AbstractDeviceController.js'
 
@@ -249,10 +250,12 @@ export default class GoveeDeviceController
     }
 }
 
-export interface GoveeControllerOptions extends DeviceControllerOptions<GoveeStream> {
-    deviceUuid: string
-    temperatureUnits?: TemperatureUnits
-}
+export type GoveeControllerOptions = Resolve<
+    DeviceControllerOptions<GoveeStream> & {
+        deviceUuid: string
+        temperatureUnits?: TemperatureUnits
+    }
+>
 
 export type GoveeControllerConstructor = new (
     options: GoveeControllerConstructorOptions

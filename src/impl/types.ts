@@ -31,19 +31,21 @@ export interface DeviceControllerBle extends DeviceController {
     readonly bleName: string
 }
 
-export interface DeviceControllerOptions<DeviceStream extends string = never> {
-    xdfRecordPath?: string
-    txtRecordPath?: string
-    logLevel?: LogLevel
-    disableStreams?: readonly DeviceStream[]
-}
+export type DeviceControllerOptions<DeviceStream extends string = never> =
+    Resolve<{
+        xdfRecordPath?: string
+        txtRecordPath?: string
+        logLevel?: LogLevel
+        disableStreams?: readonly DeviceStream[]
+    }>
 
-export interface DeviceControllerBleOptions<
-    DeviceStream extends string = never,
-> extends DeviceControllerOptions<DeviceStream> {
-    bleUuid?: string
-    rssiIntervalMs?: number
-}
+export type DeviceControllerBleOptions<DeviceStream extends string = never> =
+    Resolve<
+        DeviceControllerOptions<DeviceStream> & {
+            bleUuid?: string
+            rssiIntervalMs?: number
+        }
+    >
 
 export interface DeviceControllerConstructorOptions {
     recorder?: XdfRecorder
@@ -69,6 +71,8 @@ export type DeviceControllerConstructor = new (
 export type DeviceControllerBleConstructor = new (
     options: DeviceControllerBleConstructorOptions
 ) => DeviceControllerBle
+
+export type Resolve<T> = { [K in keyof T]: T[K] } & {}
 
 export type DeviceState = 'disconnected' | 'connected' | 'streaming'
 

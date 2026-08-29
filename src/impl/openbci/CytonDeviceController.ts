@@ -9,6 +9,7 @@ import {
     DeviceController,
     DeviceControllerOptions,
     LogLevel,
+    Resolve,
 } from '../types.js'
 import AbstractDeviceControllerUsb from '../abstract/AbstractDeviceControllerUsb.js'
 
@@ -212,12 +213,14 @@ export type CytonControllerConstructor = new (
     options: CytonControllerConstructorOptions
 ) => CytonController
 
-export interface CytonControllerOptions extends DeviceControllerOptions<CytonStream> {
-    serialNumber?: string
-    exgType?: string
-    waitAfterConnectMs?: number
-    logDeviceInfo?: boolean
-}
+export type CytonControllerOptions = Resolve<
+    DeviceControllerOptions<CytonStream> & {
+        serialNumber?: string
+        exgType?: string
+        waitAfterConnectMs?: number
+        logDeviceInfo?: boolean
+    }
+>
 
 export interface CytonControllerConstructorOptions {
     usb: UsbDevice

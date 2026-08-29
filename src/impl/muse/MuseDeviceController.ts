@@ -6,6 +6,7 @@ import {
     DeviceControllerBle,
     DeviceControllerBleConstructorOptions,
     DeviceControllerBleOptions,
+    Resolve,
 } from '../types.js'
 import AbstractDeviceControllerBle from '../abstract/AbstractDeviceControllerBle.js'
 import MuseSAthena from './variants/MuseSAthena.js'
@@ -136,13 +137,17 @@ export default class MuseDeviceController
     }
 }
 
-export interface MuseControllerOptions extends DeviceControllerBleOptions<MuseStream> {
-    model?: MuseDeviceModel
-}
+export type MuseControllerOptions = Resolve<
+    DeviceControllerBleOptions<MuseStream> & {
+        model?: MuseDeviceModel
+    }
+>
 
-export interface MuseVariantOptions extends MuseControllerOptions {
-    txtStream?: WriteStream
-}
+export type MuseVariantOptions = Resolve<
+    MuseControllerOptions & {
+        txtStream?: WriteStream
+    }
+>
 
 export type MuseDeviceControllerConstructor = new (
     options: MuseControllerConstructorOptions
