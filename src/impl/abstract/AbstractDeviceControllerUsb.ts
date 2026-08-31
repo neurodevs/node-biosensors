@@ -1,6 +1,6 @@
 import { UsbDevice } from '@neurodevs/node-lsl'
 
-import { DeviceControllerUsbConstructorOptions } from '../types.js'
+import { DeviceControllerUsbConstructorOptions } from '../../types.js'
 
 import AbstractDeviceController from './AbstractDeviceController.js'
 

@@ -13,7 +13,7 @@ import MuseDeviceController, {
     MuseControllerOptions,
     MuseStream,
 } from './MuseDeviceController.js'
-import { Resolve } from '../types.js'
+import { Resolve } from '../../types.js'
 
 export default class MuseBleVariant implements MuseVariant {
     protected static readonly streamQueries = [

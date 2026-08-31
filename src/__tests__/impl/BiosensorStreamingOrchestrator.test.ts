@@ -5,7 +5,7 @@ import { test, assert } from '@neurodevs/node-tdd'
 import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 
 import { DeviceSpecification } from '../../impl/BiosensorDeviceFactory.js'
-import { DeviceName } from '../../impl/types.js'
+import { DeviceName } from '../../types.js'
 import BiosensorStreamingOrchestrator, {
     StreamingOrchestrator,
     StreamingOrchestratorConstructorOptions,

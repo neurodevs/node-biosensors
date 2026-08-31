@@ -10,7 +10,7 @@ import {
     DeviceControllerOptions,
     LogLevel,
     Resolve,
-} from '../types.js'
+} from '../../types.js'
 import AbstractDeviceControllerUsb from '../abstract/AbstractDeviceControllerUsb.js'
 
 export default class CytonDeviceController

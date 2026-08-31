@@ -1,4 +1,4 @@
-export * from './impl/types.js'
+export * from './types.js'
 
 // BiosensorDeviceFactory
 

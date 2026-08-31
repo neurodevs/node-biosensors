@@ -5,7 +5,7 @@ import BiosensorDeviceFactory, {
     DeviceFactory,
     DeviceSpecification,
 } from './BiosensorDeviceFactory.js'
-import { DeviceName, DeviceController } from './types.js'
+import { DeviceName, DeviceController } from '../types.js'
 import { WebSocketGateway } from './BiosensorWebSocketGateway.js'
 
 export default class BiosensorStreamingOrchestrator implements StreamingOrchestrator {

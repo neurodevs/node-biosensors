@@ -5,7 +5,7 @@ import {
     LslWsBridgeOptions,
 } from '@neurodevs/node-lsl'
 
-import { DeviceController } from './types.js'
+import { DeviceController } from '../types.js'
 
 export default class BiosensorWebSocketGateway implements WebSocketGateway {
     public static Class?: WebSocketGatewayConstructor

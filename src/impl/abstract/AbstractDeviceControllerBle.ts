@@ -1,7 +1,7 @@
 import { BleGatt } from '@neurodevs/node-lsl'
 
 import AbstractDeviceController from './AbstractDeviceController.js'
-import { DeviceControllerBleConstructorOptions } from '../types.js'
+import { DeviceControllerBleConstructorOptions } from '../../types.js'
 
 export default abstract class AbstractDeviceControllerBle extends AbstractDeviceController {
     protected readonly ble: BleGatt

@@ -9,7 +9,7 @@ import {
     SingleDeviceBundle,
     MultipleDeviceBundle,
 } from '../../impl/BiosensorDeviceFactory.js'
-import { DeviceName } from '../../impl/types.js'
+import { DeviceName } from '../../types.js'
 import FakeDeviceController from '../DeviceController/FakeDeviceController.js'
 import FakeWebSocketGateway from '../WebSocketGateway/FakeWebSocketGateway.js'
 

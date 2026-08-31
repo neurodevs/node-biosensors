@@ -1,7 +1,7 @@
 import {
     DeviceControllerBle,
     DeviceControllerBleConstructorOptions,
-} from '../../impl/types.js'
+} from '../../types.js'
 
 export default class FakeZephyrDeviceController implements DeviceControllerBle {
     public static callsToConstructor: DeviceControllerBleConstructorOptions[] =

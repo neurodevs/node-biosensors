@@ -4,7 +4,7 @@ import { assert } from '@neurodevs/node-tdd'
 import { BleGatt, FakeBleGatt } from '@neurodevs/node-lsl'
 
 import AbstractDeviceControllerTest from './AbstractDeviceControllerTest.js'
-import { DeviceControllerBle } from '../impl/types.js'
+import { DeviceControllerBle } from '../types.js'
 
 export interface SpyDeviceControllerBle extends DeviceControllerBle {
     getDeviceId(): string

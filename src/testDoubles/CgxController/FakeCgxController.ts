@@ -1,6 +1,6 @@
 import { FakeLslOutlet, LslOutlet } from '@neurodevs/node-lsl'
 
-import { DeviceController } from '../../impl/types.js'
+import { DeviceController } from '../../types.js'
 import CgxDeviceController, {
     CgxControllerConstructorOptions,
 } from '../../impl/cognionics/CgxDeviceController.js'

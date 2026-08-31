@@ -10,7 +10,7 @@ import GoveeDeviceController, {
     GoveeControllerOptions,
 } from '../../impl/govee/GoveeDeviceController.js'
 import SpyGoveeController from '../../testDoubles/GoveeController/SpyGoveeController.js'
-import { LogLevel } from '../../impl/types.js'
+import { LogLevel } from '../../types.js'
 import AbstractDeviceControllerTest from '../AbstractDeviceControllerTest.js'
 
 export default class GoveeDeviceControllerTest extends AbstractDeviceControllerTest {

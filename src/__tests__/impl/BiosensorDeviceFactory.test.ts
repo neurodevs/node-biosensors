@@ -5,12 +5,12 @@ import { FakeEventMarkerOutlet, FakeWebSocketServer } from '@neurodevs/node-lsl'
 import { test, assert } from '@neurodevs/node-tdd'
 import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 
-import { DeviceController, DeviceControllerOptions } from '../../impl/types.js'
+import { DeviceController, DeviceControllerOptions } from '../../types.js'
 import BiosensorDeviceFactory, {
     DeviceFactory,
     DeviceSpecification,
 } from '../../impl/BiosensorDeviceFactory.js'
-import { DeviceName } from '../../impl/types.js'
+import { DeviceName } from '../../types.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 import { MuseControllerOptions } from '../../impl/muse/MuseDeviceController.js'
 import FakeMuseController from '../../testDoubles/MuseController/FakeMuseController.js'

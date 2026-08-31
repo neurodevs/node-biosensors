@@ -37,7 +37,7 @@ import {
 } from '@neurodevs/node-xdf'
 
 import BiosensorDeviceFactory from '../impl/BiosensorDeviceFactory.js'
-import { DeviceControllerConstructorOptions } from '../impl/types.js'
+import { DeviceControllerConstructorOptions } from '../types.js'
 import BiosensorWebSocketGateway from '../impl/BiosensorWebSocketGateway.js'
 import CgxDeviceController from '../impl/cognionics/CgxDeviceController.js'
 import GoveeDeviceController from '../impl/govee/GoveeDeviceController.js'

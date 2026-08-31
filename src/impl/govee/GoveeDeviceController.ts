@@ -15,7 +15,7 @@ import {
     DeviceControllerOptions,
     LogLevel,
     Resolve,
-} from '../types.js'
+} from '../../types.js'
 import AbstractDeviceController from '../abstract/AbstractDeviceController.js'
 
 export default class GoveeDeviceController

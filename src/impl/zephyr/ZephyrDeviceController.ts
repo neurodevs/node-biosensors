@@ -5,7 +5,7 @@ import {
     DeviceControllerBleOptions,
     DeviceControllerBleConstructor,
     DeviceControllerBleConstructorOptions,
-} from '../types.js'
+} from '../../types.js'
 import AbstractDeviceControllerBle from '../abstract/AbstractDeviceControllerBle.js'
 
 export default class ZephyrDeviceController

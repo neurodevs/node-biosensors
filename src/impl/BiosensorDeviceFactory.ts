@@ -21,7 +21,7 @@ import {
     DeviceController,
     DeviceControllerOptions,
     DeviceName,
-} from './types.js'
+} from '../types.js'
 
 export default class BiosensorDeviceFactory implements DeviceFactory {
     public static Class?: DeviceFactoryConstructor

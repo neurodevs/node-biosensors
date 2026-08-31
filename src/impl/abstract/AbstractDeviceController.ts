@@ -10,7 +10,7 @@ import {
     LogLevel,
     DEFAULT_LOG_LEVEL,
     DeviceControllerOptions,
-} from '../types.js'
+} from '../../types.js'
 
 export default abstract class AbstractDeviceController implements DeviceController {
     public static log = console

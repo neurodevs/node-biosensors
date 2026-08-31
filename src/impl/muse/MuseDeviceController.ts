@@ -5,7 +5,7 @@ import {
     DeviceControllerBleConstructorOptions,
     DeviceControllerBleOptions,
     Resolve,
-} from '../types.js'
+} from '../../types.js'
 import AbstractDeviceControllerBle from '../abstract/AbstractDeviceControllerBle.js'
 import MuseSAthena from './variants/MuseSAthena.js'
 import MuseSGen2 from './variants/MuseSGen2.js'

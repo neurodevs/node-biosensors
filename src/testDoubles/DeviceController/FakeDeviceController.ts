@@ -5,7 +5,7 @@ import { FakeLslOutlet } from '@neurodevs/node-lsl'
 import {
     DeviceController,
     DeviceControllerConstructorOptions,
-} from '../../impl/types.js'
+} from '../../types.js'
 
 export default class FakeDeviceController implements DeviceController {
     public static callsToConstructor: (

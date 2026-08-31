@@ -1,4 +1,4 @@
-import { DeviceControllerBleConstructorOptions } from '../../impl/types.js'
+import { DeviceControllerBleConstructorOptions } from '../../types.js'
 import ZephyrDeviceController from '../../impl/zephyr/ZephyrDeviceController.js'
 
 export default class SpyZephyrController extends ZephyrDeviceController {
