@@ -75,6 +75,11 @@ export * from './testDoubles/MuseDetector/FakeMuseDetector.js'
 export { default as SpyMuseDetector } from './testDoubles/MuseDetector/SpyMuseDetector.js'
 export * from './testDoubles/MuseDetector/SpyMuseDetector.js'
 
+// MuseVariant
+
+export { default as MuseBleVariant } from './impl/muse/MuseBleVariant.js'
+export * from './impl/muse/MuseBleVariant.js'
+
 // OpenBCI Cyton Board
 
 export { default as CytonDeviceController } from './impl/openbci/CytonDeviceController.js'
