@@ -182,6 +182,28 @@ export default class MuseSAthenaTest extends AbstractDeviceControllerBleTest {
     }
 
     @test()
+    protected static async exposesOutlets() {
+        assert.isEqualDeep(
+            this.instance.outlets.map((outlet) => outlet.sourceId),
+            this.sourceIdsFor(['eeg', 'imu', 'optics']),
+            'Did not expose outlets!'
+        )
+    }
+
+    @test()
+    protected static async exposesOnlyOutletsForEnabledStreams() {
+        const instance = await this.MuseDeviceController({
+            disableStreams: ['PPG'],
+        })
+
+        assert.isEqualDeep(
+            instance.outlets.map((outlet) => outlet.sourceId),
+            this.sourceIdsFor(['eeg', 'imu']),
+            'Did not expose only outlets for enabled streams!'
+        )
+    }
+
+    @test()
     protected static async createsEegClockRegressor() {
         this.assertConstructsClockRegressorWith(EEG_HZ)
     }
@@ -549,6 +571,10 @@ export default class MuseSAthenaTest extends AbstractDeviceControllerBleTest {
         }
 
         return bytes
+    }
+
+    private static sourceIdsFor(streams: string[]) {
+        return streams.map((stream) => `muse-${stream}-${this.shortUuid}`)
     }
 
     private static async MuseDeviceController(

@@ -112,6 +112,10 @@ export default class MuseDeviceController
         return this.variant.streamQueries
     }
 
+    public get outlets() {
+        return [...this.variant.outlets]
+    }
+
     private static async createVariant(
         model: MuseDeviceModel,
         options?: MuseVariantOptions

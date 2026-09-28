@@ -140,6 +140,16 @@ export default class MuseSGen2Test extends MuseBleVariantTest {
         this.assertDoesNotCreateOutletsForDisabledStreams()
     }
     @test()
+    protected static async exposesOutlets() {
+        await this.assertExposesOutlets()
+    }
+
+    @test()
+    protected static async exposesOnlyOutletsForEnabledStreams() {
+        await this.assertExposesOnlyOutletsForEnabledStreams()
+    }
+
+    @test()
     protected static async createsEegClockRegressor() {
         await this.assertCreatesEegClockRegressor()
     }

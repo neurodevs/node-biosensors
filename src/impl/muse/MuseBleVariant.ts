@@ -82,12 +82,14 @@ export default class MuseBleVariant implements MuseVariant {
     public readonly charCallbacks: CharacteristicCallbacks
     public readonly startCommands: readonly string[] = []
     public readonly streamQueries: readonly string[]
+    public readonly outlets: readonly LslOutlet[]
 
     protected constructor(options: MuseVariantConstructorOptions) {
-        const { charCallbacks, streamQueries } = options
+        const { charCallbacks, streamQueries, outlets } = options
 
         this.charCallbacks = charCallbacks
         this.streamQueries = streamQueries
+        this.outlets = outlets
     }
 
     public static async Create(
@@ -129,7 +131,20 @@ export default class MuseBleVariant implements MuseVariant {
             }
         )
 
-        return new this({ charCallbacks, streamQueries: this.streamQueries })
+        return new this({
+            charCallbacks,
+            streamQueries: this.streamQueries,
+            outlets: this.enabledOutlets([
+                eegOutlet,
+                ppgOutlet,
+                gyroOutlet,
+                accelOutlet,
+            ]),
+        })
+    }
+
+    protected static enabledOutlets(outlets: (LslOutlet | undefined)[]) {
+        return outlets.filter((outlet): outlet is LslOutlet => !!outlet)
     }
 
     protected static resolveIdentifier(bleUuid?: string) {
@@ -548,6 +563,7 @@ export interface MuseVariant {
     readonly charCallbacks: CharacteristicCallbacks
     readonly streamQueries: readonly string[]
     readonly startCommands: readonly string[]
+    readonly outlets: readonly LslOutlet[]
 }
 
 export type MuseVariantOptions = Resolve<
@@ -559,4 +575,5 @@ export type MuseVariantOptions = Resolve<
 export interface MuseVariantConstructorOptions {
     charCallbacks: CharacteristicCallbacks
     streamQueries: readonly string[]
+    outlets: readonly LslOutlet[]
 }

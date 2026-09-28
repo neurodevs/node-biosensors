@@ -553,6 +553,30 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
         )
     }
 
+    protected static async assertExposesOutlets() {
+        assert.isEqualDeep(
+            this.instance.outlets.map((outlet) => outlet.sourceId),
+            this.sourceIdsFor(['eeg', 'ppg', 'gyroscope', 'accelerometer']),
+            'Did not expose outlets!'
+        )
+    }
+
+    protected static async assertExposesOnlyOutletsForEnabledStreams() {
+        const instance = await this.MuseDeviceController({
+            disableStreams: ['Gyroscope', 'Accelerometer'],
+        })
+
+        assert.isEqualDeep(
+            instance.outlets.map((outlet) => outlet.sourceId),
+            this.sourceIdsFor(['eeg', 'ppg']),
+            'Did not expose only outlets for enabled streams!'
+        )
+    }
+
+    private static sourceIdsFor(streams: string[]) {
+        return streams.map((stream) => `muse-${stream}-${this.shortUuid}`)
+    }
+
     protected static async assertCreatesEegClockRegressor() {
         this.assertConstructsClockRegressorWith(this.eegSampleRateHz)
     }
