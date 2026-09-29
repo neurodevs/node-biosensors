@@ -1,6 +1,6 @@
 import { randomInt } from 'node:crypto'
 
-import { Server } from 'ws'
+import { Server, WebSocketServer } from 'ws'
 import {
     FakeLiblsl,
     FakeLibndx,
@@ -51,6 +51,7 @@ import FakeZephyrController from '../testDoubles/ZephyrController/FakeZephyrCont
 import FakeDeviceFTDI from '../testDoubles/FTDI/FakeDeviceFTDI.js'
 import FakeFTDI from '../testDoubles/FTDI/FakeFTDI.js'
 import FakeWebSocketGateway from '../testDoubles/WebSocketGateway/FakeWebSocketGateway.js'
+import FakeStatusServer from '../testDoubles/WebSocketServer/FakeStatusServer.js'
 import MuseDeviceController from '../impl/muse/MuseDeviceController.js'
 import FakeMuseController from '../testDoubles/MuseController/FakeMuseController.js'
 import MuseModelDetector from '../impl/muse/MuseModelDetector.js'
@@ -84,6 +85,7 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         this.setFakeLslOutlet()
         this.setFakeLslInfo()
         this.setFakeLslWsBridge()
+        this.setFakeStatusServer()
         this.setFakeXdfLoader()
         this.setFakeXdfRecorder()
         this.setFakeClockRegressor()
@@ -253,6 +255,12 @@ export default class AbstractPackageTest extends AbstractModuleTest {
 
         LslWebSocketBridge.WSS = FakeWebSocketServer as unknown as typeof Server
         FakeWebSocketServer.resetTestDouble()
+    }
+
+    protected static setFakeStatusServer() {
+        BiosensorWebSocketGateway.WSS =
+            FakeStatusServer as unknown as typeof WebSocketServer
+        FakeStatusServer.resetTestDouble()
     }
 
     protected static setFakeWebSocketGateway() {

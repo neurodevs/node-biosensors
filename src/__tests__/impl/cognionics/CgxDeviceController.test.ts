@@ -8,6 +8,7 @@ import CgxDeviceController from '../../../impl/cognionics/CgxDeviceController.js
 import SpyCgxController from '../../../testDoubles/CgxController/SpyCgxController.js'
 import FakeDeviceFTDI from '../../../testDoubles/FTDI/FakeDeviceFTDI.js'
 import FakeFTDI from '../../../testDoubles/FTDI/FakeFTDI.js'
+import { DeviceState } from '../../../types.js'
 import AbstractPackageTest from '../../AbstractPackageTest.js'
 
 export default class CgxDeviceControllerTest extends AbstractPackageTest {
@@ -24,6 +25,32 @@ export default class CgxDeviceControllerTest extends AbstractPackageTest {
     @test()
     protected static async createsInstance() {
         assert.isTruthy(this.instance, 'Failed to create instance!')
+    }
+
+    @test()
+    protected static async startsDisconnected() {
+        assert.isEqual(
+            this.instance.state,
+            'disconnected',
+            'Did not start disconnected!'
+        )
+    }
+
+    @test()
+    protected static async reportsEveryStateChange() {
+        const states: DeviceState[] = []
+        this.instance.addStateListener((state) => states.push(state))
+
+        await this.instance.connect()
+        await this.startStreaming()
+        await this.instance.stopStreaming()
+        await this.instance.disconnect()
+
+        assert.isEqualDeep(
+            states,
+            ['connected', 'streaming', 'connected', 'disconnected'],
+            'Did not report every state change!'
+        )
     }
 
     @test()

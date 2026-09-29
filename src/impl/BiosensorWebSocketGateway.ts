@@ -1,3 +1,4 @@
+import WebSocket, { WebSocketServer } from 'ws'
 import {
     LslOutlet,
     LslWebSocketBridge,
@@ -9,23 +10,69 @@ import { DeviceController } from '../types.js'
 
 export default class BiosensorWebSocketGateway implements WebSocketGateway {
     public static Class?: WebSocketGatewayConstructor
+    public static WSS = WebSocketServer
 
     private bridges: readonly LslWsBridge[]
+    private deviceStreams: readonly DeviceStreams[]
+    private statusServer: WebSocketServer
+    private unsubscribeFromDevices: (() => void)[]
     private isOpen = false
     private isDestroyed = false
 
     protected constructor(options: WebSocketGatewayConstructorOptions) {
-        const { bridges } = options
+        const { bridges, deviceStreams, statusServer } = options
 
         this.bridges = bridges
+        this.deviceStreams = deviceStreams
+        this.statusServer = statusServer
+
+        this.statusServer.on('connection', (client) =>
+            client.send(this.statusPayload)
+        )
+
+        this.unsubscribeFromDevices = deviceStreams.map(({ device }) =>
+            device.addStateListener(() => this.broadcastStatus())
+        )
     }
 
     public static async Create(
         devices: readonly DeviceController[],
         options?: WebSocketGatewayOptions
     ) {
-        const bridges = await this.createBridgesFrom(devices, options)
-        return new (this.Class ?? this)({ bridges })
+        const { listenPortStart = 8080, statusPort = listenPortStart - 1 } =
+            options ?? {}
+
+        const { bridges, deviceStreams } = await this.createBridgesFrom(
+            devices,
+            listenPortStart
+        )
+
+        const statusServer = new this.WSS({ port: statusPort })
+
+        return new (this.Class ?? this)({
+            bridges,
+            deviceStreams,
+            statusServer,
+        })
+    }
+
+    private broadcastStatus() {
+        const payload = this.statusPayload
+
+        for (const client of this.statusServer.clients) {
+            if (client.readyState === WebSocket.OPEN) {
+                client.send(payload)
+            }
+        }
+    }
+
+    private get statusPayload() {
+        return JSON.stringify({
+            devices: this.deviceStreams.map(({ device, listenPorts }) => ({
+                state: device.state,
+                listenPorts,
+            })),
+        })
     }
 
     public open() {
@@ -73,6 +120,7 @@ export default class BiosensorWebSocketGateway implements WebSocketGateway {
         if (!this.isDestroyed) {
             this.closeGatewayIfOpenBeforeDestroying()
             this.destroyLslWebSocketBridges()
+            this.stopServingDeviceStatus()
             this.isDestroyed = true
         } else {
             console.warn(
@@ -91,26 +139,35 @@ export default class BiosensorWebSocketGateway implements WebSocketGateway {
         this.bridges.forEach((bridge) => bridge.destroy())
     }
 
+    private stopServingDeviceStatus() {
+        this.unsubscribeFromDevices.forEach((unsubscribe) => unsubscribe())
+        this.statusServer.close()
+    }
+
     private static async createBridgesFrom(
         devices: readonly DeviceController[],
-        options?: WebSocketGatewayOptions
+        listenPortStart: number
     ) {
-        const { listenPortStart = 8080 } = options ?? {}
         let currentListenPort = listenPortStart
 
         const bridges: LslWsBridge[] = []
+        const deviceStreams: DeviceStreams[] = []
 
         for (const device of devices) {
+            const listenPorts: number[] = []
+
             for (const outlet of device.outlets) {
-                const bridge = await this.createBridgeFrom(
-                    outlet,
-                    currentListenPort++
-                )
+                const listenPort = currentListenPort++
+                const bridge = await this.createBridgeFrom(outlet, listenPort)
+
                 bridges.push(bridge)
+                listenPorts.push(listenPort)
             }
+
+            deviceStreams.push({ device, listenPorts })
         }
 
-        return bridges
+        return { bridges, deviceStreams }
     }
 
     private static async createBridgeFrom(
@@ -139,6 +196,7 @@ export interface WebSocketGateway {
 
 export interface WebSocketGatewayOptions {
     listenPortStart?: number
+    statusPort?: number
 }
 
 export type WebSocketGatewayConstructor = new (
@@ -147,4 +205,11 @@ export type WebSocketGatewayConstructor = new (
 
 export interface WebSocketGatewayConstructorOptions {
     bridges: readonly LslWsBridge[]
+    deviceStreams: readonly DeviceStreams[]
+    statusServer: WebSocketServer
+}
+
+export interface DeviceStreams {
+    device: DeviceController
+    listenPorts: readonly number[]
 }

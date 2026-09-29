@@ -8,6 +8,8 @@ import BiosensorWebSocketGateway, {
     WebSocketGatewayOptions,
 } from '../../impl/BiosensorWebSocketGateway.js'
 
+import FakeDeviceController from '../../testDoubles/DeviceController/FakeDeviceController.js'
+import FakeStatusServer from '../../testDoubles/WebSocketServer/FakeStatusServer.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 
 export default class BiosensorWebSocketGatewayTest extends AbstractPackageTest {
@@ -16,6 +18,10 @@ export default class BiosensorWebSocketGatewayTest extends AbstractPackageTest {
     protected static async beforeEach() {
         await super.beforeEach()
 
+        this.devices = [
+            this.FakeDeviceController(),
+            this.FakeDeviceController(),
+        ]
         this.instance = await this.BiosensorWebSocketGateway()
     }
 
@@ -187,6 +193,85 @@ export default class BiosensorWebSocketGatewayTest extends AbstractPackageTest {
         )
     }
 
+    @test()
+    protected static async servesDeviceStatusOnePortBelowStreams() {
+        assert.isEqualDeep(
+            FakeStatusServer.callsToConstructor,
+            [{ port: 8079 }],
+            'Did not serve device status one port below streams!'
+        )
+    }
+
+    @test()
+    protected static async acceptsOptionalStatusPort() {
+        FakeStatusServer.resetTestDouble()
+
+        const statusPort = randomInt(1000, 10000)
+        await this.BiosensorWebSocketGateway({ statusPort })
+
+        assert.isEqualDeep(
+            FakeStatusServer.callsToConstructor,
+            [{ port: statusPort }],
+            'Did not serve device status on given port!'
+        )
+    }
+
+    @test()
+    protected static async sendsEachDeviceStatusToNewClients() {
+        const client = FakeStatusServer.latest.connect()
+
+        assert.isEqualDeep(
+            client.lastMessage,
+            {
+                devices: [
+                    { state: 'disconnected', listenPorts: [8080, 8081] },
+                    { state: 'disconnected', listenPorts: [8082, 8083] },
+                ],
+            },
+            'Did not send each device status to new clients!'
+        )
+    }
+
+    @test()
+    protected static async broadcastsEachStateChange() {
+        const client = FakeStatusServer.latest.connect()
+
+        await this.devices[0].connect()
+
+        assert.isEqualDeep(
+            client.sent
+                .slice(1)
+                .map((message) => JSON.parse(message).devices[0].state),
+            ['connecting', 'connected'],
+            'Did not broadcast each state change!'
+        )
+    }
+
+    @test()
+    protected static async stopsBroadcastingAfterDestroy() {
+        const client = FakeStatusServer.latest.connect()
+
+        this.destroy()
+        await this.devices[0].connect()
+
+        assert.isLength(
+            client.sent,
+            1,
+            'Broadcast state changes after destroy!'
+        )
+    }
+
+    @test()
+    protected static async closesStatusServerOnDestroy() {
+        this.destroy()
+
+        assert.isEqual(
+            FakeStatusServer.numCallsToClose,
+            1,
+            'Did not close status server on destroy!'
+        )
+    }
+
     private static open() {
         this.instance.open()
     }
@@ -199,7 +284,7 @@ export default class BiosensorWebSocketGatewayTest extends AbstractPackageTest {
         this.instance.destroy()
     }
 
-    private static devices = [
+    private static devices: FakeDeviceController[] = [
         this.FakeDeviceController(),
         this.FakeDeviceController(),
     ]

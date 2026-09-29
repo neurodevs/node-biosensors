@@ -1,9 +1,12 @@
+import DeviceStateEmitter from '../../impl/DeviceStateEmitter.js'
 import { FakeLslOutlet } from '@neurodevs/node-lsl'
 
-import { DeviceControllerBle } from '../../types.js'
+import { DeviceControllerBle, DeviceStateListener } from '../../types.js'
 import { GoveeControllerConstructorOptions } from '../../impl/govee/GoveeDeviceController.js'
 
 export default class FakeGoveeController implements DeviceControllerBle {
+    private readonly stateEmitter = new DeviceStateEmitter()
+
     public static callsToConstructor: GoveeControllerConstructorOptions[] = []
     public static numCallsToConnect = 0
     public static numCallsToStartStreaming = 0
@@ -21,18 +24,23 @@ export default class FakeGoveeController implements DeviceControllerBle {
     }
 
     public async connect() {
+        this.stateEmitter.setState('connecting')
+        this.stateEmitter.setState('connected')
         FakeGoveeController.numCallsToConnect++
     }
 
     public async startStreaming() {
+        this.stateEmitter.setState('streaming')
         FakeGoveeController.numCallsToStartStreaming++
     }
 
     public async stopStreaming() {
+        this.stateEmitter.setState('connected')
         FakeGoveeController.numCallsToStopStreaming++
     }
 
     public async disconnect() {
+        this.stateEmitter.setState('disconnected')
         FakeGoveeController.numCallsToDisconnect++
     }
 
@@ -56,6 +64,14 @@ export default class FakeGoveeController implements DeviceControllerBle {
 
     public get bleName() {
         return ''
+    }
+
+    public get state() {
+        return this.stateEmitter.state
+    }
+
+    public addStateListener(listener: DeviceStateListener) {
+        return this.stateEmitter.addStateListener(listener)
     }
 
     public static resetTestDouble() {

@@ -1,10 +1,13 @@
+import DeviceStateEmitter from '../../impl/DeviceStateEmitter.js'
 import { BleGatt, FakeLslOutlet } from '@neurodevs/node-lsl'
 import { XdfRecorder } from '@neurodevs/node-xdf'
-import { DeviceControllerBle } from '../../types.js'
+import { DeviceControllerBle, DeviceStateListener } from '../../types.js'
 import { MuseControllerConstructorOptions } from '../../impl/muse/MuseDeviceController.js'
 import { MuseVariant } from '../../impl/muse/MuseBleVariant.js'
 
 export default class FakeMuseController implements DeviceControllerBle {
+    private readonly stateEmitter = new DeviceStateEmitter()
+
     public static callsToConstructor: MuseControllerConstructorOptions[] = []
     public static numCallsToConnect = 0
     public static numCallsToStartStreaming = 0
@@ -26,18 +29,23 @@ export default class FakeMuseController implements DeviceControllerBle {
     }
 
     public async connect() {
+        this.stateEmitter.setState('connecting')
+        this.stateEmitter.setState('connected')
         FakeMuseController.numCallsToConnect++
     }
 
     public async startStreaming() {
+        this.stateEmitter.setState('streaming')
         FakeMuseController.numCallsToStartStreaming++
     }
 
     public async stopStreaming() {
+        this.stateEmitter.setState('connected')
         FakeMuseController.numCallsToStopStreaming++
     }
 
     public async disconnect() {
+        this.stateEmitter.setState('disconnected')
         FakeMuseController.numCallsToDisconnect++
     }
 
@@ -55,6 +63,14 @@ export default class FakeMuseController implements DeviceControllerBle {
 
     public get streamQueries() {
         return ['type="EEG"', 'type="PPG"', 'type="GYRO"', 'type="ACCEL"']
+    }
+
+    public get state() {
+        return this.stateEmitter.state
+    }
+
+    public addStateListener(listener: DeviceStateListener) {
+        return this.stateEmitter.addStateListener(listener)
     }
 
     public static resetTestDouble() {

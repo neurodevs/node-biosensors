@@ -12,7 +12,8 @@ import { ChannelFormat } from '@neurodevs/ndx-native'
 import { LslOutlet, LslStreamOutlet } from '@neurodevs/node-lsl'
 import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 
-import { DeviceController } from '../../types.js'
+import DeviceStateEmitter from '../DeviceStateEmitter.js'
+import { DeviceController, DeviceStateListener } from '../../types.js'
 
 export default class CgxDeviceController implements DeviceController {
     public static Class?: CgxControllerConstructor
@@ -22,6 +23,8 @@ export default class CgxDeviceController implements DeviceController {
 
     public isRunning = false
     protected numPacketsDropped = 0
+
+    private readonly stateEmitter = new DeviceStateEmitter()
 
     private eegOutlet: LslOutlet
     private accelOutlet: LslOutlet
@@ -68,7 +71,9 @@ export default class CgxDeviceController implements DeviceController {
         })
     }
 
-    public async connect() {}
+    public async connect() {
+        this.stateEmitter.setState('connected')
+    }
 
     public async startStreaming() {
         this.isRunning = true
@@ -76,6 +81,8 @@ export default class CgxDeviceController implements DeviceController {
 
         await this.setupFtdi()
         await this.startReadingPackets()
+
+        this.stateEmitter.setState('streaming')
     }
 
     private startXdfRecorderIfExists() {
@@ -275,6 +282,7 @@ export default class CgxDeviceController implements DeviceController {
 
     public async stopStreaming() {
         this.finishXdfRecorderIfExists()
+        this.stateEmitter.setState('connected')
     }
 
     private finishXdfRecorderIfExists() {
@@ -286,6 +294,16 @@ export default class CgxDeviceController implements DeviceController {
             await this.stopStreaming()
             this.isRunning = false
         }
+
+        this.stateEmitter.setState('disconnected')
+    }
+
+    public get state() {
+        return this.stateEmitter.state
+    }
+
+    public addStateListener(listener: DeviceStateListener) {
+        return this.stateEmitter.addStateListener(listener)
     }
 
     public get outlets() {

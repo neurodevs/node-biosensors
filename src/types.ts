@@ -22,6 +22,8 @@ export interface DeviceController {
     startStreaming(): Promise<void>
     stopStreaming(): Promise<void>
     disconnect(): Promise<void>
+    addStateListener(listener: DeviceStateListener): () => void
+    readonly state: DeviceState
     readonly outlets: readonly LslOutlet[]
     readonly streamQueries: readonly string[]
 }
@@ -74,7 +76,10 @@ export type DeviceControllerBleConstructor = new (
 
 export type Resolve<T> = { [K in keyof T]: T[K] } & {}
 
-export type DeviceState = 'disconnected' | 'connected' | 'streaming'
+export type DeviceState =
+    'disconnected' | 'connecting' | 'connected' | 'streaming'
+
+export type DeviceStateListener = (state: DeviceState) => void
 
 export type LogLevel = 'silent' | 'warn' | 'info'
 

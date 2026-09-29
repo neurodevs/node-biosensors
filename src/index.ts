@@ -24,6 +24,9 @@ export * from './impl/BiosensorWebSocketGateway.js'
 export { default as FakeWebSocketGateway } from './testDoubles/WebSocketGateway/FakeWebSocketGateway.js'
 export * from './testDoubles/WebSocketGateway/FakeWebSocketGateway.js'
 
+export { default as FakeStatusServer } from './testDoubles/WebSocketServer/FakeStatusServer.js'
+export * from './testDoubles/WebSocketServer/FakeStatusServer.js'
+
 // --- BIOSENSOR DEVICE CONTROLLERS -----------------------------------------------------------------
 
 // DeviceController

@@ -130,6 +130,62 @@ export default abstract class AbstractDeviceControllerTest extends AbstractPacka
         )
     }
 
+    protected static async assertReportsEveryStateChange() {
+        const states: DeviceState[] = []
+        this.instance.addStateListener((state: DeviceState) =>
+            states.push(state)
+        )
+
+        await this.connect()
+        await this.startStreaming()
+        await this.stopStreaming()
+        await this.disconnect()
+
+        assert.isEqualDeep(
+            states,
+            [
+                'connecting',
+                'connected',
+                'streaming',
+                'connected',
+                'disconnected',
+            ],
+            'Did not report every state change!'
+        )
+    }
+
+    protected static async assertReportsConnectingWhileConnectInProgress() {
+        let stateDuringConnect: DeviceState | undefined
+
+        this.instance.handleConnect = async () => {
+            stateDuringConnect = this.instance.state
+        }
+
+        await this.connect()
+
+        assert.isEqual(
+            stateDuringConnect,
+            'connecting',
+            'Did not report connecting while connect was in progress!'
+        )
+    }
+
+    protected static async assertRevertsToDisconnectedWhenConnectFails() {
+        const error = new Error(this.generateId())
+
+        this.instance.handleConnect = async () => {
+            throw error
+        }
+
+        const err = await assert.doesThrowAsync(() => this.connect())
+
+        assert.isEqualDeep(
+            { message: err.message, state: this.instance.state },
+            { message: error.message, state: 'disconnected' },
+            'Did not revert to disconnected when connect failed!'
+        )
+    }
+
     protected static async assertConnectWarnsWithDeviceId() {
         await this.connect()
         await this.connect()

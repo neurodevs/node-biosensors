@@ -1,11 +1,14 @@
+import DeviceStateEmitter from '../../impl/DeviceStateEmitter.js'
 import { FakeLslOutlet, LslOutlet } from '@neurodevs/node-lsl'
 
-import { DeviceController } from '../../types.js'
+import { DeviceController, DeviceStateListener } from '../../types.js'
 import CgxDeviceController, {
     CgxControllerConstructorOptions,
 } from '../../impl/cognionics/CgxDeviceController.js'
 
 export default class FakeCgxController implements DeviceController {
+    private readonly stateEmitter = new DeviceStateEmitter()
+
     public static callsToConstructor: (CallToCgxConstructor | undefined)[] = []
     public static numCallsToConnect = 0
     public static numCallsToStartStreaming = 0
@@ -17,18 +20,23 @@ export default class FakeCgxController implements DeviceController {
     }
 
     public async connect() {
+        this.stateEmitter.setState('connecting')
+        this.stateEmitter.setState('connected')
         FakeCgxController.numCallsToConnect++
     }
 
     public async startStreaming() {
+        this.stateEmitter.setState('streaming')
         FakeCgxController.numCallsToStartStreaming++
     }
 
     public async stopStreaming() {
+        this.stateEmitter.setState('connected')
         FakeCgxController.numCallsToStopStreaming++
     }
 
     public async disconnect() {
+        this.stateEmitter.setState('disconnected')
         FakeCgxController.numCallsToDisconnect++
     }
 
@@ -40,6 +48,14 @@ export default class FakeCgxController implements DeviceController {
     }
 
     public streamQueries = CgxDeviceController.streamQueries
+
+    public get state() {
+        return this.stateEmitter.state
+    }
+
+    public addStateListener(listener: DeviceStateListener) {
+        return this.stateEmitter.addStateListener(listener)
+    }
 
     public static resetTestDouble() {
         this.callsToConstructor = []

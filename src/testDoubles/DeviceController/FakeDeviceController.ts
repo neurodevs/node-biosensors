@@ -1,3 +1,4 @@
+import DeviceStateEmitter from '../../impl/DeviceStateEmitter.js'
 import generateId from '@neurodevs/generate-id'
 import { ChannelFormat } from '@neurodevs/ndx-native'
 import { FakeLslOutlet } from '@neurodevs/node-lsl'
@@ -5,9 +6,12 @@ import { FakeLslOutlet } from '@neurodevs/node-lsl'
 import {
     DeviceController,
     DeviceControllerConstructorOptions,
+    DeviceStateListener,
 } from '../../types.js'
 
 export default class FakeDeviceController implements DeviceController {
+    private readonly stateEmitter = new DeviceStateEmitter()
+
     public static callsToConstructor: (
         DeviceControllerConstructorOptions | undefined
     )[] = []
@@ -34,18 +38,23 @@ export default class FakeDeviceController implements DeviceController {
     }
 
     public async connect() {
+        this.stateEmitter.setState('connecting')
+        this.stateEmitter.setState('connected')
         FakeDeviceController.numCallsToConnect++
     }
 
     public async startStreaming() {
+        this.stateEmitter.setState('streaming')
         FakeDeviceController.numCallsToStartStreaming++
     }
 
     public async stopStreaming() {
+        this.stateEmitter.setState('connected')
         FakeDeviceController.numCallsToStopStreaming++
     }
 
     public async disconnect() {
+        this.stateEmitter.setState('disconnected')
         FakeDeviceController.numCallsToDisconnect++
     }
 
@@ -69,6 +78,14 @@ export default class FakeDeviceController implements DeviceController {
 
     private static generateRandomInt() {
         return Math.ceil(Math.random() * 10)
+    }
+
+    public get state() {
+        return this.stateEmitter.state
+    }
+
+    public addStateListener(listener: DeviceStateListener) {
+        return this.stateEmitter.addStateListener(listener)
     }
 
     public static resetTestDouble() {

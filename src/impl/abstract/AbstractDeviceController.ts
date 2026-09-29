@@ -3,9 +3,11 @@ import fs, { WriteStream } from 'node:fs'
 import { LslOutlet } from '@neurodevs/node-lsl'
 import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 
+import DeviceStateEmitter from '../DeviceStateEmitter.js'
 import {
-    DeviceState,
     DeviceController,
+    DeviceState,
+    DeviceStateListener,
     DeviceControllerConstructorOptions,
     LogLevel,
     DEFAULT_LOG_LEVEL,
@@ -20,7 +22,7 @@ export default abstract class AbstractDeviceController implements DeviceControll
     protected readonly txtStream?: WriteStream
     protected readonly logLevel: LogLevel
 
-    protected state: DeviceState = 'disconnected'
+    private readonly stateEmitter = new DeviceStateEmitter()
 
     protected constructor(options?: DeviceControllerConstructorOptions) {
         const {
@@ -39,14 +41,22 @@ export default abstract class AbstractDeviceController implements DeviceControll
             this.warn(`Already connected to ${this.deviceId}.`)
             return
         }
-        this.state = 'connected'
+        this.setState('connecting')
 
         this.recorder?.start()
-        await this.handleConnect()
+
+        try {
+            await this.handleConnect()
+        } catch (err) {
+            this.setState('disconnected')
+            throw err
+        }
+
+        this.setState('connected')
     }
 
     public async startStreaming() {
-        if (this.state === 'disconnected') {
+        if (this.state === 'disconnected' || this.state === 'connecting') {
             this.warn(`Cannot stream from ${this.deviceId} before connecting.`)
             return
         }
@@ -54,7 +64,7 @@ export default abstract class AbstractDeviceController implements DeviceControll
             this.warn(`Already streaming from ${this.deviceId}.`)
             return
         }
-        this.state = 'streaming'
+        this.setState('streaming')
 
         await this.handleStartStreaming()
     }
@@ -64,7 +74,7 @@ export default abstract class AbstractDeviceController implements DeviceControll
             this.warn(`Already not streaming from ${this.deviceId}.`)
             return
         }
-        this.state = 'connected'
+        this.setState('connected')
 
         await this.handleStopStreaming()
     }
@@ -77,10 +87,23 @@ export default abstract class AbstractDeviceController implements DeviceControll
         if (this.state === 'streaming') {
             await this.stopStreaming()
         }
-        this.state = 'disconnected'
 
         await this.handleDisconnect()
         this.recorder?.finish()
+
+        this.setState('disconnected')
+    }
+
+    public get state() {
+        return this.stateEmitter.state
+    }
+
+    public addStateListener(listener: DeviceStateListener) {
+        return this.stateEmitter.addStateListener(listener)
+    }
+
+    protected setState(state: DeviceState) {
+        this.stateEmitter.setState(state)
     }
 
     public get outlets(): LslOutlet[] {

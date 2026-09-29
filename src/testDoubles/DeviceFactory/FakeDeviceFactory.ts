@@ -1,3 +1,4 @@
+import { WebSocketServer } from 'ws'
 import { FakeEventMarkerOutlet } from '@neurodevs/node-lsl'
 import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 
@@ -11,6 +12,7 @@ import {
 } from '../../impl/BiosensorDeviceFactory.js'
 import { DeviceName } from '../../types.js'
 import FakeDeviceController from '../DeviceController/FakeDeviceController.js'
+import FakeStatusServer from '../WebSocketServer/FakeStatusServer.js'
 import FakeWebSocketGateway from '../WebSocketGateway/FakeWebSocketGateway.js'
 
 export default class FakeDeviceFactory implements DeviceFactory {
@@ -28,7 +30,11 @@ export default class FakeDeviceFactory implements DeviceFactory {
 
     public static fakeDevice = new FakeDeviceController()
     public static fakeRecorder = new FakeXdfRecorder()
-    public static fakeGateway = new FakeWebSocketGateway({ bridges: [] })
+    public static fakeGateway = new FakeWebSocketGateway({
+        bridges: [],
+        deviceStreams: [],
+        statusServer: new FakeStatusServer() as unknown as WebSocketServer,
+    })
     public static fakeEmitter = new FakeEventMarkerOutlet()
 
     public constructor() {

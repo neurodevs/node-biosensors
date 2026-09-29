@@ -86,6 +86,21 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
     }
 
     @test()
+    protected static async reportsEveryStateChange() {
+        await this.assertReportsEveryStateChange()
+    }
+
+    @test()
+    protected static async reportsConnectingWhileConnectInProgress() {
+        await this.assertReportsConnectingWhileConnectInProgress()
+    }
+
+    @test()
+    protected static async revertsToDisconnectedWhenConnectFails() {
+        await this.assertRevertsToDisconnectedWhenConnectFails()
+    }
+
+    @test()
     protected static async disconnectCallsStopStreaming() {
         await this.assertDisconnectCallsStopStreaming()
     }
