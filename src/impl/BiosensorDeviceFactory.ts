@@ -184,10 +184,7 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         model: MuseDeviceModel,
         options?: MuseControllerOptions
     ) {
-        const muse = await MuseDeviceController.Create({ ...options, model })
-        await muse.connect()
-
-        return muse
+        return MuseDeviceController.Create({ ...options, model })
     }
 
     private ZephyrDeviceController() {

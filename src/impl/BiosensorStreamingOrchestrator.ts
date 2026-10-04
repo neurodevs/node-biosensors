@@ -22,6 +22,7 @@ export default class BiosensorStreamingOrchestrator implements StreamingOrchestr
     private emitter?: EventMarkerOutlet
 
     private controllers: DeviceController[] = []
+    private isInitialized = false
 
     protected constructor(options: StreamingOrchestratorConstructorOptions) {
         const {
@@ -46,11 +47,11 @@ export default class BiosensorStreamingOrchestrator implements StreamingOrchestr
     }
 
     public async start() {
-        await this.initialize()
+        if (!this.isInitialized) {
+            await this.initialize()
+        }
 
-        this.startXdfRecorderIfExists()
-        this.openWebSocketGatewayIfExists()
-
+        await this.connectDevices()
         await this.startStreamingDevices()
     }
 
@@ -62,6 +63,11 @@ export default class BiosensorStreamingOrchestrator implements StreamingOrchestr
         this.recorder = recorder
         this.gateway = gateway
         this.emitter = emitter
+
+        this.startXdfRecorderIfExists()
+        this.openWebSocketGatewayIfExists()
+
+        this.isInitialized = true
     }
 
     private async createDeviceBundle() {
@@ -86,6 +92,10 @@ export default class BiosensorStreamingOrchestrator implements StreamingOrchestr
         this.gateway?.open()
     }
 
+    private connectDevices() {
+        return Promise.all(this.controllers.map((device) => device.connect()))
+    }
+
     private startStreamingDevices() {
         return Promise.all(
             this.controllers.map((device) => device.startStreaming())
@@ -98,6 +108,8 @@ export default class BiosensorStreamingOrchestrator implements StreamingOrchestr
         this.destroyEmitterIfExists()
         this.destroyGatewayIfExists()
         this.finishRecorderIfExists()
+
+        this.isInitialized = false
     }
 
     private async disconnectDevices() {

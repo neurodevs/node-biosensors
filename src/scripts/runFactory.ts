@@ -9,6 +9,7 @@ const { device, recorder } = await factory.createDevice('Muse S Gen 2', {
 
 recorder?.start()
 
+await device.connect()
 void device.startStreaming()
 
 await new Promise((resolve) => {

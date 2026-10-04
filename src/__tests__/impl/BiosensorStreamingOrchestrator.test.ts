@@ -84,6 +84,83 @@ export default class BiosensorStreamingOrchestratorTest extends AbstractPackageT
     }
 
     @test()
+    protected static async startCallsConnectOnAllDevices() {
+        await this.start()
+
+        assert.isEqual(
+            FakeDeviceController.numCallsToConnect,
+            this.devices.length,
+            'Did not connect all devices!'
+        )
+    }
+
+    @test()
+    protected static async connectsDevicesAfterOpeningGatewayAndBeforeStreaming() {
+        const device = FakeDeviceFactory.fakeDevice
+        const connect = device.connect
+
+        const whenConnecting: unknown[] = []
+
+        device.connect = async () => {
+            whenConnecting.push({
+                numCallsToOpen: FakeWebSocketGateway.numCallsToOpen,
+                numCallsToStartStreaming:
+                    FakeDeviceController.numCallsToStartStreaming,
+            })
+        }
+
+        try {
+            await this.start()
+        } finally {
+            device.connect = connect
+        }
+
+        assert.isEqualDeep(
+            whenConnecting,
+            this.devices.map(() => ({
+                numCallsToOpen: 1,
+                numCallsToStartStreaming: 0,
+            })),
+            'Did not connect devices after opening gateway and before streaming!'
+        )
+    }
+
+    @test()
+    protected static async startingAgainConnectsWithoutCreatingDevicesAgain() {
+        await this.start()
+        await this.start()
+
+        assert.isEqualDeep(
+            {
+                numCallsToCreateDevices:
+                    FakeDeviceFactory.callsToCreateDevices.length,
+                numCallsToOpen: FakeWebSocketGateway.numCallsToOpen,
+                numCallsToStartRecorder: FakeXdfRecorder.numCallsToStart,
+                numCallsToConnect: FakeDeviceController.numCallsToConnect,
+            },
+            {
+                numCallsToCreateDevices: 1,
+                numCallsToOpen: 1,
+                numCallsToStartRecorder: 1,
+                numCallsToConnect: this.devices.length * 2,
+            },
+            'Did not connect again without creating devices again!'
+        )
+    }
+
+    @test()
+    protected static async startingAfterStopCreatesDevicesAgain() {
+        await this.startThenStop()
+        await this.start()
+
+        assert.isEqual(
+            FakeDeviceFactory.callsToCreateDevices.length,
+            2,
+            'Did not create devices again when starting after stop!'
+        )
+    }
+
+    @test()
     protected static async startCallsStartStreamingOnAllDevices() {
         await this.start()
 

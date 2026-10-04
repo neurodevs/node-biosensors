@@ -311,17 +311,6 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
         )
     }
 
-    @test()
-    protected static async creatingMuseControllerCallsConnect() {
-        await this.createMuseController()
-
-        assert.isEqual(
-            FakeMuseController.numCallsToConnect,
-            1,
-            'Did not call connect on Muse!'
-        )
-    }
-
     private static async createDeviceWithEmitter() {
         return await this.instance.createDevice('Cognionics Quick-20r', {
             createEventMarkerEmitter: true,
