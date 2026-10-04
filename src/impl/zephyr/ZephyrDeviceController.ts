@@ -15,6 +15,8 @@ export default class ZephyrDeviceController
     public static Class?: DeviceControllerBleConstructor
     public static readonly streamQueries: string[] = []
 
+    public readonly deviceName = 'Zephyr BioHarness 3'
+
     protected constructor(options: DeviceControllerBleConstructorOptions) {
         super(options)
     }

@@ -21,6 +21,8 @@ export default class CgxDeviceController implements DeviceController {
 
     public static readonly streamQueries = ['type="EEG"', 'type="ACCEL"']
 
+    public readonly deviceName = 'Cognionics Quick-20r'
+
     public isRunning = false
     protected numPacketsDropped = 0
 

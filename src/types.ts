@@ -23,6 +23,7 @@ export interface DeviceController {
     stopStreaming(): Promise<void>
     disconnect(): Promise<void>
     addStateListener(listener: DeviceStateListener): () => void
+    readonly deviceName: DeviceName
     readonly state: DeviceState
     readonly outlets: readonly LslOutlet[]
     readonly streamQueries: readonly string[]

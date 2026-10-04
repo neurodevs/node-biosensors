@@ -6,6 +6,7 @@ import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 import DeviceStateEmitter from '../DeviceStateEmitter.js'
 import {
     DeviceController,
+    DeviceName,
     DeviceState,
     DeviceStateListener,
     DeviceControllerConstructorOptions,
@@ -17,6 +18,8 @@ import {
 export default abstract class AbstractDeviceController implements DeviceController {
     public static log = console
     public static createWriteStream = fs.createWriteStream
+
+    public abstract readonly deviceName: DeviceName
 
     protected readonly recorder?: XdfRecorder
     protected readonly txtStream?: WriteStream

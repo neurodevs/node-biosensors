@@ -22,6 +22,15 @@ export default class ZephyrDeviceControllerTest extends AbstractDeviceController
     }
 
     @test()
+    protected static async reportsDeviceName() {
+        assert.isEqual(
+            this.instance.deviceName,
+            'Zephyr BioHarness 3',
+            'Did not report device name!'
+        )
+    }
+
+    @test()
     protected static async startsWithIsConnectedFalse() {
         await this.assertStartsWithIsConnectedFalse()
     }

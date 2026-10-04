@@ -24,6 +24,8 @@ export default class GoveeDeviceController
 {
     public static Class?: GoveeControllerConstructor
 
+    public readonly deviceName = 'Govee Thermohygrometer H5074'
+
     private static readonly streamQueries = [
         'type="Temperature"',
         'type="Humidity"',

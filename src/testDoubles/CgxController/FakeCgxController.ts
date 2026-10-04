@@ -15,6 +15,8 @@ export default class FakeCgxController implements DeviceController {
     public static numCallsToStopStreaming = 0
     public static numCallsToDisconnect = 0
 
+    public readonly deviceName = 'Cognionics Quick-20r'
+
     public constructor(options?: CgxControllerConstructorOptions) {
         FakeCgxController.callsToConstructor.push(options)
     }

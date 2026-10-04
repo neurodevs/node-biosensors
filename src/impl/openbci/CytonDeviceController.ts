@@ -20,6 +20,8 @@ export default class CytonDeviceController
     public static Class?: CytonControllerConstructor
     public static wait = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
+    public readonly deviceName = 'OpenBCI Cyton'
+
     protected readonly onData: OnUsbData
 
     private readonly waitAfterConnectMs: number

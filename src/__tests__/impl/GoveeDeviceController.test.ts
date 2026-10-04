@@ -59,6 +59,15 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
     }
 
     @test()
+    protected static async reportsDeviceName() {
+        assert.isEqual(
+            this.instance.deviceName,
+            'Govee Thermohygrometer H5074',
+            'Did not report device name!'
+        )
+    }
+
+    @test()
     protected static async startsWithIsConnectedFalse() {
         await this.assertStartsWithIsConnectedFalse()
     }

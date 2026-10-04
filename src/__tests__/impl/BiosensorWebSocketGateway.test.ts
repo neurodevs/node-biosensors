@@ -221,14 +221,55 @@ export default class BiosensorWebSocketGatewayTest extends AbstractPackageTest {
         const client = FakeStatusServer.latest.connect()
 
         assert.isEqualDeep(
-            client.lastMessage,
-            {
-                devices: [
-                    { state: 'disconnected', listenPorts: [8080, 8081] },
-                    { state: 'disconnected', listenPorts: [8082, 8083] },
-                ],
-            },
+            client.lastMessage.devices.map(
+                ({ state, listenPorts }: Record<string, unknown>) => ({
+                    state,
+                    listenPorts,
+                })
+            ),
+            [
+                { state: 'disconnected', listenPorts: [8080, 8081] },
+                { state: 'disconnected', listenPorts: [8082, 8083] },
+            ],
             'Did not send each device status to new clients!'
+        )
+    }
+
+    @test()
+    protected static async reportsEachDeviceNameInStatus() {
+        this.devices[1].deviceName = 'OpenBCI Cyton'
+
+        const client = FakeStatusServer.latest.connect()
+
+        assert.isEqualDeep(
+            client.lastMessage.devices.map(
+                (device: Record<string, unknown>) => device.deviceName
+            ),
+            ['Muse S Gen 2', 'OpenBCI Cyton'],
+            'Did not report each device name in status!'
+        )
+    }
+
+    @test()
+    protected static async reportsEachStreamInStatus() {
+        const client = FakeStatusServer.latest.connect()
+
+        let listenPort = 8080
+
+        assert.isEqualDeep(
+            client.lastMessage.devices.map(
+                (device: Record<string, unknown>) => device.streams
+            ),
+            this.devices.map((device) =>
+                device.outlets.map((outlet) => ({
+                    name: outlet.name,
+                    type: outlet.type,
+                    channelNames: outlet.channelNames,
+                    sampleRateHz: outlet.sampleRateHz,
+                    listenPort: listenPort++,
+                }))
+            ),
+            'Did not report each stream in status!'
         )
     }
 

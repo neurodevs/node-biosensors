@@ -41,6 +41,15 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
     }
 
     @test()
+    protected static async reportsDeviceName() {
+        assert.isEqual(
+            this.instance.deviceName,
+            'OpenBCI Cyton',
+            'Did not report device name!'
+        )
+    }
+
+    @test()
     protected static async startsWithIsConnectedFalse() {
         await this.assertStartsWithIsConnectedFalse()
     }

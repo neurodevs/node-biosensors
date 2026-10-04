@@ -28,6 +28,15 @@ export default class CgxDeviceControllerTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async reportsDeviceName() {
+        assert.isEqual(
+            this.instance.deviceName,
+            'Cognionics Quick-20r',
+            'Did not report device name!'
+        )
+    }
+
+    @test()
     protected static async startsDisconnected() {
         assert.isEqual(
             this.instance.state,

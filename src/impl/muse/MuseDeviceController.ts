@@ -43,13 +43,16 @@ export default class MuseDeviceController
     public static Class?: MuseDeviceControllerConstructor
     public static fallbackDeviceCounter = 1
 
+    public readonly deviceName: MuseDeviceModel
+
     protected readonly variant: MuseVariant
     protected preConnected = false
 
     protected constructor(options: MuseControllerConstructorOptions) {
-        const { variant, ...rest } = options
+        const { deviceName, variant, ...rest } = options
         super(rest)
 
+        this.deviceName = deviceName
         this.variant = variant
     }
 
@@ -74,6 +77,7 @@ export default class MuseDeviceController
         )
 
         return new (this.Class ?? this)({
+            deviceName: deviceModel,
             variant,
             ble,
             recorder,
@@ -151,6 +155,7 @@ export type MuseDeviceControllerConstructor = new (
 ) => DeviceControllerBle
 
 export interface MuseControllerConstructorOptions extends DeviceControllerBleConstructorOptions {
+    deviceName: MuseDeviceModel
     variant: MuseVariant
 }
 

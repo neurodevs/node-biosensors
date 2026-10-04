@@ -18,6 +18,8 @@ export default class FakeCytonController implements CytonController {
     public static fakeOutlets: LslOutlet[] = []
     public static fakeStreamQueries: string[] = []
 
+    public readonly deviceName = 'OpenBCI Cyton'
+
     public constructor(options: CytonControllerConstructorOptions) {
         FakeCytonController.callsToConstructor.push(options)
     }

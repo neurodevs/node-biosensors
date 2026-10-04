@@ -13,6 +13,8 @@ export default class FakeGoveeController implements DeviceControllerBle {
     public static numCallsToStopStreaming = 0
     public static numCallsToDisconnect = 0
 
+    public readonly deviceName = 'Govee Thermohygrometer H5074'
+
     private readonly deviceUuid: string
 
     public constructor(options: GoveeControllerConstructorOptions) {

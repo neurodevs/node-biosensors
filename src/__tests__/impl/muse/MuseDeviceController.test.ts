@@ -366,6 +366,30 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
         )
     }
 
+    @test()
+    protected static async reportsPassedModelAsDeviceName() {
+        const muse = await this.MuseDeviceController({
+            model: 'Muse S Athena',
+        })
+
+        assert.isEqual(
+            muse.deviceName,
+            'Muse S Athena',
+            'Did not report passed model as device name!'
+        )
+    }
+
+    @test()
+    protected static async reportsDetectedModelAsDeviceName() {
+        const muse = await this.MuseDeviceController({ model: undefined })
+
+        assert.isEqual(
+            muse.deviceName,
+            FakeMuseDetector.fakeResult,
+            'Did not report detected model as device name!'
+        )
+    }
+
     private static generateCmd(value: string) {
         return {
             characteristicUuid: CONTROL_UUID,

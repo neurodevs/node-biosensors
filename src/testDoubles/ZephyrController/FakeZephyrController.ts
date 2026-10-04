@@ -15,6 +15,8 @@ export default class FakeZephyrDeviceController implements DeviceControllerBle {
     public static numCallsToStopStreaming = 0
     public static numCallsToDisconnect = 0
 
+    public readonly deviceName = 'Zephyr BioHarness 3'
+
     public constructor(options: DeviceControllerBleConstructorOptions) {
         FakeZephyrDeviceController.callsToConstructor.push(options)
     }

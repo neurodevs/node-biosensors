@@ -69,10 +69,19 @@ export default class BiosensorWebSocketGateway implements WebSocketGateway {
     private get statusPayload() {
         return JSON.stringify({
             devices: this.deviceStreams.map(({ device, listenPorts }) => ({
+                deviceName: device.deviceName,
                 state: device.state,
                 listenPorts,
+                streams: device.outlets.map((outlet, i) =>
+                    this.streamStatusFor(outlet, listenPorts[i])
+                ),
             })),
         })
+    }
+
+    private streamStatusFor(outlet: LslOutlet, listenPort: number) {
+        const { name, type, channelNames, sampleRateHz } = outlet
+        return { name, type, channelNames, sampleRateHz, listenPort }
     }
 
     public open() {

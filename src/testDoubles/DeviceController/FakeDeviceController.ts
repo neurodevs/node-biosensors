@@ -6,6 +6,7 @@ import { FakeLslOutlet } from '@neurodevs/node-lsl'
 import {
     DeviceController,
     DeviceControllerConstructorOptions,
+    DeviceName,
     DeviceStateListener,
 } from '../../types.js'
 
@@ -20,6 +21,7 @@ export default class FakeDeviceController implements DeviceController {
     public static numCallsToStopStreaming = 0
     public static numCallsToDisconnect = 0
 
+    public static fakeDeviceName: DeviceName = 'Muse S Gen 2'
     public static fakeSourceId = generateId()
     public static fakeType = generateId()
     public static fakeName = generateId()
@@ -31,6 +33,7 @@ export default class FakeDeviceController implements DeviceController {
     public static fakeManufacturer = generateId()
     public static fakeUnits = generateId()
 
+    public deviceName = FakeDeviceController.fakeDeviceName
     public fakeStreamQueries: string[] = [generateId(), generateId()]
 
     public constructor(options?: DeviceControllerConstructorOptions) {
