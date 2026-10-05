@@ -15,6 +15,7 @@ import AbstractPackageTest from '../AbstractPackageTest.js'
 import { MuseControllerOptions } from '../../impl/muse/MuseDeviceController.js'
 import FakeMuseController from '../../testDoubles/MuseController/FakeMuseController.js'
 import { GoveeControllerOptions } from '../../impl/govee/GoveeDeviceController.js'
+import FakeGoveeController from '../../testDoubles/GoveeController/FakeGoveeController.js'
 
 export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
     private static instance: DeviceFactory
@@ -73,6 +74,19 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
     protected static async createsDeviceForGoveeController() {
         const { device } = await this.createGoveeController()
         this.assertDeviceIsTruthy(device)
+    }
+
+    @test()
+    protected static async createsGoveeControllerWithoutUuidWhenNotGiven() {
+        await this.instance.createDevice('Govee Thermohygrometer H5074')
+
+        const calls = FakeGoveeController.callsToConstructor
+
+        assert.isEqualDeep(
+            { numCalls: calls.length, deviceUuid: calls[0]?.deviceUuid },
+            { numCalls: 1, deviceUuid: undefined },
+            'Should have created Govee controller without a uuid!'
+        )
     }
 
     @test()

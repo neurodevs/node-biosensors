@@ -15,7 +15,7 @@ export default class FakeGoveeController implements DeviceControllerBle {
 
     public readonly deviceName = 'Govee Thermohygrometer H5074'
 
-    private readonly deviceUuid: string
+    private readonly deviceUuid?: string
 
     public constructor(options: GoveeControllerConstructorOptions) {
         const { deviceUuid } = options
@@ -61,7 +61,7 @@ export default class FakeGoveeController implements DeviceControllerBle {
     public streamQueries = []
 
     public get bleUuid() {
-        return this.deviceUuid
+        return this.deviceUuid ?? ''
     }
 
     public get bleName() {

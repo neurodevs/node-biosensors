@@ -43,7 +43,7 @@ export default class GoveeDeviceController
 
     private localName?: string
 
-    protected readonly deviceUuid: string
+    protected readonly deviceUuid?: string
     protected readonly temperatureUnits: TemperatureUnits
     protected readonly temperatureOutlet?: LslOutlet
     protected readonly humidityOutlet?: LslOutlet
@@ -144,11 +144,11 @@ export default class GoveeDeviceController
     }
 
     protected get deviceId() {
-        return this.deviceUuid
+        return this.deviceUuid ?? this.deviceName
     }
 
     public get bleUuid() {
-        return this.deviceUuid
+        return this.deviceUuid ?? ''
     }
 
     public get bleName() {
@@ -211,12 +211,20 @@ export default class GoveeDeviceController
 
     private BleObserverController() {
         return BleObserverController.Create({
-            deviceUuid: this.deviceUuid,
+            ...this.deviceUuidOrNamePrefix,
             onAdvertisement: (advertisement: BleAdvertisement) => {
                 this.handleAdvertisement(advertisement)
             },
         })
     }
+
+    private get deviceUuidOrNamePrefix() {
+        return this.deviceUuid
+            ? { deviceUuid: this.deviceUuid }
+            : { deviceNamePrefix: this.bleNamePrefix }
+    }
+
+    private readonly bleNamePrefix = 'Govee_H5074'
 
     private static async TemperatureOutlet(units: TemperatureUnits) {
         return await LslStreamOutlet.Create({
@@ -254,7 +262,7 @@ export default class GoveeDeviceController
 
 export type GoveeControllerOptions = Resolve<
     DeviceControllerOptions<GoveeStream> & {
-        deviceUuid: string
+        deviceUuid?: string
         temperatureUnits?: TemperatureUnits
     }
 >
@@ -264,8 +272,8 @@ export type GoveeControllerConstructor = new (
 ) => DeviceControllerBle
 
 export interface GoveeControllerConstructorOptions {
-    deviceUuid: string
     temperatureUnits: TemperatureUnits
+    deviceUuid?: string
     temperatureOutlet?: LslOutlet
     humidityOutlet?: LslOutlet
     batteryOutlet?: LslOutlet

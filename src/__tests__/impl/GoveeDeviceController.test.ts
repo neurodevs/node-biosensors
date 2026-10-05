@@ -348,12 +348,46 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
     protected static async createsBleObserverControllerOnConnect() {
         await this.connect()
 
-        const { deviceUuid } = FakeBleObserver.callsToConstructor[0] ?? {}
+        const { deviceUuid, deviceNamePrefix } =
+            FakeBleObserver.callsToConstructor[0] ?? {}
 
         assert.isEqualDeep(
-            { deviceUuid },
-            { deviceUuid: this.deviceId },
+            { deviceUuid, deviceNamePrefix },
+            { deviceUuid: this.deviceId, deviceNamePrefix: undefined },
             'Did not create a BleObserverController with the device uuid!'
+        )
+    }
+
+    @test('finds device by name prefix without uuid', undefined)
+    @test('finds device by name prefix with empty uuid', '')
+    protected static async findsDeviceByNamePrefixWithoutDeviceUuid(
+        deviceUuid?: string
+    ) {
+        const govee = await this.GoveeDeviceController({ deviceUuid })
+        await govee.connect()
+
+        const options = FakeBleObserver.callsToConstructor.at(-1)!
+
+        assert.isEqualDeep(
+            {
+                hasDeviceUuid: 'deviceUuid' in options,
+                deviceNamePrefix: options.deviceNamePrefix,
+            },
+            { hasDeviceUuid: false, deviceNamePrefix: 'Govee_H5074' },
+            'Did not find device by name prefix without device uuid!'
+        )
+    }
+
+    @test()
+    protected static async exposesEmptyBleUuidWithoutDeviceUuid() {
+        const govee = await this.GoveeDeviceController({
+            deviceUuid: undefined,
+        })
+
+        assert.isEqual(
+            govee.bleUuid,
+            '',
+            'Did not expose empty bleUuid without device uuid!'
         )
     }
 

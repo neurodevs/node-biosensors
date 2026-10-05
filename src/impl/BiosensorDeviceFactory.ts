@@ -172,8 +172,7 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
     private async GoveeDeviceController(
         options?: Partial<GoveeControllerOptions>
     ) {
-        const { deviceUuid = '' } = options ?? {}
-        return GoveeDeviceController.Create({ ...options, deviceUuid })
+        return GoveeDeviceController.Create(options ?? {})
     }
 
     private CytonDeviceController(options?: CytonControllerOptions) {
