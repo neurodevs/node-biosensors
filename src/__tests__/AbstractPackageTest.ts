@@ -48,8 +48,6 @@ import FakeGoveeController from '../testDoubles/GoveeController/FakeGoveeControl
 import SpyCgxController from '../testDoubles/CgxController/SpyCgxController.js'
 import FakeDeviceController from '../testDoubles/DeviceController/FakeDeviceController.js'
 import FakeZephyrController from '../testDoubles/ZephyrController/FakeZephyrController.js'
-import FakeDeviceFTDI from '../testDoubles/FTDI/FakeDeviceFTDI.js'
-import FakeFTDI from '../testDoubles/FTDI/FakeFTDI.js'
 import FakeWebSocketGateway from '../testDoubles/WebSocketGateway/FakeWebSocketGateway.js'
 import FakeStatusServer from '../testDoubles/WebSocketServer/FakeStatusServer.js'
 import MuseDeviceController from '../impl/muse/MuseDeviceController.js'
@@ -77,7 +75,7 @@ export default class AbstractPackageTest extends AbstractModuleTest {
 
         this.setFakeBleGatt()
         this.setFakeBleObserver()
-        this.setFakeFTDI()
+        this.setFakeUsbController()
         this.setFakeLiblsl()
         this.setFakeLibndx()
         this.setFakeLslEmitter()
@@ -194,14 +192,6 @@ export default class AbstractPackageTest extends AbstractModuleTest {
     protected static setFakeDeviceFactory() {
         BiosensorDeviceFactory.Class = FakeDeviceFactory
         FakeDeviceFactory.resetTestDouble()
-    }
-
-    protected static setFakeFTDI() {
-        CgxDeviceController.FTDI = FakeFTDI as any
-        FakeFTDI.resetTestDouble()
-        FakeDeviceFTDI.resetTestDouble()
-
-        FakeFTDI.setFakeDeviceInfos()
     }
 
     protected static setFakeLiblsl() {

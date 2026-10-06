@@ -1,22 +1,23 @@
-import generateId from '@neurodevs/generate-id'
-import { FakeLslOutlet } from '@neurodevs/node-lsl'
+import { FakeLslOutlet, FakeUsbDevice } from '@neurodevs/node-lsl'
 import { test, assert } from '@neurodevs/node-tdd'
 import { FakeXdfRecorder } from '@neurodevs/node-xdf'
-import FTDI from 'ftdi-d2xx'
 
-import CgxDeviceController from '../../../impl/cognionics/CgxDeviceController.js'
+import CgxDeviceController, {
+    CgxControllerOptions,
+} from '../../../impl/cognionics/CgxDeviceController.js'
 import SpyCgxController from '../../../testDoubles/CgxController/SpyCgxController.js'
-import FakeDeviceFTDI from '../../../testDoubles/FTDI/FakeDeviceFTDI.js'
-import FakeFTDI from '../../../testDoubles/FTDI/FakeFTDI.js'
-import { DeviceState } from '../../../types.js'
-import AbstractPackageTest from '../../AbstractPackageTest.js'
+import { LogLevel } from '../../../types.js'
+import AbstractDeviceControllerTest from '../../AbstractDeviceControllerTest.js'
 
-export default class CgxDeviceControllerTest extends AbstractPackageTest {
-    private static instance: SpyCgxController
+export default class CgxDeviceControllerTest extends AbstractDeviceControllerTest {
+    protected static instance: SpyCgxController
+
+    private static readonly serialNumber = this.deviceId
 
     protected static async beforeEach() {
         await super.beforeEach()
 
+        this.setFakeUsbController()
         this.setSpyCgxController()
 
         this.instance = await this.CgxDeviceController()
@@ -37,194 +38,216 @@ export default class CgxDeviceControllerTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async startsDisconnected() {
-        assert.isEqual(
-            this.instance.state,
-            'disconnected',
-            'Did not start disconnected!'
-        )
+    protected static async startsWithIsConnectedFalse() {
+        await this.assertStartsWithIsConnectedFalse()
+    }
+
+    @test()
+    protected static async startsWithIsStreamingFalse() {
+        await this.assertStartsWithIsStreamingFalse()
+    }
+
+    @test()
+    protected static async connectSetsIsConnectedTrue() {
+        await this.assertConnectSetsIsConnectedTrue()
+    }
+
+    @test()
+    protected static async startStreamingSetsIsStreamingTrue() {
+        await this.assertStartStreamingSetsIsStreamingTrue()
+    }
+
+    @test()
+    protected static async startStreamingDoesNotHandleIfNotConnected() {
+        await this.assertStartStreamingDoesNotHandleIfNotConnected()
+    }
+
+    @test()
+    protected static async startStreamingLeavesIsStreamingFalseIfNotConnected() {
+        await this.assertStartStreamingLeavesIsStreamingFalseIfNotConnected()
+    }
+
+    @test()
+    protected static async startStreamingWarnsIfNotConnected() {
+        await this.assertStartStreamingWarnsIfNotConnected()
+    }
+
+    @test()
+    protected static async stopStreamingSetsIsStreamingFalse() {
+        await this.assertStopStreamingSetsIsStreamingFalse()
+    }
+
+    @test()
+    protected static async disconnectSetsIsConnectedFalse() {
+        await this.assertDisconnectSetsIsConnectedFalse()
     }
 
     @test()
     protected static async reportsEveryStateChange() {
-        const states: DeviceState[] = []
-        this.instance.addStateListener((state) => states.push(state))
+        await this.assertReportsEveryStateChange()
+    }
 
-        await this.instance.connect()
-        await this.startStreaming()
-        await this.instance.stopStreaming()
-        await this.instance.disconnect()
+    @test()
+    protected static async reportsConnectingWhileConnectInProgress() {
+        await this.assertReportsConnectingWhileConnectInProgress()
+    }
+
+    @test()
+    protected static async revertsToDisconnectedWhenConnectFails() {
+        await this.assertRevertsToDisconnectedWhenConnectFails()
+    }
+
+    @test()
+    protected static async disconnectCallsStopStreaming() {
+        await this.assertDisconnectCallsStopStreaming()
+    }
+
+    @test()
+    protected static async disconnectDoesNotCallStopStreamingIfNotStreaming() {
+        await this.assertDisconnectDoesNotCallStopStreamingIfNotStreaming()
+    }
+
+    @test()
+    protected static async connectWarnsWithDeviceId() {
+        await this.assertConnectWarnsWithDeviceId()
+    }
+
+    @test()
+    protected static async startStreamingWarnsWithDeviceId() {
+        await this.assertStartStreamingWarnsWithDeviceId()
+    }
+
+    @test()
+    protected static async stopStreamingWarnsWithDeviceId() {
+        await this.assertStopStreamingWarnsWithDeviceId()
+    }
+
+    @test()
+    protected static async disconnectWarnsWithDeviceId() {
+        await this.assertDisconnectWarnsWithDeviceId()
+    }
+
+    @test()
+    protected static async warnsIfLogLevelInfo() {
+        await this.assertWarnsIfLogLevelInfo()
+    }
+
+    @test()
+    protected static async doesNotWarnIfLogLevelSilent() {
+        await this.assertDoesNotWarnIfLogLevelSilent()
+    }
+
+    @test()
+    protected static async usesDeviceNameInWarningsWithoutSerialNumber() {
+        this.instance = await this.CgxDeviceController({
+            serialNumber: undefined,
+        })
+
+        await this.disconnect()
+
+        assert.isEqual(
+            this.callsToWarn[0][0],
+            'Already disconnected from Cognionics Quick-20r.',
+            'Did not use device name in warnings without serial number!'
+        )
+    }
+
+    @test()
+    protected static async createsXdfRecorderIfPassedPath() {
+        await this.assertCreatesXdfRecorderIfPassedPath()
+    }
+
+    @test()
+    protected static async passesStreamQueriesToRecorder() {
+        assert.isEqualDeep(
+            FakeXdfRecorder.callsToConstructor[0]?.streamQueries,
+            ['type="EEG"', 'type="ACCEL"'],
+            'Incorrect stream queries!'
+        )
+    }
+
+    @test()
+    protected static async connectStartsXdfRecorder() {
+        await this.assertConnectStartsXdfRecorder()
+    }
+
+    @test()
+    protected static async disconnectFinishesXdfRecorder() {
+        await this.assertDisconnectFinishesXdfRecorder()
+    }
+
+    @test()
+    protected static async createsUsbControllerWithSerialNumberAndCgxPortSettings() {
+        const { serialNumber, baudRate, usesRtsCts } =
+            FakeUsbDevice.callsToConstructor[0] ?? {}
 
         assert.isEqualDeep(
-            states,
-            ['connected', 'streaming', 'connected', 'disconnected'],
-            'Did not report every state change!'
+            { serialNumber, baudRate, usesRtsCts },
+            {
+                serialNumber: this.serialNumber,
+                baudRate: 1000000,
+                usesRtsCts: true,
+            },
+            'Did not create USB controller with serial number and port settings!'
         )
     }
 
     @test()
-    protected static async callsGetDeviceInfoListOnFtdi() {
-        await this.startStreaming()
-        assert.isEqual(FakeFTDI.numCallsToGetDeviceInfoList, 1)
-    }
+    protected static async createsUsbControllerWithoutSerialNumberWhenNotGiven() {
+        FakeUsbDevice.resetTestDouble()
+        await CgxDeviceController.Create()
 
-    @test()
-    protected static async throwsIfFtdiDeviceNotFound() {
-        FakeFTDI.fakeDeviceInfos = []
-
-        const err = await assert.doesThrowAsync(() => this.startStreaming())
-
-        assert.isTrue(
-            err.message.includes(this.notFoundError),
-            'Did not receive the expected error!'
+        assert.isUndefined(
+            FakeUsbDevice.callsToConstructor[0]?.serialNumber,
+            'Should not have passed a serial number!'
         )
     }
 
     @test()
-    protected static async callsOpenDeviceOnSerialNumber() {
-        await this.startStreaming()
+    protected static async callsConnectOnUsbController() {
+        await this.connect()
+
+        assert.isEqual(
+            FakeUsbDevice.numCallsToConnect,
+            1,
+            'Did not call connect!'
+        )
+    }
+
+    @test()
+    protected static async disconnectCallsDisconnectOnUsbController() {
+        await this.connect()
+        await this.disconnect()
+
+        assert.isEqual(
+            FakeUsbDevice.numCallsToDisconnect,
+            1,
+            'Did not call disconnect!'
+        )
+    }
+
+    @test()
+    protected static async writesNothingToDeviceOnConnect() {
+        await this.connect()
+
+        assert.isLength(
+            FakeUsbDevice.callsToWriteUsb,
+            0,
+            'Should not write to device on connect!'
+        )
+    }
+
+    @test()
+    protected static async writesSeventeenToDeviceToTurnOnImpedanceWhenStreaming() {
+        await this.connectAndStartStreaming()
 
         assert.isEqualDeep(
-            FakeFTDI.callsToOpenDevice[0],
-            FakeFTDI.fakeDeviceInfos[0].serial_number
+            FakeUsbDevice.callsToWriteUsb.map((value) =>
+                Array.from(Buffer.from(value))
+            ),
+            [[0x11]],
+            'Did not write 0x11 to device to turn on impedance check!'
         )
-    }
-
-    @test()
-    protected static async callsSetTimeoutsOnDevice() {
-        await this.startStreaming()
-
-        assert.isEqualDeep(FakeDeviceFTDI.callsToSetTimeouts[0], {
-            txTimeoutMs: 1000,
-            rxTimeoutMs: 1000,
-        })
-    }
-
-    @test()
-    protected static async callsPurgeOnDeviceToClearPreviousData() {
-        await this.startStreaming()
-
-        assert.isEqualDeep(FakeDeviceFTDI.callsToPurge[0], FTDI.FT_PURGE_RX)
-    }
-
-    @test()
-    protected static async setsFlowControlOnDevice() {
-        await this.startStreaming()
-
-        assert.isEqualDeep(FakeDeviceFTDI.callsToSetFlowControl[0], {
-            flowControl: FTDI.FT_FLOW_RTS_CTS,
-            xOn: 0x11,
-            xOff: 0x13,
-        })
-    }
-
-    @test()
-    protected static async setsBaudRateOnDevice() {
-        await this.startStreaming()
-        assert.isEqualDeep(FakeDeviceFTDI.callsToSetBaudRate[0], 1000000)
-    }
-
-    @test()
-    protected static async setsDataCharacteristicsOnDevice() {
-        await this.startStreaming()
-
-        assert.isEqualDeep(FakeDeviceFTDI.callsToSetDataCharacteristics[0], {
-            dataBits: FTDI.FT_BITS_8,
-            stopBits: FTDI.FT_STOP_BITS_1,
-            parity: FTDI.FT_PARITY_NONE,
-        })
-    }
-
-    @test()
-    protected static async setsLatencyTimerOnDevice() {
-        await this.startStreaming()
-        assert.isEqualDeep(FakeDeviceFTDI.callsToSetLatencyTimer[0], 4)
-    }
-
-    @test()
-    protected static async writesSeventeenToDeviceToTurnOnImpedance() {
-        await this.startStreaming()
-
-        assert.isEqualDeep(FakeDeviceFTDI.callsToWrite[0], Buffer.from([0x11]))
-    }
-
-    @test()
-    protected static async startStreamingSetsIsRunningTrue() {
-        await this.startStreaming()
-        assert.isTrue(this.instance.isRunning)
-    }
-
-    @test()
-    protected static async callsReadOnDeviceOnce() {
-        await this.startStreaming()
-        assert.isEqual(FakeDeviceFTDI.callsToRead[0], this.bytesPerSample)
-    }
-
-    @test()
-    protected static async callsReadOnDeviceTwice() {
-        FakeDeviceFTDI.fakeReadPackets = [
-            this.generateCorrectSizePacket(),
-            this.generateCorrectSizePacket(),
-        ]
-
-        await this.startStreaming()
-
-        assert.isEqual(FakeDeviceFTDI.callsToRead.length, 2)
-    }
-
-    @test()
-    protected static async incrementsNumPacketsDroppedWhenPacketCounterIsNonSequential() {
-        FakeDeviceFTDI.fakeReadPackets = this.generateNonSequentialPackets()
-        await this.startStreaming()
-
-        assert.isEqual(this.instance.getNumPacketsDropped(), 1)
-    }
-
-    @test()
-    protected static async recoversFromDroppedPackets() {
-        FakeDeviceFTDI.fakeReadPackets = [
-            ...this.generateNonSequentialPackets(),
-            new Uint8Array(
-                [0xff, 0x03].concat(
-                    this.generateEmptyPacket(this.bytesPerSample - 2)
-                )
-            ),
-            new Uint8Array(
-                [0xff, 0x04].concat(
-                    this.generateEmptyPacket(this.bytesPerSample - 2)
-                )
-            ),
-        ]
-        await this.startStreaming()
-
-        assert.isEqual(this.instance.getNumPacketsDropped(), 1)
-    }
-
-    @test()
-    protected static async resetsPacketCounterAt127() {
-        FakeDeviceFTDI.fakeReadPackets = [
-            new Uint8Array(
-                [0xff, 0x7f].concat(
-                    this.generateEmptyPacket(this.bytesPerSample - 2)
-                )
-            ),
-            new Uint8Array(
-                [0xff, 0x00].concat(
-                    this.generateEmptyPacket(this.bytesPerSample - 2)
-                )
-            ),
-        ]
-        await this.startStreaming()
-
-        assert.isEqual(this.instance.getNumPacketsDropped(), 0)
-    }
-
-    @test()
-    protected static async fixesOffsetWhenFirstByteIsNotHeader() {
-        FakeDeviceFTDI.fakeReadPackets = this.generateOffsetPacket()
-        await this.startStreaming()
-
-        assert.isEqual(FakeDeviceFTDI.callsToRead[1], 2)
     }
 
     @test()
@@ -247,47 +270,6 @@ export default class CgxDeviceControllerTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async pushesEegDataToLslOutlet() {
-        const rawBytes = this.generateRandomArray(
-            this.eegCharacteristicNames.length * 3
-        )
-
-        const packet = this.prependHeaderToPacket([
-            0,
-            ...rawBytes,
-            ...this.generateEmptyPacket(16),
-        ])
-
-        FakeDeviceFTDI.fakeReadPackets = [packet, packet]
-        await this.startStreaming()
-
-        const eegData = []
-
-        for (let i = 0; i < this.eegCharacteristicNames.length; i++) {
-            const firstByte = packet[2 + i * 3]
-            const secondByte = packet[3 + i * 3]
-            const thirdByte = packet[4 + i * 3]
-
-            const rawValue =
-                ((firstByte << 24) >>> 0) +
-                ((secondByte << 17) >>> 0) +
-                ((thirdByte << 10) >>> 0)
-
-            const volts = rawValue * (5.0 / 3.0) * (1.0 / Math.pow(2, 32))
-            eegData.push(volts)
-        }
-
-        assert.isEqualDeep(
-            [
-                FakeLslOutlet.callsToPushSample[0].sample,
-                FakeLslOutlet.callsToPushSample[2].sample,
-            ],
-            [eegData, eegData],
-            'Should push EEG data to LSL outlet!'
-        )
-    }
-
-    @test()
     protected static async createConstructsLslOutletforAccelerometer() {
         assert.isEqualDeep(
             FakeLslOutlet.callsToConstructor[1],
@@ -302,50 +284,243 @@ export default class CgxDeviceControllerTest extends AbstractPackageTest {
                 units: 'Unknown',
                 chunkSize: 1,
             },
-            'Should create an LslOutlet for accelerometer!'
+            'Should create an LslOutlet!'
+        )
+    }
+
+    @test()
+    protected static async pushesEegDataToLslOutlet() {
+        const packet = this.generatePacketWithRandomData()
+
+        await this.connectAndStartStreaming()
+        this.receive(packet, packet)
+
+        const eegData = this.expectedEegDataFor(packet)
+
+        assert.isEqualDeep(
+            [this.pushedSamples[0], this.pushedSamples[2]],
+            [eegData, eegData],
+            'Should push EEG data to LSL outlet!'
         )
     }
 
     @test()
     protected static async pushesAccelerometerDataToLslOutlet() {
-        const rawBytes = this.generateRandomArray(
-            this.accelCharacteristicNames.length * 3
-        )
+        const packet = this.generatePacketWithRandomData()
 
-        const packet = this.prependHeaderToPacket([
-            0,
-            ...this.generateEmptyPacket(60),
-            ...rawBytes,
-            ...this.generateEmptyPacket(7),
-        ])
+        await this.connectAndStartStreaming()
+        this.receive(packet, packet)
 
-        FakeDeviceFTDI.fakeReadPackets = [packet, packet]
-        await this.startStreaming()
-
-        const accelData = []
-
-        for (let i = 0; i < this.accelCharacteristicNames.length; i++) {
-            const firstByte = packet[65 + i * 3]
-            const secondByte = packet[66 + i * 3]
-            const thirdByte = packet[67 + i * 3]
-
-            const rawValue =
-                ((firstByte << 24) >>> 0) +
-                ((secondByte << 17) >>> 0) +
-                ((thirdByte << 10) >>> 0)
-
-            const volts = rawValue * 2.5 * (1.0 / Math.pow(2, 32))
-            accelData.push(volts)
-        }
+        const accelData = this.expectedAccelDataFor(packet)
 
         assert.isEqualDeep(
-            [
-                FakeLslOutlet.callsToPushSample[1].sample,
-                FakeLslOutlet.callsToPushSample[3].sample,
-            ],
+            [this.pushedSamples[1], this.pushedSamples[3]],
             [accelData, accelData],
-            'Should push EEG data to LSL outlet!'
+            'Should push accelerometer data to LSL outlet!'
         )
+    }
+
+    @test()
+    protected static async doesNotPushSamplesBeforeStreaming() {
+        await this.connect()
+        this.receive(this.generatePacket())
+
+        assert.isLength(
+            this.pushedSamples,
+            0,
+            'Should not push samples before streaming!'
+        )
+    }
+
+    @test()
+    protected static async stopsPushingSamplesAfterStopStreaming() {
+        await this.connectAndStartStreaming()
+        await this.stopStreaming()
+
+        this.receive(this.generatePacket())
+
+        assert.isLength(
+            this.pushedSamples,
+            0,
+            'Should not push samples after streaming stopped!'
+        )
+    }
+
+    @test()
+    protected static async waitsForRestOfPacketBeforePushing() {
+        await this.connectAndStartStreaming()
+
+        this.receive(this.generatePacket().subarray(0, 30))
+
+        assert.isLength(
+            this.pushedSamples,
+            0,
+            'Should not push a sample from a partial packet!'
+        )
+    }
+
+    @test()
+    protected static async reassemblesPacketSplitAcrossReads() {
+        const packet = this.generatePacketWithRandomData()
+
+        await this.connectAndStartStreaming()
+        this.receive(packet.subarray(0, 30))
+        this.receive(packet.subarray(30))
+
+        assert.isEqualDeep(
+            this.pushedSamples,
+            [
+                this.expectedEegDataFor(packet),
+                this.expectedAccelDataFor(packet),
+            ],
+            'Did not reassemble packet split across reads!'
+        )
+    }
+
+    @test()
+    protected static async handlesSeveralPacketsInOneRead() {
+        await this.connectAndStartStreaming()
+
+        this.receive(
+            Buffer.concat([
+                this.generatePacket(0),
+                this.generatePacket(1),
+                this.generatePacket(2),
+            ])
+        )
+
+        assert.isLength(
+            this.pushedSamples,
+            6,
+            'Did not handle several packets in one read!'
+        )
+    }
+
+    @test()
+    protected static async skipsBytesBeforeFirstHeader() {
+        const packet = this.generatePacketWithRandomData()
+
+        await this.connectAndStartStreaming()
+        this.receive(Buffer.concat([Buffer.from([0x00, 0x12, 0x34]), packet]))
+
+        assert.isEqualDeep(
+            this.pushedSamples,
+            [
+                this.expectedEegDataFor(packet),
+                this.expectedAccelDataFor(packet),
+            ],
+            'Did not skip bytes before first header!'
+        )
+    }
+
+    @test()
+    protected static async skipsLongRunOfBytesBeforeHeaderInSameRead() {
+        const packet = this.generatePacketWithRandomData()
+
+        await this.connectAndStartStreaming()
+        this.receive(Buffer.concat([Buffer.alloc(100, 0x01), packet]))
+
+        assert.isEqualDeep(
+            this.pushedSamples,
+            [
+                this.expectedEegDataFor(packet),
+                this.expectedAccelDataFor(packet),
+            ],
+            'Did not skip long run of bytes before header in same read!'
+        )
+    }
+
+    @test()
+    protected static async ignoresBytesWithoutAnyHeader() {
+        const packet = this.generatePacketWithRandomData()
+
+        await this.connectAndStartStreaming()
+        this.receive(Buffer.alloc(200, 0x01))
+        this.receive(packet)
+
+        assert.isEqualDeep(
+            this.pushedSamples,
+            [
+                this.expectedEegDataFor(packet),
+                this.expectedAccelDataFor(packet),
+            ],
+            'Did not ignore bytes without any header!'
+        )
+    }
+
+    @test()
+    protected static async discardsTruncatedPacketAndRealignsOnNextHeader() {
+        const truncated = this.generatePacket().subarray(0, 20)
+        const packet = this.generatePacketWithRandomData()
+
+        await this.connectAndStartStreaming()
+        this.receive(Buffer.concat([truncated, packet]))
+
+        assert.isEqualDeep(
+            this.pushedSamples,
+            [
+                this.expectedEegDataFor(packet),
+                this.expectedAccelDataFor(packet),
+            ],
+            'Did not discard truncated packet and realign on next header!'
+        )
+    }
+
+    @test()
+    protected static async acceptsHeaderValueInBatteryAndTriggerBytes() {
+        const packet = this.generatePacket(0)
+        packet.fill(0xff, 75, 78)
+
+        await this.connectAndStartStreaming()
+        this.receive(packet, this.generatePacket(1))
+
+        assert.isLength(
+            this.pushedSamples,
+            4,
+            'Did not accept header value in battery and trigger bytes!'
+        )
+    }
+
+    @test()
+    protected static async incrementsNumPacketsDroppedWhenPacketCounterIsNonSequential() {
+        await this.connect()
+        this.receive(this.generatePacket(0), this.generatePacket(2))
+
+        assert.isEqual(this.instance.getNumPacketsDropped(), 1)
+    }
+
+    @test()
+    protected static async warnsWhenPacketIsDropped() {
+        await this.connect()
+        this.receive(this.generatePacket(0), this.generatePacket(2))
+
+        assert.isEqual(
+            this.callsToWarn[0]?.[0],
+            'Dropped packet 2 / 1',
+            'Did not warn when packet was dropped!'
+        )
+    }
+
+    @test()
+    protected static async recoversFromDroppedPackets() {
+        await this.connect()
+
+        this.receive(
+            this.generatePacket(0),
+            this.generatePacket(2),
+            this.generatePacket(3),
+            this.generatePacket(4)
+        )
+
+        assert.isEqual(this.instance.getNumPacketsDropped(), 1)
+    }
+
+    @test()
+    protected static async resetsPacketCounterAt127() {
+        await this.connect()
+        this.receive(this.generatePacket(0x7f), this.generatePacket(0x00))
+
+        assert.isEqual(this.instance.getNumPacketsDropped(), 0)
     }
 
     @test()
@@ -358,89 +533,6 @@ export default class CgxDeviceControllerTest extends AbstractPackageTest {
     }
 
     @test()
-    protected static async createsXdfRecorderIfPassedPath() {
-        await this.createControllerWithRecorder()
-
-        assert.isEqual(
-            FakeXdfRecorder.callsToConstructor.length,
-            1,
-            'Should create XdfRecorder!'
-        )
-    }
-
-    @test()
-    protected static async passesXdfRecordPathToRecorder() {
-        await this.createControllerWithRecorder()
-
-        const { xdfRecordPath } = FakeXdfRecorder.callsToConstructor[0] ?? {}
-        assert.isEqual(xdfRecordPath, this.xdfRecordPath, 'Incorrect path!')
-    }
-
-    @test()
-    protected static async passesStreamQueriesToRecorder() {
-        await this.createControllerWithRecorder()
-
-        const { streamQueries } = FakeXdfRecorder.callsToConstructor[0] ?? {}
-
-        assert.isEqualDeep(
-            streamQueries,
-            this.instance.streamQueries,
-            'Incorrect stream queries!'
-        )
-    }
-
-    @test()
-    protected static async startStreamingCallsStartOnXdfRecorder() {
-        const instance = await this.createControllerWithRecorder()
-        await instance.startStreaming()
-
-        assert.isEqual(
-            FakeXdfRecorder.numCallsToStart,
-            1,
-            'Should call start on XdfRecorder!'
-        )
-    }
-
-    @test()
-    protected static async stopStreamingCallsFinishOnXdfRecorder() {
-        const instance = await this.createControllerWithRecorder()
-        await instance.stopStreaming()
-
-        assert.isEqual(
-            FakeXdfRecorder.numCallsToFinish,
-            1,
-            'Should call finish on XdfRecorder!'
-        )
-    }
-
-    @test()
-    protected static async disconnectCallsFinishOnXdfRecorder() {
-        const instance = await this.createControllerWithRecorder()
-        await instance.startStreaming()
-        await instance.disconnect()
-
-        assert.isEqual(
-            FakeXdfRecorder.numCallsToFinish,
-            1,
-            'Should call finish on XdfRecorder!'
-        )
-    }
-
-    @test()
-    protected static async disconnectReturnsEarlyIfNotRunning() {
-        const instance = await this.createControllerWithRecorder()
-        await instance.startStreaming()
-        await instance.disconnect()
-        await instance.disconnect()
-
-        assert.isEqual(
-            FakeXdfRecorder.numCallsToFinish,
-            1,
-            'Should not call finish on XdfRecorder!'
-        )
-    }
-
-    @test()
     protected static async exposesLslOutlets() {
         assert.isEqual(
             this.instance.outlets.length,
@@ -449,59 +541,60 @@ export default class CgxDeviceControllerTest extends AbstractPackageTest {
         )
     }
 
-    private static async startStreaming() {
-        await this.instance.startStreaming()
+    private static async connectAndStartStreaming() {
+        await this.connect()
+        await this.startStreaming()
     }
 
-    private static generatePacketWithHeader(numEmptyBytes: number) {
-        const packet = this.generateEmptyPacket(numEmptyBytes)
-        return this.prependHeaderToPacket(packet)
+    private static receive(...chunks: Buffer[]) {
+        const { onData } = FakeUsbDevice.callsToConstructor.at(-1)!
+        chunks.forEach((chunk) => onData(chunk, chunk.length, 0))
     }
 
-    private static generateEmptyPacket(numEmptyBytes: number) {
-        return Array.from({ length: numEmptyBytes }, () => 0x00)
+    private static get pushedSamples() {
+        return FakeLslOutlet.callsToPushSample.map((call) => call.sample)
     }
 
-    private static prependHeaderToPacket(packet: number[]) {
-        return new Uint8Array([0xff].concat(packet))
+    private static generatePacket(packetCounter = 0) {
+        const packet = Buffer.alloc(this.bytesPerPacket)
+        packet[0] = 0xff
+        packet[1] = packetCounter
+        return packet
     }
 
-    private static generateCorrectSizePacket() {
-        return this.generatePacketWithHeader(this.bytesPerSample - 1)
+    private static generatePacketWithRandomData() {
+        const packet = this.generatePacket()
+
+        for (let i = 2; i < 74; i++) {
+            packet[i] = Math.floor(Math.random() * 254)
+        }
+
+        return packet
     }
 
-    private static generateNonSequentialPackets() {
-        const packetCounterZero = [0x00].concat(
-            this.generateEmptyPacket(this.bytesPerSample - 2)
-        )
+    private static expectedEegDataFor(packet: Buffer) {
+        return this.eegCharacteristicNames.map((_, i) => {
+            const rawValue =
+                ((packet[2 + i * 3] << 24) >>> 0) +
+                ((packet[3 + i * 3] << 17) >>> 0) +
+                ((packet[4 + i * 3] << 10) >>> 0)
 
-        const packetCounterTwo = [0x02].concat(
-            this.generateEmptyPacket(this.bytesPerSample - 2)
-        )
-
-        return [
-            this.prependHeaderToPacket(packetCounterZero),
-            this.prependHeaderToPacket(packetCounterTwo),
-        ]
+            return rawValue * (5.0 / 3.0) * (1.0 / Math.pow(2, 32))
+        })
     }
 
-    private static generateOffsetPacket() {
-        return [
-            new Uint8Array(
-                [0x00, 0x00, 0xff].concat(
-                    this.generateEmptyPacket(this.bytesPerSample - 3)
-                )
-            ),
-            this.generateCorrectSizePacket(),
-        ]
+    private static expectedAccelDataFor(packet: Buffer) {
+        return this.accelCharacteristicNames.map((_, i) => {
+            const rawValue =
+                ((packet[65 + i * 3] << 24) >>> 0) +
+                ((packet[66 + i * 3] << 17) >>> 0) +
+                ((packet[67 + i * 3] << 10) >>> 0)
+
+            return rawValue * 2.5 * (1.0 / Math.pow(2, 32))
+        })
     }
 
-    private static generateRandomArray(length: number) {
-        return Array.from({ length }, () => Math.floor(Math.random() * 254))
-    }
-
-    private static readonly xdfRecordPath = generateId()
-    private static readonly bytesPerSample = 78
+    private static readonly bytesPerPacket = 78
 
     private static readonly eegCharacteristicNames = [
         'F7',
@@ -533,20 +626,17 @@ export default class CgxDeviceControllerTest extends AbstractPackageTest {
         'Z_ACCEL',
     ]
 
-    private static readonly notFoundError = `
-        \n FTDI device not found for the CGX headset!
-        \n Please make sure the Bluetooth dongle is connected and FTDI D2XX drivers are installed: 
-        \n - https://ftdichip.com/drivers/d2xx-drivers/
-        \n
-    `
-
-    private static async createControllerWithRecorder() {
-        return await this.CgxDeviceController(this.xdfRecordPath)
+    protected static async ControllerWithLogLevel(logLevel: LogLevel) {
+        return await this.CgxDeviceController({ logLevel })
     }
 
-    private static async CgxDeviceController(xdfRecordPath?: string) {
+    private static async CgxDeviceController(
+        options?: Partial<CgxControllerOptions>
+    ) {
         return (await CgxDeviceController.Create({
-            xdfRecordPath,
+            serialNumber: this.serialNumber,
+            xdfRecordPath: this.xdfRecordPath,
+            ...options,
         })) as SpyCgxController
     }
 }

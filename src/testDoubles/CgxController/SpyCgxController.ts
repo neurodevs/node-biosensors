@@ -10,4 +10,8 @@ export default class SpyCgxController extends CgxDeviceController {
     public getNumPacketsDropped() {
         return this.numPacketsDropped
     }
+
+    public getState() {
+        return this.state
+    }
 }

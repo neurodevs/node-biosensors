@@ -15,6 +15,7 @@ import AbstractPackageTest from '../AbstractPackageTest.js'
 import { MuseControllerOptions } from '../../impl/muse/MuseDeviceController.js'
 import FakeMuseController from '../../testDoubles/MuseController/FakeMuseController.js'
 import { GoveeControllerOptions } from '../../impl/govee/GoveeDeviceController.js'
+import FakeCgxController from '../../testDoubles/CgxController/FakeCgxController.js'
 import FakeGoveeController from '../../testDoubles/GoveeController/FakeGoveeController.js'
 
 export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
@@ -74,6 +75,21 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
     protected static async createsDeviceForGoveeController() {
         const { device } = await this.createGoveeController()
         this.assertDeviceIsTruthy(device)
+    }
+
+    @test()
+    protected static async passesSerialNumberToCgxController() {
+        const serialNumber = this.generateId()
+
+        await this.instance.createDevice('Cognionics Quick-20r', {
+            serialNumber,
+        })
+
+        assert.isEqual(
+            FakeCgxController.callsToConstructor[0]?.serialNumber,
+            serialNumber,
+            'Did not pass serial number to CGX controller!'
+        )
     }
 
     @test()

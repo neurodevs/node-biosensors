@@ -4,7 +4,9 @@ import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
 import BiosensorWebSocketGateway, {
     WebSocketGateway,
 } from './BiosensorWebSocketGateway.js'
-import CgxDeviceController from './cognionics/CgxDeviceController.js'
+import CgxDeviceController, {
+    CgxControllerOptions,
+} from './cognionics/CgxDeviceController.js'
 import GoveeDeviceController, {
     GoveeControllerOptions,
 } from './govee/GoveeDeviceController.js'
@@ -78,7 +80,7 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
 
         switch (deviceName) {
             case 'Cognionics Quick-20r':
-                return this.CgxDeviceController()
+                return this.CgxDeviceController(options)
             case 'Govee Thermohygrometer H5074':
                 return this.GoveeDeviceController(options)
             case 'Muse S Athena':
@@ -165,8 +167,8 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         ]
     }
 
-    private async CgxDeviceController() {
-        return CgxDeviceController.Create()
+    private async CgxDeviceController(options?: CgxControllerOptions) {
+        return CgxDeviceController.Create(options)
     }
 
     private async GoveeDeviceController(
@@ -228,7 +230,7 @@ export interface PerDeviceOptionsMap extends Record<
     DeviceName,
     DeviceControllerOptions<string>
 > {
-    'Cognionics Quick-20r': DeviceControllerOptions
+    'Cognionics Quick-20r': CgxControllerOptions
     'Govee Thermohygrometer H5074': Partial<GoveeControllerOptions>
     'Muse S Athena': MuseControllerOptions
     'Muse S Gen 2': MuseControllerOptions

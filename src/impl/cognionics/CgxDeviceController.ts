@@ -7,228 +7,120 @@
 // 75: Battery voltage (value: 0–255)
 // 76-77: Trigger (value: 0–255)
 
-import FTDI from 'ftdi-d2xx'
 import { ChannelFormat } from '@neurodevs/ndx-native'
-import { LslOutlet, LslStreamOutlet } from '@neurodevs/node-lsl'
-import { XdfRecorder, XdfStreamRecorder } from '@neurodevs/node-xdf'
+import {
+    LslOutlet,
+    LslStreamOutlet,
+    UsbDevice,
+    UsbDeviceController,
+    UsbDeviceOptions,
+} from '@neurodevs/node-lsl'
+import { XdfRecorder } from '@neurodevs/node-xdf'
 
-import DeviceStateEmitter from '../DeviceStateEmitter.js'
-import { DeviceController, DeviceStateListener } from '../../types.js'
+import { DeviceController, LogLevel } from '../../types.js'
+import AbstractDeviceControllerUsb from '../abstract/AbstractDeviceControllerUsb.js'
 
-export default class CgxDeviceController implements DeviceController {
+export default class CgxDeviceController
+    extends AbstractDeviceControllerUsb
+    implements DeviceController
+{
     public static Class?: CgxControllerConstructor
-    public static FTDI = FTDI
 
     public static readonly streamQueries = ['type="EEG"', 'type="ACCEL"']
 
     public readonly deviceName = 'Cognionics Quick-20r'
 
-    public isRunning = false
     protected numPacketsDropped = 0
 
-    private readonly stateEmitter = new DeviceStateEmitter()
+    private readonly eegOutlet: LslOutlet
+    private readonly accelOutlet: LslOutlet
+    private readonly serialNumber?: string
 
-    private eegOutlet: LslOutlet
-    private accelOutlet: LslOutlet
-    private xdfRecorder?: XdfRecorder
-
-    private infos!: FTDI.FTDI_DeviceInfo[]
-    private device!: FTDI.FTDI_Device
-    private packetCounter!: number
-
-    private readonly readTimeoutMs = 1000
-    private readonly writeTimeoutMs = 1000
-    private readonly latencyTimerMs = 4
-    private readonly bytesPerSample = 78
-    private readonly baudRate = 1000000
-    private readonly seventeenInHex = 0x11
-    private readonly nineteenInHex = 0x13
-    private readonly ftdiFlowControlMode = FTDI.FT_FLOW_RTS_CTS
-    private readonly ftdiReadBuffer = FTDI.FT_PURGE_RX
-    private readonly eightDataBits = FTDI.FT_BITS_8
-    private readonly oneStopBit = FTDI.FT_STOP_BITS_1
-    private readonly noParityBit = FTDI.FT_PARITY_NONE
+    private packetCounter?: number
 
     protected constructor(options: CgxControllerConstructorOptions) {
-        const { eegOutlet, accelOutlet, xdfRecorder } = options
+        const {
+            usb,
+            onPacket,
+            eegOutlet,
+            accelOutlet,
+            serialNumber,
+            recorder,
+            logLevel,
+        } = options
+
+        super({ usb, recorder, logLevel })
 
         this.eegOutlet = eegOutlet
         this.accelOutlet = accelOutlet
-        this.xdfRecorder = xdfRecorder
+        this.serialNumber = serialNumber
+
+        onPacket((packet) => this.handlePacket(packet))
     }
 
     public static async Create(options?: CgxControllerOptions) {
-        const { xdfRecordPath } = options ?? {}
+        const { serialNumber, xdfRecordPath, logLevel } = options ?? {}
 
         const eegOutlet = await this.EegOutlet()
         const accelOutlet = await this.AccelOutlet()
 
-        const xdfRecorder = await this.createXdfRecorderIfPath(xdfRecordPath)
+        const { onData, onPacket } = this.createPacketReassembler()
+        const usb = this.UsbDeviceController(onData, serialNumber)
+
+        const recorder = await this.XdfStreamRecorder(
+            xdfRecordPath,
+            this.streamQueries
+        )
 
         return new (this.Class ?? this)({
+            usb,
+            onPacket,
             eegOutlet,
             accelOutlet,
-            xdfRecorder,
-            xdfRecordPath,
+            serialNumber,
+            recorder,
+            logLevel,
         })
     }
 
-    public async connect() {
-        this.stateEmitter.setState('connected')
-    }
-
-    public async startStreaming() {
-        this.isRunning = true
-        this.startXdfRecorderIfExists()
-
-        await this.setupFtdi()
-        await this.startReadingPackets()
-
-        this.stateEmitter.setState('streaming')
-    }
-
-    private startXdfRecorderIfExists() {
-        this.xdfRecorder?.start()
-    }
-
-    private async setupFtdi() {
-        await this.loadFtdiDeviceInfos()
-        await this.openDeviceBySerialNumber()
-
-        this.configureFtdiDevice()
-
+    protected async handleStartStreaming() {
         await this.turnOnImpedanceCheck()
     }
 
-    private async loadFtdiDeviceInfos() {
-        this.infos = await this.FTDI.getDeviceInfoList()
-        this.throwIfDeviceNotFound()
-    }
-
-    private throwIfDeviceNotFound() {
-        if (this.infos.length === 0) {
-            throw new Error(this.notFoundError)
-        }
-    }
-
-    private readonly notFoundError = `
-        \n FTDI device not found for the CGX headset!
-        \n Please make sure the Bluetooth dongle is connected and FTDI D2XX drivers are installed: 
-        \n - https://ftdichip.com/drivers/d2xx-drivers/
-        \n
-    `
-
-    private async openDeviceBySerialNumber() {
-        this.device = await this.FTDI.openDevice(this.serialNumber)
-    }
-
-    private get serialNumber() {
-        return this.infos[0].serial_number
-    }
-
-    private configureFtdiDevice() {
-        this.setReadAndWriteTimeouts()
-        this.purgeReadBuffer()
-        this.setFlowControl()
-        this.setBaudRate()
-        this.setDataCharacteristics()
-        this.setLatencyTimer()
-    }
-
-    private setReadAndWriteTimeouts() {
-        this.device.setTimeouts(this.readTimeoutMs, this.writeTimeoutMs)
-    }
-
-    private purgeReadBuffer() {
-        this.device.purge(this.ftdiReadBuffer)
-    }
-
-    private setFlowControl() {
-        this.device.setFlowControl(
-            this.ftdiFlowControlMode,
-            this.seventeenInHex,
-            this.nineteenInHex
-        )
-    }
-
-    private setBaudRate() {
-        this.device.setBaudRate(this.baudRate)
-    }
-
-    private setDataCharacteristics() {
-        this.device.setDataCharacteristics(
-            this.eightDataBits,
-            this.oneStopBit,
-            this.noParityBit
-        )
-    }
-
-    private setLatencyTimer() {
-        this.device.setLatencyTimer(this.latencyTimerMs)
-    }
-
     private async turnOnImpedanceCheck() {
-        await this.device.write(Buffer.from([0x11]))
+        await this.usb.writeUsb('\x11')
     }
 
-    private async startReadingPackets() {
-        while (this.isRunning) {
-            try {
-                await this.readPacket()
-            } catch {
-                return
-            }
-        }
-    }
+    protected async handleStopStreaming() {}
 
-    private async readPacket() {
-        const packet = await this.readPacketAndEnsureAlignment()
+    private handlePacket(packet: Uint8Array) {
         this.handlePacketCounter(packet)
 
-        this.decode24BitEeg(packet)
-        this.decode24BitAccelerometer(packet)
-    }
-
-    private async readPacketAndEnsureAlignment() {
-        const packet = await this.device.read(this.bytesPerSample)
-
-        if (packet[0] !== 0xff) {
-            const idx = packet.indexOf(0xff)
-            const partial = packet.slice(idx)
-
-            if (idx === -1) {
-                console.log('Malformed packet')
-                return packet
-            }
-
-            const rest = await this.device.read(idx)
-            packet.set(rest, partial.length)
+        if (this.state === 'streaming') {
+            this.decode24BitEeg(packet)
+            this.decode24BitAccelerometer(packet)
         }
-
-        return packet
     }
 
     private handlePacketCounter(packet: Uint8Array) {
         const current = packet[1]
 
-        if (this.packetCounter == null) {
+        if (this.packetCounter === undefined) {
             this.packetCounter = current
             return
         }
 
         const expected = (this.packetCounter + 1) % 255
 
-        if (current !== expected) {
-            if (current !== 0) {
-                this.numPacketsDropped++
-                console.log(`Dropped packet ${current} / ${expected}`)
-            }
+        if (current !== expected && current !== 0) {
+            this.numPacketsDropped++
+            this.warn(`Dropped packet ${current} / ${expected}`)
         }
 
         this.packetCounter = current
     }
 
-    private decode24BitEeg(packet: Uint8Array<ArrayBufferLike>) {
+    private decode24BitEeg(packet: Uint8Array) {
         const eegData = []
 
         for (let i = 0; i < this.numEegChannels; i++) {
@@ -247,15 +139,13 @@ export default class CgxDeviceController implements DeviceController {
         }
 
         this.eegOutlet.pushSample(eegData)
-
-        console.log('EEG data:', eegData)
     }
 
     private get numEegChannels() {
         return CgxDeviceController.eegCharacteristicNames.length
     }
 
-    private decode24BitAccelerometer(packet: Uint8Array<ArrayBufferLike>) {
+    private decode24BitAccelerometer(packet: Uint8Array) {
         const accelData = []
 
         for (let i = 0; i < this.numAccelChannels; i++) {
@@ -274,38 +164,14 @@ export default class CgxDeviceController implements DeviceController {
         }
 
         this.accelOutlet.pushSample(accelData)
-
-        console.log('Accelerometer data:', accelData)
     }
 
     private get numAccelChannels() {
         return CgxDeviceController.accelCharacteristicNames.length
     }
 
-    public async stopStreaming() {
-        this.finishXdfRecorderIfExists()
-        this.stateEmitter.setState('connected')
-    }
-
-    private finishXdfRecorderIfExists() {
-        this.xdfRecorder?.finish()
-    }
-
-    public async disconnect() {
-        if (this.isRunning) {
-            await this.stopStreaming()
-            this.isRunning = false
-        }
-
-        this.stateEmitter.setState('disconnected')
-    }
-
-    public get state() {
-        return this.stateEmitter.state
-    }
-
-    public addStateListener(listener: DeviceStateListener) {
-        return this.stateEmitter.addStateListener(listener)
+    protected get deviceId() {
+        return this.serialNumber ?? this.deviceName
     }
 
     public get outlets() {
@@ -316,8 +182,70 @@ export default class CgxDeviceController implements DeviceController {
         return CgxDeviceController.streamQueries
     }
 
-    private get FTDI() {
-        return CgxDeviceController.FTDI
+    private static createPacketReassembler() {
+        let pending: Buffer = Buffer.alloc(0)
+        let handlePacket: (packet: Uint8Array) => void = () => {}
+
+        const onPacket = (handler: (packet: Uint8Array) => void) => {
+            handlePacket = handler
+        }
+
+        const onData: UsbDeviceOptions['onData'] = (data) => {
+            pending = Buffer.concat([pending, data])
+
+            for (;;) {
+                pending = this.fromFirstHeader(pending)
+
+                if (pending.length < this.bytesPerPacket) {
+                    return
+                }
+
+                const nextHeader = this.indexOfHeaderInsidePacket(pending)
+
+                if (nextHeader !== -1) {
+                    pending = pending.subarray(nextHeader)
+                    continue
+                }
+
+                handlePacket(
+                    Uint8Array.from(pending.subarray(0, this.bytesPerPacket))
+                )
+                pending = pending.subarray(this.bytesPerPacket)
+            }
+        }
+
+        return { onData, onPacket }
+    }
+
+    private static fromFirstHeader(bytes: Buffer) {
+        const header = bytes.indexOf(this.headerByte)
+        return header === -1 ? Buffer.alloc(0) : bytes.subarray(header)
+    }
+
+    private static indexOfHeaderInsidePacket(bytes: Buffer) {
+        const header = bytes
+            .subarray(1, this.firstByteThatMayEqualHeader)
+            .indexOf(this.headerByte)
+
+        return header === -1 ? -1 : header + 1
+    }
+
+    private static readonly bytesPerPacket = 78
+    private static readonly headerByte = 0xff
+    private static readonly firstByteThatMayEqualHeader = 75
+
+    private static readonly baudRate = 1000000
+
+    private static UsbDeviceController(
+        onData: UsbDeviceOptions['onData'],
+        serialNumber?: string
+    ) {
+        return UsbDeviceController.Create({
+            onData,
+            serialNumber,
+            baudRate: this.baudRate,
+            usesRtsCts: true,
+        })
     }
 
     private static readonly eegCharacteristicNames = [
@@ -374,12 +302,6 @@ export default class CgxDeviceController implements DeviceController {
         chunkSize: 1,
     }
 
-    private static createXdfRecorderIfPath(xdfRecordPath?: string) {
-        return xdfRecordPath
-            ? XdfStreamRecorder.Create(xdfRecordPath, this.streamQueries)
-            : undefined
-    }
-
     private static async EegOutlet() {
         return await LslStreamOutlet.Create(this.eegOptions)
     }
@@ -390,7 +312,9 @@ export default class CgxDeviceController implements DeviceController {
 }
 
 export interface CgxControllerOptions {
+    serialNumber?: string
     xdfRecordPath?: string
+    logLevel?: LogLevel
 }
 
 export type CgxControllerConstructor = new (
@@ -398,8 +322,11 @@ export type CgxControllerConstructor = new (
 ) => DeviceController
 
 export interface CgxControllerConstructorOptions {
+    usb: UsbDevice
+    onPacket: (handler: (packet: Uint8Array) => void) => void
     eegOutlet: LslOutlet
     accelOutlet: LslOutlet
-    xdfRecorder?: XdfRecorder
-    xdfRecordPath?: string
+    serialNumber?: string
+    recorder?: XdfRecorder
+    logLevel?: LogLevel
 }

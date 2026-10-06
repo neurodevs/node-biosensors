@@ -71,5 +71,6 @@ export type CallToCgxConstructor =
     | {
           eegOutlet?: LslOutlet
           accelOutlet?: LslOutlet
+          serialNumber?: string
       }
     | undefined
