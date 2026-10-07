@@ -1099,10 +1099,10 @@
     ffi-rs "^1.3.1"
     ws "^8.18.3"
 
-"@neurodevs/node-lsl@^23.3.0":
-  version "23.3.0"
-  resolved "https://registry.yarnpkg.com/@neurodevs/node-lsl/-/node-lsl-23.3.0.tgz#ffc33ec0208395949131b10001c8b97b19b2948a"
-  integrity sha512-Z76p+imlVjqmrSb1ba0H+CWIw7kwAugoao4e21gzSggEmn7hegDYcfsvv2ro1EaOeyuLoyPiv28g42dUzm9Vpg==
+"@neurodevs/node-lsl@^23.3.1":
+  version "23.3.1"
+  resolved "https://registry.yarnpkg.com/@neurodevs/node-lsl/-/node-lsl-23.3.1.tgz#67d928c85d83daa4e877c997ee8f131be578d092"
+  integrity sha512-lo4PoAh2PCwAQNn5bMjW0mhsGJv/svlev0dafYR0Z+WHDxabPjqsJmaXgmRXhcAZKtCjpN9N/PDuAKtONBwMWQ==
   dependencies:
     "@neurodevs/generate-id" "^1.1.3"
     "@neurodevs/ndx-native" "^10.1.0"

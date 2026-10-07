@@ -200,6 +200,74 @@ export default class BiosensorStreamingOrchestratorTest extends AbstractPackageT
     }
 
     @test()
+    protected static async stopCleansUpEverythingEvenWhenDeviceFailsToDisconnect() {
+        const instance = await this.createWithEventMarkerEmitter()
+        await instance.start()
+
+        await this.stopWithFailingDisconnects(instance, ['first'])
+
+        assert.isEqualDeep(
+            {
+                numCallsToDisconnect: this.numFailingDisconnectCalls,
+                numGatewaysDestroyed: FakeWebSocketGateway.numCallsToDestroy,
+                numEmittersDestroyed: FakeEventMarkerOutlet.numCallsToDestroy,
+                numRecordersFinished: FakeXdfRecorder.numCallsToFinish,
+            },
+            {
+                numCallsToDisconnect: this.devices.length,
+                numGatewaysDestroyed: 1,
+                numEmittersDestroyed: 1,
+                numRecordersFinished: 1,
+            },
+            'Did not clean up everything when a device failed to disconnect!'
+        )
+    }
+
+    @test()
+    protected static async stopThrowsErrorFromDeviceThatFailedToDisconnect() {
+        await this.start()
+
+        const err = await this.stopWithFailingDisconnects(this.instance, [
+            'only failure',
+        ])
+
+        assert.isEqual(
+            err?.message,
+            'only failure',
+            'Did not throw error from device that failed to disconnect!'
+        )
+    }
+
+    @test()
+    protected static async stopThrowsEveryErrorWhenSeveralDevicesFailToDisconnect() {
+        await this.start()
+
+        const err = await this.stopWithFailingDisconnects(this.instance, [
+            'first failure',
+            'second failure',
+        ])
+
+        assert.isEqual(
+            err?.message,
+            'first failure\nsecond failure',
+            'Did not throw every error when several devices failed!'
+        )
+    }
+
+    @test()
+    protected static async startingAfterFailedStopCreatesDevicesAgain() {
+        await this.start()
+        await this.stopWithFailingDisconnects(this.instance, ['failure'])
+        await this.start()
+
+        assert.isEqual(
+            FakeDeviceFactory.callsToCreateDevices.length,
+            2,
+            'Did not create devices again when starting after failed stop!'
+        )
+    }
+
+    @test()
     protected static async stopCallsDestroyOnWebSocketGatewayIfExists() {
         await this.startThenStop()
 
@@ -258,6 +326,37 @@ export default class BiosensorStreamingOrchestratorTest extends AbstractPackageT
             0,
             'Should not have disconnected any devices!'
         )
+    }
+
+    private static numFailingDisconnectCalls = 0
+
+    private static async stopWithFailingDisconnects(
+        instance: StreamingOrchestrator,
+        errorMessages: string[]
+    ) {
+        const device = FakeDeviceFactory.fakeDevice
+        const disconnect = device.disconnect
+        const remainingMessages = [...errorMessages]
+
+        this.numFailingDisconnectCalls = 0
+
+        device.disconnect = async () => {
+            this.numFailingDisconnectCalls++
+            const message = remainingMessages.shift()
+
+            if (message) {
+                throw new Error(message)
+            }
+        }
+
+        try {
+            await instance.stop()
+            return undefined
+        } catch (err) {
+            return err as Error
+        } finally {
+            device.disconnect = disconnect
+        }
     }
 
     private static async startThenStop() {

@@ -103,19 +103,33 @@ export default class BiosensorStreamingOrchestrator implements StreamingOrchestr
     }
 
     public async stop() {
-        await this.disconnectDevices()
+        const errors = await this.disconnectDevices()
 
         this.destroyEmitterIfExists()
         this.destroyGatewayIfExists()
         this.finishRecorderIfExists()
 
         this.isInitialized = false
+
+        this.throwIfAny(errors)
     }
 
     private async disconnectDevices() {
-        return Promise.all(
+        const results = await Promise.allSettled(
             this.controllers.map((device) => device.disconnect())
         )
+
+        const errors = results
+            .filter((result) => result.status === 'rejected')
+            .map((result) => result.reason as Error)
+
+        return errors
+    }
+
+    private throwIfAny(errors: Error[]) {
+        if (errors.length > 0) {
+            throw new Error(errors.map((err) => err.message).join('\n'))
+        }
     }
 
     private destroyEmitterIfExists() {
