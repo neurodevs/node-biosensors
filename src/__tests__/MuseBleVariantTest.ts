@@ -479,7 +479,7 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
         const firstCall = FakeLslOutlet.callsToConstructor[0]
 
         assert.isEqualDeep(firstCall, {
-            name: `Muse EEG (${this.shortUuid})`,
+            name: `${this.model} EEG (${this.shortUuid})`,
             type: 'EEG',
             channelNames: this.eegCharNames,
             sampleRateHz: this.eegSampleRateHz,
@@ -495,7 +495,7 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
         const secondCall = FakeLslOutlet.callsToConstructor[1]
 
         assert.isEqualDeep(secondCall, {
-            name: `Muse PPG (${this.shortUuid})`,
+            name: `${this.model} PPG (${this.shortUuid})`,
             type: 'PPG',
             channelNames: ['PPG_AMBIENT', 'PPG_INFRARED', 'PPG_RED'],
             sampleRateHz: 64,
@@ -511,7 +511,7 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
         const call = FakeLslOutlet.callsToConstructor[2]
 
         assert.isEqualDeep(call, {
-            name: `Muse Gyroscope (${this.shortUuid})`,
+            name: `${this.model} Gyroscope (${this.shortUuid})`,
             type: 'GYRO',
             channelNames: ['X', 'Y', 'Z'],
             sampleRateHz: this.imuSampleRateHz,
@@ -527,7 +527,7 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
         const call = FakeLslOutlet.callsToConstructor[3]
 
         assert.isEqualDeep(call, {
-            name: `Muse Accelerometer (${this.shortUuid})`,
+            name: `${this.model} Accelerometer (${this.shortUuid})`,
             type: 'ACCEL',
             channelNames: ['X', 'Y', 'Z'],
             sampleRateHz: this.imuSampleRateHz,

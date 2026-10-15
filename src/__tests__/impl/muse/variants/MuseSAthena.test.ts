@@ -135,40 +135,46 @@ export default class MuseSAthenaTest extends AbstractDeviceControllerBleTest {
 
     @test()
     protected static async createsEegOutlet() {
-        assert.isEqualDeep(this.outletByName(`Muse EEG (${this.shortUuid})`), {
-            name: `Muse EEG (${this.shortUuid})`,
-            type: 'EEG',
-            channelNames: EEG_CHANNELS,
-            sampleRateHz: EEG_HZ,
-            channelFormat: 'float32',
-            sourceId: `muse-eeg-${this.shortUuid}`,
-            manufacturer: 'Interaxon Inc.',
-            units: 'microvolt',
-            chunkSize: 1,
-        })
+        assert.isEqualDeep(
+            this.outletByName(`Muse S Athena EEG (${this.shortUuid})`),
+            {
+                name: `Muse S Athena EEG (${this.shortUuid})`,
+                type: 'EEG',
+                channelNames: EEG_CHANNELS,
+                sampleRateHz: EEG_HZ,
+                channelFormat: 'float32',
+                sourceId: `muse-eeg-${this.shortUuid}`,
+                manufacturer: 'Interaxon Inc.',
+                units: 'microvolt',
+                chunkSize: 1,
+            }
+        )
     }
 
     @test()
     protected static async createsImuOutlet() {
-        assert.isEqualDeep(this.outletByName(`Muse IMU (${this.shortUuid})`), {
-            name: `Muse IMU (${this.shortUuid})`,
-            type: 'IMU',
-            channelNames: IMU_CHANNELS,
-            sampleRateHz: IMU_HZ,
-            channelFormat: 'float32',
-            sourceId: `muse-imu-${this.shortUuid}`,
-            manufacturer: 'Interaxon Inc.',
-            units: 'N/A',
-            chunkSize: 1,
-        })
+        assert.isEqualDeep(
+            this.outletByName(`Muse S Athena IMU (${this.shortUuid})`),
+            {
+                name: `Muse S Athena IMU (${this.shortUuid})`,
+                type: 'IMU',
+                channelNames: IMU_CHANNELS,
+                sampleRateHz: IMU_HZ,
+                channelFormat: 'float32',
+                sourceId: `muse-imu-${this.shortUuid}`,
+                manufacturer: 'Interaxon Inc.',
+                units: 'N/A',
+                chunkSize: 1,
+            }
+        )
     }
 
     @test()
     protected static async createsOpticsOutlet() {
         assert.isEqualDeep(
-            this.outletByName(`Muse Optics (${this.shortUuid})`),
+            this.outletByName(`Muse S Athena Optics (${this.shortUuid})`),
             {
-                name: `Muse Optics (${this.shortUuid})`,
+                name: `Muse S Athena Optics (${this.shortUuid})`,
                 type: 'PPG',
                 channelNames: OPTICS_CHANNELS,
                 sampleRateHz: OPTICS_HZ,

@@ -233,8 +233,8 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
         await MuseDeviceController.Create({ model: 'Muse S Gen 2' })
         await MuseDeviceController.Create({ model: 'Muse S Athena' })
 
-        const eegNames = FakeLslOutlet.callsToConstructor.filter((call) =>
-            call?.name?.startsWith('Muse EEG')
+        const eegNames = FakeLslOutlet.callsToConstructor.filter(
+            (call) => call?.type === 'EEG'
         )
 
         assert.isEqualDeep(
@@ -243,8 +243,8 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
                 secondName: eegNames[2]?.name,
             },
             {
-                firstName: 'Muse EEG (Device-1)',
-                secondName: 'Muse EEG (Device-2)',
+                firstName: 'Muse S Gen 2 EEG (Device-1)',
+                secondName: 'Muse S Athena EEG (Device-2)',
             },
             'Should start the fallback short id at 1 when no bleUuid is passed!'
         )

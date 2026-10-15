@@ -11,6 +11,7 @@ import {
 
 import MuseDeviceController, {
     MuseControllerOptions,
+    MuseDeviceModel,
     MuseStream,
 } from './MuseDeviceController.js'
 import { Resolve } from '../../types.js'
@@ -23,6 +24,7 @@ export default class MuseBleVariant implements MuseVariant {
         'type="ACCEL"',
     ]
 
+    protected static readonly model: MuseDeviceModel
     protected static readonly charUuids: Record<string, string>
     protected static readonly eegCharNames: string[]
 
@@ -516,7 +518,7 @@ export default class MuseBleVariant implements MuseVariant {
 
     private static async EegOutlet(identifier: string) {
         return await this.LslOutlet({
-            name: `Muse EEG (${identifier})`,
+            name: `${this.model} EEG (${identifier})`,
             type: 'EEG',
             channelNames: this.eegCharNames,
             sampleRateHz: this.eegSampleRateHz,
@@ -527,7 +529,7 @@ export default class MuseBleVariant implements MuseVariant {
 
     private static async PpgOutlet(identifier: string) {
         return await this.LslOutlet({
-            name: `Muse PPG (${identifier})`,
+            name: `${this.model} PPG (${identifier})`,
             type: 'PPG',
             channelNames: ['PPG_AMBIENT', 'PPG_INFRARED', 'PPG_RED'],
             sampleRateHz: 64,
@@ -538,7 +540,7 @@ export default class MuseBleVariant implements MuseVariant {
 
     private static async GyroOutlet(identifier: string) {
         return await this.LslOutlet({
-            name: `Muse Gyroscope (${identifier})`,
+            name: `${this.model} Gyroscope (${identifier})`,
             type: 'GYRO',
             channelNames: ['X', 'Y', 'Z'],
             sampleRateHz: this.imuSampleRateHz,
@@ -549,7 +551,7 @@ export default class MuseBleVariant implements MuseVariant {
 
     private static async AccelOutlet(identifier: string) {
         return await this.LslOutlet({
-            name: `Muse Accelerometer (${identifier})`,
+            name: `${this.model} Accelerometer (${identifier})`,
             type: 'ACCEL',
             channelNames: ['X', 'Y', 'Z'],
             sampleRateHz: this.imuSampleRateHz,

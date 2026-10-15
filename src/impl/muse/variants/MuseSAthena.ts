@@ -6,6 +6,8 @@ import { type MuseVariant, type MuseVariantOptions } from '../MuseBleVariant.js'
 import MuseBleVariant from '../MuseBleVariant.js'
 
 export default class MuseSAthena extends MuseBleVariant {
+    protected static readonly model = 'Muse S Athena'
+
     protected static readonly streamQueries = [
         'type="EEG"',
         'type="IMU"',
@@ -574,7 +576,7 @@ export default class MuseSAthena extends MuseBleVariant {
 
     private static async createEegOutlet(identifier: string) {
         return await this.LslOutlet({
-            name: `Muse EEG (${identifier})`,
+            name: `${this.model} EEG (${identifier})`,
             type: 'EEG',
             channelNames: this.eegChannels,
             sampleRateHz: this.sampleRatesHz.EEG!,
@@ -585,7 +587,7 @@ export default class MuseSAthena extends MuseBleVariant {
 
     private static async createImuOutlet(identifier: string) {
         return await this.LslOutlet({
-            name: `Muse IMU (${identifier})`,
+            name: `${this.model} IMU (${identifier})`,
             type: 'IMU',
             channelNames: this.imuChannels,
             sampleRateHz: this.sampleRatesHz.IMU!,
@@ -596,7 +598,7 @@ export default class MuseSAthena extends MuseBleVariant {
 
     private static async createOpticsOutlet(identifier: string) {
         return await this.LslOutlet({
-            name: `Muse Optics (${identifier})`,
+            name: `${this.model} Optics (${identifier})`,
             type: 'PPG',
             channelNames: this.opticsChannels,
             sampleRateHz: this.sampleRatesHz.OPTICS!,
