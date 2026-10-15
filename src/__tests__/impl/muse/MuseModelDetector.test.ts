@@ -71,6 +71,31 @@ export default class MuseModelDetectorTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async throwsClearlyWhenMuseNeverReplies() {
+        this.fakeControlResponse(this.instance, '')
+
+        await assert.doesThrowAsync(
+            async () => await this.instance.detectModel(),
+            `Muse did not say which model it is within ${MuseModelDetector.detectModelTimeoutMs / 1000} seconds! Make sure it is on, charged and not connected to another app, then try again.`
+        )
+    }
+
+    @test()
+    protected static async disconnectsBleWhenDetectionFails() {
+        this.fakeControlResponse(this.instance, '')
+
+        await assert.doesThrowAsync(
+            async () => await this.instance.detectModel()
+        )
+
+        assert.isEqual(
+            FakeBleGatt.numCallsToDisconnect,
+            1,
+            'Did not disconnect the BLE device after detection failed!'
+        )
+    }
+
+    @test()
     protected static async connectsBleDuringDetection() {
         this.fakeControlResponse(this.instance, this.gen2ControlResponse)
 

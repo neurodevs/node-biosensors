@@ -37,12 +37,12 @@ export default class MuseModelDetector implements MuseDetector {
     public async detectModel() {
         await this.ble.connect()
 
-        const response = await this.readControlResponse()
-        const model = this.resolveModelFrom(response)
-
-        await this.ble.disconnect()
-
-        return model
+        try {
+            const response = await this.readControlResponse()
+            return this.resolveModelFrom(response)
+        } finally {
+            await this.ble.disconnect()
+        }
     }
 
     protected readControlResponse = async () => {
@@ -80,6 +80,10 @@ export default class MuseModelDetector implements MuseDetector {
     }
 
     private resolveModelFrom(controlResponse: string) {
+        if (!controlResponse) {
+            this.throwMuseNeverReplied()
+        }
+
         const match = controlResponse.match(/"sp"\s*:\s*"([^"]*)"/)
         const codename = match?.[1] ?? ''
 
@@ -91,6 +95,12 @@ export default class MuseModelDetector implements MuseDetector {
 
         throw new Error(
             `Could not resolve Muse model from unknown CONTROL hardware codename "${codename}" (sp field)! Response: ${controlResponse}.`
+        )
+    }
+
+    private throwMuseNeverReplied(): never {
+        throw new Error(
+            `Muse did not say which model it is within ${MuseModelDetector.detectModelTimeoutMs / 1000} seconds! Make sure it is on, charged and not connected to another app, then try again.`
         )
     }
 

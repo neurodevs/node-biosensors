@@ -1,6 +1,6 @@
 {
   "name": "@neurodevs/node-biosensors",
-  "version": "9.1.3",
+  "version": "9.1.4",
   "description": "A Node.js package for various biosensors and associated biosignals.",
   "type": "module",
   "keywords": [
