@@ -100,7 +100,7 @@ export default class MuseModelDetector implements MuseDetector {
 
     private throwMuseNeverReplied(): never {
         throw new Error(
-            `Muse did not say which model it is within ${MuseModelDetector.detectModelTimeoutMs / 1000} seconds! Make sure it is on, charged and not connected to another app, then try again.`
+            `Muse did not say which model it is within ${MuseModelDetector.detectModelTimeoutMs / 1000} seconds! Make sure it is on, charged, and not connected to another app, then try again.`
         )
     }
 
