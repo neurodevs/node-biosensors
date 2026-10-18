@@ -80,8 +80,16 @@ export default class BiosensorWebSocketGateway implements WebSocketGateway {
     }
 
     private streamStatusFor(outlet: LslOutlet, listenPort: number) {
-        const { name, type, channelNames, sampleRateHz } = outlet
-        return { name, type, channelNames, sampleRateHz, listenPort }
+        const { name, type, channelNames, sampleRateHz, descElements } = outlet
+
+        return {
+            name,
+            type,
+            channelNames,
+            sampleRateHz,
+            listenPort,
+            desc: descElements,
+        }
     }
 
     public open() {

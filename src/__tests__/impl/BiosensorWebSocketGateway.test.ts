@@ -267,6 +267,7 @@ export default class BiosensorWebSocketGatewayTest extends AbstractPackageTest {
                     channelNames: outlet.channelNames,
                     sampleRateHz: outlet.sampleRateHz,
                     listenPort: listenPort++,
+                    desc: outlet.descElements,
                 }))
             ),
             'Did not report each stream in status!'
