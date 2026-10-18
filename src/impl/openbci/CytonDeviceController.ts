@@ -55,16 +55,17 @@ export default class CytonDeviceController
             logDeviceInfo = false,
             exgType = 'ExG',
             logLevel,
+            nickname,
         } = options ?? {}
 
         const disabled = this.resolveDisabledStreams(options ?? {})
 
         if (!disabled.has('ExG')) {
-            await this.ExgOutlet(serialNumber, exgType)
+            await this.ExgOutlet(serialNumber, exgType, nickname)
         }
 
         if (!disabled.has('Accelerometer')) {
-            await this.AccelOutlet(serialNumber)
+            await this.AccelOutlet(serialNumber, nickname)
         }
 
         const onData = this.createOnData(logDeviceInfo, logLevel)
@@ -170,9 +171,11 @@ export default class CytonDeviceController
 
     private static async ExgOutlet(
         serialNumber: string | undefined,
-        exgType: string
+        exgType: string,
+        nickname?: string
     ) {
         await LslStreamOutlet.Create({
+            ...this.describedBy(nickname),
             name: `Cyton ${exgType} (${serialNumber})`,
             type: exgType,
             channelNames: [
@@ -194,8 +197,9 @@ export default class CytonDeviceController
         })
     }
 
-    private static async AccelOutlet(serialNumber?: string) {
+    private static async AccelOutlet(serialNumber?: string, nickname?: string) {
         await LslStreamOutlet.Create({
+            ...this.describedBy(nickname),
             name: `Cyton Accelerometer (${serialNumber})`,
             type: 'ACCEL',
             channelNames: ['X', 'Y', 'Z'],

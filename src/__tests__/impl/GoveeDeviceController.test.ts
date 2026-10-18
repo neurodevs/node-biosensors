@@ -330,6 +330,20 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
     }
 
     @test()
+    protected static async describesEachOutletWithNickname() {
+        FakeLslOutlet.callsToConstructor.length = 0
+        const nickname = this.generateId()
+
+        await this.GoveeDeviceController({ nickname })
+
+        assert.isEqualDeep(
+            FakeLslOutlet.callsToConstructor.map((call) => call?.description),
+            new Array(3).fill({ nickname }),
+            'Should describe each outlet with the nickname!'
+        )
+    }
+
+    @test()
     protected static async doesNotCreateOutletsForDisabledStreams() {
         FakeLslOutlet.callsToConstructor.length = 0
 

@@ -177,6 +177,20 @@ export default class CgxDeviceControllerTest extends AbstractDeviceControllerTes
     }
 
     @test()
+    protected static async describesEachOutletWithNickname() {
+        FakeLslOutlet.callsToConstructor.length = 0
+        const nickname = this.generateId()
+
+        await this.CgxDeviceController({ nickname })
+
+        assert.isEqualDeep(
+            FakeLslOutlet.callsToConstructor.map((call) => call?.description),
+            new Array(2).fill({ nickname }),
+            'Should describe each outlet with the nickname!'
+        )
+    }
+
+    @test()
     protected static async createsUsbControllerWithSerialNumberAndCgxPortSettings() {
         const { serialNumber, baudRate, usesRtsCts } =
             FakeUsbDevice.callsToConstructor[0] ?? {}

@@ -152,6 +152,10 @@ export default abstract class AbstractDeviceController implements DeviceControll
         return new Set(disableStreams ?? [])
     }
 
+    protected static describedBy(nickname?: string) {
+        return nickname ? { description: { nickname } } : {}
+    }
+
     protected static TxtRecordStream(txtRecordPath?: string) {
         return txtRecordPath
             ? this.createWriteStream(txtRecordPath, { flags: 'a' })

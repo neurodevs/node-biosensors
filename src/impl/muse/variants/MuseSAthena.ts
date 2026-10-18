@@ -164,7 +164,7 @@ export default class MuseSAthena extends MuseBleVariant {
     public static async Create(
         options?: MuseVariantOptions
     ): Promise<MuseVariant> {
-        const { bleUuid = '' } = options ?? {}
+        const { bleUuid = '', nickname } = options ?? {}
 
         const identifier = this.resolveIdentifier(bleUuid)
         const disabled = this.resolveDisabledStreams(options)
@@ -174,13 +174,13 @@ export default class MuseSAthena extends MuseBleVariant {
 
         const outlets: AthenaOutlets = {
             EEG: !disabled.has('EEG')
-                ? await this.createEegOutlet(identifier)
+                ? await this.createEegOutlet(identifier, nickname)
                 : undefined,
             IMU: !disableImu
-                ? await this.createImuOutlet(identifier)
+                ? await this.createImuOutlet(identifier, nickname)
                 : undefined,
             OPTICS: !disabled.has('PPG')
-                ? await this.createOpticsOutlet(identifier)
+                ? await this.createOpticsOutlet(identifier, nickname)
                 : undefined,
         }
 
@@ -574,8 +574,12 @@ export default class MuseSAthena extends MuseBleVariant {
         return value >= 0x8000 ? value - 0x10000 : value
     }
 
-    private static async createEegOutlet(identifier: string) {
+    private static async createEegOutlet(
+        identifier: string,
+        nickname?: string
+    ) {
         return await this.LslOutlet({
+            nickname,
             name: `${this.model} EEG (${identifier})`,
             type: 'EEG',
             channelNames: this.eegChannels,
@@ -585,8 +589,12 @@ export default class MuseSAthena extends MuseBleVariant {
         })
     }
 
-    private static async createImuOutlet(identifier: string) {
+    private static async createImuOutlet(
+        identifier: string,
+        nickname?: string
+    ) {
         return await this.LslOutlet({
+            nickname,
             name: `${this.model} IMU (${identifier})`,
             type: 'IMU',
             channelNames: this.imuChannels,
@@ -596,8 +604,12 @@ export default class MuseSAthena extends MuseBleVariant {
         })
     }
 
-    private static async createOpticsOutlet(identifier: string) {
+    private static async createOpticsOutlet(
+        identifier: string,
+        nickname?: string
+    ) {
         return await this.LslOutlet({
+            nickname,
             name: `${this.model} Optics (${identifier})`,
             type: 'PPG',
             channelNames: this.opticsChannels,

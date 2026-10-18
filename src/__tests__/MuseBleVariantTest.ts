@@ -539,6 +539,19 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
         })
     }
 
+    protected static async assertDescribesEachOutletWithNickname() {
+        FakeLslOutlet.callsToConstructor.length = 0
+        const nickname = this.generateId()
+
+        await this.MuseDeviceController({ nickname })
+
+        assert.isEqualDeep(
+            FakeLslOutlet.callsToConstructor.map((call) => call?.description),
+            new Array(4).fill({ nickname }),
+            'Should describe each outlet with the nickname!'
+        )
+    }
+
     protected static async assertDoesNotCreateOutletsForDisabledStreams() {
         FakeLslOutlet.callsToConstructor.length = 0
 

@@ -85,18 +85,19 @@ export default class GoveeDeviceController
             txtRecordPath,
             logLevel,
             temperatureUnits = 'Celsius',
+            nickname,
         } = options
 
         const disabled = this.resolveDisabledStreams(options)
 
         const temperatureOutlet = !disabled.has('Temperature')
-            ? await this.TemperatureOutlet(temperatureUnits)
+            ? await this.TemperatureOutlet(temperatureUnits, nickname)
             : undefined
         const humidityOutlet = !disabled.has('Humidity')
-            ? await this.HumidityOutlet()
+            ? await this.HumidityOutlet(nickname)
             : undefined
         const batteryOutlet = !disabled.has('Battery')
-            ? await this.BatteryOutlet()
+            ? await this.BatteryOutlet(nickname)
             : undefined
 
         const recorder = await this.XdfStreamRecorder(
@@ -226,9 +227,13 @@ export default class GoveeDeviceController
 
     private readonly bleNamePrefix = 'Govee_H5074'
 
-    private static async TemperatureOutlet(units: TemperatureUnits) {
+    private static async TemperatureOutlet(
+        units: TemperatureUnits,
+        nickname?: string
+    ) {
         return await LslStreamOutlet.Create({
             ...this.sharedOutletOptions,
+            ...this.describedBy(nickname),
             sourceId: 'govee-temperature',
             name: 'Govee Temperature',
             type: 'Temperature',
@@ -237,9 +242,10 @@ export default class GoveeDeviceController
         })
     }
 
-    private static async HumidityOutlet() {
+    private static async HumidityOutlet(nickname?: string) {
         return await LslStreamOutlet.Create({
             ...this.sharedOutletOptions,
+            ...this.describedBy(nickname),
             sourceId: 'govee-humidity',
             name: 'Govee Humidity',
             type: 'Humidity',
@@ -248,9 +254,10 @@ export default class GoveeDeviceController
         })
     }
 
-    private static async BatteryOutlet() {
+    private static async BatteryOutlet(nickname?: string) {
         return await LslStreamOutlet.Create({
             ...this.sharedOutletOptions,
+            ...this.describedBy(nickname),
             sourceId: 'govee-battery',
             name: 'Govee Battery',
             type: 'Battery',

@@ -188,6 +188,20 @@ export default class MuseSAthenaTest extends AbstractDeviceControllerBleTest {
     }
 
     @test()
+    protected static async describesEachOutletWithNickname() {
+        FakeLslOutlet.callsToConstructor.length = 0
+        const nickname = this.generateId()
+
+        await this.MuseDeviceController({ nickname })
+
+        assert.isEqualDeep(
+            FakeLslOutlet.callsToConstructor.map((call) => call?.description),
+            new Array(3).fill({ nickname }),
+            'Should describe each outlet with the nickname!'
+        )
+    }
+
+    @test()
     protected static async exposesOutlets() {
         assert.isEqualDeep(
             this.instance.outlets.map((outlet) => outlet.sourceId),

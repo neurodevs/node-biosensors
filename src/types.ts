@@ -40,6 +40,7 @@ export type DeviceControllerOptions<DeviceStream extends string = never> =
         txtRecordPath?: string
         logLevel?: LogLevel
         disableStreams?: readonly DeviceStream[]
+        nickname?: string
     }>
 
 export type DeviceControllerBleOptions<DeviceStream extends string = never> =

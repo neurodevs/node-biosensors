@@ -135,6 +135,11 @@ export default class Muse2Test extends MuseBleVariantTest {
     }
 
     @test()
+    protected static async describesEachOutletWithNickname() {
+        await this.assertDescribesEachOutletWithNickname()
+    }
+
+    @test()
     protected static async doesNotCreateOutletsForDisabledStreams() {
         this.assertDoesNotCreateOutletsForDisabledStreams()
     }

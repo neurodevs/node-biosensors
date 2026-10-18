@@ -97,22 +97,22 @@ export default class MuseBleVariant implements MuseVariant {
     public static async Create(
         options?: MuseVariantOptions
     ): Promise<MuseVariant> {
-        const { bleUuid = '' } = options ?? {}
+        const { bleUuid = '', nickname } = options ?? {}
 
         const identifier = this.resolveIdentifier(bleUuid)
         const disabled = this.resolveDisabledStreams(options)
 
         const eegOutlet = !disabled.has('EEG')
-            ? await this.EegOutlet(identifier)
+            ? await this.EegOutlet(identifier, nickname)
             : undefined
         const ppgOutlet = !disabled.has('PPG')
-            ? await this.PpgOutlet(identifier)
+            ? await this.PpgOutlet(identifier, nickname)
             : undefined
         const gyroOutlet = !disabled.has('Gyroscope')
-            ? await this.GyroOutlet(identifier)
+            ? await this.GyroOutlet(identifier, nickname)
             : undefined
         const accelOutlet = !disabled.has('Accelerometer')
-            ? await this.AccelOutlet(identifier)
+            ? await this.AccelOutlet(identifier, nickname)
             : undefined
 
         const charCallbacks = this.generateCharCallbacks(
@@ -239,6 +239,10 @@ export default class MuseBleVariant implements MuseVariant {
     protected static resolveDisabledStreams(options?: MuseVariantOptions) {
         const { disableStreams } = options ?? {}
         return new Set(disableStreams ?? [])
+    }
+
+    protected static describedBy(nickname?: string) {
+        return nickname ? { description: { nickname } } : {}
     }
 
     protected static resolveLogAndStream(options?: MuseVariantOptions) {
@@ -507,17 +511,22 @@ export default class MuseBleVariant implements MuseVariant {
         sampleRateHz: number
         sourceId: string
         units: string
+        nickname?: string
     }) {
+        const { nickname, ...outletParams } = params
+
         return await LslStreamOutlet.Create({
-            ...params,
+            ...outletParams,
+            ...this.describedBy(nickname),
             channelFormat: 'float32',
             manufacturer: 'Interaxon Inc.',
             chunkSize: 1,
         })
     }
 
-    private static async EegOutlet(identifier: string) {
+    private static async EegOutlet(identifier: string, nickname?: string) {
         return await this.LslOutlet({
+            nickname,
             name: `${this.model} EEG (${identifier})`,
             type: 'EEG',
             channelNames: this.eegCharNames,
@@ -527,8 +536,9 @@ export default class MuseBleVariant implements MuseVariant {
         })
     }
 
-    private static async PpgOutlet(identifier: string) {
+    private static async PpgOutlet(identifier: string, nickname?: string) {
         return await this.LslOutlet({
+            nickname,
             name: `${this.model} PPG (${identifier})`,
             type: 'PPG',
             channelNames: ['PPG_AMBIENT', 'PPG_INFRARED', 'PPG_RED'],
@@ -538,8 +548,9 @@ export default class MuseBleVariant implements MuseVariant {
         })
     }
 
-    private static async GyroOutlet(identifier: string) {
+    private static async GyroOutlet(identifier: string, nickname?: string) {
         return await this.LslOutlet({
+            nickname,
             name: `${this.model} Gyroscope (${identifier})`,
             type: 'GYRO',
             channelNames: ['X', 'Y', 'Z'],
@@ -549,8 +560,9 @@ export default class MuseBleVariant implements MuseVariant {
         })
     }
 
-    private static async AccelOutlet(identifier: string) {
+    private static async AccelOutlet(identifier: string, nickname?: string) {
         return await this.LslOutlet({
+            nickname,
             name: `${this.model} Accelerometer (${identifier})`,
             type: 'ACCEL',
             channelNames: ['X', 'Y', 'Z'],

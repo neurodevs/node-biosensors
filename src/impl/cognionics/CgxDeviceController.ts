@@ -59,10 +59,11 @@ export default class CgxDeviceController
     }
 
     public static async Create(options?: CgxControllerOptions) {
-        const { serialNumber, xdfRecordPath, logLevel } = options ?? {}
+        const { serialNumber, xdfRecordPath, logLevel, nickname } =
+            options ?? {}
 
-        const eegOutlet = await this.EegOutlet()
-        const accelOutlet = await this.AccelOutlet()
+        const eegOutlet = await this.EegOutlet(nickname)
+        const accelOutlet = await this.AccelOutlet(nickname)
 
         const { onData, onPacket } = this.createPacketReassembler()
         const usb = this.UsbDeviceController(onData, serialNumber)
@@ -302,12 +303,18 @@ export default class CgxDeviceController
         chunkSize: 1,
     }
 
-    private static async EegOutlet() {
-        return await LslStreamOutlet.Create(this.eegOptions)
+    private static async EegOutlet(nickname?: string) {
+        return await LslStreamOutlet.Create({
+            ...this.eegOptions,
+            ...this.describedBy(nickname),
+        })
     }
 
-    private static async AccelOutlet() {
-        return await LslStreamOutlet.Create(this.accelOptions)
+    private static async AccelOutlet(nickname?: string) {
+        return await LslStreamOutlet.Create({
+            ...this.accelOptions,
+            ...this.describedBy(nickname),
+        })
     }
 }
 
@@ -315,6 +322,7 @@ export interface CgxControllerOptions {
     serialNumber?: string
     xdfRecordPath?: string
     logLevel?: LogLevel
+    nickname?: string
 }
 
 export type CgxControllerConstructor = new (
