@@ -17,7 +17,12 @@ import {
 } from '@neurodevs/node-lsl'
 import { XdfRecorder } from '@neurodevs/node-xdf'
 
-import { DeviceController, LogLevel } from '../../types.js'
+import {
+    DeviceController,
+    DeviceControllerOptions,
+    LogLevel,
+    Resolve,
+} from '../../types.js'
 import AbstractDeviceControllerUsb from '../abstract/AbstractDeviceControllerUsb.js'
 
 export default class CgxDeviceController
@@ -32,8 +37,8 @@ export default class CgxDeviceController
 
     protected numPacketsDropped = 0
 
-    private readonly eegOutlet: LslOutlet
-    private readonly accelOutlet: LslOutlet
+    private readonly eegOutlet?: LslOutlet
+    private readonly accelOutlet?: LslOutlet
     private readonly serialNumber?: string
 
     private packetCounter?: number
@@ -62,8 +67,15 @@ export default class CgxDeviceController
         const { serialNumber, xdfRecordPath, logLevel, nickname } =
             options ?? {}
 
-        const eegOutlet = await this.EegOutlet(nickname)
-        const accelOutlet = await this.AccelOutlet(nickname)
+        const disabled = this.resolveDisabledStreams(options ?? {})
+
+        const eegOutlet = !disabled.has('EEG')
+            ? await this.EegOutlet(nickname)
+            : undefined
+
+        const accelOutlet = !disabled.has('Accelerometer')
+            ? await this.AccelOutlet(nickname)
+            : undefined
 
         const { onData, onPacket } = this.createPacketReassembler()
         const usb = this.UsbDeviceController(onData, serialNumber)
@@ -98,8 +110,8 @@ export default class CgxDeviceController
         this.handlePacketCounter(packet)
 
         if (this.state === 'streaming') {
-            this.decode24BitEeg(packet)
-            this.decode24BitAccelerometer(packet)
+            this.pushEegIfOn(packet)
+            this.pushAccelerometerIfOn(packet)
         }
     }
 
@@ -121,6 +133,14 @@ export default class CgxDeviceController
         this.packetCounter = current
     }
 
+    private pushEegIfOn(packet: Uint8Array) {
+        this.eegOutlet?.pushSample(this.decode24BitEeg(packet))
+    }
+
+    private pushAccelerometerIfOn(packet: Uint8Array) {
+        this.accelOutlet?.pushSample(this.decode24BitAccelerometer(packet))
+    }
+
     private decode24BitEeg(packet: Uint8Array) {
         const eegData = []
 
@@ -139,7 +159,7 @@ export default class CgxDeviceController
             eegData.push(volts)
         }
 
-        this.eegOutlet.pushSample(eegData)
+        return eegData
     }
 
     private get numEegChannels() {
@@ -164,7 +184,7 @@ export default class CgxDeviceController
             accelData.push(volts)
         }
 
-        this.accelOutlet.pushSample(accelData)
+        return accelData
     }
 
     private get numAccelChannels() {
@@ -176,7 +196,9 @@ export default class CgxDeviceController
     }
 
     public get outlets() {
-        return [this.eegOutlet, this.accelOutlet]
+        return [this.eegOutlet, this.accelOutlet].filter(
+            (outlet) => outlet !== undefined
+        )
     }
 
     public get streamQueries() {
@@ -318,22 +340,23 @@ export default class CgxDeviceController
     }
 }
 
-export interface CgxControllerOptions {
-    serialNumber?: string
-    xdfRecordPath?: string
-    logLevel?: LogLevel
-    nickname?: string
-}
+export type CgxControllerOptions = Resolve<
+    DeviceControllerOptions<CgxStream> & {
+        serialNumber?: string
+    }
+>
 
 export type CgxControllerConstructor = new (
     options: CgxControllerConstructorOptions
 ) => DeviceController
 
+export type CgxStream = 'EEG' | 'Accelerometer'
+
 export interface CgxControllerConstructorOptions {
     usb: UsbDevice
     onPacket: (handler: (packet: Uint8Array) => void) => void
-    eegOutlet: LslOutlet
-    accelOutlet: LslOutlet
+    eegOutlet?: LslOutlet
+    accelOutlet?: LslOutlet
     serialNumber?: string
     recorder?: XdfRecorder
     logLevel?: LogLevel

@@ -4,6 +4,7 @@ import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 
 import CgxDeviceController, {
     CgxControllerOptions,
+    CgxStream,
 } from '../../../impl/cognionics/CgxDeviceController.js'
 import SpyCgxController from '../../../testDoubles/CgxController/SpyCgxController.js'
 import { LogLevel } from '../../../types.js'
@@ -552,6 +553,89 @@ export default class CgxDeviceControllerTest extends AbstractDeviceControllerTes
             this.instance.outlets.length,
             2,
             'Did not expose outlets!'
+        )
+    }
+
+    @test()
+    protected static async doesNotCreateOutletsForDisabledStreams() {
+        FakeLslOutlet.callsToConstructor.length = 0
+
+        await this.CgxDeviceController({
+            disableStreams: ['EEG', 'Accelerometer'],
+        })
+
+        assert.isEqual(
+            FakeLslOutlet.callsToConstructor.length,
+            0,
+            'Should not create outlets when passed disableStreams!'
+        )
+    }
+
+    @test('creates only accelerometer outlet without EEG', 'EEG', 'ACCEL')
+    @test(
+        'creates only EEG outlet without accelerometer',
+        'Accelerometer',
+        'EEG'
+    )
+    protected static async createsOutletOnlyForStreamLeftOn(
+        disabled: CgxStream,
+        expectedType: string
+    ) {
+        FakeLslOutlet.callsToConstructor.length = 0
+
+        await this.CgxDeviceController({ disableStreams: [disabled] })
+
+        assert.isEqualDeep(
+            FakeLslOutlet.callsToConstructor.map((call) => call?.type),
+            [expectedType],
+            `Should create an outlet only for the stream left on!`
+        )
+    }
+
+    @test()
+    protected static async pushesOnlyAccelerometerDataWithoutEeg() {
+        const packet = this.generatePacketWithRandomData()
+        this.instance = await this.CgxDeviceController({
+            disableStreams: ['EEG'],
+        })
+
+        await this.connectAndStartStreaming()
+        this.receive(packet)
+
+        assert.isEqualDeep(
+            this.pushedSamples,
+            [this.expectedAccelDataFor(packet)],
+            'Should push only accelerometer data without EEG!'
+        )
+    }
+
+    @test()
+    protected static async pushesOnlyEegDataWithoutAccelerometer() {
+        const packet = this.generatePacketWithRandomData()
+        this.instance = await this.CgxDeviceController({
+            disableStreams: ['Accelerometer'],
+        })
+
+        await this.connectAndStartStreaming()
+        this.receive(packet)
+
+        assert.isEqualDeep(
+            this.pushedSamples,
+            [this.expectedEegDataFor(packet)],
+            'Should push only EEG data without accelerometer!'
+        )
+    }
+
+    @test()
+    protected static async exposesOnlyOutletsOfStreamsLeftOn() {
+        const instance = await this.CgxDeviceController({
+            disableStreams: ['Accelerometer'],
+        })
+
+        assert.isEqual(
+            instance.outlets.length,
+            1,
+            'Should expose only outlets of streams left on!'
         )
     }
 
