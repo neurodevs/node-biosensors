@@ -95,6 +95,10 @@ export default class CytonDeviceController
         return [`type="${exgType}"`, 'type="ACCEL"']
     }
 
+    public get identifier() {
+        return this.serialNumber
+    }
+
     protected get deviceId() {
         return this.serialNumber ?? ''
     }

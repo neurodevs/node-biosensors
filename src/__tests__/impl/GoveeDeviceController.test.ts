@@ -393,6 +393,15 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
     }
 
     @test()
+    protected static async identifiesDeviceByDeviceUuid() {
+        assert.isEqual(
+            this.instance.identifier,
+            this.deviceId,
+            'Did not identify the device by its device uuid!'
+        )
+    }
+
+    @test()
     protected static async exposesEmptyBleUuidWithoutDeviceUuid() {
         const govee = await this.GoveeDeviceController({
             deviceUuid: undefined,

@@ -41,6 +41,15 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
     }
 
     @test()
+    protected static async identifiesDeviceBySerialNumber() {
+        assert.isEqual(
+            this.instance.identifier,
+            this.serialNumber,
+            'Did not identify the device by its serial number!'
+        )
+    }
+
+    @test()
     protected static async reportsDeviceName() {
         assert.isEqual(
             this.instance.deviceName,

@@ -166,6 +166,11 @@ export default class ZephyrDeviceControllerTest extends AbstractDeviceController
     }
 
     @test()
+    protected static async identifiesDeviceByBleUuid() {
+        await this.assertIdentifiesDeviceByBleUuid()
+    }
+
+    @test()
     protected static async exposesNameFromBleController() {
         await this.assertExposesNameFromBleController()
     }

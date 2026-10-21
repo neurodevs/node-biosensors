@@ -152,6 +152,10 @@ export default class GoveeDeviceController
         return this.deviceUuid ?? ''
     }
 
+    public get identifier() {
+        return this.deviceUuid
+    }
+
     public get bleName() {
         return this.localName ?? 'N/A'
     }

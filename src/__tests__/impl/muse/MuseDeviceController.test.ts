@@ -165,6 +165,11 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
     }
 
     @test()
+    protected static async identifiesDeviceByBleUuid() {
+        await this.assertIdentifiesDeviceByBleUuid()
+    }
+
+    @test()
     protected static async exposesNameFromBleController() {
         await this.assertExposesNameFromBleController()
     }

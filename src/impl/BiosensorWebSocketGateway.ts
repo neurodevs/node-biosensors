@@ -70,6 +70,7 @@ export default class BiosensorWebSocketGateway implements WebSocketGateway {
         return JSON.stringify({
             devices: this.deviceStreams.map(({ device, listenPorts }) => ({
                 deviceName: device.deviceName,
+                identifier: device.identifier,
                 state: device.state,
                 listenPorts,
                 streams: device.outlets.map((outlet, i) =>

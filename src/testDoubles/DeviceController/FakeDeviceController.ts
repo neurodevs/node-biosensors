@@ -34,6 +34,7 @@ export default class FakeDeviceController implements DeviceController {
     public static fakeUnits = generateId()
 
     public deviceName = FakeDeviceController.fakeDeviceName
+    public identifier?: string
     public fakeStreamQueries: string[] = [generateId(), generateId()]
 
     public constructor(options?: DeviceControllerConstructorOptions) {

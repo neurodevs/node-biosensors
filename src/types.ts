@@ -24,6 +24,7 @@ export interface DeviceController {
     disconnect(): Promise<void>
     addStateListener(listener: DeviceStateListener): () => void
     readonly deviceName: DeviceName
+    readonly identifier?: string
     readonly state: DeviceState
     readonly outlets: readonly LslOutlet[]
     readonly streamQueries: readonly string[]

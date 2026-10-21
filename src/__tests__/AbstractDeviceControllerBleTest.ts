@@ -83,6 +83,14 @@ export default abstract class AbstractDeviceControllerBleTest extends AbstractDe
         )
     }
 
+    protected static async assertIdentifiesDeviceByBleUuid() {
+        assert.isEqual(
+            this.instance.identifier,
+            this.instance.getBle().uuid,
+            'Did not identify the device by its BLE uuid!'
+        )
+    }
+
     protected static async assertExposesNameFromBleController() {
         assert.isEqual(
             this.instance.bleName,

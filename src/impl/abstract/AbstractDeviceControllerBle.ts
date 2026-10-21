@@ -25,6 +25,10 @@ export default abstract class AbstractDeviceControllerBle extends AbstractDevice
         return this.ble.uuid
     }
 
+    public get identifier() {
+        return this.ble.uuid
+    }
+
     public get bleName() {
         return this.ble.name
     }

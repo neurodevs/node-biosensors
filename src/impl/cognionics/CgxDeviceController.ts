@@ -191,6 +191,10 @@ export default class CgxDeviceController
         return CgxDeviceController.accelCharacteristicNames.length
     }
 
+    public get identifier() {
+        return this.serialNumber
+    }
+
     protected get deviceId() {
         return this.serialNumber ?? this.deviceName
     }

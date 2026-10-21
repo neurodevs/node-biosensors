@@ -251,6 +251,21 @@ export default class BiosensorWebSocketGatewayTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async reportsEachDeviceIdentifierInStatus() {
+        this.devices[0].identifier = 'muse-uuid'
+
+        const client = FakeStatusServer.latest.connect()
+
+        assert.isEqualDeep(
+            client.lastMessage.devices.map(
+                (device: Record<string, unknown>) => device.identifier
+            ),
+            ['muse-uuid', undefined],
+            'Did not report each device identifier in status!'
+        )
+    }
+
+    @test()
     protected static async reportsEachStreamInStatus() {
         const client = FakeStatusServer.latest.connect()
 
