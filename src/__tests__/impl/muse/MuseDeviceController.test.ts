@@ -170,6 +170,39 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
     }
 
     @test()
+    protected static async sendsStartCommandsAgainOnceReconnected() {
+        await this.connect()
+        await this.startStreaming()
+
+        const sentBeforeLoss = FakeBleGatt.callsToWriteCharacteristic.length
+
+        this.loseBleConnection()
+
+        await this.reconnectBle()
+
+        assert.isEqualDeep(
+            FakeBleGatt.callsToWriteCharacteristic.slice(sentBeforeLoss),
+            FakeBleGatt.callsToWriteCharacteristic.slice(0, sentBeforeLoss),
+            'Did not send the start commands again once reconnected!'
+        )
+    }
+
+    @test()
+    protected static async reportsReconnectingOnceConnectionIsLost() {
+        await this.assertReportsReconnectingOnceConnectionIsLost()
+    }
+
+    @test()
+    protected static async resumesStreamingOnceReconnected() {
+        await this.assertResumesStreamingOnceReconnected()
+    }
+
+    @test()
+    protected static async returnsToConnectedOnceReconnectedIfNotStreaming() {
+        await this.assertReturnsToConnectedOnceReconnectedIfNotStreaming()
+    }
+
+    @test()
     protected static async exposesNameFromBleController() {
         await this.assertExposesNameFromBleController()
     }

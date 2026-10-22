@@ -1,5 +1,5 @@
 import DeviceStateEmitter from '../../impl/DeviceStateEmitter.js'
-import { BleGatt, FakeLslOutlet } from '@neurodevs/node-lsl'
+import { BleGatt, BleGattController, FakeLslOutlet } from '@neurodevs/node-lsl'
 import { XdfRecorder } from '@neurodevs/node-xdf'
 import { DeviceControllerBle, DeviceStateListener } from '../../types.js'
 import {
@@ -25,11 +25,11 @@ export default class FakeMuseController implements DeviceControllerBle {
     public constructor(options: MuseControllerConstructorOptions) {
         FakeMuseController.callsToConstructor.push(options)
 
-        const { deviceName, variant, ble, recorder } = options
+        const { deviceName, variant, bleOptions, recorder } = options
 
         this.deviceName = deviceName
 
-        this.ble = ble
+        this.ble = BleGattController.Create(bleOptions)
         this.variant = variant
         this.recorder = recorder
     }

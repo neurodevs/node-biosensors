@@ -1,6 +1,6 @@
 import { WriteStream } from 'node:fs'
 
-import { BleGatt, LslOutlet, UsbDevice } from '@neurodevs/node-lsl'
+import { BleGattOptions, LslOutlet, UsbDevice } from '@neurodevs/node-lsl'
 import { XdfRecorder } from '@neurodevs/node-xdf'
 
 export const DEVICE_NAMES = [
@@ -59,7 +59,7 @@ export interface DeviceControllerConstructorOptions {
 }
 
 export interface DeviceControllerBleConstructorOptions extends DeviceControllerConstructorOptions {
-    ble: BleGatt
+    bleOptions: BleGattOptions
 }
 
 export interface DeviceControllerUsbConstructorOptions extends Omit<
@@ -80,7 +80,7 @@ export type DeviceControllerBleConstructor = new (
 export type Resolve<T> = { [K in keyof T]: T[K] } & {}
 
 export type DeviceState =
-    'disconnected' | 'connecting' | 'connected' | 'streaming'
+    'disconnected' | 'connecting' | 'connected' | 'streaming' | 'reconnecting'
 
 export type DeviceStateListener = (state: DeviceState) => void
 

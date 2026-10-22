@@ -1,4 +1,4 @@
-import { BleGattController, CharacteristicCallbacks } from '@neurodevs/node-lsl'
+import { BleGattOptions, CharacteristicCallbacks } from '@neurodevs/node-lsl'
 
 import {
     DeviceControllerBle,
@@ -69,7 +69,7 @@ export default class MuseDeviceController
             txtStream,
         })
 
-        const ble = this.BleGattController(variant.charCallbacks, options)
+        const bleOptions = this.BleGattOptions(variant.charCallbacks, options)
 
         const recorder = await this.XdfStreamRecorder(
             xdfRecordPath,
@@ -79,7 +79,7 @@ export default class MuseDeviceController
         return new (this.Class ?? this)({
             deviceName: deviceModel,
             variant,
-            ble,
+            bleOptions,
             recorder,
             txtStream,
             logLevel,
@@ -128,19 +128,19 @@ export default class MuseDeviceController
         return await MuseVariant.Create({ ...(options ?? {}), model })
     }
 
-    private static BleGattController(
+    private static BleGattOptions(
         charCallbacks: CharacteristicCallbacks,
         options?: MuseControllerOptions
-    ) {
+    ): BleGattOptions {
         const { bleUuid, rssiIntervalMs } = options ?? {}
 
-        return BleGattController.Create({
+        return {
             charCallbacks,
             rssiIntervalMs,
             ...(bleUuid
                 ? { deviceUuid: bleUuid }
                 : { deviceNamePrefix: 'Muse' }),
-        })
+        }
     }
 }
 

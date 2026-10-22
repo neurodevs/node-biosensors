@@ -80,7 +80,7 @@ export default abstract class AbstractDeviceControllerTest extends AbstractPacka
 
         assert.isEqual(
             this.callsToWarn[0][0],
-            `Cannot stream from ${this.deviceId} before connecting.`,
+            `Cannot stream from ${this.deviceId} while disconnected.`,
             'Did not warn that connect is required!'
         )
     }

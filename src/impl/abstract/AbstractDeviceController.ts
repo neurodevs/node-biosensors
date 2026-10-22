@@ -59,8 +59,14 @@ export default abstract class AbstractDeviceController implements DeviceControll
     }
 
     public async startStreaming() {
-        if (this.state === 'disconnected' || this.state === 'connecting') {
-            this.warn(`Cannot stream from ${this.deviceId} before connecting.`)
+        if (
+            this.state === 'disconnected' ||
+            this.state === 'connecting' ||
+            this.state === 'reconnecting'
+        ) {
+            this.warn(
+                `Cannot stream from ${this.deviceId} while ${this.state}.`
+            )
             return
         }
         if (this.state === 'streaming') {

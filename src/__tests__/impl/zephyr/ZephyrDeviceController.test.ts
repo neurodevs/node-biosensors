@@ -171,6 +171,21 @@ export default class ZephyrDeviceControllerTest extends AbstractDeviceController
     }
 
     @test()
+    protected static async reportsReconnectingOnceConnectionIsLost() {
+        await this.assertReportsReconnectingOnceConnectionIsLost()
+    }
+
+    @test()
+    protected static async resumesStreamingOnceReconnected() {
+        await this.assertResumesStreamingOnceReconnected()
+    }
+
+    @test()
+    protected static async returnsToConnectedOnceReconnectedIfNotStreaming() {
+        await this.assertReturnsToConnectedOnceReconnectedIfNotStreaming()
+    }
+
+    @test()
     protected static async exposesNameFromBleController() {
         await this.assertExposesNameFromBleController()
     }
@@ -211,8 +226,14 @@ export default class ZephyrDeviceControllerTest extends AbstractDeviceController
     protected static async createsBleControllerWithNamePrefixIfNoUuid() {
         await this.ZephyrDeviceController({ bleUuid: undefined })
 
+        const {
+            onLost: _onLost,
+            onReconnect: _onReconnect,
+            ...options
+        } = FakeBleGatt.callsToConstructor[1]!
+
         assert.isEqualDeep(
-            FakeBleGatt.callsToConstructor[1],
+            options,
             {
                 charCallbacks: [],
                 deviceNamePrefix: 'BH BHT',

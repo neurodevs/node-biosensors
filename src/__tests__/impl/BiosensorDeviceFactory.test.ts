@@ -332,7 +332,8 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
     protected static async passesBleUuidToMuseController() {
         await this.createMuseController()
 
-        const actual = FakeMuseController.callsToConstructor[0].ble.uuid
+        const actual =
+            FakeMuseController.callsToConstructor[0].bleOptions.deviceUuid
 
         assert.isEqual(
             actual,

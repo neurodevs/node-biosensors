@@ -25,6 +25,48 @@ export default abstract class AbstractDeviceControllerBleTest extends AbstractDe
         FakeBleGatt.fakeName = this.deviceName
     }
 
+    protected static async assertReportsReconnectingOnceConnectionIsLost() {
+        await this.connect()
+        await this.startStreaming()
+
+        this.loseBleConnection()
+
+        assert.isEqual(
+            this.instance.state,
+            'reconnecting',
+            'Did not report reconnecting once the connection was lost!'
+        )
+    }
+
+    protected static async assertResumesStreamingOnceReconnected() {
+        await this.connect()
+        await this.startStreaming()
+
+        this.loseBleConnection()
+
+        await this.reconnectBle()
+
+        assert.isEqual(
+            this.instance.state,
+            'streaming',
+            'Did not resume streaming once reconnected!'
+        )
+    }
+
+    protected static async assertReturnsToConnectedOnceReconnectedIfNotStreaming() {
+        await this.connect()
+
+        this.loseBleConnection()
+
+        await this.reconnectBle()
+
+        assert.isEqual(
+            this.instance.state,
+            'connected',
+            'Did not return to connected once reconnected!'
+        )
+    }
+
     protected static async assertConnectCallsBleControllerConnect() {
         await this.connect()
 
@@ -97,5 +139,17 @@ export default abstract class AbstractDeviceControllerBleTest extends AbstractDe
             this.instance.getBle().name,
             'Did not expose name from BLE controller!'
         )
+    }
+
+    protected static loseBleConnection() {
+        FakeBleGatt.callsToConstructor.at(-1)!.onLost!()
+    }
+
+    protected static async reconnectBle() {
+        FakeBleGatt.callsToConstructor.at(-1)!.onReconnect!()
+
+        while (this.instance.state === 'reconnecting') {
+            await new Promise((resolve) => setTimeout(resolve, 0))
+        }
     }
 }
