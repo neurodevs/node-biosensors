@@ -186,6 +186,31 @@ export default class MuseSGen1Test extends MuseBleVariantTest {
     }
 
     @test()
+    protected static async eegDeviceTimeResumesAfterCounterRestarts() {
+        await this.assertEegDeviceTimeResumesAfterCounterRestarts()
+    }
+
+    @test()
+    protected static async eegDeviceTimeContinuesAcrossCounterWrap() {
+        await this.assertEegDeviceTimeContinuesAcrossCounterWrap()
+    }
+
+    @test()
+    protected static async eegDeviceTimeAlwaysIncreases() {
+        await this.assertEegDeviceTimeAlwaysIncreases()
+    }
+
+    @test()
+    protected static async ppgDeviceTimeResumesAfterCounterRestarts() {
+        await this.assertPpgDeviceTimeResumesAfterCounterRestarts()
+    }
+
+    @test()
+    protected static async imuDeviceTimeResumesAfterCounterRestarts() {
+        await this.assertImuDeviceTimeResumesAfterCounterRestarts()
+    }
+
+    @test()
     protected static async onDataCallsGyroClockRegressorDeriveTimestamps() {
         await this.assertCallsDeriveTimestampsOnGyroRegressor()
     }

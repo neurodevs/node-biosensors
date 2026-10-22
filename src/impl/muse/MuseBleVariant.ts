@@ -34,6 +34,8 @@ export default class MuseBleVariant implements MuseVariant {
     private static readonly ppgSampleRateHz = 64
     private static readonly ppgChunkSize = 6
 
+    private static readonly maxCounterDriftSec = 1
+
     protected static readonly eegCharNames5Ch = [
         'EEG_TP10',
         'EEG_AF8',
@@ -276,6 +278,11 @@ export default class MuseBleVariant implements MuseVariant {
     ) {
         const charChunks: number[][] = []
         const charCounters: number[] = []
+
+        const deviceClock = this.createPacketClock(
+            this.eegChunkSize,
+            this.eegSampleRateHz
+        )
         let t0 = 0
         let packetCounter = 0
 
@@ -300,7 +307,7 @@ export default class MuseBleVariant implements MuseVariant {
             ) {
                 const pushTimestamps = this.derivePushTimestamps(
                     regressor,
-                    (packetCounter * this.eegChunkSize) / this.eegSampleRateHz,
+                    deviceClock(packetCounter, t0),
                     t0,
                     this.eegChunkSize
                 )
@@ -330,6 +337,49 @@ export default class MuseBleVariant implements MuseVariant {
         return (
             charCounters.length === numChars &&
             charCounters.every((counter) => counter === charCounters[0])
+        )
+    }
+
+    private static createPacketClock(chunkSize: number, sampleRateHz: number) {
+        const packetSec = chunkSize / sampleRateHz
+
+        let unwrappedCounter: number | undefined
+        let lastCounter = 0
+        let lastArrivalSec = 0
+
+        return (packetCounter: number, arrivalSec: number) => {
+            unwrappedCounter =
+                unwrappedCounter === undefined
+                    ? packetCounter
+                    : unwrappedCounter +
+                      this.packetsSinceLast(
+                          packetCounter - lastCounter,
+                          arrivalSec - lastArrivalSec,
+                          packetSec
+                      )
+
+            lastCounter = packetCounter
+            lastArrivalSec = arrivalSec
+
+            return (unwrappedCounter * chunkSize) / sampleRateHz
+        }
+    }
+
+    private static packetsSinceLast(
+        counterDiff: number,
+        arrivalDiffSec: number,
+        packetSec: number
+    ) {
+        const packetsByCounter = (counterDiff + 65536) % 65536
+        const packetsByArrival = arrivalDiffSec / packetSec
+
+        const didCounterRestart =
+            Math.abs(packetsByCounter - packetsByArrival) * packetSec >
+            this.maxCounterDriftSec
+
+        return Math.max(
+            1,
+            didCounterRestart ? Math.round(packetsByArrival) : packetsByCounter
         )
     }
 
@@ -372,6 +422,11 @@ export default class MuseBleVariant implements MuseVariant {
         regressor?: ClockRegressor
     ) {
         const charChunks: number[][] = []
+
+        const deviceClock = this.createPacketClock(
+            this.ppgChunkSize,
+            this.ppgSampleRateHz
+        )
         let t0 = 0
         let packetCounter = 0
 
@@ -392,7 +447,7 @@ export default class MuseBleVariant implements MuseVariant {
             if (charIdx === this.ppgCharNames.length - 1) {
                 const pushTimestamps = this.derivePushTimestamps(
                     regressor,
-                    (packetCounter * this.ppgChunkSize) / this.ppgSampleRateHz,
+                    deviceClock(packetCounter, t0),
                     t0,
                     this.ppgChunkSize
                 )
@@ -459,6 +514,10 @@ export default class MuseBleVariant implements MuseVariant {
     ) {
         const { log, txtStream: stream } = logAndStream
         const scale = this.imuScales[name]!
+        const deviceClock = this.createPacketClock(
+            this.imuChunkSize,
+            this.imuSampleRateHz
+        )
 
         return (bytes: readonly number[], timestampSec: number) => {
             const samples = this.decodeImuPacket(bytes, scale)
@@ -466,7 +525,7 @@ export default class MuseBleVariant implements MuseVariant {
 
             const pushTimestamps = this.derivePushTimestamps(
                 regressor,
-                (packetCounter * this.imuChunkSize) / this.imuSampleRateHz,
+                deviceClock(packetCounter, timestampSec),
                 timestampSec,
                 this.imuChunkSize
             )

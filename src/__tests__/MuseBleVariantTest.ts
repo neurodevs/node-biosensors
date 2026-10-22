@@ -652,6 +652,96 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
         )
     }
 
+    protected static async assertEegDeviceTimeResumesAfterCounterRestarts() {
+        const packetSec = this.eegChunkSize / this.eegSampleRateHz
+        const gapSec = randomInt(5, 30)
+
+        this.simulateEegPacket(500, 100)
+        this.simulateEegPacket(3, 100 + gapSec)
+
+        assert.isEqualDeep(
+            this.eegDeriveCalls.map(({ deviceTime }) => deviceTime),
+            [
+                this.expectedEegDeviceTime(500),
+                this.expectedEegDeviceTime(
+                    500 + Math.round(gapSec / packetSec)
+                ),
+            ],
+            'EEG device time should resume after the gap when the packet counter restarts!'
+        )
+    }
+
+    protected static async assertEegDeviceTimeContinuesAcrossCounterWrap() {
+        const packetSec = this.eegChunkSize / this.eegSampleRateHz
+
+        this.simulateEegPacket(65535, 100)
+        this.simulateEegPacket(0, 100 + packetSec)
+
+        assert.isEqualDeep(
+            this.eegDeriveCalls.map(({ deviceTime }) => deviceTime),
+            [
+                this.expectedEegDeviceTime(65535),
+                this.expectedEegDeviceTime(65536),
+            ],
+            'EEG device time should keep counting when the packet counter wraps!'
+        )
+    }
+
+    protected static async assertEegDeviceTimeAlwaysIncreases() {
+        this.simulateEegPacket(500, 100)
+        this.simulateEegPacket(500, 100)
+
+        const [first, second] = this.eegDeriveCalls.map(
+            ({ deviceTime }) => deviceTime
+        )
+
+        assert.isAbove(
+            second!,
+            first!,
+            'EEG device time should increase even when a packet counter repeats!'
+        )
+    }
+
+    protected static async assertPpgDeviceTimeResumesAfterCounterRestarts() {
+        const packetSec = this.ppgChunkSize / this.ppgSampleRateHz
+        const gapSec = randomInt(5, 30)
+
+        this.simulatePpgPacket(500, 100)
+        this.simulatePpgPacket(3, 100 + gapSec)
+
+        assert.isEqualDeep(
+            this.deriveCallsWithChunkSize(this.ppgChunkSize).map(
+                ({ deviceTime }) => deviceTime
+            ),
+            [
+                (500 * this.ppgChunkSize) / this.ppgSampleRateHz,
+                ((500 + Math.round(gapSec / packetSec)) * this.ppgChunkSize) /
+                    this.ppgSampleRateHz,
+            ],
+            'PPG device time should resume after the gap when the packet counter restarts!'
+        )
+    }
+
+    protected static async assertImuDeviceTimeResumesAfterCounterRestarts() {
+        const packetSec = this.imuChunkSize / this.imuSampleRateHz
+        const gapSec = randomInt(5, 30)
+
+        this.simulateImuPacket('GYROSCOPE', 500, 100)
+        this.simulateImuPacket('GYROSCOPE', 3, 100 + gapSec)
+
+        assert.isEqualDeep(
+            this.deriveCallsWithChunkSize(this.imuChunkSize).map(
+                ({ deviceTime }) => deviceTime
+            ),
+            [
+                (500 * this.imuChunkSize) / this.imuSampleRateHz,
+                ((500 + Math.round(gapSec / packetSec)) * this.imuChunkSize) /
+                    this.imuSampleRateHz,
+            ],
+            'IMU device time should resume after the gap when the packet counter restarts!'
+        )
+    }
+
     protected static async assertDisableEegIgnoresAllEegData() {
         await this.MuseDeviceController({
             logLevel: 'info',
@@ -765,9 +855,48 @@ export default abstract class MuseBleVariantTest extends AbstractDeviceControlle
     }
 
     protected static get eegDeriveCalls() {
+        return this.deriveCallsWithChunkSize(this.eegChunkSize)
+    }
+
+    protected static deriveCallsWithChunkSize(chunkSize: number) {
         return FakeClockRegressor.callsToDeriveTimestamps.filter(
-            ({ chunkSize }) => chunkSize === this.eegChunkSize
+            (call) => call.chunkSize === chunkSize
         )
+    }
+
+    protected static simulateEegPacket(
+        packetCounter: number,
+        timestampSec: number
+    ) {
+        this.simulateEegOnDataWithValues(
+            this.eegCharNames.map(() => this.generateEegCharValues()),
+            { packetCounter, timestampSec }
+        )
+    }
+
+    protected static simulatePpgPacket(
+        packetCounter: number,
+        timestampSec: number
+    ) {
+        for (const charName of this.ppgCharNames) {
+            const fakeBytes = this.generatePpgBytes(
+                this.generatePpgCharValues(),
+                packetCounter
+            )
+            this.simulateOnData(charName, fakeBytes, timestampSec)
+        }
+    }
+
+    protected static simulateImuPacket(
+        charName: 'GYROSCOPE' | 'ACCELEROMETER',
+        packetCounter: number,
+        timestampSec: number
+    ) {
+        const fakeBytes = [
+            ...this.generateCounterBytes(packetCounter),
+            ...this.generateImuBytes(this.generateImuSamples()).slice(2),
+        ]
+        this.simulateOnData(charName, fakeBytes, timestampSec)
     }
 
     protected static expectedEegDeviceTime(packetCounter: number) {
