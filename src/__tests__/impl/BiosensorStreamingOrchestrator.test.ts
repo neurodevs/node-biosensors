@@ -55,6 +55,7 @@ export default class BiosensorStreamingOrchestratorTest extends AbstractPackageT
                     xdfRecordPath: this.xdfRecordPath,
                     webSocketPortStart: this.webSocketPortStart,
                     createEventMarkerEmitter: false,
+                    xdfHeaderInfo: undefined,
                 },
             },
             'Did not create devices with expected options!'
@@ -376,6 +377,27 @@ export default class BiosensorStreamingOrchestratorTest extends AbstractPackageT
     private static readonly webSocketPortStart = randomInt(1000, 5000)
 
     private static readonly museBleUuid = this.generateId()
+
+    @test()
+    protected static async passesXdfHeaderInfoToFactory() {
+        const xdfHeaderInfo = { protocol: this.generateId() }
+        const instance = await this.BiosensorStreamingOrchestrator({
+            xdfHeaderInfo,
+        })
+
+        await instance.start()
+
+        assert.isEqualDeep(
+            FakeDeviceFactory.callsToCreateDevices[0].sessionOptions,
+            {
+                xdfRecordPath: this.xdfRecordPath,
+                webSocketPortStart: this.webSocketPortStart,
+                createEventMarkerEmitter: false,
+                xdfHeaderInfo,
+            },
+            'Did not pass the XDF header info to the factory!'
+        )
+    }
 
     private static readonly devices: (DeviceName | DeviceSpecification)[] = [
         'Cognionics Quick-20r',

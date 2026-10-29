@@ -1000,6 +1000,15 @@
     ffi-rs "^1.3.2"
     koffi "^3.0.1"
 
+"@neurodevs/ndx-native@^13.1.0":
+  version "13.1.0"
+  resolved "https://registry.yarnpkg.com/@neurodevs/ndx-native/-/ndx-native-13.1.0.tgz#21225009a79d408bda61b44c3dfdf6b8b546e282"
+  integrity sha512-FXZH8cW4GFWKWP5h9DTXQpRnbkMP8f1HyPuxtyfg5N7upiMpNdAL7ljiIxeWIHzujDh7dTwLPs8UcTiFKrM8rw==
+  dependencies:
+    "@neurodevs/node-mangled-names" "^1.0.1"
+    ffi-rs "^1.3.2"
+    koffi "^3.0.1"
+
 "@neurodevs/ndx-native@^9.0.0":
   version "9.0.2"
   resolved "https://registry.yarnpkg.com/@neurodevs/ndx-native/-/ndx-native-9.0.2.tgz#0a49dcdd24bdcaa6c174b4c3c9b1de42f0ddaa06"
@@ -1098,12 +1107,12 @@
     "@neurodevs/node-mangled-names" "^1.0.1"
     ffi-rs "^1.0.98"
 
-"@neurodevs/node-xdf@^5.0.4":
-  version "5.0.4"
-  resolved "https://registry.yarnpkg.com/@neurodevs/node-xdf/-/node-xdf-5.0.4.tgz#0a0700ac34efd00a72ecc0a72ef426962a9e4d9c"
-  integrity sha512-zqK8+633WgUztuGVv0n/5rAHkIKJE7I1hRRNmtRu893tStxpbPCb/ZciddeiTbVDpthYlZnPzjkuvhvflOGrzA==
+"@neurodevs/node-xdf@^5.1.0":
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/@neurodevs/node-xdf/-/node-xdf-5.1.0.tgz#aab2ab5a1f95a7c3532e7c7f4de044762ba24d6e"
+  integrity sha512-crdVe3OXmqupqOwZeLNapgflHDvTA+CnUWKJ4+E/FBG06gQeniCs9n0dEdGhSa3sYWT0hFPLppmgU5REunlcEA==
   dependencies:
-    "@neurodevs/ndx-native" "^13.0.0"
+    "@neurodevs/ndx-native" "^13.1.0"
     "@neurodevs/node-lsl" "^23.7.1"
 
 "@neurodevs/prettier-config-ndx@^1.0.2":

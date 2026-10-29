@@ -34,6 +34,8 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
     private deviceSpecs!: readonly DeviceSpecification[]
     private createdBundles!: SingleDeviceBundle[]
 
+    private readonly markerStreamQuery = 'type="Markers"'
+
     protected constructor() {}
 
     public static Create() {
@@ -47,8 +49,12 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         const spec = { deviceName, options } satisfies CreateDeviceSpec<K>
         this.spec = spec as CreateDeviceSpec
 
-        const { xdfRecordPath, webSocketPortStart, createEventMarkerEmitter } =
-            options ?? {}
+        const {
+            xdfRecordPath,
+            xdfHeaderInfo,
+            webSocketPortStart,
+            createEventMarkerEmitter,
+        } = options ?? {}
 
         this.createdDevice = await this.createDeviceByName()
 
@@ -57,7 +63,13 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         if (xdfRecordPath) {
             bundle.recorder = await this.XdfStreamRecorder(
                 xdfRecordPath,
-                this.deviceStreamQueries
+                [
+                    ...this.deviceStreamQueries,
+                    ...(createEventMarkerEmitter
+                        ? [this.markerStreamQuery]
+                        : []),
+                ],
+                xdfHeaderInfo
             )
         }
 
@@ -111,8 +123,12 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         deviceSpecifications: readonly DeviceSpecification[],
         options?: SessionOptions
     ) {
-        const { xdfRecordPath, webSocketPortStart, createEventMarkerEmitter } =
-            options ?? {}
+        const {
+            xdfRecordPath,
+            xdfHeaderInfo,
+            webSocketPortStart,
+            createEventMarkerEmitter,
+        } = options ?? {}
 
         this.deviceSpecs = deviceSpecifications
         this.createdBundles = await this.createAllDevices()
@@ -122,7 +138,13 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         if (xdfRecordPath) {
             bundle.recorder = await this.XdfStreamRecorder(
                 xdfRecordPath,
-                this.allStreamQueries
+                [
+                    ...this.allStreamQueries,
+                    ...(createEventMarkerEmitter
+                        ? [this.markerStreamQuery]
+                        : []),
+                ],
+                xdfHeaderInfo
             )
         }
 
@@ -192,8 +214,12 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         return ZephyrDeviceController.Create()
     }
 
-    private XdfStreamRecorder(xdfRecordPath: string, streamQueries: string[]) {
-        return XdfStreamRecorder.Create(xdfRecordPath, streamQueries)
+    private XdfStreamRecorder(
+        xdfRecordPath: string,
+        streamQueries: string[],
+        info?: XdfHeaderInfo
+    ) {
+        return XdfStreamRecorder.Create(xdfRecordPath, streamQueries, { info })
     }
 
     private async BiosensorWebSocketGateway(
@@ -254,9 +280,12 @@ export type CreateDeviceSpec<Name extends DeviceName = DeviceName> = {
 
 export interface SessionOptions {
     xdfRecordPath?: string
+    xdfHeaderInfo?: XdfHeaderInfo
     webSocketPortStart?: number
     createEventMarkerEmitter?: boolean
 }
+
+export type XdfHeaderInfo = Readonly<Record<string, string>>
 
 export interface SingleDeviceBundle {
     device: DeviceController

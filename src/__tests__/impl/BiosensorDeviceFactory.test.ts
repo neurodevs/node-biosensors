@@ -329,6 +329,68 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
     }
 
     @test()
+    protected static async createDevicesRecordsMarkerStreamWithEmitter() {
+        await this.instance.createDevices(this.deviceSpecifications, {
+            xdfRecordPath: this.xdfRecordPath,
+            createEventMarkerEmitter: true,
+        })
+
+        assert.isTrue(
+            FakeXdfRecorder.callsToConstructor[0]?.streamQueries.includes(
+                'type="Markers"'
+            ),
+            'Did not record the marker stream!'
+        )
+    }
+
+    @test()
+    protected static async createDeviceRecordsMarkerStreamWithEmitter() {
+        await this.instance.createDevice('Cognionics Quick-20r', {
+            xdfRecordPath: this.xdfRecordPath,
+            createEventMarkerEmitter: true,
+        })
+
+        assert.isTrue(
+            FakeXdfRecorder.callsToConstructor
+                .at(-1)
+                ?.streamQueries.includes('type="Markers"'),
+            'Did not record the marker stream!'
+        )
+    }
+
+    @test()
+    protected static async createDevicesWritesXdfHeaderInfo() {
+        const xdfHeaderInfo = { protocol: this.generateId() }
+
+        await this.instance.createDevices(this.deviceSpecifications, {
+            xdfRecordPath: this.xdfRecordPath,
+            xdfHeaderInfo,
+        })
+
+        assert.isEqualDeep(
+            FakeXdfRecorder.callsToConstructor[0]?.info,
+            xdfHeaderInfo,
+            'Did not write the XDF header info!'
+        )
+    }
+
+    @test()
+    protected static async createDeviceWritesXdfHeaderInfo() {
+        const xdfHeaderInfo = { protocol: this.generateId() }
+
+        await this.instance.createDevice('Cognionics Quick-20r', {
+            xdfRecordPath: this.xdfRecordPath,
+            xdfHeaderInfo,
+        })
+
+        assert.isEqualDeep(
+            FakeXdfRecorder.callsToConstructor.at(-1)?.info,
+            xdfHeaderInfo,
+            'Did not write the XDF header info!'
+        )
+    }
+
+    @test()
     protected static async passesBleUuidToMuseController() {
         await this.createMuseController()
 

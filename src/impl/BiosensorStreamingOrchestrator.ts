@@ -4,6 +4,7 @@ import { XdfRecorder } from '@neurodevs/node-xdf'
 import BiosensorDeviceFactory, {
     DeviceFactory,
     DeviceSpecification,
+    XdfHeaderInfo,
 } from './BiosensorDeviceFactory.js'
 import { DeviceName, DeviceController } from '../types.js'
 import { WebSocketGateway } from './BiosensorWebSocketGateway.js'
@@ -13,6 +14,7 @@ export default class BiosensorStreamingOrchestrator implements StreamingOrchestr
 
     private devices: readonly (DeviceName | DeviceSpecification)[]
     private xdfRecordPath?: string
+    private xdfHeaderInfo?: XdfHeaderInfo
     private webSocketPortStart?: number
     private eventMarkers?: readonly TimedEventMarker[]
 
@@ -28,6 +30,7 @@ export default class BiosensorStreamingOrchestrator implements StreamingOrchestr
         const {
             devices,
             xdfRecordPath,
+            xdfHeaderInfo,
             webSocketPortStart,
             eventMarkers,
             factory,
@@ -35,6 +38,7 @@ export default class BiosensorStreamingOrchestrator implements StreamingOrchestr
 
         this.devices = devices
         this.xdfRecordPath = xdfRecordPath
+        this.xdfHeaderInfo = xdfHeaderInfo
         this.webSocketPortStart = webSocketPortStart
         this.eventMarkers = eventMarkers
 
@@ -73,6 +77,7 @@ export default class BiosensorStreamingOrchestrator implements StreamingOrchestr
     private async createDeviceBundle() {
         return await this.factory.createDevices(this.deviceSpecifications, {
             xdfRecordPath: this.xdfRecordPath,
+            xdfHeaderInfo: this.xdfHeaderInfo,
             webSocketPortStart: this.webSocketPortStart,
             createEventMarkerEmitter: this.eventMarkers !== undefined,
         })
@@ -159,6 +164,7 @@ export interface StreamingOrchestratorOptions {
     xdfRecordPath?: string
     webSocketPortStart?: number
     eventMarkers?: readonly TimedEventMarker[]
+    xdfHeaderInfo?: XdfHeaderInfo
 }
 
 export type StreamingOrchestratorConstructor = new (
