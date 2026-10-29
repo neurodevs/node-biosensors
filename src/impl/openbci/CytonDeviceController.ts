@@ -1,4 +1,5 @@
 import {
+    LslOutlet,
     LslStreamOutlet,
     UsbDevice,
     UsbDeviceController,
@@ -27,6 +28,8 @@ export default class CytonDeviceController
     private readonly waitAfterConnectMs: number
     private readonly serialNumber?: string
     private readonly exgType: string
+    private readonly exgOutlet?: LslOutlet
+    private readonly accelOutlet?: LslOutlet
 
     protected constructor(options: CytonControllerConstructorOptions) {
         const {
@@ -37,6 +40,8 @@ export default class CytonDeviceController
             serialNumber,
             recorder,
             logLevel,
+            exgOutlet,
+            accelOutlet,
         } = options
 
         super({ usb, recorder, logLevel })
@@ -45,6 +50,8 @@ export default class CytonDeviceController
         this.waitAfterConnectMs = waitAfterConnectMs
         this.onData = onData
         this.exgType = exgType
+        this.exgOutlet = exgOutlet
+        this.accelOutlet = accelOutlet
     }
 
     public static async Create(options?: CytonControllerOptions) {
@@ -60,13 +67,13 @@ export default class CytonDeviceController
 
         const disabled = this.resolveDisabledStreams(options ?? {})
 
-        if (!disabled.has('ExG')) {
-            await this.ExgOutlet(serialNumber, exgType, nickname)
-        }
+        const exgOutlet = !disabled.has('ExG')
+            ? await this.ExgOutlet(serialNumber, exgType, nickname)
+            : undefined
 
-        if (!disabled.has('Accelerometer')) {
-            await this.AccelOutlet(serialNumber, nickname)
-        }
+        const accelOutlet = !disabled.has('Accelerometer')
+            ? await this.AccelOutlet(serialNumber, nickname)
+            : undefined
 
         const onData = this.createOnData(logDeviceInfo, logLevel)
         const usb = this.UsbDeviceController(serialNumber, onData)
@@ -84,7 +91,15 @@ export default class CytonDeviceController
             recorder,
             logLevel,
             exgType,
+            exgOutlet,
+            accelOutlet,
         })
+    }
+
+    public get outlets() {
+        return [this.exgOutlet, this.accelOutlet].filter(
+            (outlet) => outlet !== undefined
+        )
     }
 
     public get streamQueries() {
@@ -178,7 +193,7 @@ export default class CytonDeviceController
         exgType: string,
         nickname?: string
     ) {
-        await LslStreamOutlet.Create({
+        return await LslStreamOutlet.Create({
             ...this.describedBy(nickname),
             name: `Cyton ${exgType} (${serialNumber})`,
             type: exgType,
@@ -202,7 +217,7 @@ export default class CytonDeviceController
     }
 
     private static async AccelOutlet(serialNumber?: string, nickname?: string) {
-        await LslStreamOutlet.Create({
+        return await LslStreamOutlet.Create({
             ...this.describedBy(nickname),
             name: `Cyton Accelerometer (${serialNumber})`,
             type: 'ACCEL',
@@ -240,6 +255,8 @@ export interface CytonControllerConstructorOptions {
     serialNumber?: string
     recorder?: XdfRecorder
     logLevel?: LogLevel
+    exgOutlet?: LslOutlet
+    accelOutlet?: LslOutlet
 }
 
 export type OnUsbData = (

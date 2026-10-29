@@ -164,6 +164,11 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
     }
 
     @test()
+    protected static async disconnectDestroysEveryOutlet() {
+        await this.assertDisconnectDestroysEveryOutlet()
+    }
+
+    @test()
     protected static async createsUsbController() {
         assert.isEqualDeep(FakeUsbDevice.callsToConstructor[0], {
             onData: this.getOnData(),
