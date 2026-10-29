@@ -187,6 +187,11 @@ export default class CgxDeviceControllerTest extends AbstractDeviceControllerTes
     }
 
     @test()
+    protected static async disconnectDestroysEveryOutlet() {
+        await this.assertDisconnectDestroysEveryOutlet()
+    }
+
+    @test()
     protected static async describesEachOutletWithNickname() {
         FakeLslOutlet.callsToConstructor.length = 0
         const nickname = this.generateId()

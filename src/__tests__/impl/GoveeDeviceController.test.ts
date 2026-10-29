@@ -173,6 +173,11 @@ export default class GoveeDeviceControllerTest extends AbstractDeviceControllerT
     }
 
     @test()
+    protected static async disconnectDestroysEveryOutlet() {
+        await this.assertDisconnectDestroysEveryOutlet()
+    }
+
+    @test()
     protected static async exposesUuidFromDeviceUuid() {
         assert.isEqual(
             this.instance.bleUuid,

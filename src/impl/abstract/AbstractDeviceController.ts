@@ -99,6 +99,7 @@ export default abstract class AbstractDeviceController implements DeviceControll
 
         await this.handleDisconnect()
         this.recorder?.finish()
+        this.outlets.forEach((outlet) => outlet.destroy())
 
         this.setState('disconnected')
     }

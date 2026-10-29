@@ -1,3 +1,4 @@
+import { FakeLslOutlet } from '@neurodevs/node-lsl'
 import { assert } from '@neurodevs/node-tdd'
 
 import { FakeXdfRecorder } from '@neurodevs/node-xdf'
@@ -255,6 +256,22 @@ export default abstract class AbstractDeviceControllerTest extends AbstractPacka
             FakeXdfRecorder.numCallsToFinish,
             1,
             'Did not finish XDF recorder!'
+        )
+    }
+
+    protected static async assertDisconnectDestroysEveryOutlet() {
+        await this.connect()
+        const numOutlets = this.instance.outlets.length
+
+        await this.disconnect()
+
+        assert.isEqualDeep(
+            {
+                hasOutlets: numOutlets > 0,
+                numCallsToDestroy: FakeLslOutlet.numCallsToDestroy,
+            },
+            { hasOutlets: true, numCallsToDestroy: numOutlets },
+            'Did not destroy every outlet on disconnect!'
         )
     }
 
