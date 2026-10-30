@@ -5,7 +5,9 @@ import { test, assert } from '@neurodevs/node-tdd'
 import { FakeXdfRecorder } from '@neurodevs/node-xdf'
 
 import CytonDeviceController, {
+    CYTON_EXG_TYPES,
     CytonControllerOptions,
+    CytonExgType,
 } from '../../../impl/openbci/CytonDeviceController.js'
 import { LogLevel } from '../../../types.js'
 import AbstractDeviceControllerTest from '../../AbstractDeviceControllerTest.js'
@@ -471,11 +473,23 @@ export default class CytonDeviceControllerTest extends AbstractDeviceControllerT
         )
     }
 
+    @test()
+    protected static async offersCommonExgTypes() {
+        assert.isEqualDeep(
+            [...CYTON_EXG_TYPES],
+            ['ExG', 'EEG', 'EMG', 'ECG', 'EGG', 'EOG'],
+            'Did not offer the common ExG types!'
+        )
+    }
+
     @test('defaults exgType to ExG', undefined, 'ExG')
     @test('overrides exgType with EEG', 'EEG', 'EEG')
     @test('overrides exgType with EMG', 'EMG', 'EMG')
+    @test('overrides exgType with ECG', 'ECG', 'ECG')
+    @test('overrides exgType with EGG', 'EGG', 'EGG')
+    @test('overrides exgType with EOG', 'EOG', 'EOG')
     protected static async setsExgOutletTypeFromExgType(
-        exgType: string | undefined,
+        exgType: CytonExgType | undefined,
         expected: string
     ) {
         FakeLslOutlet.resetTestDouble()

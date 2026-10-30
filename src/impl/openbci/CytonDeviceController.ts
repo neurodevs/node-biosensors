@@ -27,7 +27,7 @@ export default class CytonDeviceController
 
     private readonly waitAfterConnectMs: number
     private readonly serialNumber?: string
-    private readonly exgType: string
+    private readonly exgType: CytonExgType
     private readonly exgOutlet?: LslOutlet
     private readonly accelOutlet?: LslOutlet
 
@@ -106,7 +106,7 @@ export default class CytonDeviceController
         return CytonDeviceController.generateStreamQueries(this.exgType)
     }
 
-    private static generateStreamQueries(exgType: string) {
+    private static generateStreamQueries(exgType: CytonExgType) {
         return [`type="${exgType}"`, 'type="ACCEL"']
     }
 
@@ -190,7 +190,7 @@ export default class CytonDeviceController
 
     private static async ExgOutlet(
         serialNumber: string | undefined,
-        exgType: string,
+        exgType: CytonExgType,
         nickname?: string
     ) {
         return await LslStreamOutlet.Create({
@@ -237,7 +237,7 @@ export interface CytonController extends DeviceController {}
 export type CytonControllerOptions = Resolve<
     DeviceControllerOptions<CytonStream> & {
         serialNumber?: string
-        exgType?: string
+        exgType?: CytonExgType
         waitAfterConnectMs?: number
         logDeviceInfo?: boolean
     }
@@ -251,7 +251,7 @@ export interface CytonControllerConstructorOptions {
     usb: UsbDevice
     waitAfterConnectMs: number
     onData: OnUsbData
-    exgType: string
+    exgType: CytonExgType
     serialNumber?: string
     recorder?: XdfRecorder
     logLevel?: LogLevel
@@ -266,3 +266,14 @@ export type OnUsbData = (
 ) => void
 
 export type CytonStream = 'ExG' | 'Accelerometer'
+
+export const CYTON_EXG_TYPES = [
+    'ExG',
+    'EEG',
+    'EMG',
+    'ECG',
+    'EGG',
+    'EOG',
+] as const
+
+export type CytonExgType = (typeof CYTON_EXG_TYPES)[number]
