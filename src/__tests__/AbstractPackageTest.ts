@@ -27,6 +27,8 @@ import {
     FakeUsbDevice,
     BleObserverController,
     FakeBleObserver,
+    RfcommDeviceController,
+    FakeRfcommDevice,
 } from '@neurodevs/node-lsl'
 import AbstractModuleTest, { assert } from '@neurodevs/node-tdd'
 import {
@@ -76,6 +78,7 @@ export default class AbstractPackageTest extends AbstractModuleTest {
         this.setFakeBleGatt()
         this.setFakeBleObserver()
         this.setFakeUsbController()
+        this.setFakeRfcommDevice()
         this.setFakeLiblsl()
         this.setFakeLibndx()
         this.setFakeLslEmitter()
@@ -237,6 +240,11 @@ export default class AbstractPackageTest extends AbstractModuleTest {
     protected static setFakeUsbController() {
         UsbDeviceController.Class = FakeUsbDevice
         FakeUsbDevice.resetTestDouble()
+    }
+
+    protected static setFakeRfcommDevice() {
+        RfcommDeviceController.Class = FakeRfcommDevice
+        FakeRfcommDevice.resetTestDouble()
     }
 
     protected static setFakeLslWsBridge() {

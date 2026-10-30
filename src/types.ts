@@ -1,6 +1,11 @@
 import { WriteStream } from 'node:fs'
 
-import { BleGattOptions, LslOutlet, UsbDevice } from '@neurodevs/node-lsl'
+import {
+    BleGattOptions,
+    RfcommDevice,
+    LslOutlet,
+    UsbDevice,
+} from '@neurodevs/node-lsl'
 import { XdfRecorder } from '@neurodevs/node-xdf'
 
 export const DEVICE_NAMES = [
@@ -67,6 +72,13 @@ export interface DeviceControllerUsbConstructorOptions extends Omit<
     'txtStream'
 > {
     usb: UsbDevice
+}
+
+export interface DeviceControllerRfcommConstructorOptions extends Omit<
+    DeviceControllerConstructorOptions,
+    'txtStream'
+> {
+    rfcomm: RfcommDevice
 }
 
 export type DeviceControllerConstructor = new (

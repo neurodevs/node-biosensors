@@ -10,7 +10,9 @@ import CgxDeviceController, {
 import GoveeDeviceController, {
     GoveeControllerOptions,
 } from './govee/GoveeDeviceController.js'
-import ZephyrDeviceController from './zephyr/ZephyrDeviceController.js'
+import ZephyrDeviceController, {
+    ZephyrControllerOptions,
+} from './zephyr/ZephyrDeviceController.js'
 import MuseDeviceController, {
     MuseControllerOptions,
     MuseDeviceModel,
@@ -104,7 +106,7 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
             case 'OpenBCI Cyton':
                 return this.CytonDeviceController(options)
             case 'Zephyr BioHarness 3':
-                return this.ZephyrDeviceController()
+                return this.ZephyrDeviceController(options)
             default:
                 throw this.invalidNameError
         }
@@ -210,8 +212,8 @@ export default class BiosensorDeviceFactory implements DeviceFactory {
         return MuseDeviceController.Create({ ...options, model })
     }
 
-    private ZephyrDeviceController() {
-        return ZephyrDeviceController.Create()
+    private ZephyrDeviceController(options?: ZephyrControllerOptions) {
+        return ZephyrDeviceController.Create(options)
     }
 
     private XdfStreamRecorder(
@@ -264,7 +266,7 @@ export interface PerDeviceOptionsMap extends Record<
     'Muse 2': MuseControllerOptions
     'Muse 1 Gen 2': MuseControllerOptions
     'OpenBCI Cyton': CytonControllerOptions
-    'Zephyr BioHarness 3': DeviceControllerOptions
+    'Zephyr BioHarness 3': ZephyrControllerOptions
 }
 
 export type DeviceSpecification = {

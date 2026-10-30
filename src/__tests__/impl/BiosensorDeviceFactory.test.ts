@@ -17,6 +17,7 @@ import FakeMuseController from '../../testDoubles/MuseController/FakeMuseControl
 import { GoveeControllerOptions } from '../../impl/govee/GoveeDeviceController.js'
 import FakeCgxController from '../../testDoubles/CgxController/FakeCgxController.js'
 import FakeGoveeController from '../../testDoubles/GoveeController/FakeGoveeController.js'
+import FakeZephyrController from '../../testDoubles/ZephyrController/FakeZephyrController.js'
 
 export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
     private static instance: DeviceFactory
@@ -109,6 +110,19 @@ export default class BiosensorDeviceFactoryTest extends AbstractPackageTest {
     protected static async createsDeviceForZephyrController() {
         const { device } = await this.createZephyrController()
         this.assertDeviceIsTruthy(device)
+    }
+
+    @test()
+    protected static async passesAddressToZephyrController() {
+        const address = this.generateId()
+
+        await this.instance.createDevice('Zephyr BioHarness 3', { address })
+
+        assert.isEqual(
+            FakeZephyrController.callsToConstructor[0]?.address,
+            address,
+            'Did not pass address to Zephyr controller!'
+        )
     }
 
     @test()

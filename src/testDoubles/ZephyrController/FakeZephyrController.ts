@@ -1,15 +1,14 @@
 import DeviceStateEmitter from '../../impl/DeviceStateEmitter.js'
 import {
-    DeviceControllerBle,
-    DeviceControllerBleConstructorOptions,
-    DeviceStateListener,
-} from '../../types.js'
+    ZephyrController,
+    ZephyrControllerConstructorOptions,
+} from '../../impl/zephyr/ZephyrDeviceController.js'
+import { DeviceStateListener } from '../../types.js'
 
-export default class FakeZephyrDeviceController implements DeviceControllerBle {
+export default class FakeZephyrDeviceController implements ZephyrController {
     private readonly stateEmitter = new DeviceStateEmitter()
 
-    public static callsToConstructor: DeviceControllerBleConstructorOptions[] =
-        []
+    public static callsToConstructor: ZephyrControllerConstructorOptions[] = []
     public static numCallsToConnect = 0
     public static numCallsToStartStreaming = 0
     public static numCallsToStopStreaming = 0
@@ -17,7 +16,7 @@ export default class FakeZephyrDeviceController implements DeviceControllerBle {
 
     public readonly deviceName = 'Zephyr BioHarness 3'
 
-    public constructor(options: DeviceControllerBleConstructorOptions) {
+    public constructor(options: ZephyrControllerConstructorOptions) {
         FakeZephyrDeviceController.callsToConstructor.push(options)
     }
 
@@ -48,11 +47,7 @@ export default class FakeZephyrDeviceController implements DeviceControllerBle {
 
     public streamQueries = []
 
-    public get bleUuid() {
-        return ''
-    }
-
-    public get bleName() {
+    public get identifier() {
         return ''
     }
 

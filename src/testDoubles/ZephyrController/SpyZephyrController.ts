@@ -1,8 +1,9 @@
-import { DeviceControllerBleConstructorOptions } from '../../types.js'
-import ZephyrDeviceController from '../../impl/zephyr/ZephyrDeviceController.js'
+import ZephyrDeviceController, {
+    ZephyrControllerConstructorOptions,
+} from '../../impl/zephyr/ZephyrDeviceController.js'
 
 export default class SpyZephyrController extends ZephyrDeviceController {
-    public constructor(options: DeviceControllerBleConstructorOptions) {
+    public constructor(options: ZephyrControllerConstructorOptions) {
         super(options)
     }
 
@@ -10,8 +11,8 @@ export default class SpyZephyrController extends ZephyrDeviceController {
         return this.deviceId
     }
 
-    public getBle() {
-        return this.ble
+    public getOnData() {
+        return this.onData
     }
 
     public getState() {
