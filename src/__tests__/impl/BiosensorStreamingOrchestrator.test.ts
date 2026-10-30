@@ -313,25 +313,17 @@ export default class BiosensorStreamingOrchestratorTest extends AbstractPackageT
     }
 
     @test()
-    protected static async destroysGatewayBeforeDisconnectingDevices() {
-        await this.start()
-        const device = FakeDeviceFactory.fakeDevice
-        const disconnect = device.disconnect.bind(device)
-        const numDestroyedAtDisconnect: number[] = []
-
-        device.disconnect = async () => {
-            numDestroyedAtDisconnect.push(
-                FakeWebSocketGateway.numCallsToDestroy
-            )
-            await disconnect()
-        }
-
-        await this.stop()
+    protected static async servesDeviceStatusUntilDevicesDisconnect() {
+        const numDestroyedAtDisconnect =
+            await this.numGatewaysDestroyedAtEachDisconnect()
 
         assert.isEqualDeep(
-            numDestroyedAtDisconnect,
-            this.devices.map(() => 1),
-            'Did not destroy gateway before disconnecting devices!'
+            {
+                atDisconnect: numDestroyedAtDisconnect,
+                afterStop: FakeWebSocketGateway.numCallsToDestroy,
+            },
+            { atDisconnect: this.devices.map(() => 0), afterStop: 1 },
+            'Did not serve device status until devices disconnected!'
         )
     }
 
@@ -375,6 +367,22 @@ export default class BiosensorStreamingOrchestratorTest extends AbstractPackageT
     }
 
     private static numFailingDisconnectCalls = 0
+
+    private static async numGatewaysDestroyedAtEachDisconnect() {
+        await this.start()
+        const device = FakeDeviceFactory.fakeDevice
+        const disconnect = device.disconnect.bind(device)
+        const numDestroyed: number[] = []
+
+        device.disconnect = async () => {
+            numDestroyed.push(FakeWebSocketGateway.numCallsToDestroy)
+            await disconnect()
+        }
+
+        await this.stop()
+
+        return numDestroyed
+    }
 
     private static async stopWithFailingDisconnects(
         instance: StreamingOrchestrator,

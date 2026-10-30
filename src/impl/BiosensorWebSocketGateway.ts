@@ -12,17 +12,17 @@ export default class BiosensorWebSocketGateway implements WebSocketGateway {
     public static Class?: WebSocketGatewayConstructor
     public static WSS = WebSocketServer
 
-    private bridges: readonly LslWsBridge[]
+    private bridges: LslWsBridge[]
     private deviceStreams: readonly DeviceStreams[]
     private statusServer: WebSocketServer
-    private unsubscribeFromDevices: (() => void)[]
+    private disconnectListeners: (() => void)[]
     private isOpen = false
     private isDestroyed = false
 
     protected constructor(options: WebSocketGatewayConstructorOptions) {
         const { bridges, deviceStreams, statusServer } = options
 
-        this.bridges = bridges
+        this.bridges = [...bridges]
         this.deviceStreams = deviceStreams
         this.statusServer = statusServer
 
@@ -30,9 +30,7 @@ export default class BiosensorWebSocketGateway implements WebSocketGateway {
             client.send(this.statusPayload)
         )
 
-        this.unsubscribeFromDevices = deviceStreams.map(({ device }) =>
-            device.addStateListener(() => this.broadcastStatus())
-        )
+        this.disconnectListeners = this.addDisconnectingListeners(deviceStreams)
     }
 
     public static async Create(
@@ -54,6 +52,26 @@ export default class BiosensorWebSocketGateway implements WebSocketGateway {
             deviceStreams,
             statusServer,
         })
+    }
+
+    private addDisconnectingListeners(deviceStreams: readonly DeviceStreams[]) {
+        return deviceStreams.map(({ device, bridges }) =>
+            device.addStateListener((state) => {
+                if (state === 'disconnecting') {
+                    this.destroyAll(bridges)
+                }
+                this.broadcastStatus()
+            })
+        )
+    }
+
+    private destroyAll(bridges: readonly LslWsBridge[]) {
+        for (const bridge of bridges) {
+            if (this.bridges.includes(bridge)) {
+                bridge.destroy()
+                this.bridges = this.bridges.filter((live) => live !== bridge)
+            }
+        }
     }
 
     private broadcastStatus() {
@@ -137,7 +155,7 @@ export default class BiosensorWebSocketGateway implements WebSocketGateway {
     public destroy() {
         if (!this.isDestroyed) {
             this.closeGatewayIfOpenBeforeDestroying()
-            this.destroyLslWebSocketBridges()
+            this.destroyAll(this.bridges)
             this.stopServingDeviceStatus()
             this.isDestroyed = true
         } else {
@@ -153,13 +171,10 @@ export default class BiosensorWebSocketGateway implements WebSocketGateway {
         }
     }
 
-    private destroyLslWebSocketBridges() {
-        this.bridges.forEach((bridge) => bridge.destroy())
-    }
-
     private stopServingDeviceStatus() {
-        this.unsubscribeFromDevices.forEach((unsubscribe) => unsubscribe())
+        this.disconnectListeners.forEach((disconnect) => disconnect())
         this.statusServer.close()
+        this.statusServer.clients.forEach((client) => client.terminate())
     }
 
     private static async createBridgesFrom(
@@ -182,7 +197,11 @@ export default class BiosensorWebSocketGateway implements WebSocketGateway {
                 listenPorts.push(listenPort)
             }
 
-            deviceStreams.push({ device, listenPorts })
+            deviceStreams.push({
+                device,
+                listenPorts,
+                bridges: bridges.slice(-listenPorts.length),
+            })
         }
 
         return { bridges, deviceStreams }
@@ -230,4 +249,5 @@ export interface WebSocketGatewayConstructorOptions {
 export interface DeviceStreams {
     device: DeviceController
     listenPorts: readonly number[]
+    bridges: readonly LslWsBridge[]
 }

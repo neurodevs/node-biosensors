@@ -45,6 +45,12 @@ export default class FakeStatusServer {
 export class FakeStatusClient {
     public readyState: number = WebSocket.OPEN
     public sent: string[] = []
+    public wasTerminated = false
+
+    public terminate() {
+        this.wasTerminated = true
+        this.readyState = WebSocket.CLOSED
+    }
 
     public send(data: string) {
         this.sent.push(data)

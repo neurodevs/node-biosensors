@@ -92,18 +92,27 @@ export default abstract class AbstractDeviceController implements DeviceControll
     public async disconnect() {
         if (this.state === 'disconnected') {
             this.warn(`Already disconnected from ${this.deviceId}.`)
-            this.destroyOutletsOnce()
+            this.destroyOutletsIfStillUp()
             return
         }
         if (this.state === 'streaming') {
             await this.stopStreaming()
         }
 
+        this.setState('disconnecting')
         await this.handleDisconnect()
         this.recorder?.finish()
         this.destroyOutletsOnce()
 
         this.setState('disconnected')
+    }
+
+    private destroyOutletsIfStillUp() {
+        if (!this.wereOutletsDestroyed) {
+            this.setState('disconnecting')
+            this.destroyOutletsOnce()
+            this.setState('disconnected')
+        }
     }
 
     private destroyOutletsOnce() {

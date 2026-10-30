@@ -58,6 +58,7 @@ export default class FakeDeviceController implements DeviceController {
     }
 
     public async disconnect() {
+        this.stateEmitter.setState('disconnecting')
         this.stateEmitter.setState('disconnected')
         FakeDeviceController.numCallsToDisconnect++
     }

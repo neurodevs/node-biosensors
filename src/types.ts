@@ -92,7 +92,12 @@ export type DeviceControllerBleConstructor = new (
 export type Resolve<T> = { [K in keyof T]: T[K] } & {}
 
 export type DeviceState =
-    'disconnected' | 'connecting' | 'connected' | 'streaming' | 'reconnecting'
+    | 'disconnected'
+    | 'connecting'
+    | 'connected'
+    | 'streaming'
+    | 'reconnecting'
+    | 'disconnecting'
 
 export type DeviceStateListener = (state: DeviceState) => void
 

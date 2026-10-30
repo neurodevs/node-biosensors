@@ -149,6 +149,7 @@ export default abstract class AbstractDeviceControllerTest extends AbstractPacka
                 'connected',
                 'streaming',
                 'connected',
+                'disconnecting',
                 'disconnected',
             ],
             'Did not report every state change!'
@@ -288,6 +289,47 @@ export default abstract class AbstractDeviceControllerTest extends AbstractPacka
             this.instance.outlets.length,
             'Did not destroy outlets on disconnect after a failed connect!'
         )
+    }
+
+    protected static async assertReportsDisconnectingBeforeDestroyingOutlets() {
+        await this.connect()
+        this.recordOutletsDestroyedWhenDisconnecting()
+
+        await this.disconnect()
+
+        assert.isEqual(
+            this.numOutletsDestroyedWhenDisconnecting,
+            0,
+            'Did not report disconnecting before destroying outlets!'
+        )
+    }
+
+    protected static async assertReportsDisconnectingAfterFailedConnect() {
+        this.instance.handleConnect = async () => {
+            throw new Error(this.generateId())
+        }
+        await assert.doesThrowAsync(() => this.connect())
+        this.recordOutletsDestroyedWhenDisconnecting()
+
+        await this.disconnect()
+
+        assert.isEqual(
+            this.numOutletsDestroyedWhenDisconnecting,
+            0,
+            'Did not report disconnecting before destroying outlets after a failed connect!'
+        )
+    }
+
+    private static numOutletsDestroyedWhenDisconnecting?: number
+
+    private static recordOutletsDestroyedWhenDisconnecting() {
+        this.numOutletsDestroyedWhenDisconnecting = undefined
+        this.instance.addStateListener((state: DeviceState) => {
+            if (state === 'disconnecting') {
+                this.numOutletsDestroyedWhenDisconnecting =
+                    FakeLslOutlet.numCallsToDestroy
+            }
+        })
     }
 
     protected static async assertDestroysOutletsOnlyOnce() {

@@ -177,6 +177,16 @@ export default class ZephyrDeviceControllerTest extends AbstractDeviceController
     }
 
     @test()
+    protected static async reportsDisconnectingBeforeDestroyingOutlets() {
+        await this.assertReportsDisconnectingBeforeDestroyingOutlets()
+    }
+
+    @test()
+    protected static async reportsDisconnectingAfterFailedConnect() {
+        await this.assertReportsDisconnectingAfterFailedConnect()
+    }
+
+    @test()
     protected static async logsIfPassedLogLevelInfo() {
         await this.assertLogsIfPassedLogLevelInfo()
     }

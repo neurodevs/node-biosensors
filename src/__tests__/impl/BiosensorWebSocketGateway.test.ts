@@ -329,6 +329,70 @@ export default class BiosensorWebSocketGatewayTest extends AbstractPackageTest {
         )
     }
 
+    @test()
+    protected static async destroysBridgesOfDeviceAsItStartsDisconnecting() {
+        await this.devices[0].disconnect()
+
+        assert.isEqual(
+            FakeLslWsBridge.numCallsToDestroy,
+            2,
+            'Did not destroy the bridges of a disconnecting device!'
+        )
+    }
+
+    @test()
+    protected static async keepsBroadcastingWhileDevicesDisconnect() {
+        const client = FakeStatusServer.latest.connect()
+
+        await this.devices[0].disconnect()
+
+        assert.isEqualDeep(
+            client.sent
+                .slice(1)
+                .map((message) => JSON.parse(message).devices[0].state),
+            ['disconnecting', 'disconnected'],
+            'Did not keep broadcasting while devices disconnected!'
+        )
+    }
+
+    @test()
+    protected static async destroysBridgesOnceAfterDevicesDisconnected() {
+        await this.devices[0].disconnect()
+        this.destroy()
+
+        assert.isEqual(
+            FakeLslWsBridge.numCallsToDestroy,
+            4,
+            'Destroyed bridges more than once!'
+        )
+    }
+
+    @test()
+    protected static async closesOnlyBridgesThatAreNotDestroyed() {
+        this.open()
+        await this.devices[0].disconnect()
+
+        this.close()
+
+        assert.isEqual(
+            FakeLslWsBridge.numCallsToDeactivate,
+            2,
+            'Deactivated bridges that were already destroyed!'
+        )
+    }
+
+    @test()
+    protected static async closesConnectedStatusClientsOnDestroy() {
+        const client = FakeStatusServer.latest.connect()
+
+        this.destroy()
+
+        assert.isTrue(
+            client.wasTerminated,
+            'Did not close connected status clients on destroy!'
+        )
+    }
+
     private static open() {
         this.instance.open()
     }
