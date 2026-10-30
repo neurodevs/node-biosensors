@@ -291,6 +291,28 @@ export default class BiosensorStreamingOrchestratorTest extends AbstractPackageT
     }
 
     @test()
+    protected static async finishesRecorderBeforeDisconnectingDevices() {
+        await this.start()
+
+        const device = FakeDeviceFactory.fakeDevice
+        const disconnect = device.disconnect.bind(device)
+        const numFinishedAtDisconnect: number[] = []
+
+        device.disconnect = async () => {
+            numFinishedAtDisconnect.push(FakeXdfRecorder.numCallsToFinish)
+            await disconnect()
+        }
+
+        await this.stop()
+
+        assert.isEqualDeep(
+            numFinishedAtDisconnect,
+            this.devices.map(() => 1),
+            'Did not finish recorder before disconnecting devices!'
+        )
+    }
+
+    @test()
     protected static async createsEventMarkerEmitterIfRequested() {
         const instance = await this.createWithEventMarkerEmitter()
 
