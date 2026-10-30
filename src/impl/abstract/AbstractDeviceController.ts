@@ -26,6 +26,7 @@ export default abstract class AbstractDeviceController implements DeviceControll
     protected readonly logLevel: LogLevel
 
     private readonly stateEmitter = new DeviceStateEmitter()
+    private wereOutletsDestroyed = false
 
     protected constructor(options?: DeviceControllerConstructorOptions) {
         const {
@@ -91,6 +92,7 @@ export default abstract class AbstractDeviceController implements DeviceControll
     public async disconnect() {
         if (this.state === 'disconnected') {
             this.warn(`Already disconnected from ${this.deviceId}.`)
+            this.destroyOutletsOnce()
             return
         }
         if (this.state === 'streaming') {
@@ -99,9 +101,16 @@ export default abstract class AbstractDeviceController implements DeviceControll
 
         await this.handleDisconnect()
         this.recorder?.finish()
-        this.outlets.forEach((outlet) => outlet.destroy())
+        this.destroyOutletsOnce()
 
         this.setState('disconnected')
+    }
+
+    private destroyOutletsOnce() {
+        if (!this.wereOutletsDestroyed) {
+            this.outlets.forEach((outlet) => outlet.destroy())
+            this.wereOutletsDestroyed = true
+        }
     }
 
     public get state() {

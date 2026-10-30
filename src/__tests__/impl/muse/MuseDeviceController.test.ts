@@ -160,6 +160,16 @@ export default class MuseDeviceControllerTest extends AbstractDeviceControllerBl
     }
 
     @test()
+    protected static async disconnectDestroysOutletsAfterFailedConnect() {
+        await this.assertDisconnectDestroysOutletsAfterFailedConnect()
+    }
+
+    @test()
+    protected static async destroysOutletsOnlyOnce() {
+        await this.assertDestroysOutletsOnlyOnce()
+    }
+
+    @test()
     protected static async passesRssiIntervalMsToBleController() {
         await this.assertPassesRssiIntervalMsToBleController()
     }

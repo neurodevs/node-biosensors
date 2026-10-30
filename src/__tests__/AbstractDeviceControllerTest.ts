@@ -275,6 +275,34 @@ export default abstract class AbstractDeviceControllerTest extends AbstractPacka
         )
     }
 
+    protected static async assertDisconnectDestroysOutletsAfterFailedConnect() {
+        this.instance.handleConnect = async () => {
+            throw new Error(this.generateId())
+        }
+        await assert.doesThrowAsync(() => this.connect())
+
+        await this.disconnect()
+
+        assert.isEqual(
+            FakeLslOutlet.numCallsToDestroy,
+            this.instance.outlets.length,
+            'Did not destroy outlets on disconnect after a failed connect!'
+        )
+    }
+
+    protected static async assertDestroysOutletsOnlyOnce() {
+        await this.connect()
+        await this.disconnect()
+
+        await this.disconnect()
+
+        assert.isEqual(
+            FakeLslOutlet.numCallsToDestroy,
+            this.instance.outlets.length,
+            'Destroyed outlets more than once!'
+        )
+    }
+
     protected static async assertCreatesWriteStreamIfPassedTxtRecordPath() {
         await this.simulateDataWithTxtRecordPath()
 
