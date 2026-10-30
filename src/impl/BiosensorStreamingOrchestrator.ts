@@ -109,11 +109,11 @@ export default class BiosensorStreamingOrchestrator implements StreamingOrchestr
 
     public async stop() {
         this.finishRecorderIfExists()
+        this.destroyGatewayIfExists()
 
         const errors = await this.disconnectDevices()
 
         this.destroyEmitterIfExists()
-        this.destroyGatewayIfExists()
 
         this.isInitialized = false
 

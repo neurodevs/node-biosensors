@@ -313,6 +313,29 @@ export default class BiosensorStreamingOrchestratorTest extends AbstractPackageT
     }
 
     @test()
+    protected static async destroysGatewayBeforeDisconnectingDevices() {
+        await this.start()
+        const device = FakeDeviceFactory.fakeDevice
+        const disconnect = device.disconnect.bind(device)
+        const numDestroyedAtDisconnect: number[] = []
+
+        device.disconnect = async () => {
+            numDestroyedAtDisconnect.push(
+                FakeWebSocketGateway.numCallsToDestroy
+            )
+            await disconnect()
+        }
+
+        await this.stop()
+
+        assert.isEqualDeep(
+            numDestroyedAtDisconnect,
+            this.devices.map(() => 1),
+            'Did not destroy gateway before disconnecting devices!'
+        )
+    }
+
+    @test()
     protected static async createsEventMarkerEmitterIfRequested() {
         const instance = await this.createWithEventMarkerEmitter()
 
