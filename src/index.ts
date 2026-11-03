@@ -45,6 +45,14 @@ export * from './testDoubles/CgxController/FakeCgxController.js'
 export { default as SpyCgxController } from './testDoubles/CgxController/SpyCgxController.js'
 export * from './testDoubles/CgxController/SpyCgxController.js'
 
+// EmotiBit
+
+export { default as EmotibitDeviceController } from './impl/EmotibitDeviceController.js'
+export * from './impl/EmotibitDeviceController.js'
+
+export { default as FakeEmotibitController } from './testDoubles/EmotibitController/FakeEmotibitController.js'
+export * from './testDoubles/EmotibitController/FakeEmotibitController.js'
+
 // Govee Thermohygrometer (H5074)
 
 export { default as GoveeDeviceController } from './impl/govee/GoveeDeviceController.js'
