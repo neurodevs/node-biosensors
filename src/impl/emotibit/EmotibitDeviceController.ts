@@ -1,4 +1,4 @@
-import { DeviceControllerOptions } from '../types.js'
+import { DeviceControllerOptions } from '../../types.js'
 
 export default class EmotibitDeviceController implements EmotibitController {
     public static Class?: EmotibitControllerConstructor

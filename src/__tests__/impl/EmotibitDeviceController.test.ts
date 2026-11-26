@@ -2,7 +2,7 @@ import { test, assert } from '@neurodevs/node-tdd'
 
 import EmotibitDeviceController, {
     EmotibitController,
-} from '../../impl/EmotibitDeviceController.js'
+} from '../../impl/emotibit/EmotibitDeviceController.js'
 import AbstractPackageTest from '../AbstractPackageTest.js'
 
 export default class EmotibitDeviceControllerTest extends AbstractPackageTest {

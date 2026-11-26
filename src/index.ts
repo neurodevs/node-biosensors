@@ -47,8 +47,8 @@ export * from './testDoubles/CgxController/SpyCgxController.js'
 
 // EmotiBit
 
-export { default as EmotibitDeviceController } from './impl/EmotibitDeviceController.js'
-export * from './impl/EmotibitDeviceController.js'
+export { default as EmotibitDeviceController } from './impl/emotibit/EmotibitDeviceController.js'
+export * from './impl/emotibit/EmotibitDeviceController.js'
 
 export { default as FakeEmotibitController } from './testDoubles/EmotibitController/FakeEmotibitController.js'
 export * from './testDoubles/EmotibitController/FakeEmotibitController.js'

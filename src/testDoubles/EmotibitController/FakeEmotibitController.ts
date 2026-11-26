@@ -1,4 +1,4 @@
-import { EmotibitController } from '../../impl/EmotibitDeviceController.js'
+import { EmotibitController } from '../../impl/emotibit/EmotibitDeviceController.js'
 
 export default class FakeEmotibitController implements EmotibitController {
     public static numCallsToConstructor = 0
